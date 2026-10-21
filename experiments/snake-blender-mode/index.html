@@ -63,7 +63,8 @@
       width:100%;max-width:1100px;display:flex;gap:20px;align-items:flex-start;flex-direction:column
     }
     .canvas-wrap{position:relative;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));padding:20px;border-radius:12px}
-    canvas#board{display:block;width:100%;height:auto;border-radius:8px;background:transparent}
+    /* touch-action:none keeps swipes on the board from scrolling or zooming the page */
+    canvas#board{display:block;width:100%;height:auto;border-radius:8px;background:transparent;touch-action:none;-webkit-user-select:none;user-select:none}
     .hud-legend{display:flex;gap:12px;align-items:center;margin-top:8px}
     .legend-item{display:flex;gap:8px;align-items:center}
     .chip{width:18px;height:18px;border-radius:4px}
@@ -143,6 +144,7 @@
         <div class="legend-item"><div class="chip snake"></div><div style="color:var(--muted)">Snake</div></div>
         <div class="legend-item"><div class="chip apple"></div><div style="color:var(--muted)">Apple</div></div>
         <div class="legend-item"><div class="chip obst"></div><div style="color:var(--muted)">Obstacle</div></div>
+        <div class="legend-item" id="controls-hint" style="color:var(--muted)">Arrow keys or WASD to steer</div>
       </div>
     </main>
   </div>
@@ -214,7 +216,7 @@
       };
 
       // Game state
-      let cols = 20; // will adapt for responsiveness
+      let cols = 20; // fixed grid; tile size adapts to the window
       let rows = 20;
       let tileSize = 24; // px logical
       let dpr = window.devicePixelRatio || 1;
@@ -265,14 +267,12 @@
       function resizeCanvas(){
         // choose grid size based on container width
         const containerWidth = Math.min(window.innerWidth - 80, 1000);
+        // leave room for the header and legend so the whole board stays on screen
+        const containerHeight = window.innerHeight - 220;
         // ensure square canvas, tile count fixed but tile size adapts
-        const maxSide = Math.floor(containerWidth);
-        tileSize = Math.floor(maxSide / cols);
-        if (tileSize < 14){
-          // make grid smaller on narrow screens by reducing cols/rows
-          cols = rows = 16;
-          tileSize = Math.floor(maxSide / cols);
-        }
+        const maxSide = Math.floor(Math.max(200, Math.min(containerWidth, containerHeight)));
+        // grid size stays fixed (changing it mid-game would strand apples off the board); only tiles scale
+        tileSize = Math.max(8, Math.floor(maxSide / cols));
         const size = tileSize * cols;
         dpr = window.devicePixelRatio || 1;
         board.width = size * dpr;
@@ -315,11 +315,8 @@
         // draw snake
         for(let i=0;i<snake.length;i++){
           const seg = snake[i];
-          const gradient = ctx.createLinearGradient(seg.x*tileSize, seg.y*tileSize, (seg.x+1)*tileSize, (seg.y+1)*tileSize);
-          gradient.addColorStop(0, i===0? '#8affb6': 'var(--accent)');
-          gradient.addColorStop(1, i===0? '#0ea35c': '#0b8f50');
-          ctx.fillStyle = i===0 ? '#0b8f50' : '#0ea35c';
-          drawRect(seg.x, seg.y, ctx.fillStyle, true);
+          // head is darker so direction is readable; body is the brighter green
+          drawRect(seg.x, seg.y, i===0 ? '#065f35' : '#0ea35c', true);
         }
       }
 
@@ -432,11 +429,35 @@
         if (code === 'ArrowLeft' || code.toLowerCase() === 'a') nd = {x:-1,y:0};
         if (code === 'ArrowRight' || code.toLowerCase() === 'd') nd = {x:1,y:0};
         if (nd){
-          // prevent reversing
-          if (nd.x === -dir.x && nd.y === -dir.y) return;
-          nextDir = nd;
+          // stop arrow keys from scrolling the page while playing
+          e.preventDefault();
+          turn(nd);
         }
       });
+
+      function turn(nd){
+        // prevent reversing
+        if (nd.x === -dir.x && nd.y === -dir.y) return;
+        nextDir = nd;
+      }
+
+      // Touch: swipe on the board to steer. Keeping the finger down and swiping again turns again.
+      const swipeMin = 24; // px of finger travel that counts as a swipe
+      let swipeStart = null;
+      board.addEventListener('pointerdown', (e)=>{
+        if (e.pointerType === 'mouse') return;
+        swipeStart = {x:e.clientX, y:e.clientY};
+      });
+      board.addEventListener('pointermove', (e)=>{
+        if (!swipeStart || !running) return;
+        const dx = e.clientX - swipeStart.x;
+        const dy = e.clientY - swipeStart.y;
+        if (Math.max(Math.abs(dx), Math.abs(dy)) < swipeMin) return;
+        if (Math.abs(dx) > Math.abs(dy)) turn({x:Math.sign(dx), y:0});
+        else turn({x:0, y:Math.sign(dy)});
+        swipeStart = {x:e.clientX, y:e.clientY};
+      });
+      ['pointerup','pointercancel'].forEach(t=>board.addEventListener(t, ()=>{ swipeStart = null; }));
 
       // Core step
       function step(){
@@ -462,15 +483,17 @@
           }
         }
 
-        // self collision
-        for(let i=0;i<snake.length;i++){
-          if (eq(head, snake[i])) return endGame('You bit yourself');
-        }
-
         // check for apple at the computed head BEFORE mutating snake
         let ateIndex = -1;
         for(let i=0;i<apples.length;i++){
           if (eq(head, apples[i])){ ateIndex = i; break; }
+        }
+
+        // self collision; the tail moves out of the way this tick unless the snake is growing
+        const tailMoves = ateIndex < 0 && pendingGrowth === 0;
+        const bodyToCheck = tailMoves ? snake.length - 1 : snake.length;
+        for(let i=0;i<bodyToCheck;i++){
+          if (eq(head, snake[i])) return endGame('You bit yourself');
         }
         if (ateIndex >= 0){
           // remove apple and update score
@@ -495,7 +518,7 @@
         clearInterval(timer);
         timer = null;
         goScore.textContent = score;
-        goTitle.textContent = 'Game Over';
+        goTitle.textContent = reason || 'Game Over';
         gameover.style.display = 'flex';
       }
 
@@ -582,9 +605,11 @@
       // expose for debugging (optional)
       window._snakeGame = {start:startGame, stop:stopGame, settings, reset:resetGame};
 
-      // small touch: pause on visibility hidden
+      // pause while the tab is hidden, resume when it comes back
       document.addEventListener('visibilitychange', ()=>{
-        if (document.hidden){ if (running) stopGame(); }
+        if (!running) return;
+        clearInterval(timer);
+        timer = document.hidden ? null : setInterval(step, tickMs);
       });
 
       // accelerate speed if SpeedBooster toggled during run (dynamic)
@@ -613,7 +638,10 @@
       board.addEventListener('dblclick', ()=> showModal());
 
       // show initial hint
-      startBtn.title = 'Start game (Arrow keys or WASD)';
+      const touchFirst = window.matchMedia('(pointer: coarse)').matches;
+      const controlsHint = touchFirst ? 'Swipe on the board to steer' : 'Arrow keys or WASD to steer';
+      document.getElementById('controls-hint').textContent = controlsHint;
+      startBtn.title = 'Start game (' + controlsHint + ')';
 
     })();
   </script>

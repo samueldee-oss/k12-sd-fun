@@ -19,6 +19,11 @@ const learningRowsEl = document.getElementById("learningRows");
 const resetLearningButton = document.getElementById("resetLearningButton");
 
 const keys = new Set();
+// Finger position (canvas y) for each paddle while it is being dragged; null when not touched.
+const touchY = { left: null, right: null };
+const touchSides = new Map();
+const touchFirst = window.matchMedia("(pointer: coarse)").matches;
+const serveKey = touchFirst ? "Tap" : "Space";
 const winScore = 7;
 const paddle = {
   width: 14,
@@ -101,7 +106,7 @@ function resetGame() {
   state.cpuY = canvas.height / 2 - paddle.height / 2;
   prepareBalls(false);
   state.lastTime = 0;
-  updateHud(state.tournament.active ? tournamentPrompt() : "Press Space to serve");
+  updateHud(state.tournament.active ? tournamentPrompt() : `Press ${serveKey} to serve`);
   updateBracket();
   updateLearningCurve();
   draw();
@@ -122,8 +127,8 @@ function rightPlayerName() {
 }
 
 function tournamentPrompt() {
-  if (!state.tournament.active) return "Press Space to serve";
-  return `${bracketRounds[state.tournament.round]} vs ${rightPlayerName()}. Space to serve`;
+  if (!state.tournament.active) return `Press ${serveKey} to serve`;
+  return `${bracketRounds[state.tournament.round]} vs ${rightPlayerName()}. ${serveKey} to serve`;
 }
 
 function serve() {
@@ -166,14 +171,14 @@ function scorePoint(scoredByPlayer, ball) {
   state.running = false;
   stopBalls();
   prepareBalls(false);
-  updateHud(scoredByPlayer ? "Point Player 1. Space to serve" : `Point ${rightPlayerName()}. Space to serve`);
+  updateHud(scoredByPlayer ? `Point Player 1. ${serveKey} to serve` : `Point ${rightPlayerName()}. ${serveKey} to serve`);
 }
 
 function finishMatch(playerOneWon) {
   recordLearningResult(playerOneWon);
 
   if (!state.tournament.active) {
-    updateHud(playerOneWon ? "Player 1 wins. Space to replay" : `${rightPlayerName()} wins. Space to replay`);
+    updateHud(playerOneWon ? `Player 1 wins. ${serveKey} to replay` : `${rightPlayerName()} wins. ${serveKey} to replay`);
     return;
   }
 
@@ -221,6 +226,7 @@ function movePlayer(dt) {
   const canUseArrows = currentOpponentMode() !== "player";
   if (keys.has("KeyW") || (canUseArrows && keys.has("ArrowUp"))) dy -= paddle.speed * dt;
   if (keys.has("KeyS") || (canUseArrows && keys.has("ArrowDown"))) dy += paddle.speed * dt;
+  if (touchY.left !== null) dy = touchY.left - paddle.height / 2 - state.playerY;
   state.playerY = clamp(state.playerY + dy, 18, canvas.height - paddle.height - 18);
 }
 
@@ -228,6 +234,7 @@ function movePlayerTwo(dt) {
   let dy = 0;
   if (keys.has("ArrowUp")) dy -= paddle.speed * dt;
   if (keys.has("ArrowDown")) dy += paddle.speed * dt;
+  if (touchY.right !== null) dy = touchY.right - paddle.height / 2 - state.cpuY;
   state.cpuY = clamp(state.cpuY + dy, 18, canvas.height - paddle.height - 18);
 }
 
@@ -331,7 +338,10 @@ function draw() {
     ctx.fillStyle = "rgba(244, 245, 242, 0.82)";
     ctx.font = "20px Arial, Helvetica, sans-serif";
     ctx.textAlign = "center";
-    const controls = currentOpponentMode() === "player" ? "P1: W/S   P2: Arrow Keys" : "W/S or Arrow Keys";
+    let controls = currentOpponentMode() === "player" ? "P1: W/S   P2: Arrow Keys" : "W/S or Arrow Keys";
+    if (touchFirst) {
+      controls = currentOpponentMode() === "player" ? "Each player drags on their own half" : "Drag on the left half to move";
+    }
     ctx.fillText(controls, canvas.width / 2, canvas.height / 2 + 54);
   }
 }
@@ -468,6 +478,41 @@ window.addEventListener("keydown", (event) => {
 
 window.addEventListener("keyup", (event) => {
   keys.delete(event.code);
+});
+
+// Touch: drag on the left half to move Player 1, on the right half to move Player 2. Tap to serve.
+function canvasY(event) {
+  const rect = canvas.getBoundingClientRect();
+  return ((event.clientY - rect.top) / rect.height) * canvas.height;
+}
+
+canvas.addEventListener("pointerdown", (event) => {
+  if (event.pointerType === "mouse") return;
+  const rect = canvas.getBoundingClientRect();
+  const onLeft = event.clientX - rect.left < rect.width / 2;
+  const side = onLeft || currentOpponentMode() !== "player" ? "left" : "right";
+  touchSides.set(event.pointerId, side);
+  touchY[side] = canvasY(event);
+  if (!state.running) serve();
+  try {
+    // keep receiving this finger's moves even if it slides off the court
+    canvas.setPointerCapture(event.pointerId);
+  } catch {
+    // capture is optional; the drag still works while the finger stays on the court
+  }
+});
+
+canvas.addEventListener("pointermove", (event) => {
+  const side = touchSides.get(event.pointerId);
+  if (side) touchY[side] = canvasY(event);
+});
+
+["pointerup", "pointercancel"].forEach((type) => {
+  canvas.addEventListener(type, (event) => {
+    const side = touchSides.get(event.pointerId);
+    if (side) touchY[side] = null;
+    touchSides.delete(event.pointerId);
+  });
 });
 
 startButton.addEventListener("click", serve);

@@ -7,5 +7,8 @@ This is a side project made with GitHub Copilot Chat on 2026-08-19 and is **not 
 It used to sit at the top of the project folder as `index.html`; it was moved here so it is not mistaken for the
 project's landing page. The conversation that produced it is in [`transcript.md`](transcript.md).
 
-Known issue recorded in the transcript: the snake did not visibly grow when eating, and the author reported the game ending at
-a score of about 60 to 70; the session ended before this was resolved.
+The transcript records two problems the Copilot session never solved: the snake did not visibly grow when eating, and the game
+ended at a score of about 60 to 70. Both had one cause: the drawing code passed a CSS variable (`var(--accent)`) as a canvas
+gradient color, which throws, so only the head was ever drawn and the snake ran into its own invisible body. Fixed on
+2026-10-20, along with arrow keys scrolling the page, the board being taller than the window, dying when moving into the
+square the tail was leaving, the game freezing after switching tabs, and the grid shrinking to 16x16 on narrow windows.

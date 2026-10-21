@@ -97,6 +97,10 @@ canvas {
   max-height: min(54vh, 540px);
   min-height: 220px;
   display: block;
+  /* keeps paddle drags from scrolling or zooming the page on tablets */
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #090b0d;
