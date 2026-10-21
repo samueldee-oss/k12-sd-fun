@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>bathtub1.v5</name>
+        <uuid>b09500e6-3344-4fb0-b037-8d512eff55c3</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Time" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>30</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="0" height="0" />
+        <isee:security />
+        <isee:print_setup width="582" height="762" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Water_in_Bathtub">
+            <eqn>0</eqn>
+            <inflow>Inflow</inflow>
+            <non_negative />
+            <display x="173" y="90" color="blue" />
+        </stock>
+        <flow name="Inflow">
+            <eqn>IF time &gt;= 20 then 0 else 5</eqn>
+            <non_negative />
+            <display x="124" y="87" color="blue">
+                <pts>
+                    <pt x="95" y="87" />
+                    <pt x="153" y="87" />
+                </pts>
+            </display>
+        </flow>
+        <display page_width="582" page_height="762" isee:converter_size="large" interval="DT">
+            <stacked_container height="282" width="492" uid="0">
+                <graph type="time_series" title="Untitled" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:23:55Z" cleared="true" time_precision="2" from="0" to="30">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="Water_in_Bathtub" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <entity name="Inflow" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="274" y="225" width="26" height="22" color="fuchsia" label_side="bottom" label="Graph 1" type="graph" icon_of="0" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="13" y="118" content="0" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

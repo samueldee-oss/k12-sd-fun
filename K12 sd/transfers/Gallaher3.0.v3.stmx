@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Gallaher3.0.v3</name>
+        <uuid>1d54a75f-6076-4655-9985-c97d66ce3b72</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Minutes" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>80</stop>
+        <dt>0.5</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Water_Volume">
+            <eqn>0</eqn>
+            <inflow>Water_Faucet</inflow>
+            <outflow>Output</outflow>
+            <non_negative />
+            <display x="145" y="52" color="black" />
+        </stock>
+        <flow name="Water_Faucet">
+            <eqn>2 {gallons per minute}</eqn>
+            <non_negative />
+            <display x="88" y="51" color="black">
+                <pts>
+                    <pt x="51" y="51" />
+                    <pt x="125" y="51" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Output">
+            <eqn>Water_Volume*Drain</eqn>
+            <non_negative />
+            <display x="216" y="50" color="black">
+                <pts>
+                    <pt x="165" y="50" />
+                    <pt x="268" y="50" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Drain">
+            <eqn>.05 {Fraction of water lost per minute}</eqn>
+            <display x="246" y="115" color="black" />
+        </aux>
+        <display page_width="595" page_height="775" isee:converter_size="medium" interval="DT">
+            <connector x="167" y="57" uid="0">
+                <from>Water_Volume</from>
+                <to>Output</to>
+            </connector>
+            <connector x="244" y="106" uid="1">
+                <from>Drain</from>
+                <to>Output</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="2">
+                <graph type="time_series" title="Water Volume vs Time" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:41:50Z" cleared="true" time_precision="0" from="0" to="80">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <scale min="0" max="80" />
+                        <entity name="Water_Volume" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="393" y="76" width="26" height="22" color="black" label_side="bottom" label="Water Volume vs Time" type="graph" icon_of="2" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="788" page_height="528" home_page="0">
+            <simulation_delay>0.1</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="78" content="2" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

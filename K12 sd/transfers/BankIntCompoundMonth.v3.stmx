@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>BankIntCompoundMonth.v3</name>
+        <uuid>7f8a8ffa-8917-409d-979e-dc4da205483b</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Months" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>60</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Bank_Balance">
+            <eqn>1000</eqn>
+            <inflow>Interest</inflow>
+            <non_negative />
+            <display x="240" y="82" color="blue" />
+        </stock>
+        <flow name="Interest">
+            <eqn>Bank_Balance*Interest_Rate</eqn>
+            <non_negative />
+            <display x="146" y="81" color="blue">
+                <pts>
+                    <pt x="72" y="81" />
+                    <pt x="220" y="81" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Interest_Rate">
+            <eqn>.06/12</eqn>
+            <display x="228" y="133" color="blue" />
+        </aux>
+        <display page_width="595" page_height="775" isee:converter_size="medium" interval="12">
+            <connector x="218" y="86" uid="0">
+                <from>Bank_Balance</from>
+                <to>Interest</to>
+            </connector>
+            <connector x="220" y="129" uid="1">
+                <from>Interest_Rate</from>
+                <to>Interest</to>
+            </connector>
+            <stacked_container x="86" y="197" height="263" width="190" uid="2">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="12" cleared="true" date_time="1998-06-23T16:38:56Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" precision="0.01" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Bank_Balance" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="331" y="101" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="2" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="788" page_height="528" home_page="0">
+            <simulation_delay>0.1</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

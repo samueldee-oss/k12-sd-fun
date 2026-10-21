@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Model1.v3</name>
+        <uuid>32791a5a-8350-4374-a835-ac2dec86e662</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Months" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>360</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Savings_Account">
+            <eqn>0</eqn>
+            <inflow>Deposit</inflow>
+            <non_negative />
+            <display x="207" y="96" color="black" />
+        </stock>
+        <flow name="Deposit">
+            <eqn>200</eqn>
+            <non_negative />
+            <display x="137" y="101" color="black">
+                <pts>
+                    <pt x="87" y="101" />
+                    <pt x="187" y="101" />
+                </pts>
+            </display>
+        </flow>
+        <display page_width="595" page_height="775" isee:converter_size="medium" interval="12">
+            <stacked_container height="282" width="492" uid="0">
+                <graph type="time_series" title="Savings Account" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:46:52Z" cleared="true" time_precision="0" from="0" to="360">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <entity name="Savings_Account" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="314" y="93" width="26" height="22" color="black" label_side="bottom" label="Money vs Time Graph" type="graph" icon_of="0" />
+            <stacked_container height="286" width="465" uid="1">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="12" cleared="true" date_time="1997-07-09T08:54:31Z">
+                    <title>Savings Account</title>
+                    <item type="time" color="black" precision="0.01" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Savings_Account" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="311" y="153" width="26" height="22" color="black" label_side="bottom" label="Money vs Time Table" type="table" icon_of="1" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="788" page_height="528" home_page="0">
+            <simulation_delay>0.1</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="78" content="0" />
+        <popup x="16" y="78" content="1" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

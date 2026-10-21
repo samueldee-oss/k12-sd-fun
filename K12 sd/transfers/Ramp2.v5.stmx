@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Ramp2.v5</name>
+        <uuid>1a10be01-6d15-4cb1-a46e-4504e34224a3</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Time" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>12</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="1334" height="630" />
+        <isee:security />
+        <isee:print_setup width="583" height="763" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Velocity">
+            <eqn>0</eqn>
+            <inflow>Acceleration</inflow>
+            <non_negative />
+            <display x="285" y="100" color="blue" />
+        </stock>
+        <flow name="Acceleration">
+            <eqn>Gravity*SIN(Ramp_angle)</eqn>
+            <display x="207" y="97" color="blue">
+                <pts>
+                    <pt x="150" y="97" />
+                    <pt x="265" y="97" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Ramp_angle">
+            <eqn>IF Position&lt;Ramp_length THEN PI/6 ELSE 0</eqn>
+            <display x="170" y="184" color="blue" />
+        </aux>
+        <aux name="Gravity">
+            <eqn>9.8</eqn>
+            <display x="284" y="162" color="blue" />
+        </aux>
+        <aux name="Ramp_length">
+            <eqn>3</eqn>
+            <display x="104" y="216" color="blue" />
+        </aux>
+        <stock name="Position">
+            <eqn>0</eqn>
+            <inflow>Vel</inflow>
+            <non_negative />
+            <display x="308" y="263" color="blue" />
+        </stock>
+        <flow name="Vel">
+            <eqn>Velocity</eqn>
+            <non_negative />
+            <display x="380" y="263" color="blue">
+                <pts>
+                    <pt x="432" y="263" />
+                    <pt x="328" y="263" />
+                </pts>
+            </display>
+        </flow>
+        <display page_width="583" page_height="763" isee:converter_size="large" interval="DT">
+            <connector x="170" y="172" uid="0">
+                <from>Ramp_angle</from>
+                <to>Acceleration</to>
+            </connector>
+            <connector x="272" y="162" uid="1">
+                <from>Gravity</from>
+                <to>Acceleration</to>
+            </connector>
+            <connector x="113" y="208" uid="2">
+                <from>Ramp_length</from>
+                <to>Ramp_angle</to>
+            </connector>
+            <connector x="288" y="263" uid="3">
+                <from>Position</from>
+                <to>Ramp_angle</to>
+            </connector>
+            <connector x="307" y="111" uid="4">
+                <from>Velocity</from>
+                <to>Vel</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="5">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:04:54Z" cleared="true" time_precision="2" from="0" to="12">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="Velocity" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <entity name="Position" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="538" y="63" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="5" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="13" y="112" content="5" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

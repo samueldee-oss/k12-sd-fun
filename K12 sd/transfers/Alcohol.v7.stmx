@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Alcohol.v7</name>
+        <uuid>0a46592e-0f0a-4c98-8948-3348318f4b56</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Hours" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>12</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="interface" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="621" height="442" />
+        <isee:security password="true" />
+        <isee:print_setup width="552" height="730" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="ALCOHOL_IN_BODY">
+            <doc>The total amount of alcohol in the body at any given time, in milliliters.  At the beginning of the model, the subject has no alcohol in their body.  </doc>
+            <eqn>0 {mL}</eqn>
+            <inflow>Alcohol_Intake</inflow>
+            <outflow>Oxidation</outflow>
+            <non_negative />
+            <display x="202" y="67" color="blue" />
+        </stock>
+        <aux name="Body_Weight">
+            <doc>The weight, in pounds of the subject.  Body weight is used to calculate the volume of distribution (Vd), the volume of the body which can absorb liquids.  This body weight convertor allows the user to change the subject&apos;s weight, either here or by means of a slider on the authoring layer. </doc>
+            <eqn>150 {pounds}</eqn>
+            <display x="425" y="196" color="red" label_side="top" />
+        </aux>
+        <aux name="Volume_of_Distribution">
+            <doc>The volume of the body throughout which liquids, such as alcohol, can flow.  For men, it is by multiplying body weight (in pounds) by .36667 and for women by .30556.  (In this convertor&apos;s equation, the number in the &quot;Gender convertor, either 1 or 0, determines which number will be used.)  Vd is calculated in liters, and then multiplied by 1000 to get milliliters.  Note: This assumes that the subject is not heavily overweight; if so, another equation would be needed to calculate Vd, since the fat percentage in the body is an element of the calculation.</doc>
+            <eqn>IF Gender = 1 THEN (Body_Weight*.36667*1000) ELSE (Body_Weight*.30556*1000) {mL}</eqn>
+            <display x="353" y="197" color="red" label_angle="341" />
+        </aux>
+        <flow name="Oxidation">
+            <doc>The rate at which alcohol is oxidated, or removed, from the body.  The average, healthy, adult human liver can oxidate between .25 and .33 ounces (7.343 and 9.759 mL) per hour.  (We use the lower end of this range, but the user can change it if he or she wishes.)  This is a constant rate, regardless of age, gender, or the amount of alcohol in the body (i.e. it is linear, not exponential), and this rate continues until all the alcohol has been oxidated.</doc>
+            <eqn>7.343</eqn>
+            <non_negative />
+            <display x="282" y="65" color="blue">
+                <pts>
+                    <pt x="222" y="65" />
+                    <pt x="343" y="65" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Alcohol_Intake">
+            <doc>The Alcohol Intake at any given hour, in milliliters, is calculated as the Number of Drinks each hour and the amount of Pure Alcohol in Each Drink.</doc>
+            <eqn>Pure_Alcohol_in_Each_Drink*Number_of_Drinks {mL} </eqn>
+            <non_negative />
+            <display x="122" y="66" color="blue" label_side="left">
+                <pts>
+                    <pt x="62" y="66" />
+                    <pt x="182" y="66" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Pure_Alcohol_in_Each_Drink">
+            <doc>The amount of pure alcohol in each drink.  For the purposes of this model, it will be assumed that each drink has the same amount of alcohol, .5 ounces or 14.787 milliliters.  A 12-ounce glass of beer, 4-ounce glass of wine or 1-ounce shot of liquor has about .5 ounces of alcohol.</doc>
+            <eqn>14.7867647813 {milliliters}</eqn>
+            <display x="68" y="27" color="blue" />
+        </aux>
+        <aux name="BAC">
+            <doc>Blood Alcohol Concentration (BAC) is the standard term used in legal matters to determine how much alcohol someone has in their bloodstream. BAC is determined as mL of alcohol in the body, divided by the total Volume of Distribution, in milliliters.  (The quotient is then multiplied by 100 to obtain a percentage.)</doc>
+            <eqn>(ALCOHOL_IN_BODY/Volume_of_Distribution)*100 </eqn>
+            <display x="270" y="210" color="red" label_side="left" label_angle="174" />
+        </aux>
+        <aux name="Gender">
+            <doc>This convertor acts as an on/off switch for the purpose of determining gender.   If the subject is male, it is set to 1; if female, 0.  This is necessary because males and females have a different percentages of the body which can absorb liquid like alcohol, and have to be modeled differently.  The user can change the number in the convertor, or by means of the &quot;male/female&quot; switch on the authoring layer.</doc>
+            <eqn>1</eqn>
+            <display x="368" y="149" color="red" label_side="left" label_angle="210" />
+        </aux>
+        <aux name="Legal_Level">
+            <doc>The Blood Alcohol Level at which one can no longer drive legally.  This convertor provides a baseline against which the subject&apos;s Blood Alcohol Concentration can be compared.</doc>
+            <eqn>.08</eqn>
+            <display x="43" y="347" color="red" />
+        </aux>
+        <aux name="Major_Motor_Impairment">
+            <doc>The Blood Alchol Concentration at which a person begins to lose gross motor control and begins to stumble and fall.  (There is gradual loss of fine motor control beginning around .03 %.)   This convertor provides a baseline against which the subject&apos;s Blood Alcohol Concentration can be compared.</doc>
+            <eqn>.15</eqn>
+            <display x="143" y="347" color="red" />
+        </aux>
+        <aux name="Unconsiousness">
+            <doc>The Blood Alcohol Concentration at which a person loses consciousness and can conceivably slip into a coma.  Unconsciousness, coma, and death all occur at very close intervals.   This convertor provides a baseline against which the subject&apos;s Blood Alcohol Concentration can be compared.</doc>
+            <eqn>.4</eqn>
+            <display x="255" y="347" color="red" />
+        </aux>
+        <aux name="Impairment_of_Reflex_Action">
+            <doc>A graph of the relationship between Blood Alcohol Concentration and the increase in reflex-action time (the time that it takes to see something and begin to react to it).  Alcohol dulls a person&apos;s responses and increases the time it takes to react, thus creating a danger when the subject is driving or engaged in a similar activity.</doc>
+            <eqn>BAC</eqn>
+            <gf>
+                <xscale min="0" max="0.16" />
+                <yscale min="0" max="210" />
+                <ypts>0,27,36,54,81,108,123,159,201</ypts>
+            </gf>
+            <display x="162" y="252" color="black" label_side="top" label_angle="148" />
+        </aux>
+        <flow name="Reflex_Action_Time">
+            <doc>The reflex-action time of a hypothetical driver.   Reflex-action time is the amount of time that it takes the subject to receive a stimulus (i.e. see a danger) and to begin their reaction to it (i.e. push the brake pedal in a car).  The average reflex-action time of an adult, who is not tired, ill or otherwise incapacitated, is 600 milliseconds.  When alcohol is in the blood stream, reflex-action time is increased.</doc>
+            <eqn>600+Impairment_of_Reflex_Action {milliseconds}</eqn>
+            <non_negative />
+            <display x="354" y="256" color="black">
+                <pts>
+                    <pt x="259" y="256" />
+                    <pt x="449" y="256" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Average_Sober_Reaction_Time">
+            <doc>The average reflex-action time for a sober, awake driver.  This convertor provides a baseline against which to measure the subject&apos;s reflex-action time. (see: Reflex-Action Time flow)</doc>
+            <eqn>600 {milliseconds}</eqn>
+            <display x="382" y="346" color="black" />
+        </aux>
+        <stock name="Total_Drinks">
+            <eqn>0</eqn>
+            <inflow>Number_of_Drinks</inflow>
+            <non_negative />
+            <display x="73" y="140" color="blue" />
+        </stock>
+        <flow name="Number_of_Drinks">
+            <eqn>TIME</eqn>
+            <non_negative />
+            <gf type="discrete">
+                <xscale min="0" max="12" />
+                <yscale min="0" max="10" />
+                <ypts>0,0,0,0,0,0,0,0,0,0,0,0,0</ypts>
+            </gf>
+            <display x="150" y="137" color="blue">
+                <pts>
+                    <pt x="208" y="137" />
+                    <pt x="93" y="137" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="ALCOHOL_IN_BODY_2">
+            <doc>The total amount of alcohol in the body at any given time, in milliliters.  At the beginning of the model, the subject has no alcohol in their body.  </doc>
+            <eqn>0 {mL}</eqn>
+            <inflow>Alcohol_Intake_2</inflow>
+            <outflow>Oxidation_2</outflow>
+            <non_negative />
+            <display x="812" y="73" color="blue" />
+        </stock>
+        <aux name="Body_Weight_2">
+            <doc>The weight, in pounds of the subject.  Body weight is used to calculate the volume of distribution (Vd), the volume of the body which can absorb liquids.  This body weight convertor allows the user to change the subject&apos;s weight, either here or by means of a slider on the authoring layer. </doc>
+            <eqn>150 {pounds}</eqn>
+            <display x="1035" y="202" color="red" label_side="top" />
+        </aux>
+        <aux name="Volume_of_Distribution_2">
+            <doc>The volume of the body throughout which liquids, such as alcohol, can flow.  For men, it is by multiplying body weight (in pounds) by .36667 and for women by .30556.  (In this convertor&apos;s equation, the number in the &quot;Gender convertor, either 1 or 0, determines which number will be used.)  Vd is calculated in liters, and then multiplied by 1000 to get milliliters.  Note: This assumes that the subject is not heavily overweight; if so, another equation would be needed to calculate Vd, since the fat percentage in the body is an element of the calculation.</doc>
+            <eqn>IF Gender_2 = 1 THEN (Body_Weight_2*.36667*1000) ELSE (Body_Weight_2*.30556*1000) {mL}</eqn>
+            <display x="963" y="203" color="red" label_angle="341" />
+        </aux>
+        <flow name="Oxidation_2">
+            <doc>The rate at which alcohol is oxidated, or removed, from the body.  The average, healthy, adult human liver can oxidate between .25 and .33 ounces (7.343 and 9.759 mL) per hour.  (We use the lower end of this range, but the user can change it if he or she wishes.)  This is a constant rate, regardless of age, gender, or the amount of alcohol in the body (i.e. it is linear, not exponential), and this rate continues until all the alcohol has been oxidated.</doc>
+            <eqn>7.393</eqn>
+            <non_negative />
+            <display x="892" y="71" color="blue">
+                <pts>
+                    <pt x="832" y="71" />
+                    <pt x="953" y="71" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Alcohol_Intake_2">
+            <doc>The Alcohol Intake at any given hour, in milliliters, is calculated as the Number of Drinks each hour and the amount of Pure Alcohol in Each Drink.</doc>
+            <eqn>Pure_Alcohol_in_Each_Drink_2*Number_of_Drinks_2 {mL}</eqn>
+            <non_negative />
+            <display x="732" y="72" color="blue" label_side="left">
+                <pts>
+                    <pt x="672" y="72" />
+                    <pt x="792" y="72" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Pure_Alcohol_in_Each_Drink_2">
+            <doc>The amount of pure alcohol in each drink.  For the purposes of this model, it will be assumed that each drink has the same amount of alcohol, .5 ounces or 14.787 milliliters.  A 12-ounce glass of beer, 4-ounce glass of wine or 1-ounce shot of liquor has about .5 ounces of alcohol.</doc>
+            <eqn>14.7867647813 {milliliters}</eqn>
+            <display x="678" y="33" color="blue" />
+        </aux>
+        <aux name="BAC_2">
+            <doc>Blood Alcohol Concentration (BAC) is the standard term used in legal matters to determine how much alcohol someone has in their bloodstream. BAC is determined as mL of alcohol in the body, divided by the total Volume of Distribution, in milliliters.  (The quotient is then multiplied by 100 to obtain a percentage.)</doc>
+            <eqn>(ALCOHOL_IN_BODY_2/Volume_of_Distribution_2)*100 </eqn>
+            <display x="880" y="216" color="red" label_side="left" label_angle="174" />
+        </aux>
+        <aux name="Gender_2">
+            <doc>This convertor acts as an on/off switch for the purpose of determining gender.   If the subject is male, it is set to 1; if female, 0.  This is necessary because males and females have a different percentages of the body which can absorb liquid like alcohol, and have to be modeled differently.  The user can change the number in the convertor, or by means of the &quot;male/female&quot; switch on the authoring layer.</doc>
+            <eqn>1</eqn>
+            <display x="978" y="155" color="red" label_side="left" label_angle="210" />
+        </aux>
+        <aux name="Legal_Level_2">
+            <doc>The Blood Alcohol Level at which one can no longer drive legally.  This convertor provides a baseline against which the subject&apos;s Blood Alcohol Concentration can be compared.</doc>
+            <eqn>.08</eqn>
+            <display x="648" y="340" color="red" />
+        </aux>
+        <aux name="Major_Motor_Impairment_2">
+            <doc>The Blood Alchol Concentration at which a person begins to lose gross motor control and begins to stumble and fall.  (There is gradual loss of fine motor control beginning around .03 %.)   This convertor provides a baseline against which the subject&apos;s Blood Alcohol Concentration can be compared.</doc>
+            <eqn>.15</eqn>
+            <display x="754" y="341" color="red" />
+        </aux>
+        <aux name="Unconsiousness_2">
+            <doc>The Blood Alcohol Concentration at which a person loses consciousness and can conceivably slip into a coma.  Unconsciousness, coma, and death all occur at very close intervals.   This convertor provides a baseline against which the subject&apos;s Blood Alcohol Concentration can be compared.</doc>
+            <eqn>.4</eqn>
+            <display x="863" y="342" color="red" />
+        </aux>
+        <aux name="Impairment_of_Reflex_Action_2">
+            <doc>A graph of the relationship between Blood Alcohol Concentration and the increase in reflex-action time (the time that it takes to see something and begin to react to it).  Alcohol dulls a person&apos;s responses and increases the time it takes to react, thus creating a danger when the subject is driving or engaged in a similar activity.</doc>
+            <eqn>BAC_2</eqn>
+            <gf>
+                <xscale min="0" max="0.16" />
+                <yscale min="0" max="210" />
+                <ypts>0,27,36,54,81,108,123,159,201</ypts>
+            </gf>
+            <display x="779" y="250" color="black" label_angle="324" />
+        </aux>
+        <flow name="Reflex_Action_Time_2">
+            <doc>The reflex-action time of a hypothetical driver.   Reflex-action time is the amount of time that it takes the subject to receive a stimulus (i.e. see a danger) and to begin their reaction to it (i.e. push the brake pedal in a car).  The average reflex-action time of an adult, who is not tired, ill or otherwise incapacitated, is 600 milliseconds.  When alcohol is in the blood stream, reflex-action time is increased.</doc>
+            <eqn>600+Impairment_of_Reflex_Action_2 {milliseconds}</eqn>
+            <non_negative />
+            <display x="964" y="262" color="black">
+                <pts>
+                    <pt x="869" y="262" />
+                    <pt x="1059" y="262" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Average_Sober_Reaction_Time_2">
+            <doc>The average reflex-action time for a sober, awake driver.  This convertor provides a baseline against which to measure the subject&apos;s reflex-action time. (see: Reflex-Action Time flow)</doc>
+            <eqn>600 {milliseconds}</eqn>
+            <display x="992" y="348" color="black" />
+        </aux>
+        <stock name="Total_Drinks_2">
+            <eqn>0</eqn>
+            <inflow>Number_of_Drinks_2</inflow>
+            <non_negative />
+            <display x="683" y="146" color="blue" />
+        </stock>
+        <flow name="Number_of_Drinks_2">
+            <eqn>TIME</eqn>
+            <non_negative />
+            <gf>
+                <xscale min="0" max="12" />
+                <yscale min="0" max="10" />
+                <ypts>2,2,1,0,0,0,0,0,0,0,0,0,0</ypts>
+            </gf>
+            <display x="760" y="143" color="blue">
+                <pts>
+                    <pt x="818" y="143" />
+                    <pt x="703" y="143" />
+                </pts>
+            </display>
+        </flow>
+        <display page_width="552" page_height="730" page_cols="2" isee:converter_size="large" interval="DT">
+            <connector x="413" y="193" uid="0" color="red">
+                <from>Body_Weight</from>
+                <to>Volume_of_Distribution</to>
+            </connector>
+            <connector x="216" y="82" uid="1" color="blue">
+                <from>ALCOHOL_IN_BODY</from>
+                <to>BAC</to>
+            </connector>
+            <connector x="341" y="196" uid="2" color="red">
+                <from>Volume_of_Distribution</from>
+                <to>BAC</to>
+            </connector>
+            <connector x="362" y="160" uid="3" color="red">
+                <from>Gender</from>
+                <to>Volume_of_Distribution</to>
+            </connector>
+            <connector x="78" y="21" uid="4" color="blue">
+                <from>Pure_Alcohol_in_Each_Drink</from>
+                <to>Alcohol_Intake</to>
+            </connector>
+            <connector x="146" y="129" uid="5" color="blue">
+                <from>Number_of_Drinks</from>
+                <to>Alcohol_Intake</to>
+            </connector>
+            <connector x="261" y="218" uid="6" color="red">
+                <from>BAC</from>
+                <to>Impairment_of_Reflex_Action</to>
+            </connector>
+            <connector x="172" y="260" uid="7" color="black">
+                <from>Impairment_of_Reflex_Action</from>
+                <to>Reflex_Action_Time</to>
+            </connector>
+            <connector x="1023" y="199" uid="8" color="red">
+                <from>Body_Weight_2</from>
+                <to>Volume_of_Distribution_2</to>
+            </connector>
+            <connector x="826" y="88" uid="9" color="blue">
+                <from>ALCOHOL_IN_BODY_2</from>
+                <to>BAC_2</to>
+            </connector>
+            <connector x="951" y="202" uid="10" color="red">
+                <from>Volume_of_Distribution_2</from>
+                <to>BAC_2</to>
+            </connector>
+            <connector x="972" y="166" uid="11" color="red">
+                <from>Gender_2</from>
+                <to>Volume_of_Distribution_2</to>
+            </connector>
+            <connector x="688" y="27" uid="12" color="blue">
+                <from>Pure_Alcohol_in_Each_Drink_2</from>
+                <to>Alcohol_Intake_2</to>
+            </connector>
+            <connector x="756" y="135" uid="13" color="blue">
+                <from>Number_of_Drinks_2</from>
+                <to>Alcohol_Intake_2</to>
+            </connector>
+            <connector x="872" y="223" uid="14" color="red">
+                <from>BAC_2</from>
+                <to>Impairment_of_Reflex_Action_2</to>
+            </connector>
+            <connector x="791" y="252" uid="15" color="black">
+                <from>Impairment_of_Reflex_Action_2</from>
+                <to>Reflex_Action_Time_2</to>
+            </connector>
+            <stacked_container height="305" width="673" uid="16">
+                <table font-size="9" background="#FFFE91" column_width="122" orientation="vertical" interval="0.25" cleared="true" date_time="2002-01-07T12:59:55Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" width="63" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="ALCOHOL_IN_BODY" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Alcohol_Intake" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Number_of_Drinks" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="3">
+                        <entity name="Oxidation" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="501" y="329" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="16" />
+            <button x="462" y="110" width="85" height="21" uid="17" appearance="opaque" background="blue" color="white" style="rounded" label="Examples" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="1727" y="0" isee:effect="1" />
+            </button>
+            <button x="461" y="73" width="85" height="21" uid="18" appearance="opaque" background="blue" color="white" style="rounded" label="Elements" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="1152" y="0" isee:effect="1" />
+            </button>
+            <button x="462" y="144" width="85" height="21" uid="19" appearance="opaque" background="blue" color="white" style="rounded" label="Interface" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="2306" y="0" isee:effect="1" />
+            </button>
+            <button x="461" y="39" width="85" height="21" uid="20" appearance="opaque" background="blue" color="white" style="rounded" label="Facts" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="577" y="0" isee:effect="1" />
+            </button>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="3" page_width="1588" page_height="1128" background="#E0E0E0">
+            <simulation_delay>0</simulation_delay>
+            <stacked_container x="2313" y="5" height="254" width="453" visible_index="1" uid="21">
+                <graph type="time_series" title="BAC" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:22:06Z" cleared="true" time_precision="2" from="0" to="12">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="BAC" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="Legal_Level" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="Major_Motor_Impairment" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Reflex-Action Time" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:22:06Z" cleared="true" time_precision="2" from="0" to="12">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="590" max="1000" />
+                        <entity name="Reflex_Action_Time" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="590" max="1000" />
+                        <entity name="Average_Sober_Reaction_Time" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="#FF7F00" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="Legal_Level" />
+                    </plot>
+                    <plot index="3" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="BAC" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:22:06Z" cleared="true" time_precision="2" from="0" to="12">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="BAC" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="BAC_2" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="Legal_Level" />
+                    </plot>
+                    <plot index="3" pen_width="1" color="#008F44" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="Major_Motor_Impairment" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="2550" y="106" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph" type="graph" icon_of="21" />
+            <stacked_container x="1732" y="62" height="262" width="468" visible_index="2" uid="22">
+                <graph type="time_series" title="Parents at dinner" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:22:06Z" cleared="true" time_precision="2" from="0" to="12">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="BAC" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="BAC_2" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="Legal_Level" />
+                    </plot>
+                    <plot index="3" pen_width="1" color="#008F44" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="Major_Motor_Impairment" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Binge at party" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:22:06Z" cleared="true" time_precision="2" from="0" to="12">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="BAC" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="Legal_Level" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="Major_Motor_Impairment" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Predict the drinks" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:22:06Z" cleared="true" time_precision="2" from="0" to="12">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="BAC" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="Legal_Level" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="0.3" />
+                        <entity name="Major_Motor_Impairment" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="2058" y="188" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Scenarios" type="graph" icon_of="22" />
+            <text_box x="67" y="69" uid="23" color="black" font-family="Book Antiqua" font-size="36" font-style="italic" text-align="center" padding="5" width="434" height="54">To Drive Or Not To Drive</text_box>
+            <text_box x="160" y="161" uid="24" color="#515151" font-family="Book Antiqua" font-size="18" text-align="center" padding="5" width="254" height="142">Jonathan Barbur&#x0D;Shanna Prevé&#x0D;Stephany Yerger&#x0D;&#x0D;La Salle High School&#x0D;Milwaukie, Oregon - 1999</text_box>
+            <button x="252" y="332" width="73" height="32" uid="25" appearance="opaque" background="blue" color="white" style="rounded" label="Start" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="576" y="0" isee:effect="1" />
+            </button>
+            <text_box x="621" y="18" uid="26" color="black" font-family="Arial" font-size="24" font-weight="bold" font-style="italic" text-align="center" padding="5" width="488" height="35">Facts About Alcohol</text_box>
+            <text_box x="617" y="60" uid="27" color="black" font-family="Arial" font-size="14" padding="5" width="503" height="290">• A 12-oz. mug of beer, a 4-oz. glass of wine, or a 1-oz. shot of liquor has the same amount of pure alcohol – about one-half ounce.&#x0D;&#x0D;• Alcohol is a depressent – a drug which slows your reflexes and dulls your judgement&#x0D;&#x0D;• Alcoholism is an addictive drug - some teens become alcoholics within six months of taking their first drink&#x0D;&#x0D;• Alcohol causes FIVE times more deaths than cocaine, heroin and other illicit drugs combined&#x0D;&#x0D;• A teen has a drug or alcohol-related crash every FIVE seconds&#x0D;&#x0D;• Drinking and driving crashes are the NUMBER ONE cause of death among teenagers&#x0D;&#x0D;• More than 12,000 American teens are killed - forty thousand disfigured - each year in alcohol-related crashes</text_box>
+            <button x="606" y="372" width="74" height="23" uid="28" appearance="opaque" background="blue" color="white" style="rounded" label="Back" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="0" isee:effect="1" />
+            </button>
+            <button x="1800" y="367" width="87" height="22" uid="29" appearance="opaque" background="blue" color="white" style="rounded" label="Facts" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="576" y="0" isee:effect="1" />
+            </button>
+            <button x="1225" y="364" width="87" height="22" uid="30" appearance="opaque" background="blue" color="white" style="rounded" label="Facts" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="572" y="0" isee:effect="1" />
+            </button>
+            <button x="1446" y="361" width="85" height="24" uid="31" appearance="opaque" background="blue" color="white" style="rounded" label="Examples" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="1728" y="0" isee:effect="1" />
+            </button>
+            <button x="1918" y="366" width="85" height="24" uid="32" appearance="opaque" background="blue" color="white" style="rounded" label="Elements" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="1156" y="0" isee:effect="1" />
+            </button>
+            <button x="2138" y="366" width="80" height="23" uid="33" appearance="opaque" background="blue" color="white" style="rounded" label="Interface" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="2304" y="0" isee:effect="1" />
+            </button>
+            <button x="2037" y="366" width="73" height="24" uid="34" appearance="opaque" background="blue" color="white" style="rounded" label="Model" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="model" x="0" y="0" isee:effect="1" />
+            </button>
+            <button x="709" y="372" width="87" height="22" uid="35" appearance="opaque" background="blue" color="white" style="rounded" label="Elements" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="1152" y="0" isee:effect="1" />
+            </button>
+            <button x="934" y="370" width="85" height="24" uid="36" appearance="opaque" background="blue" color="white" style="rounded" label="Examples" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="1728" y="0" isee:effect="1" />
+            </button>
+            <button x="1049" y="371" width="80" height="23" uid="37" appearance="opaque" background="blue" color="white" style="rounded" label="Interface" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="2304" y="0" isee:effect="1" />
+            </button>
+            <button x="829" y="371" width="73" height="22" uid="38" appearance="opaque" background="blue" color="white" style="rounded" label="Model" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="model" x="0" y="0" isee:effect="1" />
+            </button>
+            <button x="1567" y="362" width="80" height="23" uid="39" appearance="opaque" background="blue" color="white" style="rounded" label="Interface" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="2302" y="0" isee:effect="1" />
+            </button>
+            <button x="1340" y="362" width="73" height="24" uid="40" appearance="opaque" background="blue" color="white" style="rounded" label="Model" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="model" x="0" y="0" isee:effect="1" />
+            </button>
+            <button x="2457" y="364" width="87" height="22" uid="41" appearance="opaque" background="blue" color="white" style="rounded" label="Facts" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="569" y="0" isee:effect="1" />
+            </button>
+            <button x="2761" y="363" width="85" height="24" uid="42" appearance="opaque" background="blue" color="white" style="rounded" label="Examples" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="1728" y="0" isee:effect="1" />
+            </button>
+            <button x="2563" y="363" width="80" height="23" uid="43" appearance="opaque" background="blue" color="white" style="rounded" label="Elements" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="1152" y="0" isee:effect="1" />
+            </button>
+            <button x="2666" y="364" width="73" height="24" uid="44" appearance="opaque" background="blue" color="white" style="rounded" label="Model" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="model" x="0" y="0" isee:effect="1" />
+            </button>
+            <text_box x="1203" y="145" uid="45" color="black" font-family="Arial" font-size="14" text-align="center" padding="5" width="489" height="108">Many elements contribute to an individual&apos;s Blood Alcohol Concentration. The following elements are incorporated into this model:&#x0D;</text_box>
+            <text_box x="1199" y="38" uid="46" color="black" font-family="Arial" font-size="24" font-weight="bold" font-style="italic" text-align="center" padding="5" width="490" height="35">Elements of the Model</text_box>
+            <text_box x="1376" y="194" uid="47" color="black" font-family="Arial" font-size="14" padding="5" width="167" height="66">• Number of drinks&#x0D;• Body weight&#x0D;• Gender&#x0D;• Time</text_box>
+            <text_box x="1772" y="13" uid="48" color="#E0E0E0" font-family="Arial" font-size="24" font-weight="bold" font-style="italic" text-align="center" padding="5" width="490" height="35">Common Situations</text_box>
+            <button x="2784" y="27" width="80" height="23" uid="49" appearance="opaque" background="blue" color="white" style="rounded" label="Run" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <menu_action>run</menu_action>
+            </button>
+            <slider x="2538" y="311" color="blue" width="197" height="43" min="90" max="300">
+                <entity name="Body_Weight" />
+            </slider>
+            <button x="2784" y="63" width="80" height="23" uid="50" appearance="opaque" background="blue" color="white" style="rounded" label="Stop" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <menu_action>stop</menu_action>
+            </button>
+            <button x="2785" y="100" width="79" height="23" uid="51" appearance="opaque" background="blue" color="white" style="rounded" label="Reset" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <menu_action>restore_all</menu_action>
+            </button>
+            <switch x="2365" y="299" uid="52" show_name="false" color="blue" width="32" height="60" switch_style="toggle">
+                <entity name="Gender" value="1" />
+            </switch>
+            <numeric_display precision="1" display_as="number" color="blue" show_name="true" retain_ending_value="true" uid="53" x="2784" y="278">
+                <entity name="Total_Drinks" />
+            </numeric_display>
+            <graphical_input x="2822" y="208" label_side="top" color="blue" width="100" height="103">
+                <entity name="Number_of_Drinks" />
+            </graphical_input>
+            <text_box x="2365" y="270" uid="54" color="black" font-family="Arial" font-size="12" text-align="center" padding="5" width="40" height="23">Male</text_box>
+            <text_box x="2352" y="366" uid="55" color="black" font-family="Arial" font-size="12" text-align="center" padding="5" width="59" height="23">Female</text_box>
+            <numeric_display precision="0.01" display_as="number" color="red" show_name="true" retain_ending_value="true" uid="56" x="2784" y="295">
+                <entity name="BAC" />
+            </numeric_display>
+            <graphical_input x="3030" y="131" label_side="top" color="blue" width="100" height="103">
+                <entity name="Number_of_Drinks_2" />
+            </graphical_input>
+            <slider x="3105" y="290" color="blue" width="197" height="43" min="90" max="300">
+                <entity name="Body_Weight_2" />
+            </slider>
+            <numeric_display precision="1" display_as="number" color="blue" show_name="true" retain_ending_value="true" uid="57" x="3035" y="199">
+                <entity name="Total_Drinks_2" />
+            </numeric_display>
+            <switch x="3181" y="102" uid="58" show_name="false" color="blue" width="32" height="60" switch_style="toggle">
+                <entity name="Gender_2" value="1" />
+            </switch>
+            <text_box x="3181" y="72" uid="59" color="black" font-family="Arial" font-size="12" text-align="center" padding="5" width="40" height="23">Male</text_box>
+            <text_box x="3174" y="177" uid="60" color="black" font-family="Arial" font-size="12" text-align="center" padding="5" width="59" height="23">Female</text_box>
+            <text_box x="2203" y="59" uid="61" color="black" font-family="Arial" font-size="14" padding="5" width="101" height="290">Scenario 1.&#x0D;Dinner:&#x0D;Male, 180lb.&#x0D;Female, 120lb.&#x0D;Drinks:&#x0D;2,2,1&#x0D;&#x0D;Scenario 2.&#x0D;Party:&#x0D;Male, 150lb. &#x0D;Drinks:&#x0D;4,5,2,3,0,2&#x0D;&#x0D;Scenario 3:&#x0D;Male, 150 lb.&#x0D;Drinks:&#x0D;You figure it out!</text_box>
+            <text_box x="2983" y="15" uid="62" color="black" font-family="Arial" font-size="18" font-weight="bold" text-align="center" padding="5" width="261" height="29">Secondary subject</text_box>
+            <button x="3013" y="336" width="169" height="26" uid="63" appearance="opaque" background="blue" color="white" style="rounded" label="Return to interface" font-family="Arial" font-size="14" text-align="center" font-weight="bold">
+                <link target="interface" x="2304" y="0" isee:effect="1" />
+            </button>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="48" y="437" content="16" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>DeerIsle.v5</name>
+        <uuid>c4bc5f6e-9dec-4408-8162-13099f1240bd</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="RK4" time_units="Years" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>100</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="interface" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="630" height="431" />
+        <isee:security />
+        <isee:print_setup width="576" height="731" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Food_Supply">
+            <eqn>100000</eqn>
+            <scale min="0" max="200000" />
+            <inflow>Replenishment</inflow>
+            <outflow>Eating</outflow>
+            <non_negative />
+            <display x="242" y="87" color="blue">
+                <scale min="0" max="200000" />
+            </display>
+        </stock>
+        <flow name="Replenishment">
+            <eqn>IF(Food_Supply)&gt;(10)AND(Food_Supply)&lt;(200000)THEN(Food_Supply*.111)ELSE(0)</eqn>
+            <non_negative />
+            <display x="177" y="86" color="blue">
+                <pts>
+                    <pt x="133" y="86" />
+                    <pt x="222" y="86" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Eating">
+            <eqn>Deer*5</eqn>
+            <non_negative />
+            <display x="312" y="91" color="blue">
+                <pts>
+                    <pt x="262" y="91" />
+                    <pt x="363" y="91" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Deer">
+            <eqn>1500</eqn>
+            <scale min="0" max="10000" />
+            <inflow>Births</inflow>
+            <outflow>Deaths</outflow>
+            <display x="234" y="222" color="blue">
+                <scale min="0" max="10000" />
+            </display>
+        </stock>
+        <flow name="Births">
+            <eqn>Deer*Birth_Fraction</eqn>
+            <non_negative />
+            <display x="168" y="224" color="blue">
+                <pts>
+                    <pt x="123" y="224" />
+                    <pt x="214" y="224" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Deaths">
+            <eqn>.01+Deer*Death_Adjustment</eqn>
+            <non_negative />
+            <display x="307" y="220" color="blue">
+                <pts>
+                    <pt x="254" y="220" />
+                    <pt x="361" y="220" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Birth_Fraction">
+            <eqn>.04</eqn>
+            <display x="162" y="318" color="blue" />
+        </aux>
+        <aux name="Food_availability_Fraction">
+            <eqn>Food_Supply/Deer</eqn>
+            <display x="362" y="158" color="blue" />
+        </aux>
+        <aux name="Death_Adjustment">
+            <eqn>Food_availability_Fraction</eqn>
+            <gf>
+                <xscale min="0" max="50" />
+                <yscale min="0" max="0.6" />
+                <ypts>0.59699999999999998,0.11800000000000001,0.076999999999999999,0.048000000000000001,0.019,0.0070000000000000001,0.0060000000000000001,0.0060000000000000001,0.0050000000000000001,0.0040000000000000001,0</ypts>
+            </gf>
+            <display x="417" y="197" color="blue" />
+        </aux>
+        <display page_width="576" page_height="731" isee:converter_size="large" interval="DT">
+            <connector x="246" y="205" uid="0">
+                <from>Deer</from>
+                <to>Eating</to>
+            </connector>
+            <connector x="262" y="99" uid="1">
+                <from>Food_Supply</from>
+                <to>Food_availability_Fraction</to>
+            </connector>
+            <connector x="254" y="212" uid="2">
+                <from>Deer</from>
+                <to>Food_availability_Fraction</to>
+            </connector>
+            <connector x="220" y="92" uid="3">
+                <from>Food_Supply</from>
+                <to>Replenishment</to>
+            </connector>
+            <connector x="163" y="306" uid="4">
+                <from>Birth_Fraction</from>
+                <to>Births</to>
+            </connector>
+            <connector x="212" y="237" uid="5">
+                <from>Deer</from>
+                <to>Births</to>
+            </connector>
+            <connector x="256" y="226" uid="6">
+                <from>Deer</from>
+                <to>Deaths</to>
+            </connector>
+            <connector x="372" y="165" uid="7">
+                <from>Food_availability_Fraction</from>
+                <to>Death_Adjustment</to>
+            </connector>
+            <connector x="405" y="195" uid="8">
+                <from>Death_Adjustment</from>
+                <to>Deaths</to>
+            </connector>
+            <stacked_container height="270" width="475" uid="9">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="0.25" cleared="true" date_time="1994-06-18T17:00:40Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" width="100" />
+                    <item color="black" precision="max" delimit_000s="true" index="0">
+                        <entity name="Food_Supply" />
+                    </item>
+                    <item color="black" precision="max" delimit_000s="true" index="1">
+                        <entity name="Deer" />
+                    </item>
+                    <item color="black" precision="max" delimit_000s="true" index="2">
+                        <entity name="Replenishment" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="487" y="68" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="9" />
+            <text_box x="-32767" y="-32767" uid="10" color="#7F00FF" font-family="Arial" font-size="9" padding="5" border-style="solid" border-width="thin" width="260" height="60">AST30522696</text_box>
+            <text_box x="-32767" y="-32767" uid="11" color="#7F00FF" font-family="Arial" font-size="9" padding="5" border-style="solid" border-width="thin" width="260" height="60">AST30522696</text_box>
+            <text_box x="-32767" y="-32767" uid="12" color="#7F00FF" font-family="Arial" font-size="9" padding="5" border-style="solid" border-width="thin" width="260" height="60">AST30522696</text_box>
+            <text_box x="-32767" y="-32767" uid="13" color="#7F00FF" font-family="Arial" font-size="9" padding="5" border-style="solid" border-width="thin" width="260" height="60">AST30522222</text_box>
+            <text_box x="-32767" y="-32767" uid="14" color="#7F00FF" font-family="Arial" font-size="9" padding="5" border-style="solid" border-width="thin" width="260" height="60">AST30522222</text_box>
+            <text_box x="-32767" y="-32767" uid="15" color="#7F00FF" font-family="Arial" font-size="9" padding="5" border-style="solid" border-width="thin" width="260" height="60">AST30522222</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_width="640" page_height="480" scroll_y="8">
+            <simulation_delay>0</simulation_delay>
+            <stacked_container x="3" y="6" height="259" width="456" uid="16">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:27:29Z" cleared="true" time_precision="2" from="0" to="100">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="Deer" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <entity name="Food_Supply" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="20" y="13" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="16" />
+            <slider x="134" y="299" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="0" max="0.2">
+                <entity name="Birth_Fraction" />
+            </slider>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="40" y="113" content="9" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

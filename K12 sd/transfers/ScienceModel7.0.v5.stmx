@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>ScienceModel7.0.v5</name>
+        <uuid>96b51952-15c0-4da7-8822-6a39401ae218</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Time" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>20</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="1334" height="630" />
+        <isee:security />
+        <isee:print_setup width="552" height="728" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Items">
+            <eqn>1000</eqn>
+            <outflow>Items_gone</outflow>
+            <non_negative />
+            <display x="99" y="58" color="blue" />
+        </stock>
+        <flow name="Items_gone">
+            <eqn>Rate_of_Decline*(Items-Intended_Reduction_Goal)</eqn>
+            <non_negative />
+            <display x="182" y="54" color="blue" label_side="top" label_angle="85">
+                <pts>
+                    <pt x="119" y="54" />
+                    <pt x="245" y="54" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Rate_of_Decline">
+            <eqn>.5</eqn>
+            <display x="107" y="125" color="blue" />
+        </aux>
+        <aux name="Intended_Reduction_Goal">
+            <eqn>200</eqn>
+            <display x="233" y="123" color="blue" />
+        </aux>
+        <display page_width="552" page_height="728" isee:converter_size="large" interval="DT">
+            <connector x="117" y="118" uid="0">
+                <from>Rate_of_Decline</from>
+                <to>Items_gone</to>
+            </connector>
+            <connector x="225" y="114" uid="1">
+                <from>Intended_Reduction_Goal</from>
+                <to>Items_gone</to>
+            </connector>
+            <connector x="122" y="61" uid="2">
+                <from>Items</from>
+                <to>Items_gone</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="3">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:09:00Z" cleared="true" time_precision="2" from="0" to="20">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="1000" />
+                        <entity name="Items" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="339" y="41" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="3" />
+            <stacked_container height="286" width="465" uid="4">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="1" cleared="true" date_time="1997-07-20T13:00:40Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" width="100" />
+                    <item color="black" precision="max" delimit_000s="true" index="0">
+                        <entity name="Items" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="338" y="102" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="4" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="8" y="51" content="3" />
+        <popup x="8" y="51" content="4" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

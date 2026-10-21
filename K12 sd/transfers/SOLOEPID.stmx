@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>SOLOEPID</name>
+        <uuid>17f25631-dc09-4b7a-85d9-460cd4d5b33c</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Time" pause_interval="1" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>1</start>
+        <stop>21</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="interface" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="626" height="427" />
+        <isee:security password="true" />
+        <isee:print_setup width="595" height="744" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="SUSCEPTIBLE">
+            <doc>We begin with a total of 50 individuals, only one of whom is INFECTED.</doc>
+            <eqn>49</eqn>
+            <outflow>New_Infections</outflow>
+            <non_negative />
+            <display x="178" y="186" color="blue" />
+        </stock>
+        <stock name="INFECTED">
+            <doc>We begin with 50 individuals, one of whom is INFECTED.</doc>
+            <eqn>1</eqn>
+            <inflow>New_Infections</inflow>
+            <non_negative />
+            <display x="329" y="187" color="blue" />
+        </stock>
+        <flow name="New_Infections">
+            <doc>The number of individuals who become infected in any time interval depends on:&#x0D;•the number who were already infected and therefore doing the infecting,&#x0D;•the number of contacts each of those individuals has,&#x0D;•the probability that any one contact will pass the infection, and&#x0D;•the probability that any contact will, in fact, be with a susceptible individual&#x0D;</doc>
+            <eqn>INFECTED*contacts_per_time*prob_of_infection*(1-prob_that_contact_is_infected)</eqn>
+            <non_negative />
+            <display x="253" y="196" color="blue" label_side="top">
+                <pts>
+                    <pt x="198" y="196" />
+                    <pt x="309" y="196" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="contacts_per_time">
+            <doc>How many individuals does an infected individual contact IN SUCH A MANNER THAT THE DISEASE COULD BE PASSED ON?</doc>
+            <eqn>1</eqn>
+            <display x="206" y="233" color="blue" />
+        </aux>
+        <aux name="prob_of_infection">
+            <doc>Given a single contact, what is the probability that the disease will be successfully passed on?&#x0D;</doc>
+            <eqn>.5</eqn>
+            <display x="304" y="235" color="blue" />
+        </aux>
+        <aux name="prob_that_contact_is_infected">
+            <doc>The &quot;normal&quot; configuration of this coverter is to define it as &quot;prob that contact is susceptible,&quot; since that is the case in which the disease CAN be passed on to a new individual.  In this case, however, it is important to know when a &quot;player&quot; will receive an infection, so this (the reciprocal of the regular approach) does double duty here.  Note that in the definition of the flow, that a (1 - prob_that_contact_is_infected) formula is used to properly calculate the flow of new individuals into the INFECTED stock.</doc>
+            <eqn>INFECTED/(INFECTED+SUSCEPTIBLE-1)</eqn>
+            <display x="233" y="324" color="blue" />
+        </aux>
+        <aux name="random_number_generator">
+            <eqn>RANDOM(0, 1)</eqn>
+            <display x="438" y="253" color="#FF007F" label_side="top" label_angle="53" />
+        </aux>
+        <aux name="receive_infection?">
+            <doc>This converter captures the &quot;logic&quot; of being infected as a result of random contacts with individuals who may or may not themselves be infected.  The random number generator produces a number between 0 and 1.  It compares that number to the probability that a given contact in the population will be infectious AND (through the &quot;* prob of infection&quot; element) that an infected individual will pass the infection to you.  If very few individuals are infected, the probability of you receiving the infection will be small; only in the unlikely event that &quot;your&quot; random number is even smaller will you be infected.  As the probability of encountering an infected individual goes up, so too will the probability that &quot;your&quot; number will be lower also increase,  At worst, when everyone else is infected, the prob.../2 will only be 0.5, and you will have only a 50% chance that &quot;your&quot; number will be less and that you will receive an infecting contact.</doc>
+            <eqn>IF random_number_generator &lt; (prob_that_contact_is_infected * prob_of_infection) THEN 1 ELSE 0</eqn>
+            <display x="422" y="322" color="#FF007F" label_side="right" label_angle="6" />
+        </aux>
+        <aux name="elapsed_time">
+            <doc>This is just a devise to allow a message to be posted at the end of the game and to halt the game.</doc>
+            <eqn>time</eqn>
+            <event_poster min="0" max="19">
+                <threshold value="19">
+                    <event sim_action="stop">
+                        <text_box>You have run through 20 rounds of the game, which should be quite sufficient.  Since encounters are programmed as &quot;random, &quot;you are welcome to play again -- your experience should be different.&#x0D;&#x0D;Thanks for playing!  Please move now to &quot;Debrief.&quot;</text_box>
+                    </event>
+                </threshold>
+            </event_poster>
+            <display x="47" y="235" color="#FF007F" />
+        </aux>
+        <display page_width="595" page_height="744" page_rows="3" isee:converter_size="large" interval="DT">
+            <connector x="158" y="200" uid="0" color="blue">
+                <from>SUSCEPTIBLE</from>
+                <to>prob_that_contact_is_infected</to>
+            </connector>
+            <connector x="338" y="202" uid="1" color="blue">
+                <from>INFECTED</from>
+                <to>prob_that_contact_is_infected</to>
+            </connector>
+            <connector x="309" y="205" uid="2" color="blue">
+                <from>INFECTED</from>
+                <to>New_Infections</to>
+            </connector>
+            <connector x="210" y="222" uid="3" color="blue">
+                <from>contacts_per_time</from>
+                <to>New_Infections</to>
+            </connector>
+            <connector x="292" y="235" uid="4" color="blue">
+                <from>prob_of_infection</from>
+                <to>New_Infections</to>
+            </connector>
+            <connector x="241" y="315" uid="5" color="blue">
+                <from>prob_that_contact_is_infected</from>
+                <to>New_Infections</to>
+            </connector>
+            <connector x="243" y="328" uid="6">
+                <from>prob_that_contact_is_infected</from>
+                <to>receive_infection?</to>
+            </connector>
+            <connector x="443" y="264" uid="7">
+                <from>random_number_generator</from>
+                <to>receive_infection?</to>
+            </connector>
+            <connector x="315" y="231" uid="8">
+                <from>prob_of_infection</from>
+                <to>receive_infection?</to>
+            </connector>
+            <text_box x="167" y="24" uid="9" color="blue" font-family="Arial" font-size="12" padding="5" width="264" height="42">NOTE:  The elements in blue are the basic infection transmission structure.  </text_box>
+            <text_box x="168" y="58" uid="10" color="#FF007F" font-family="Arial" font-size="12" padding="5" width="264" height="58">The elements in red are the new elements needed to make this a &quot;solo&quot; game </text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="2" page_rows="6" page_width="640" page_height="480">
+            <simulation_delay>0</simulation_delay>
+            <stacked_container x="2" y="1250" height="253" width="450" uid="11">
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:14:10Z" comparative="true" cleared="true" time_precision="2" from="1" to="21">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="receive_infection?" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="272" y="1353" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="11" />
+            <stacked_container x="431" y="1237" height="268" width="154" uid="12">
+                <table font-size="9" background="#FFFFC9" column_width="87" orientation="vertical" interval="1" cleared="true" date_time="2001-12-19T11:48:09Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" header-text-align="right" width="50" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="receive_infection?" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="562" y="1435" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="12" />
+            <gauge retain_ending_value="true" precision="0.1" delimit_000s="true" x="361" y="1208" uid="13">
+                <entity name="receive_infection?" />
+                <zones>
+                    <zone type="normal" min="0" max="0.33" color="green" />
+                    <zone type="caution" min="0.33" max="0.66" color="yellow" />
+                    <zone type="panic" min="0.66" max="1" color="red)" />
+                </zones>
+            </gauge>
+            <text_box x="425" y="1217" uid="14" color="#7AABCB" font-family="Arial" font-size="12" padding="5" width="227" height="42">&#x0D;&#x0D;&#x0D;&#x0D;&#x0D;</text_box>
+            <text_box x="45" y="1" uid="15" color="red" font-family="Arial" font-size="18" font-weight="bold" text-align="center" padding="5" width="458" height="56">THE &quot;EPIDEMIC GAME&quot;&#x0D;Adapted for Single Players</text_box>
+            <text_box x="146" y="48" uid="16" color="blue" font-family="Arial" font-size="9" text-align="center" padding="5" width="264" height="23">© 2000, 2001 Waters Center for System Dynamics</text_box>
+            <text_box x="4" y="68" uid="17" color="black" font-family="Arial" font-size="12" padding="5" width="576" height="298">This is an adaptation of the &quot;Epidemic Game&quot; designed by Will Glass-Husain in the early 1990&apos;s (File D-4243-3 at the System Dynamics Group, Sloan School of Management, MIT; or package CC-1993-9 at the Creative Learning Exchange).  This adaptation is provided for individuals who are not associated with groups of 10 or more or who lack a facilitator for either of the interactive group versions (&quot;One-handed&quot; or &quot;Two-handed&quot;) of this game.  If the group version is a possibility, it is, by far, the preferable option.&#x0D;&#x0D;In the basic scenario of the Epidemic Game individuals mix and mingle, having regular &quot;contact&quot; with others of the group, one of whom is, initially, infected with the dreaded &quot;New England Regional Disease&quot; (&quot;NERD&quot; - this WAS invented by an MIT undergraduate!).  In each time interval each individual &quot;contacts&quot; one other individual.  If an individual has NERD, there is a 50% chance he or she will pass the affliction to the person contacted.  With groups of 10 or more, this simulation is run as a physical role-playing game, with extensive debriefing.  Here, the computer (through this STELLA® model -- ® High Performance Systems, Inc., Hanover, NH) plays the roles of all the missing people.  Your job is to virtually mingle with that group and to observe when and how often one of your e-colleagues passes the disease on to you.  Buttons in the Control Panel provide more information and instructions.</text_box>
+            <button x="429" y="361" width="149" height="23" uid="18" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Center Control Panel" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="1111" />
+            </button>
+            <text_box x="1" y="1479" uid="19" color="#7F00FF" font-family="Arial" font-size="12" padding="5" width="238" height="42">&#x0D;&#x0D;&#x0D;&#x0D;&#x0D;</text_box>
+            <text_box x="285" y="1481" uid="20" color="#7F00FF" font-family="Arial" font-size="12" padding="5" width="172" height="42">&#x0D;&#x0D;&#x0D;</text_box>
+            <button x="156" y="1126" width="146" height="24" uid="21" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Return to Introduction" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="0" />
+            </button>
+            <button x="154" y="1157" width="146" height="24" uid="22" appearance="opaque" background="black" color="white" style="rounded" clicking_sound="false" label="Scenario Information" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <popup x="0" y="32" width="400" height="300" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">The simulation you are about to enter has the following characteristics:&#x0D;&#x0D;1.  There are fifty individuals in the simulated population:  1 infected individual; you (uninfected!); and 48 other uninfected folks.&#x0D;&#x0D;2.  During each time interval, each person &quot;shakes hands&quot; with one other individual.&#x0D;&#x0D;3.  When an infected person shakes hands with an uninfected individual, there is a 50% chance of passing the disease to the uninfected.&#x0D;&#x0D;4.  The simulation will run for 20 time units (turns).&#x0D;&#x0D;5.  If, in a given turn, you are NOT infected the &quot;received infection?&quot; value (presented with the warning dial, the graph, and the table) will be &quot;0&quot; (the warning dial will be bordered in green for &quot;safe&quot;).&#x0D;&#x0D;6.  If in a given turn, you ARE infected, the &quot;received infection&quot; will be &quot;1&quot; (the warning dial will be bordered in red).</text_box>
+                </popup>
+            </button>
+            <button x="154" y="1187" width="146" height="24" uid="23" appearance="opaque" background="black" color="white" style="rounded" clicking_sound="false" label="Instructions" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <popup x="0" y="32" width="400" height="250" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">1.  Click the &quot;Clear All&quot; button if any values remain on the graph or in the table.&#x0D;&#x0D;2.  Click the &quot;Run/Resume&quot; button it &quot;play&quot; one round of the game.  &#x0D;&#x0D;3.  If you have been infected, the waring dial will be bordered with red and the &quot;received infection?&quot; value (in any of the three output devices) will be &quot;1.&quot;&#x0D;&#x0D;4.  If you did not receive an infecting hand shake in that turn, the warning dial will be bordered in green and the &quot;received infection?&quot; value will be &quot;0.&quot;&#x0D;&#x0D;5.  Click the &quot;Run/Resume&quot; to proceed through another round.&#x0D;&#x0D;6.  Continue to play until you have completed 20 rounds.&#x0D;&#x0D;7.  Proceed to the &quot;Debrief&quot; section.&#x0D;&#x0D;8.  If you need or wish to stop the game at any point, click the &quot;Stop&quot; button.&#x0D;&#x0D;</text_box>
+                </popup>
+            </button>
+            <button x="155" y="1218" width="146" height="24" uid="24" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Debrief" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="2212" />
+            </button>
+            <button x="414" y="1126" width="87" height="24" uid="25" appearance="opaque" background="red" color="white" style="rounded" clicking_sound="false" label="Clear All" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <menu_action>restore_all</menu_action>
+            </button>
+            <button x="414" y="1157" width="96" height="22" uid="26" appearance="opaque" background="red" color="white" style="rounded" clicking_sound="false" label="Run/Resume" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <menu_action>run</menu_action>
+            </button>
+            <button x="415" y="1188" width="87" height="24" uid="27" appearance="opaque" background="red" color="white" style="rounded" clicking_sound="false" label="Stop" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <menu_action>stop</menu_action>
+            </button>
+            <text_box x="19" y="2225" uid="28" color="#7F00FF" font-family="Arial" font-size="14" font-weight="bold" text-align="center" padding="5" width="540" height="27">DEBRIEF:  Individual &quot;Epidemic Game&quot;</text_box>
+            <button x="136" y="2379" width="146" height="24" uid="29" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Return to Introduction" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="0" />
+            </button>
+            <button x="289" y="2380" width="149" height="23" uid="30" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Center Control Panel" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="1111" />
+            </button>
+            <text_box x="47" y="2269" uid="31" color="black" font-family="Arial" font-size="12" padding="5" width="530" height="106">It is very important to explore what happened during the Epidemic Game.  At this point, however, you can return to join the participants in the &quot;One-handed&quot; and &quot;Two-handed&quot; group simulations in using the common debriefing section of this packet.  If you choose to &quot;Quit&quot; at this point, please do so WITHOUT saving changes to this simulation, so that later users can enter an exercise with blank screens.</text_box>
+            <button x="248" y="2411" width="79" height="26" uid="32" appearance="opaque" background="red" color="white" style="rounded" label="Quit" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <menu_action>exit</menu_action>
+            </button>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

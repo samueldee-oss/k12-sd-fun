@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>YEAST2.v3</name>
+        <uuid>7512fab2-4d39-466d-8d65-9ac206c69de9</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Hours" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>80</stop>
+        <dt>0.0625</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="false" layer="map" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Food">
+            <doc>This is the total stock of food, per millilitre, available for the bacteria to eat.  The jar starts full of food and the amount goes down as the bacteria eat it up. (Each unit, or &quot;serving,&quot;  is the amount one bacteria eats in one hour.)  The initial value of 1,000,000,000 is set so that the food runs out in three days at room temp.</doc>
+            <eqn>1000000000</eqn>
+            <outflow>Consumption</outflow>
+            <non_negative />
+            <display x="153" y="118" color="blue" />
+        </stock>
+        <flow name="Consumption">
+            <doc>This flow tells how much food the yeast have eaten per hour, in each millilitre.  This makes the stock of food go down. </doc>
+            <eqn>Desired_consumption*Effect_of_food_on_cons</eqn>
+            <non_negative />
+            <display x="219" y="114" color="blue">
+                <pts>
+                    <pt x="173" y="114" />
+                    <pt x="265" y="114" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Yeast">
+            <doc>This stock is the total number of yeast, per millilitre, in the culture medium.  It begins when the first yeast is added to the medium.  Then the number can increase or decrease depending on how fast the yeast multiply and/or die.  The initial value represents the innoculation.</doc>
+            <eqn>10</eqn>
+            <inflow>Growth</inflow>
+            <outflow>Deaths</outflow>
+            <non_negative />
+            <display x="306" y="273" color="blue" />
+        </stock>
+        <flow name="Deaths">
+            <doc>This flow tells how many yeast, per millilitre, are dying per hour.  This makes the population  go down.</doc>
+            <eqn>Yeast*Death_Fraction</eqn>
+            <non_negative />
+            <display x="362" y="270" color="blue">
+                <pts>
+                    <pt x="326" y="270" />
+                    <pt x="399" y="270" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Growth">
+            <doc>This flow tells how many new yeast, per millilitre, are being added to the population per hour.   This makes the population go up.</doc>
+            <eqn>Yeast*Growth_fraction</eqn>
+            <non_negative />
+            <display x="253" y="270" color="blue">
+                <pts>
+                    <pt x="220" y="270" />
+                    <pt x="286" y="270" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Temperature">
+            <doc>In this experiment, you can set the temperature at anything from 0 to 100 degrees Centigrade to see what effect the temperature has on the growth of the yeast.  (Above 100, nothing different happens because the yeast all die at 100 degrees.  Below zero, they remain dormant.)   </doc>
+            <eqn>2</eqn>
+            <display x="310" y="338" color="blue" />
+        </aux>
+        <aux name="Death_Fraction">
+            <doc>This is the fraction of the population dying per hour.  It is determined by the food supply and the temperature at the time.  These effects are added together, rather than multiplied, because except in extreme conditions, the values for these effects are 0.  When food is ample and/or temperature optimal, death fraction from either effect is 0.  If one of the effects should cause death fraction to increase while the other remains at 0, an additivie formulation allows the death fraction to increase, whereas a multiplicative formulation would still yield 0.</doc>
+            <eqn>Effect_of_food_on_death+Effect_of_temp_on__Death</eqn>
+            <display x="456" y="337" color="blue" />
+        </aux>
+        <aux name="Effect_of_temp_on__Death">
+            <doc>This graph says that bacteria die off rapidly at very high temperatures. They all die at 100 degrees.  Note that the fractional death rate of 100 when temperature is 100 causes the yeast to die immediately.</doc>
+            <eqn>Temperature</eqn>
+            <gf>
+                <xscale min="0" max="100" />
+                <yscale min="0" max="100" />
+                <ypts>0,0,0,0,0,0,0,0,0,9,99.5</ypts>
+            </gf>
+            <display x="387" y="377" color="blue" />
+        </aux>
+        <aux name="Effect_of_food_on_death">
+            <doc>Effect of death depends on actual consumption relative to desired consumption.  If the population can consume as much food as it needs, there is no effect on death.  As the food available falls below what they need to eat, some yeast go hungry and die.  When there is no food left, they all die off at a very fast rate.  Note that the fractional death fraction is 10 when consumption relative to desired is 0, which causes the yeast to die off very quickly.</doc>
+            <eqn>Consumption__Relative_to_Desired</eqn>
+            <gf>
+                <xscale min="0" max="1" />
+                <yscale min="0" max="10" />
+                <ypts>10,5.9000000000000004,4.0999999999999996,3.1000000000000001,1.95,1.45,0.94999999999999996,0.5,0.20000000000000001,0,0</ypts>
+            </gf>
+            <display x="470" y="265" color="blue" />
+        </aux>
+        <aux name="Effect_of_temp_on_growth">
+            <doc>This graph says that bacteria grow best between 30 and 40 degrees Centigrade but not very well at lower or higher temperatures.  They do not grow at all at 0 or 100 degrees.  Note:  this graph is identical to the &quot;effect of temp on cons graph,&quot; because yeast only eat to grow.</doc>
+            <eqn>Temperature</eqn>
+            <gf>
+                <xscale min="0" max="100" />
+                <yscale min="0" max="1" />
+                <ypts>0,0.050000000000000003,0.17000000000000001,0.89500000000000002,1,1,0.95999999999999996,0.71999999999999997,0.20000000000000001,0.065000000000000002,0</ypts>
+            </gf>
+            <display x="239" y="374" color="blue" />
+        </aux>
+        <aux name="Growth_fraction">
+            <doc>This is the growth fraction per hour.  The yeast&apos;s basic reproduction rate is affected by the temperature and the food supply at the time.  For exponential growth:&#x0D;   growth fraction = 1/time constant, and &#x0D;   time constant = doubling time/.7 (approximately);&#x0D;therefore under optimal conditions -- &#x0D;  Growth_fraction =  .7/Time_to_Reproduce.&#x0D;Effect_of_ food or Effect_of_temperature can cause Growth_fraction to fall below the optimal.  These effects are multiplied together so that if one causes growth to stop, Growth_fraction becomes zero regardless of the value of the other.</doc>
+            <eqn>(.7/Time_to_Reproduce)*Effect_of_food_on_growth*Effect_of_temp_on_growth</eqn>
+            <display x="156" y="337" color="blue" />
+        </aux>
+        <aux name="Effect_of_food_on_cons">
+            <doc>As long as there is at least one hour&apos;s supply of food left, the yeast will  just keep eating.  The amount of food available affects the consumption only when the food gets scarce and hard to find.</doc>
+            <eqn>Hours_of_Food_Left</eqn>
+            <gf>
+                <xscale min="0" max="1" />
+                <yscale min="0" max="1" />
+                <ypts>0,0.60499999999999998,0.89000000000000001,0.94999999999999996,1,1,1,1,1,1,1</ypts>
+            </gf>
+            <display x="159" y="157" color="blue" />
+        </aux>
+        <aux name="Effect_of_food_on_growth">
+            <doc>Effect of food on growth depends on consumption relative to desired consumption.  This graph says that bacteria grow fast when they consume enough.  As consumption falls, they grow more slowly.  They do not grow at all if consumption falls to zero.  &#x0D;&#x0D;</doc>
+            <eqn>Consumption__Relative_to_Desired</eqn>
+            <gf>
+                <xscale min="0" max="1" />
+                <yscale min="0" max="1" />
+                <ypts>0,0.59999999999999998,0.90000000000000002,0.94999999999999996,0.97499999999999998,1,1,1,1,1,1</ypts>
+            </gf>
+            <display x="405" y="433" color="blue" />
+        </aux>
+        <aux name="Time_to_Reproduce">
+            <doc>This constant is the time for one bacteria to reproduce.  For example, .5 means that it takes half an hour for the bacteria to divide in two. </doc>
+            <eqn>.5</eqn>
+            <display x="75" y="369" color="blue" />
+        </aux>
+        <aux name="Desired_consumption">
+            <doc>Desired consumption specifies how much food any given population needs to survive, based on the number of yeast, how much each one eats, and the effect of the current temperature on their eating.   </doc>
+            <eqn>Yeast*Cons_rate*Effect_of_temp_on_cons</eqn>
+            <display x="264" y="204" color="blue" />
+        </aux>
+        <aux name="Effect_of_temp_on_cons">
+            <doc>When the temperature is 40 to 50 degrees Centigrade, the yeast eat at their optimal rate.  They do not eat at all when they are frozen or boiling.  Note:  this graph is identical to the graph for &quot;effect of temp on growth,&quot; because yeast only eat to grow.</doc>
+            <eqn>Temperature</eqn>
+            <gf>
+                <xscale min="0" max="100" />
+                <yscale min="0" max="1" />
+                <ypts>0,0.12,0.55500000000000005,0.91000000000000003,1,1,0.94499999999999995,0.77500000000000002,0.215,0.085000000000000006,0</ypts>
+            </gf>
+            <display x="144" y="259" color="blue" />
+        </aux>
+        <aux name="Cons_rate">
+            <doc>This constant shows how much food each yeast consumes per hour.  Each yeast eats 1 unit (or &quot;serving&quot;) per hour. </doc>
+            <eqn>1</eqn>
+            <display x="295" y="167" color="blue" />
+        </aux>
+        <aux name="Hours_of_Food_Left">
+            <doc>This compares how much food the current population needs to how much food there actually is, to determine if there is enough or too little. (The .00001 in the equation prevents division by 0.)  Hours of food left, rather than the stock of food, is used as a measure of supply because the food relative to the number of yeast is the critical factor -- for example, 10 units of food for 1 yeast might be adequate, whereas 10 units of food for 1 million yeast would not. </doc>
+            <eqn>Food/max(.000001,Desired_consumption)</eqn>
+            <display x="81" y="164" color="blue" />
+        </aux>
+        <aux name="Consumption__Relative_to_Desired">
+            <doc>Acutal consumption relative to desired consumption measures the adequacy of food supply for the current population.  The use of desired consumption is necessary because under some conditions, for example a temperature of 0 degrees, the existing yeast do not desire to consume the food.  In this situation, a consumption of 0 should not cause death rate to increase.  Note that the MAX in the denominator is used to prevent division by 0.  A similar MAX in the numeratior is used to handle the situation in which Consumption and Desired Consumption are both 0 (for example at a temperature of 0).  The equation then equals 1.0 -- there is ample food since none is desired -- and therefore the effect of food on death fraction equals 0.</doc>
+            <eqn>max(.00001,Consumption)/max(.00001,Desired_consumption)</eqn>
+            <display x="418" y="182" color="blue" />
+        </aux>
+        <display page_width="595" page_height="775" page_cols="13" page_rows="24" isee:converter_size="medium" interval="DT" scroll_y="64">
+            <connector x="310" y="290" uid="0">
+                <from>Yeast</from>
+                <to>Deaths</to>
+            </connector>
+            <connector x="302" y="290" uid="1">
+                <from>Yeast</from>
+                <to>Growth</to>
+            </connector>
+            <connector x="448" y="333" uid="2">
+                <from>Death_Fraction</from>
+                <to>Deaths</to>
+            </connector>
+            <connector x="399" y="377" uid="3">
+                <from>Effect_of_temp_on__Death</from>
+                <to>Death_Fraction</to>
+            </connector>
+            <connector x="315" y="349" uid="4">
+                <from>Temperature</from>
+                <to>Effect_of_temp_on__Death</to>
+            </connector>
+            <connector x="473" y="277" uid="5">
+                <from>Effect_of_food_on_death</from>
+                <to>Death_Fraction</to>
+            </connector>
+            <connector x="303" y="348" uid="6">
+                <from>Temperature</from>
+                <to>Effect_of_temp_on_growth</to>
+            </connector>
+            <connector x="227" y="375" uid="7">
+                <from>Effect_of_temp_on_growth</from>
+                <to>Growth_fraction</to>
+            </connector>
+            <connector x="164" y="333" uid="8">
+                <from>Growth_fraction</from>
+                <to>Growth</to>
+            </connector>
+            <connector x="157" y="257" uid="9">
+                <from>Effect_of_temp_on_cons</from>
+                <to>Desired_consumption</to>
+            </connector>
+            <connector x="395" y="438" uid="10">
+                <from>Effect_of_food_on_growth</from>
+                <to>Growth_fraction</to>
+            </connector>
+            <connector x="87" y="367" uid="11">
+                <from>Time_to_Reproduce</from>
+                <to>Growth_fraction</to>
+            </connector>
+            <connector x="298" y="258" uid="12">
+                <from>Yeast</from>
+                <to>Desired_consumption</to>
+            </connector>
+            <connector x="259" y="196" uid="13">
+                <from>Desired_consumption</from>
+                <to>Consumption</to>
+            </connector>
+            <connector x="92" y="168" uid="14">
+                <from>Hours_of_Food_Left</from>
+                <to>Effect_of_food_on_cons</to>
+            </connector>
+            <connector x="300" y="342" uid="15">
+                <from>Temperature</from>
+                <to>Effect_of_temp_on_cons</to>
+            </connector>
+            <connector x="167" y="153" uid="16">
+                <from>Effect_of_food_on_cons</from>
+                <to>Consumption</to>
+            </connector>
+            <connector x="227" y="114" uid="17">
+                <from>Consumption</from>
+                <to>Consumption__Relative_to_Desired</to>
+            </connector>
+            <connector x="287" y="176" uid="18">
+                <from>Cons_rate</from>
+                <to>Desired_consumption</to>
+            </connector>
+            <connector x="252" y="207" uid="19">
+                <from>Desired_consumption</from>
+                <to>Hours_of_Food_Left</to>
+            </connector>
+            <connector x="276" y="202" uid="20">
+                <from>Desired_consumption</from>
+                <to>Consumption__Relative_to_Desired</to>
+            </connector>
+            <connector x="137" y="103" uid="21">
+                <from>Food</from>
+                <to>Hours_of_Food_Left</to>
+            </connector>
+            <connector x="427" y="190" uid="22">
+                <from>Consumption__Relative_to_Desired</from>
+                <to>Effect_of_food_on_death</to>
+            </connector>
+            <connector x="430" y="183" uid="23">
+                <from>Consumption__Relative_to_Desired</from>
+                <to>Effect_of_food_on_growth</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="24">
+                <graph type="time_series" title="Yeast Culture Lab" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:51:39Z" cleared="true" time_precision="0" from="0" to="80">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <entity name="Food" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <entity name="Yeast" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="662" y="105" width="26" height="22" color="#0CA0FF" label_side="bottom" label="20 degrees room temp" type="graph" icon_of="24" />
+            <stacked_container height="282" width="492" uid="25">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:51:39Z" cleared="true" time_precision="0" from="0" to="80">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <entity name="Food" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <entity name="Yeast" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="665" y="166" width="26" height="22" color="#0CA0FF" label_side="bottom" label="40 degrees  optimal" type="graph" icon_of="25" />
+            <stacked_container height="282" width="492" uid="26">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:51:39Z" cleared="true" time_precision="0" from="0" to="1">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <entity name="Food" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <entity name="Yeast" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="665" y="236" width="26" height="22" color="#0CA0FF" label_side="bottom" label="95 degrees  very hot" type="graph" icon_of="26" />
+            <stacked_container height="282" width="492" uid="27">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:51:39Z" cleared="true" time_precision="0" from="0" to="80">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <entity name="Food" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <entity name="Yeast" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="668" y="308" width="26" height="22" color="#0CA0FF" label_side="bottom" label="2 degrees  refrigerator" type="graph" icon_of="27" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="788" page_height="528" home_page="0">
+            <simulation_delay>0.1</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="78" content="24" />
+        <popup x="16" y="78" content="25" />
+        <popup x="16" y="78" content="26" />
+        <popup x="16" y="78" content="27" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

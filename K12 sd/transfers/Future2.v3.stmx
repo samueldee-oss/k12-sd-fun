@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Future2.v3</name>
+        <uuid>aa336ab9-2ec2-4770-b7ac-941980047edf</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Age" pause_interval="1" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>16</start>
+        <stop>65</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" show_documentation="true" show_pages="true" />
+    <model>
+        <stock name="Bank_Account">
+            <eqn>0</eqn>
+            <inflow>Income</inflow>
+            <outflow>Expenses</outflow>
+            <display x="199" y="190" color="blue" />
+        </stock>
+        <flow name="Income">
+            <eqn>(Salary_Conditional)*Graph_Conditional +(Bank_Account*Positive_Interest)</eqn>
+            <non_negative />
+            <display x="107" y="188" color="blue" label_side="top">
+                <pts>
+                    <pt x="35" y="188" />
+                    <pt x="179" y="188" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Salary_Conditional">
+            <doc>The assumption is that starting salary will be commensurate with educational level. The set value was determined from statistical data.</doc>
+            <eqn>if Whole_Number_Rounder = 1 then Type_1_Starting_Salary else if Whole_Number_Rounder = 2 then Type_2_Starting_Salary else Type_3_Starting_Salary</eqn>
+            <display x="121" y="402" color="blue" label_side="left" label_angle="176" />
+        </aux>
+        <flow name="Expenses">
+            <eqn>IF(TIME&gt;(Years_of_Education+6))THEN(12*(Car_Payment+Mortgage_or_Rent+Living_Expenses)+(Bank_Account*Negative_Interest))ELSE(0)</eqn>
+            <non_negative />
+            <display x="244" y="186" color="blue" label_side="top" label_angle="85">
+                <pts>
+                    <pt x="219" y="186" />
+                    <pt x="269" y="186" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Positive_Interest">
+            <doc>Interest earned on savings balance.</doc>
+            <eqn>if Bank_Account &gt; 0 then .05 else 0</eqn>
+            <display x="188" y="245" color="blue" />
+        </aux>
+        <aux name="Negative_Interest">
+            <doc>Interest paid on loans.</doc>
+            <eqn>if Bank_Account &lt; 0 then -.15 else 0</eqn>
+            <display x="256" y="276" color="blue" />
+        </aux>
+        <aux name="Car_Payment">
+            <eqn>0</eqn>
+            <display x="391" y="187" color="blue" />
+        </aux>
+        <aux name="Mortgage_or_Rent">
+            <eqn>0</eqn>
+            <display x="394" y="230" color="blue" />
+        </aux>
+        <aux name="Living_Expenses">
+            <eqn>0</eqn>
+            <display x="390" y="278" color="blue" />
+        </aux>
+        <aux name="Type_1_Starting_Salary">
+            <eqn>10000</eqn>
+            <display x="59" y="448" color="blue" />
+        </aux>
+        <aux name="Type_2_Starting_Salary">
+            <eqn>10000</eqn>
+            <display x="118" y="499" color="blue" />
+        </aux>
+        <aux name="Type_3_Starting_Salary">
+            <eqn>14000</eqn>
+            <display x="178" y="448" color="blue" />
+        </aux>
+        <aux name="Whole_Number_Rounder">
+            <doc>All numbers on the slider will be converted to whole numbers 1, 2, or 3.</doc>
+            <eqn>Years_of_Education</eqn>
+            <gf type="discrete">
+                <xscale min="10" max="16" />
+                <yscale min="0" max="3" />
+                <ypts>1,1,2,2,2,3,3</ypts>
+            </gf>
+            <display x="237" y="402" color="blue" label_side="top" label_angle="97" />
+        </aux>
+        <aux name="Years_of_Education">
+            <eqn>10</eqn>
+            <display x="237" y="500" color="blue" label_angle="289" />
+        </aux>
+        <aux name="Graph_Conditional">
+            <doc>The assumption is that growth in salary over a lifetime will vary with education level; slower growth occurring with less education.</doc>
+            <eqn>If Whole_Number_Rounder = 1 then Type_1_Graph else if Whole_Number_Rounder=2 then Type_2_Graph else Type_3_Graph</eqn>
+            <display x="347" y="402" color="blue" label_side="right" label_angle="4" />
+        </aux>
+        <aux name="Type_2_Graph">
+            <doc>The assumption is that individual yearly income starts low due to training and/or apprenticeship, then rises slowly and maximizes at 1.5 * initial value at approximately age 37 with only a slight rise afterwards due to inflation.</doc>
+            <eqn>time</eqn>
+            <gf>
+                <xscale min="16" max="65" />
+                <yscale min="0.5" max="2" />
+                <ypts>0,0.50749999999999995,0.95750000000000002,1.25,1.3474999999999999,1.4299999999999999,1.4675,1.4975000000000001,1.5349999999999999,1.5425,1.5649999999999999,1.5649999999999999,1.5725,1.5800000000000001,1.5874999999999999</ypts>
+            </gf>
+            <display x="350" y="501" color="blue" />
+        </aux>
+        <aux name="Type_3_Graph">
+            <doc>The assumption is that individual yearly income starts low due to college degree program, then rises sharply and maximizes at 2 * initial value at approximately age 40 with following increases due to inflation.</doc>
+            <eqn>time</eqn>
+            <gf>
+                <xscale min="16" max="65" />
+                <yscale min="0" max="3" />
+                <ypts>0,0,0.98999999999999999,1.26,1.4399999999999999,1.6399999999999999,1.8200000000000001,2,2.1000000000000001,2.1499999999999999,2.2000000000000002,2.23,2.2599999999999998,2.2799999999999998,2.2999999999999998</ypts>
+            </gf>
+            <display x="407" y="451" color="blue" />
+        </aux>
+        <aux name="Type_1_Graph">
+            <doc>The assumption is that individual yearly income starts low, rises slowly and maximizes at 1.25 * initial value at approximately age 37 with only a slight rise over the course of the rest of the work years relative to inflation.</doc>
+            <eqn>time</eqn>
+            <gf>
+                <xscale min="16" max="65" />
+                <yscale min="1" max="2" />
+                <ypts>1,1.1000000000000001,1.2,1.22,1.23,1.24,1.25,1.26,1.27,1.2749999999999999,1.28,1.2849999999999999,1.29,1.3,1.3</ypts>
+            </gf>
+            <display x="296" y="450" color="blue" />
+        </aux>
+        <group name="Income_Statement_2">
+            <entity name="Bank_Account" />
+            <entity name="Income" />
+            <entity name="Expenses" />
+            <entity name="Positive_Interest" />
+            <entity name="Negative_Interest" />
+            <display locked="true" x="4" y="153" width="297" height="155" color="red">
+                <item uid="0" />
+                <item uid="1" />
+                <item uid="2" />
+                <item uid="3" />
+                <item uid="4" />
+                <item uid="5" />
+            </display>
+        </group>
+        <group name="Expenses_2">
+            <entity name="Car_Payment" />
+            <entity name="Mortgage_or_Rent" />
+            <entity name="Living_Expenses" />
+            <display locked="true" x="307" y="171" width="169" height="136" color="red">
+                <item uid="6" />
+                <item uid="7" />
+                <item uid="8" />
+            </display>
+        </group>
+        <group name="Salary_and_Education_2">
+            <entity name="Salary_Conditional" />
+            <entity name="Type_1_Starting_Salary" />
+            <entity name="Type_2_Starting_Salary" />
+            <entity name="Type_3_Starting_Salary" />
+            <entity name="Whole_Number_Rounder" />
+            <entity name="Years_of_Education" />
+            <entity name="Graph_Conditional" />
+            <entity name="Type_2_Graph" />
+            <entity name="Type_1_Graph" />
+            <entity name="Type_3_Graph" />
+            <display locked="true" x="3" y="389" width="444" height="144" color="red">
+                <item uid="9" />
+                <item uid="10" />
+                <item uid="11" />
+                <item uid="12" />
+                <item uid="13" />
+                <item uid="14" />
+                <item uid="15" />
+                <item uid="16" />
+                <item uid="17" />
+                <item uid="18" />
+                <item uid="19" />
+                <item uid="20" />
+            </display>
+        </group>
+        <display show_pages="true" page_width="595" page_height="775" page_cols="2" isee:converter_size="medium" isee:animate_flows="true" isee:animate_stocks="true" isee:animate_converters="true" interval="DT" report_balances="ending" scroll_y="120">
+            <connector x="114" y="397" uid="9">
+                <from>Salary_Conditional</from>
+                <to>Income</to>
+            </connector>
+            <connector x="196" y="205" uid="0">
+                <from>Bank_Account</from>
+                <to>Positive_Interest</to>
+            </connector>
+            <connector x="180" y="241" uid="1">
+                <from>Positive_Interest</from>
+                <to>Income</to>
+            </connector>
+            <connector x="209" y="205" uid="2">
+                <from>Bank_Account</from>
+                <to>Negative_Interest</to>
+            </connector>
+            <connector x="252" y="268" uid="3">
+                <from>Negative_Interest</from>
+                <to>Expenses</to>
+            </connector>
+            <connector x="177" y="193" uid="4">
+                <from>Bank_Account</from>
+                <to>Income</to>
+            </connector>
+            <connector x="221" y="207" uid="5">
+                <from>Bank_Account</from>
+                <to>Expenses</to>
+            </connector>
+            <connector x="385" y="228" uid="6">
+                <from>Mortgage_or_Rent</from>
+                <to>Expenses</to>
+            </connector>
+            <connector x="382" y="274" uid="7">
+                <from>Living_Expenses</from>
+                <to>Expenses</to>
+            </connector>
+            <connector x="69" y="441" uid="12">
+                <from>Type_1_Starting_Salary</from>
+                <to>Salary_Conditional</to>
+            </connector>
+            <connector x="118" y="487" uid="13">
+                <from>Type_2_Starting_Salary</from>
+                <to>Salary_Conditional</to>
+            </connector>
+            <connector x="169" y="440" uid="14">
+                <from>Type_3_Starting_Salary</from>
+                <to>Salary_Conditional</to>
+            </connector>
+            <connector x="225" y="402" uid="15">
+                <from>Whole_Number_Rounder</from>
+                <to>Salary_Conditional</to>
+            </connector>
+            <connector x="237" y="488" uid="16">
+                <from>Years_of_Education</from>
+                <to>Whole_Number_Rounder</to>
+            </connector>
+            <connector x="305" y="442" uid="17">
+                <from>Type_1_Graph</from>
+                <to>Graph_Conditional</to>
+            </connector>
+            <connector x="350" y="489" uid="18">
+                <from>Type_2_Graph</from>
+                <to>Graph_Conditional</to>
+            </connector>
+            <connector x="398" y="443" uid="20">
+                <from>Type_3_Graph</from>
+                <to>Graph_Conditional</to>
+            </connector>
+            <connector x="249" y="402" uid="19">
+                <from>Whole_Number_Rounder</from>
+                <to>Graph_Conditional</to>
+            </connector>
+            <connector x="339" y="398" uid="10">
+                <from>Graph_Conditional</from>
+                <to>Income</to>
+            </connector>
+            <connector x="234" y="490" uid="11">
+                <from>Years_of_Education</from>
+                <to>Expenses</to>
+            </connector>
+            <connector x="382" y="188" uid="8">
+                <from>Car_Payment</from>
+                <to>Expenses</to>
+            </connector>
+            <text_box x="141" y="15" uid="21" color="#7F00FF" font-family="Times New Roman" font-size="18" font-weight="bold" text-align="center" padding="5" border-style="double" border-width="thick-thin" width="299" height="89">MODELING YOUR FUTURE:&#x0D;Education and Career Choice Options&#x0D;</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface show_pages="true" page_rows="3" page_width="788" page_height="528">
+            <simulation_delay>0.1</simulation_delay>
+            <isee:process_frame x="272" y="1206" width="157" height="79" name="Income_Statement" show_name="false" color="#0CA0FF" border-style="solid" border-width="thin" />
+            <isee:process_frame x="43" y="1190" width="152" height="55" name="Expenses" show_name="false" color="#0CA0FF" border-style="solid" border-width="thin" />
+            <isee:bundled_connector color="red">
+                <from>Expenses</from>
+                <to>Income_Statement</to>
+                <pts>
+                    <pt x="195" y="1185" />
+                    <pt x="272" y="1185" />
+                </pts>
+            </isee:bundled_connector>
+            <isee:process_frame x="46" y="1288" width="148" height="53" name="Salary_and_Education" show_name="false" color="#0CA0FF" border-style="solid" border-width="thin" />
+            <isee:bundled_connector color="red">
+                <from>Salary_and_Education</from>
+                <to>Income_Statement</to>
+                <pts>
+                    <pt x="194" y="1267" />
+                    <pt x="272" y="1267" />
+                </pts>
+            </isee:bundled_connector>
+            <stacked_container x="6" y="273" height="245" width="451" visible_index="1" uid="22">
+                <graph type="time_series" title="Chosen Type Income" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:40:43Z" cleared="true" time_precision="0" from="16" to="65">
+                    <plot index="0" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <entity name="Income" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Comparative Income" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" comparative="true" cleared="true" time_precision="0" from="16" to="65">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <entity name="Income" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="243" y="330" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Income Graph" type="graph" icon_of="22" />
+            <stacked_container x="3" y="955" height="161" width="466" uid="23">
+                <table font-size="9" background="#FFFE91" column_width="76" orientation="vertical" interval="1" report_balances="ending" cleared="true" date_time="1995-06-21T09:12:20Z">
+                    <title> Table 1</title>
+                    <item type="time" color="black" precision="0.01" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Income" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Expenses" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Bank_Account" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="230" y="1043" width="26" height="22" color="#008F44" label_side="bottom" label="Table 2" type="table" icon_of="23" />
+            <slider x="134" y="25" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="10" max="16">
+                <entity name="Years_of_Education" value="16" />
+            </slider>
+            <slider x="134" y="74" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="10000" max="14000">
+                <entity name="Type_1_Starting_Salary" value="10000" />
+            </slider>
+            <slider x="134" y="124" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="10000" max="18000">
+                <entity name="Type_2_Starting_Salary" value="10000" />
+            </slider>
+            <slider x="134" y="173" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="14000" max="36000">
+                <entity name="Type_3_Starting_Salary" />
+            </slider>
+            <text_box x="269" y="4" uid="24" color="#7F00FF" font-family="Arial" font-size="8" padding="5" border-style="double" border-width="thin" width="186" height="46">If 10 or 11 are selected, use Type 1 slider&#x0D;If 12 to 15 are selected, use Type 2 slider&#x0D;If 16 is selected, use Type 3 slider</text_box>
+            <text_box x="269" y="54" uid="25" color="#7F00FF" font-family="Arial" font-size="8" padding="5" border-style="double" border-width="thin" width="187" height="47">HS drop-out and no experience = $10,000&#x0D;Experience and GED or re-enrolled in school= $14,000&#x0D;&#x0D;&#x0D;</text_box>
+            <text_box x="269" y="104" uid="26" color="#7F00FF" font-family="Arial" font-size="8" padding="5" border-style="double" border-width="thin" width="187" height="47">HS graduate and no experience = $10,000&#x0D;Experience and 2-year training program or                associate&apos;s degree = $18,000</text_box>
+            <text_box x="270" y="155" uid="27" color="#7F00FF" font-family="Arial" font-size="8" padding="5" border-style="double" border-width="thin" width="188" height="56">College grad (basic) = $14,000&#x0D;College grad (+ math/science) or specialty career major (high demand) = $36,000</text_box>
+            <text_box x="118" y="222" uid="28" color="#7F00FF" font-family="Arial" font-size="12" font-weight="bold" text-align="center" padding="5" border-style="solid" border-width="thin" width="259" height="28">SCROLL DOWN FOR INCOME GRAPH</text_box>
+            <slider x="142" y="760" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="0" max="1000">
+                <entity name="Car_Payment" value="307" />
+            </slider>
+            <slider x="141" y="811" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="0" max="1000">
+                <entity name="Mortgage_or_Rent" value="307" />
+            </slider>
+            <slider x="142" y="864" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="0" max="10000">
+                <entity name="Living_Expenses" value="396" />
+            </slider>
+            <text_box x="65" y="530" uid="29" color="#7F00FF" font-family="Arial" font-size="12" font-weight="bold" text-align="center" padding="5" border-style="solid" border-width="thin" width="339" height="32">SCROLL DOWN FOR MONTHLY EXPENSE SLIDERS</text_box>
+            <text_box x="12" y="585" uid="30" color="#7F00FF" font-family="Arial" font-size="12" padding="5" border-style="double" border-width="thick-thin" width="442" height="67">Note:  Expense sliders are MONTHLY.&#x0D;     Money not spent will be tracked as savings (at 5% interest).&#x0D;     Overspending will be tracked as a loan (at 15% interest).</text_box>
+            <text_box x="109" y="915" uid="31" color="#7F00FF" font-family="Arial" font-size="12" font-weight="bold" padding="5" border-style="solid" border-width="thin" width="247" height="26">SCROLL DOWN FOR DATA TABLE</text_box>
+            <text_box x="281" y="842" uid="32" color="#7F00FF" font-family="Arial" font-size="8" padding="5" border-style="double" border-width="thin" width="179" height="48">Food, utilities, entertainment, travel, gasoline, insurance, taxes, charitable donations, repairs, furnishings, ETC.</text_box>
+            <text_box x="151" y="1125" uid="33" color="#7F00FF" font-family="Arial" font-size="12" font-weight="bold" text-align="center" padding="5" border-style="solid" border-width="thin" width="165" height="27">Sector Flow Diagram</text_box>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

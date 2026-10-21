@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Tree Game Puzzle Policy3</name>
+        <uuid>00e09985-f5ab-4c9f-b014-407f9ddaf421</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="14" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Years" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>20</stop>
+        <dt>1</dt>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="interface" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1094" height="658" />
+        <isee:security />
+        <isee:print_setup width="576" height="768" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="module" />
+    <model>
+        <stock name="Trees_on_Farm">
+            <eqn>120</eqn>
+            <inflow>Planting_Trees</inflow>
+            <outflow>Cutting_Trees</outflow>
+            <non_negative />
+            <display x="248" y="185" color="blue" />
+        </stock>
+        <flow name="Planting_Trees">
+            <eqn>Trees_on_Farm*Planting_Fraction</eqn>
+            <non_negative />
+            <display x="154" y="181" color="blue" label_angle="223">
+                <pts>
+                    <pt x="83" y="181" />
+                    <pt x="226" y="181" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Cutting_Trees">
+            <eqn>25</eqn>
+            <non_negative />
+            <display x="350" y="180" color="blue" label_angle="302">
+                <pts>
+                    <pt x="270" y="180" />
+                    <pt x="430" y="180" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Planting_Fraction">
+            <eqn>.1</eqn>
+            <display x="128" y="320" color="blue" />
+        </aux>
+        <stock name="Total_Sold">
+            <eqn>0</eqn>
+            <inflow>Cutting_Trees</inflow>
+            <non_negative />
+            <display x="452" y="184" color="blue" />
+        </stock>
+        <display page_width="576" page_height="768" isee:converter_size="medium" isee:animate_flows="true" isee:animate_stocks="true" isee:animate_converters="true" interval="DT" scroll_x="24">
+            <connector x="123" y="313" uid="0">
+                <from>Planting_Fraction</from>
+                <to>Planting_Trees</to>
+            </connector>
+            <connector x="233" y="202" uid="1">
+                <from>Trees_on_Farm</from>
+                <to>Planting_Trees</to>
+            </connector>
+            <style font-family="Arial" font-size="14" />
+        </display>
+        <interface show_pages="true" page_cols="2" page_rows="2" page_width="1012" page_height="696" scroll_y="696" home_page="3">
+            <simulation_delay>0.1</simulation_delay>
+            <stacked_container x="25" y="38" height="319" width="556" uid="2">
+                <graph type="time_series" title="Trees on the Farm" background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" cleared="true" time_precision="2" from="0" to="20">
+                    <plot index="0" pen_width="3" color="blue" precision="1" show_y_axis="true">
+                        <entity name="Trees_on_Farm" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled" background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" cleared="true" time_precision="2" from="0" to="20">
+                    <plot index="0" pen_width="3" color="blue" precision="1" show_y_axis="true">
+                        <entity name="Trees_on_Farm" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="233" y="128" width="26" height="22" color="#008F44" label_side="bottom" label="Graph 1" type="graph" icon_of="2" />
+            <stacked_container x="608" y="37" height="322" width="389" uid="3">
+                <table font-size="9" background="#FFFFC9" column_width="93" orientation="vertical" interval="DT" cleared="true" date_time="2010-12-09T11:30:41Z">
+                    <title>Trees</title>
+                    <item type="time" color="black" header-font-weight="bold" precision="1" width="47" />
+                    <item color="black" header-font-weight="bold" precision="1" delimit_000s="true" index="0">
+                        <entity name="Trees_on_Farm" />
+                    </item>
+                    <item color="black" header-font-weight="bold" precision="1" delimit_000s="true" index="1">
+                        <entity name="Planting_Trees" />
+                    </item>
+                    <item color="black" header-font-weight="bold" precision="1" delimit_000s="true" index="2">
+                        <entity name="Cutting_Trees" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="903" y="161" width="26" height="22" color="#CACB30" label_side="bottom" label="Table 1" type="table" icon_of="3" />
+            <slider x="132" y="408" color="#30CB32" width="197" height="43" min="0" max="0.4" precision="0.1">
+                <entity name="Planting_Fraction" />
+            </slider>
+            <slider x="127" y="472" color="red" width="197" height="43" min="0" max="60" precision="1">
+                <entity name="Cutting_Trees" />
+            </slider>
+            <button x="335" y="439" width="68" height="45" uid="4" appearance="opaque" background="black" color="white" style="rounded" label="Restore Graphs &amp; Tables" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>restore_graphs_tables</menu_action>
+            </button>
+            <button x="335" y="381" width="65" height="34" uid="5" appearance="opaque" background="black" color="white" style="rounded" label="Run" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>run</menu_action>
+            </button>
+            <numeric_display precision="1" display_as="number" color="blue" show_name="true" retain_ending_value="true" uid="6" x="897" y="385">
+                <entity name="Total_Sold" />
+            </numeric_display>
+            <button x="844" y="416" width="114" height="54" uid="7" appearance="opaque" background="black" color="white" style="rounded" label="Restore Numeric Displays" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>restore_numeric_displays</menu_action>
+            </button>
+            <text_box x="498" y="377" uid="8" color="black" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="254" height="77">POLICY EXAMPLE 3:&#x0D;Planting: proportion of Trees&#x0D;Cutting: Constant</text_box>
+            <button x="842" y="521" width="59" height="58" uid="9" appearance="opaque" background="black" color="white" style="square" icon="5">
+                <link target="home_page" isee:default_icon="true" />
+            </button>
+            <text_box x="207" y="782" uid="10" color="black" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="518" height="229">THE TREE GAME PUZZLE                    POLICY 3&#x0D;&#x0D;POLICY EXAMPLE 3:&#x0D;Planting: Proportion of Trees&#x0D;Cutting:   Constant&#x0D;&#x0D;This simulation of the Tree Game Puzzle allows the manager to decide that the yearly planting will be a percentage, or fraction, of the existing tree population.  The number cut each year will remain constant, an amount  the manager will set.  The beginning settings for this simulation are planting 10% of the tree population each year and cutting down 25 trees to sell.   &#x0D;&#x0D;Run the simulation and see what happens.  Then adjust the settings and notice the changes.</text_box>
+            <button x="407" y="1046" width="108" height="64" uid="11" appearance="opaque" background="black" color="white" style="rounded" label="Try your policy" font-family="Arial" font-size="12" text-align="center">
+                <link target="interface" x="0" y="0" />
+            </button>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="14" />
+    </model>
+</xmile>

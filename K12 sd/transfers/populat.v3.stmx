@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>populat.v3</name>
+        <uuid>e6640142-b783-4863-b9b3-2a1af983501b</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Time" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>12</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="false" layer="map" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="A_HUMAN_POPULATION">
+            <eqn> { Place initial value here… }</eqn>
+            <inflow>Inflow_Rate</inflow>
+            <outflow>outflow_rate</outflow>
+            <non_negative />
+            <display x="272" y="251" color="blue" label_angle="84" />
+        </stock>
+        <flow name="Inflow_Rate">
+            <eqn> { Place right hand side of equation here… }</eqn>
+            <non_negative />
+            <display x="207" y="253" color="blue" label_side="left">
+                <pts>
+                    <pt x="162" y="253" />
+                    <pt x="252" y="253" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="outflow_rate">
+            <eqn> { Place right hand side of equation here… }</eqn>
+            <non_negative />
+            <display x="335" y="253" color="blue" label_side="right">
+                <pts>
+                    <pt x="292" y="253" />
+                    <pt x="378" y="253" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Normal_Birth_Fraction">
+            <eqn> { Place right hand side of equation here… }</eqn>
+            <display x="95" y="212" color="blue" label_side="top" label_angle="144" />
+        </aux>
+        <aux name="Normal_Death_Fraction">
+            <eqn> { Place right hand side of equation here… }</eqn>
+            <display x="449" y="217" color="blue" label_side="top" label_angle="27" />
+        </aux>
+        <aux name="Emigration">
+            <eqn> { Place right hand side of equation here… }</eqn>
+            <display x="294" y="304" color="blue" />
+        </aux>
+        <aux name="Immigration">
+            <eqn> { Place right hand side of equation here… }</eqn>
+            <display x="228" y="305" color="blue" />
+        </aux>
+        <aux name="Cataclysmic_Event">
+            <eqn> { Place right hand side of equation here… }</eqn>
+            <display x="399" y="435" color="blue" />
+        </aux>
+        <aux name="Changes_in_Mortality_Fraction">
+            <eqn> { Place right hand side of equation here… }</eqn>
+            <display x="394" y="313" color="blue" label_side="right" label_angle="4" />
+        </aux>
+        <aux name="Change_in_Birth_Fraction">
+            <eqn> { Place right hand side of equation here… }</eqn>
+            <display x="74" y="376" color="blue" />
+        </aux>
+        <display page_width="595" page_height="775" isee:converter_size="medium" interval="DT">
+            <connector x="104" y="214" uid="0">
+                <from>Normal_Birth_Fraction</from>
+                <to>Inflow_Rate</to>
+            </connector>
+            <connector x="255" y="268" uid="1">
+                <from>A_HUMAN_POPULATION</from>
+                <to>Inflow_Rate</to>
+            </connector>
+            <connector x="290" y="268" uid="2">
+                <from>A_HUMAN_POPULATION</from>
+                <to>outflow_rate</to>
+            </connector>
+            <connector x="440" y="217" uid="3">
+                <from>Normal_Death_Fraction</from>
+                <to>outflow_rate</to>
+            </connector>
+            <connector x="220" y="300" uid="4">
+                <from>Immigration</from>
+                <to>Inflow_Rate</to>
+            </connector>
+            <connector x="301" y="298" uid="5">
+                <from>Emigration</from>
+                <to>outflow_rate</to>
+            </connector>
+            <connector x="396" y="427" uid="6">
+                <from>Cataclysmic_Event</from>
+                <to>outflow_rate</to>
+            </connector>
+            <connector x="385" y="309" uid="7">
+                <from>Changes_in_Mortality_Fraction</from>
+                <to>outflow_rate</to>
+            </connector>
+            <connector x="81" y="370" uid="8">
+                <from>Change_in_Birth_Fraction</from>
+                <to>Inflow_Rate</to>
+            </connector>
+            <text_box x="26" y="8" uid="9" color="#7F00FF" font-family="Arial" font-size="10" padding="5" width="357" height="24">Figure 1. Modeling Population Dynamics and the Human Experience</text_box>
+            <text_box x="11" y="34" uid="10" color="#7F00FF" font-family="Arial" font-size="10" padding="5" width="549" height="77">For those unfamiliar with a STELLA model, the center box is a &quot;stock&quot; of people; the arrow to the left of the box indicates a &quot;flow&quot; of &quot;new&quot; people into the population, with the surrounding circles (converters) and arrows (connectors) providing information which collectively defines the &quot;rate&quot; of the flow. Likewise, to the right of the stock, one has an &quot;outflow&quot; of people from the population, again, with various factors identified as influencing the rate of the flow. </text_box>
+            <text_box x="124" y="110" uid="11" color="#7F00FF" font-family="Arial" font-size="10" padding="5" width="300" height="98">The two most basic defining elements for a human population are the &quot;birth fraction&quot; and &quot;death fractions.&quot; During some time unit (typically a year), a percentage of the population dies, while another percentage gives birth. The size of the difference between these two significantly influences the overall dynamic of population growth or decline. </text_box>
+            <text_box x="169" y="334" uid="12" color="#7F00FF" font-family="Arial" font-size="10" padding="5" width="184" height="204">Yet another pair of factors which loom large in human history are immigration and emigration. What typically influences these? In history, we think of overpopulation elsewhere stimulating immigration, or some magnetic factor of comparative advantage: frontier history, colonization, and urbanization are all influenced by rates of immigration. Alternately, emigration could be triggered by resource limitations or comparative advantages seen elsewhere. </text_box>
+            <text_box x="10" y="408" uid="13" color="#7F00FF" font-family="Arial" font-size="10" padding="5" width="151" height="115">Both in terms of the past and present, significant changes in births have been rendered through changing ages of marriage,  desired family sizes, birth control, among other factors. </text_box>
+            <text_box x="398" y="329" uid="14" color="#7F00FF" font-family="Arial" font-size="10" padding="5" width="159" height="87">Changes in mortality fractions have been effected through changing medical care, life expectancy,  and sanitation improvements, among other factors. </text_box>
+            <text_box x="361" y="465" uid="15" color="#7F00FF" font-family="Arial" font-size="10" padding="5" width="193" height="75">History emphasizes the importance of events such as disease epidemics, wars, and other cataclysms in which considerable numbers of lives are lost. </text_box>
+            <text_box x="3" y="548" uid="16" color="#7F00FF" font-family="Arial" font-size="10" padding="5" border-style="solid" border-width="thin" width="568" height="75">History is filled with tales of colonization, conquest, war, urbanization, and epidemics; one critical factor frequently overlooked when discussing these events is population and the dynamics of growth and decline. Building and defining a model such as is presented above will enable students to appreciate how population dynamics are both a driving force in  causing or shaping local, regional, and global developments; and, equally important for understanding modernity, how population is effected by these other factors. </text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="788" page_height="528" home_page="0">
+            <simulation_delay>0.1</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Galaxy.v5</name>
+        <uuid>e9079654-12fa-4db4-8afe-71934b090327</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="100 Million Years" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>250</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="817" height="572" />
+        <isee:security />
+        <isee:print_setup width="365" height="276" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" show_documentation="true" />
+    <model>
+        <stock name="Nebula_Matter">
+            <doc>This is the amount of Mass that is currently in the form of nebuli</doc>
+            <eqn>1000000000000 {Solar Masses}</eqn>
+            <inflow>Nebula_Matter_from_Supernovas</inflow>
+            <outflow>Creation_of_Big_Stars</outflow>
+            <outflow>Creation_of_Small_Stars</outflow>
+            <display x="45" y="165" color="black" label_side="right" label_angle="26" />
+        </stock>
+        <stock name="Matter_in_Big_Stars">
+            <doc>This is the amount of matter in big stars.</doc>
+            <eqn>0 {Big Stars}</eqn>
+            <inflow>Creation_of_Big_Stars</inflow>
+            <outflow>Star_Matter_from_Supernovas</outflow>
+            <outflow>Nebula_Matter_from_Supernovas</outflow>
+            <display x="321" y="162" color="black" label_angle="68" />
+        </stock>
+        <aux name="Formation_Rate_of_Big_Stars">
+            <doc>This is the percent of nebulae matter that turns into Big Stars every 100 million years</doc>
+            <eqn>.1 {no units}</eqn>
+            <display x="266" y="231" color="black" label_side="top" label_angle="55" />
+        </aux>
+        <stock name="Matter_in_WD_&amp;_NS_&amp;_BH">
+            <doc>This is the total amout of matter in white dwarves, neutron stars and black holes from when the big stars go supernova.</doc>
+            <eqn>0 {NS&amp;BH}</eqn>
+            <inflow>Star_Matter_from_Supernovas</inflow>
+            <inflow>Collapses_of_Small_Stars</inflow>
+            <display x="577" y="158" color="black" label_angle="117" />
+        </stock>
+        <aux name="Fraction_that_goes_to_Nebulas">
+            <doc>Fraction of matter that does not go into the remaining core of a star that goes supernova.</doc>
+            <eqn>.825 {no units}</eqn>
+            <display x="78" y="68" color="black" label_side="right" label_angle="13" />
+        </aux>
+        <aux name="Volume">
+            <doc>This is the volume of the galaxy, based on the Milky Way Galaxy.</doc>
+            <eqn>31420000000000 {cubic lightyears}</eqn>
+            <display x="308" y="362" color="black" label_angle="257" />
+        </aux>
+        <stock name="Nebula_Matter_2">
+            <doc>This is the amount of Mass that is currently in the form of nebuli</doc>
+            <eqn>1000000000000 {Solar Masses}</eqn>
+            <inflow>Nebula_Matter_from_Supernovas_2</inflow>
+            <outflow>Creation_of_Big_Stars_2</outflow>
+            <display x="39" y="598" color="white" label_side="right" label_angle="26" />
+        </stock>
+        <aux name="Fraction_that_goes_to_WD_NS_and_BH">
+            <doc>This is the fraction of a Big Star that collapses into the core when it goes supernova.</doc>
+            <eqn>.175 {no units}</eqn>
+            <display x="502" y="246" color="black" label_side="top" label_angle="109" />
+        </aux>
+        <flow name="Creation_of_Big_Stars">
+            <doc>This is the amount of Nebuela matter that is forming into Big Stars.</doc>
+            <eqn>(Nebula_Matter*Percentage_of_Nebula_Matter_that_Forms_Stars)*Density_Effect_on_Creation_of_Stars*Formation_Rate_of_Big_Stars {Solar Masses}</eqn>
+            <non_negative />
+            <display x="183" y="163" color="black" label_angle="202">
+                <pts>
+                    <pt x="65" y="163" />
+                    <pt x="301" y="163" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Star_Matter_from_Supernovas">
+            <doc>This is the matter from big stars that becomes White Dwarves, Neutron Stars, and eventually Black Holes</doc>
+            <eqn>Collapse_of_Big_Stars*Fraction_that_goes_to_WD_NS_and_BH {Solar Masses}</eqn>
+            <non_negative />
+            <display x="449" y="164" color="black" label_side="top" label_angle="127">
+                <pts>
+                    <pt x="341" y="164" />
+                    <pt x="557" y="164" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Matter_in_Big_Stars_2">
+            <doc>This is the amount of matter in big stars.</doc>
+            <eqn>0 {Big Stars}</eqn>
+            <inflow>Creation_of_Big_Stars_2</inflow>
+            <outflow>Star_Matter_from_Supernovas_2</outflow>
+            <outflow>Nebula_Matter_from_Supernovas_2</outflow>
+            <display x="315" y="595" color="black" label_angle="68" />
+        </stock>
+        <aux name="Average_Lifespan_of_Big_Stars">
+            <doc>This is the average for how long a Big Star will last until it goes supernova if unaffected by other factors</doc>
+            <eqn>5 {100 million  years}</eqn>
+            <display x="529" y="282" color="black" label_angle="198" />
+        </aux>
+        <aux name="Formation_Rate_of_Big_Stars_2">
+            <doc>This is the percent of nebulae matter that turns into Big Stars every 100 million years</doc>
+            <eqn>.1 {no units}</eqn>
+            <display x="270" y="658" color="black" label_side="top" label_angle="55" />
+        </aux>
+        <aux name="Nebula_Density">
+            <doc>This is how dense the nebulae matter is.</doc>
+            <eqn>Nebula_Matter/Volume {no units}</eqn>
+            <display x="144" y="332" color="black" label_angle="257" />
+        </aux>
+        <aux name="Density_Effect_on_Creation_of_Stars">
+            <doc>This is how the density of the nebulae matter affects the creation of stars.</doc>
+            <eqn>Nebula_Density {no units}</eqn>
+            <gf>
+                <xscale min="0" max="1" />
+                <yscale min="0.1" max="1.5" />
+                <ypts>0.10000000000000001,0.121,0.17699999999999999,0.23999999999999999,0.30299999999999999,0.42899999999999999,0.58999999999999997,0.7649999999999999,1.024,1.2829999999999999,1.4999999999999998</ypts>
+            </gf>
+            <display x="290" y="297" color="black" label_angle="203" />
+        </aux>
+        <aux name="Percentage_of_Nebula_Matter_that_Forms_Stars">
+            <doc>This is the percent of the Nebula Matter that is turning into star matter at any given time</doc>
+            <eqn>.07 {no units}</eqn>
+            <display x="163" y="243" color="black" label_angle="320" />
+        </aux>
+        <flow name="Collapses_of_Small_Stars">
+            <doc>This is the rate thet small stars collapses into white dwarfs.</doc>
+            <eqn>Matter_in_Small_Stars*Fraction_of_small_stars_that_die</eqn>
+            <non_negative />
+            <display x="321" y="405" color="black" label_side="left" label_angle="212">
+                <pts>
+                    <pt x="65" y="405" />
+                    <pt x="578" y="405" />
+                    <pt x="578" y="173" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Matter_in_Small_Stars">
+            <doc>This is the amount of small stars.</doc>
+            <eqn>0 {Small Stars}</eqn>
+            <inflow>Creation_of_Small_Stars</inflow>
+            <outflow>Collapses_of_Small_Stars</outflow>
+            <display x="45" y="407" color="black" label_side="bottom" label_angle="310" />
+        </stock>
+        <aux name="Collapse_of_Big_Stars">
+            <doc>This is how many Big Stars collapse every 100 million years</doc>
+            <eqn>(Matter_in_Big_Stars/Average_Lifespan_of_Big_Stars) {no units}</eqn>
+            <display x="459" y="262" color="black" label_angle="267" />
+        </aux>
+        <aux name="Formation_Rate_of_Small_stars">
+            <doc>This is the percent of nebulae matter that forms small stars every 100 millions years.</doc>
+            <eqn>.9 {no units}</eqn>
+            <display x="91" y="375" color="black" label_side="right" />
+        </aux>
+        <flow name="Creation_of_Small_Stars">
+            <doc>This is the creation rate of small stars.</doc>
+            <eqn>(Nebula_Matter*Percentage_of_Nebula_Matter_that_Forms_Stars)*Density_Effect_on_Creation_of_Stars*Formation_Rate_of_Small_stars {Solar Masses}</eqn>
+            <non_negative />
+            <display x="49" y="286" color="black">
+                <pts>
+                    <pt x="49" y="180" />
+                    <pt x="49" y="392" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Fraction_of_small_stars_that_die">
+            <doc>This is the average lifespan of small stars.</doc>
+            <eqn>time {100 million years}</eqn>
+            <gf>
+                <xscale min="0" max="250" />
+                <yscale min="0" max="0.005" />
+                <ypts>2.5000000000000001e-005,0.000175,0.00050000000000000001,0.001,0.0018750000000000001,0.0037500000000000003,0.0048000000000000004,0.0050000000000000001,0.0050000000000000001,0.0050000000000000001,0.0050000000000000001</ypts>
+            </gf>
+            <display x="424" y="384" color="black" label_side="top" label_angle="26" />
+        </aux>
+        <flow name="Nebula_Matter_from_Supernovas">
+            <doc>This is the amount of matter that goes back to nebula matter when big stars go supernova.</doc>
+            <eqn>Collapse_of_Big_Stars*Fraction_that_goes_to_Nebulas {solar masses}</eqn>
+            <non_negative />
+            <display x="157" y="89" color="black" label_angle="322">
+                <pts>
+                    <pt x="301" y="151" />
+                    <pt x="261" y="151" />
+                    <pt x="261" y="89" />
+                    <pt x="54" y="89" />
+                    <pt x="54" y="150" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Matter_in_WD_&amp;_NS_&amp;_BH_2">
+            <doc>This is the total amout of matter in white dwarves, neutron stars and black holes from when the big stars go supernova.</doc>
+            <eqn>0 {NS&amp;BH}</eqn>
+            <inflow>Star_Matter_from_Supernovas_2</inflow>
+            <display x="571" y="591" color="black" label_angle="117" />
+        </stock>
+        <aux name="Fraction_that_goes_to_Nebulas_2">
+            <doc>Fraction of matter that does not go into the remaining core of a star that goes supernova.</doc>
+            <eqn>.825 {no units}</eqn>
+            <display x="72" y="501" color="black" label_side="right" label_angle="13" />
+        </aux>
+        <flow name="Nebula_Matter_from_Supernovas_2">
+            <doc>This is the amount of matter that goes back to nebula matter when big stars go supernova.</doc>
+            <eqn>Collapse_of_Big_Stars_2*Fraction_that_goes_to_Nebulas_2 {solar masses}</eqn>
+            <non_negative />
+            <display x="151" y="522" color="black" label_angle="322">
+                <pts>
+                    <pt x="295" y="584" />
+                    <pt x="255" y="584" />
+                    <pt x="255" y="522" />
+                    <pt x="48" y="522" />
+                    <pt x="48" y="583" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Creation_of_Big_Stars_2">
+            <doc>This is the amount of Nebuela matter that is forming into Big Stars.</doc>
+            <eqn>(Nebula_Matter_2*Percentage_of_Nebula_Matter_that_Forms_Stars_2)*Density_Effect_on_Creation_of_Stars_2*Formation_Rate_of_Big_Stars_2{Solar Masses}</eqn>
+            <non_negative />
+            <display x="177" y="596" color="black" label_angle="202">
+                <pts>
+                    <pt x="59" y="596" />
+                    <pt x="295" y="596" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Star_Matter_from_Supernovas_2">
+            <doc>This is the matter from big stars that becomes White Dwarves, Neutron Stars, and eventually Black Holes</doc>
+            <eqn>Collapse_of_Big_Stars_2*Fraction_that_goes_to_WD_NS_and_BH_2 {Solar Masses}</eqn>
+            <non_negative />
+            <display x="443" y="597" color="black" label_side="top" label_angle="127">
+                <pts>
+                    <pt x="335" y="597" />
+                    <pt x="551" y="597" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Average_Lifespan_of_Big_Stars_2">
+            <doc>This is the average for how long a Big Star will last until it goes supernova if unaffected by other factors</doc>
+            <eqn>5 {100 million  years}</eqn>
+            <display x="523" y="715" color="black" label_angle="198" />
+        </aux>
+        <aux name="Fraction_that_goes_to_WD_NS_and_BH_2">
+            <doc>This is the fraction of a Big Star that collapses into the core when it goes supernova.</doc>
+            <eqn>.175 {no units}</eqn>
+            <display x="496" y="679" color="black" label_side="top" label_angle="109" />
+        </aux>
+        <aux name="Percentage_of_Nebula_Matter_that_Forms_Stars_2">
+            <doc>This is the percent of the Nebula Matter that is turning into star matter at any given time</doc>
+            <eqn>.07 {no units}</eqn>
+            <display x="157" y="676" color="black" label_angle="320" />
+        </aux>
+        <aux name="Collapse_of_Big_Stars_2">
+            <doc>This is how many Big Stars collapse every 100 million years</doc>
+            <eqn>(Matter_in_Big_Stars_2/Average_Lifespan_of_Big_Stars_2) {no units}</eqn>
+            <display x="453" y="695" color="black" label_angle="267" />
+        </aux>
+        <aux name="Volume_2">
+            <doc>This is the volume of the galaxy, based on the Milky Way Galaxy.</doc>
+            <eqn>31420000000000 {cubic lightyears}</eqn>
+            <display x="234" y="786" color="black" label_angle="257" />
+        </aux>
+        <aux name="Nebula_Density_2">
+            <doc>This is how dense the nebulae matter is.</doc>
+            <eqn>Nebula_Matter_2/Volume_2 {no units}</eqn>
+            <display x="70" y="756" color="white" label_angle="257" />
+        </aux>
+        <aux name="Density_Effect_on_Creation_of_Stars_2">
+            <doc>This is how the density of the nebulae matter affects the creation of stars.</doc>
+            <eqn>Nebula_Density_2 {no units}</eqn>
+            <gf>
+                <xscale min="0" max="1" />
+                <yscale min="0.1" max="1.5" />
+                <ypts>0.10000000000000001,0.121,0.17699999999999999,0.23999999999999999,0.30299999999999999,0.42899999999999999,0.58999999999999997,0.7649999999999999,1.024,1.2829999999999999,1.4999999999999998</ypts>
+            </gf>
+            <display x="216" y="721" color="white" label_angle="203" />
+        </aux>
+        <display page_width="365" page_height="276" page_cols="2" page_rows="8" isee:converter_size="large" interval="10" scroll_y="1414">
+            <connector x="263" y="219" uid="0" color="black">
+                <from>Formation_Rate_of_Big_Stars</from>
+                <to>Creation_of_Big_Stars</to>
+            </connector>
+            <connector x="67" y="177" uid="1" color="black">
+                <from>Nebula_Matter</from>
+                <to>Creation_of_Big_Stars</to>
+            </connector>
+            <connector x="339" y="177" uid="2" color="black">
+                <from>Matter_in_Big_Stars</from>
+                <to>Collapse_of_Big_Stars</to>
+            </connector>
+            <connector x="521" y="274" uid="3" color="black">
+                <from>Average_Lifespan_of_Big_Stars</from>
+                <to>Collapse_of_Big_Stars</to>
+            </connector>
+            <connector x="85" y="77" uid="4" color="black">
+                <from>Fraction_that_goes_to_Nebulas</from>
+                <to>Nebula_Matter_from_Supernovas</to>
+            </connector>
+            <connector x="498" y="235" uid="5" color="black">
+                <from>Fraction_that_goes_to_WD_NS_and_BH</from>
+                <to>Star_Matter_from_Supernovas</to>
+            </connector>
+            <connector x="259" y="653" uid="6" color="black">
+                <from>Formation_Rate_of_Big_Stars_2</from>
+                <to>Creation_of_Big_Stars_2</to>
+            </connector>
+            <connector x="48" y="180" uid="7" color="black">
+                <from>Nebula_Matter</from>
+                <to>Nebula_Density</to>
+            </connector>
+            <connector x="296" y="359" uid="8" color="black">
+                <from>Volume</from>
+                <to>Nebula_Density</to>
+            </connector>
+            <connector x="61" y="610" uid="9" color="white">
+                <from>Nebula_Matter_2</from>
+                <to>Creation_of_Big_Stars_2</to>
+            </connector>
+            <connector x="152" y="324" uid="10" color="black">
+                <from>Nebula_Density</from>
+                <to>Density_Effect_on_Creation_of_Stars</to>
+            </connector>
+            <connector x="282" y="288" uid="11" color="black">
+                <from>Density_Effect_on_Creation_of_Stars</from>
+                <to>Creation_of_Big_Stars</to>
+            </connector>
+            <connector x="173" y="238" uid="12" color="black">
+                <from>Percentage_of_Nebula_Matter_that_Forms_Stars</from>
+                <to>Creation_of_Big_Stars</to>
+            </connector>
+            <connector x="448" y="256" uid="13" color="black">
+                <from>Collapse_of_Big_Stars</from>
+                <to>Nebula_Matter_from_Supernovas</to>
+            </connector>
+            <connector x="458" y="250" uid="14" color="black">
+                <from>Collapse_of_Big_Stars</from>
+                <to>Star_Matter_from_Supernovas</to>
+            </connector>
+            <connector x="88" y="363" uid="15" color="black">
+                <from>Formation_Rate_of_Small_stars</from>
+                <to>Creation_of_Small_Stars</to>
+            </connector>
+            <connector x="413" y="388" uid="16" color="black">
+                <from>Fraction_of_small_stars_that_die</from>
+                <to>Collapses_of_Small_Stars</to>
+            </connector>
+            <connector x="67" y="408" uid="17" color="black">
+                <from>Matter_in_Small_Stars</from>
+                <to>Collapses_of_Small_Stars</to>
+            </connector>
+            <connector x="333" y="610" uid="18" color="white">
+                <from>Matter_in_Big_Stars_2</from>
+                <to>Collapse_of_Big_Stars_2</to>
+            </connector>
+            <connector x="279" y="293" uid="19" color="black">
+                <from>Density_Effect_on_Creation_of_Stars</from>
+                <to>Creation_of_Small_Stars</to>
+            </connector>
+            <connector x="48" y="182" uid="20" color="black">
+                <from>Nebula_Matter</from>
+                <to>Creation_of_Small_Stars</to>
+            </connector>
+            <connector x="152" y="248" uid="21" color="black">
+                <from>Percentage_of_Nebula_Matter_that_Forms_Stars</from>
+                <to>Creation_of_Small_Stars</to>
+            </connector>
+            <connector x="515" y="707" uid="22" color="black">
+                <from>Average_Lifespan_of_Big_Stars_2</from>
+                <to>Collapse_of_Big_Stars_2</to>
+            </connector>
+            <connector x="79" y="510" uid="23" color="black">
+                <from>Fraction_that_goes_to_Nebulas_2</from>
+                <to>Nebula_Matter_from_Supernovas_2</to>
+            </connector>
+            <connector x="492" y="668" uid="24" color="black">
+                <from>Fraction_that_goes_to_WD_NS_and_BH_2</from>
+                <to>Star_Matter_from_Supernovas_2</to>
+            </connector>
+            <connector x="167" y="671" uid="25" color="black">
+                <from>Percentage_of_Nebula_Matter_that_Forms_Stars_2</from>
+                <to>Creation_of_Big_Stars_2</to>
+            </connector>
+            <connector x="442" y="689" uid="26" color="black">
+                <from>Collapse_of_Big_Stars_2</from>
+                <to>Nebula_Matter_from_Supernovas_2</to>
+            </connector>
+            <connector x="452" y="683" uid="27" color="black">
+                <from>Collapse_of_Big_Stars_2</from>
+                <to>Star_Matter_from_Supernovas_2</to>
+            </connector>
+            <connector x="222" y="783" uid="28" color="black">
+                <from>Volume_2</from>
+                <to>Nebula_Density_2</to>
+            </connector>
+            <connector x="78" y="748" uid="29" color="white">
+                <from>Nebula_Density_2</from>
+                <to>Density_Effect_on_Creation_of_Stars_2</to>
+            </connector>
+            <connector x="49" y="613" uid="30" color="white">
+                <from>Nebula_Matter_2</from>
+                <to>Nebula_Density_2</to>
+            </connector>
+            <connector x="219" y="709" uid="31" color="white">
+                <from>Density_Effect_on_Creation_of_Stars_2</from>
+                <to>Creation_of_Big_Stars_2</to>
+            </connector>
+            <stacked_container x="23" y="852" height="387" width="663" uid="32">
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:33:23Z" cleared="true" time_precision="2" from="0" to="250">
+                    <plot index="0" pen_width="1" color="black" precision="0.01" show_y_axis="true">
+                        <entity name="Matter_in_Big_Stars" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="black" precision="0.01" show_y_axis="true">
+                        <entity name="Matter_in_Big_Stars_2" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="448" y="474" width="26" height="22" color="black" label_side="bottom" label="Graph 1" type="graph" icon_of="32" />
+            <stacked_container x="81" y="1424" height="518" width="631" uid="33">
+                <table font-size="9" background="white" column_width="119" orientation="vertical" interval="10" cleared="true" date_time="1999-04-29T15:42:05Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" width="100" />
+                    <item color="black" precision="1" delimit_000s="true" index="0">
+                        <entity name="Matter_in_Big_Stars" />
+                    </item>
+                    <item color="black" precision="1" delimit_000s="true" index="1">
+                        <entity name="Matter_in_Big_Stars_2" />
+                    </item>
+                    <item color="black" precision="1" delimit_000s="true" index="2">
+                        <entity name="Matter_in_Small_Stars" />
+                    </item>
+                    <item color="black" precision="1" delimit_000s="true" index="3">
+                        <entity name="Matter_in_WD_&amp;_NS_&amp;_BH" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="695" y="1257" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="33" />
+            <text_box x="279" y="68" uid="34" color="black" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="142" height="58">WD:  White Dwarves&#x0D;NS:  Neutron Stars&#x0D;BH:  Black Holes</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_rows="2" page_width="640" page_height="480" scroll_y="16">
+            <simulation_delay>0</simulation_delay>
+            <stacked_container x="80" y="35" height="554" width="542" uid="35">
+                <isee:loop background="white" color="black" name="Untitled Loop" selected_entity="Matter_in_Big_Stars" label="R">
+                    <index>0</index>
+                    <entity name="Matter_in_Big_Stars" />
+                    <entity name="Collapse_of_Big_Stars" />
+                    <entity name="Nebula_Matter_from_Supernovas" />
+                    <entity name="Nebula_Matter" />
+                    <entity name="Nebula_Density" />
+                    <entity name="Density_Effect_on_Creation_of_Stars" />
+                    <entity name="Creation_of_Big_Stars" />
+                </isee:loop>
+            </stacked_container>
+            <pad_icon x="155" y="107" width="26" height="22" color="black" label_side="bottom" label="Loop 1" type="loop" icon_of="35" />
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

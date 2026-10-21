@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Lesson3MODELING</name>
+        <uuid>a2beae7c-15b8-4216-b27e-7768faee3bb5</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="12" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Days" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>5</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="858" height="611" />
+        <isee:security />
+        <isee:print_setup width="818" height="572" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="module" />
+    <model>
+        <stock name="MY_ACCOUNT">
+            <doc>In this simulation, the initial number of $$ in MY ACCOUNT equals my first day&apos;s costs for ingredients and supplies (or daily expenditures). First, you have to have the money to spend, then you earn money based on sales. </doc>
+            <eqn>Expenses__Daily</eqn>
+            <inflow>Daily_Income</inflow>
+            <outflow>Daily_Expenses</outflow>
+            <non_negative />
+            <event_poster min="0" max="60">
+                <threshold value="0.1" direction="decreasing">
+                    <event sim_action="stop">
+                        <text_box>You are out of money and cannot buy any more ingredients.  You must close your Lemonade Stand.  Better luck next time.</text_box>
+                    </event>
+                </threshold>
+            </event_poster>
+            <display x="360" y="1339" color="blue" />
+        </stock>
+        <flow name="Daily\nIncome">
+            <doc>Your daily income is based on the number of cups you sell each day (daily cups actually sold) multiplied by the price you charge per cup. &#x0D;&#x0D;If you would like to change this equation, click &quot;Hide Document&quot; to view options. When you are satisfied with a new equation, click OK.</doc>
+            <eqn>Daily_Cups_Actually_Sold * price_per_cup</eqn>
+            <non_negative />
+            <display x="283" y="1339" color="black" label_side="top">
+                <pts>
+                    <pt x="229" y="1339" />
+                    <pt x="338" y="1339" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="possible_number_of_\ncups_able_\nto_sell">
+            <doc>If you click on &quot;To Graphical Function&quot; you will see the graph that describes how many cups can be sold for each price between $0.50 and $1.50 per cup. These are POSSIBLE sales, depending upon whether or not you have produced enough batches of lemonade to sell. &#x0D;&#x0D;You may change the graph. </doc>
+            <eqn>price_per_cup</eqn>
+            <gf>
+                <xscale min="0.5" max="1.5" />
+                <yscale min="0" max="300" />
+                <ypts>300,225,150,75,55,40,32,24,16,8,0</ypts>
+            </gf>
+            <display x="166" y="1452" color="black" label_side="top" label_angle="103" />
+        </aux>
+        <stock name="TOTAL_PROFIT">
+            <eqn>0</eqn>
+            <outflow>Daily_Profit</outflow>
+            <non_negative />
+            <display x="375" y="1797" color="blue" />
+        </stock>
+        <stock name="MY\n_ACCOUNT">
+            <doc>In this simulation, the initial number of $$ in MY ACCOUNT equals my first day&apos;s costs for ingredients and supplies (or daily expenditures). First, you have to have the money to spend, then you earn money based on sales. </doc>
+            <eqn>daily__expenditures</eqn>
+            <inflow>Daily__Income</inflow>
+            <outflow>Daily__Expenses</outflow>
+            <non_negative />
+            <event_poster min="0" max="60">
+                <threshold value="0.1" direction="decreasing">
+                    <event sim_action="stop">
+                        <text_box>You are out of money and cannot buy any more ingredients.  You must close your Lemonade Stand.  Better luck next time.</text_box>
+                    </event>
+                </threshold>
+            </event_poster>
+            <display x="363" y="829" color="red" />
+        </stock>
+        <flow name="Daily_\nIncome">
+            <doc>The rate that Daily Income flows into MY ACCOUNT is determined by daily income from sales.&#x0D;&#x0D;If you would like to change this, click &quot;Hide Document&quot; to view options. When you are satisfied with a new equation, click OK.</doc>
+            <eqn>daily__income_from_sales</eqn>
+            <non_negative />
+            <display x="286" y="829" color="black" label_side="top" label_angle="125">
+                <pts>
+                    <pt x="232" y="829" />
+                    <pt x="341" y="829" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Daily\nExpenses">
+            <doc>Total expenses each day are determined by the number of batches you choose to make multiplied by the cost per batch. &#x0D;&#x0D;If you would like to change this equation, click &quot;Hide Document&quot; to view options. When you are satisfied with a new equation, click OK.</doc>
+            <eqn>batches_made * cost_per_batch</eqn>
+            <non_negative />
+            <display x="437" y="1338" color="red" label_side="top" label_angle="43">
+                <pts>
+                    <pt x="382" y="1338" />
+                    <pt x="493" y="1338" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="batches\nmade">
+            <doc>In this simulation, you may choose to make between 1 and 4 batches (each of 75 cups of lemonade). &#x0D;&#x0D;Type in the number you want to change the number of batches made and click OK. </doc>
+            <eqn>0</eqn>
+            <display x="416" y="1440" color="fuchsia" label_side="left" label_angle="160" />
+        </aux>
+        <stock name="TOTAL_CUPS\nSOLD">
+            <eqn>0</eqn>
+            <inflow>Cups_Sold</inflow>
+            <non_negative />
+            <display x="101" y="1988" color="blue" />
+        </stock>
+        <flow name="Cups\nSold">
+            <eqn>Daily_Cups_Actually_Sold</eqn>
+            <non_negative />
+            <display x="146" y="1987" color="blue" label_angle="305">
+                <pts>
+                    <pt x="170" y="1987" />
+                    <pt x="123" y="1987" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="price_per\ncup">
+            <doc>This is the price (in $) you set for a cup of lemonade. &#x0D;&#x0D;In the simulation, this price could vary from 0.50 cents to $1.50 a cup. Type in a number to change the price per cup and click OK.</doc>
+            <eqn>0</eqn>
+            <event_poster min="1" max="2">
+                <threshold value="1">
+                    <event>
+                        <text_box />
+                    </event>
+                </threshold>
+            </event_poster>
+            <display x="262" y="1426" color="fuchsia" />
+        </aux>
+        <stock name="TOTAL__EXPENSES">
+            <eqn>0</eqn>
+            <inflow>Expenses__Daily</inflow>
+            <non_negative />
+            <display x="637" y="1986" color="blue" label_angle="139" />
+        </stock>
+        <flow name="Expenses_\nDaily">
+            <eqn>Daily_Expenses</eqn>
+            <non_negative />
+            <display x="693" y="1986" color="blue" label_angle="313">
+                <pts>
+                    <pt x="728" y="1986" />
+                    <pt x="659" y="1986" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="TOTAL__INCOME">
+            <eqn>0</eqn>
+            <inflow>Income_Daily</inflow>
+            <non_negative />
+            <display x="209" y="1795" color="blue" label_angle="126" />
+        </stock>
+        <aux name="Daily_Cups\nActually_Sold">
+            <doc>This equation compares how many cups you COULD sell with the  number of cups you&apos;ve made (batches multiplied by 75 cups per batch) and picks the minimum number (you sell EITHER the amount you&apos;ve made or fewer cups if the price is too high).</doc>
+            <eqn>ROUND(MIN(possible_number_of__cups_able__to_sell, (batches_made * 75)))</eqn>
+            <display x="336" y="1472" color="black" label_angle="279" />
+        </aux>
+        <flow name="Daily_\nExpenses">
+            <doc>The daily expenses that flow out of MY ACCOUNT are determined by my daily expenditures. &#x0D;&#x0D;If you would like to change this, click &quot;Hide Document&quot; to view options. When you are satisfied with a new equation, click OK.</doc>
+            <eqn>daily__expenditures</eqn>
+            <non_negative />
+            <display x="440" y="828" color="red" label_side="top" label_angle="43">
+                <pts>
+                    <pt x="385" y="828" />
+                    <pt x="496" y="828" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="cost_per_batch">
+            <doc>In the simulation, you may make between 1 and 4 batches of lemonade (each producing 75 cups of lemonade). &#x0D;&#x0D;The cost per batch falls as you make more batches. To see these costs in a graph, click on &quot;To Graphical Function.&quot;  You may change the numbers in this graph.</doc>
+            <eqn>batches_made</eqn>
+            <gf>
+                <xscale min="1" max="4" />
+                <yscale min="0" max="100" />
+                <ypts>35,30,27,25</ypts>
+            </gf>
+            <display x="500" y="1429" color="red" />
+        </aux>
+        <flow name="Income\nDaily">
+            <eqn>Daily_Income</eqn>
+            <non_negative />
+            <display x="265" y="1799" color="blue" label_side="top" label_angle="63">
+                <pts>
+                    <pt x="300" y="1799" />
+                    <pt x="231" y="1799" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="TOTAL_CUPS\nDISCARDED">
+            <eqn>0</eqn>
+            <inflow>Cups_Discarded</inflow>
+            <non_negative />
+            <display x="336" y="1989" color="blue" />
+        </stock>
+        <flow name="Cups\nDiscarded">
+            <eqn>(batches_made * 75) - Daily_Cups_Actually_Sold</eqn>
+            <non_negative />
+            <display x="395" y="1991" color="blue" label_side="top" label_angle="45">
+                <pts>
+                    <pt x="433" y="1991" />
+                    <pt x="358" y="1991" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="daily_\nexpenditures">
+            <doc>How much are my daily expenditures?&#x0D;&#x0D;In the simulation, this depends on how many batches of lemonade you make. That information is contained in a graph found in a  &quot;cost per batch&quot; converter in the &quot;Model Used in Lesson 3.&quot;&#x0D;&#x0D;Type in a number to change daily expenditures and click OK. </doc>
+            <eqn>0</eqn>
+            <display x="474" y="880" color="red" label_angle="295" />
+        </aux>
+        <aux name="TOTAL___CUPS_SOLD">
+            <eqn>TOTAL_CUPS_SOLD+Cups_Sold</eqn>
+            <display x="104" y="2042" color="blue" />
+        </aux>
+        <aux name="TOTAL___CUPS_DISCARDED">
+            <eqn>TOTAL_CUPS_DISCARDED+Cups_Discarded</eqn>
+            <display x="340" y="2067" color="blue" />
+        </aux>
+        <aux name="TOTAL_INCOME">
+            <eqn>TOTAL__INCOME+Income_Daily</eqn>
+            <display x="208" y="1875" color="blue" />
+        </aux>
+        <aux name="TOTAL_EXPENSES">
+            <eqn>TOTAL__EXPENSES+Expenses__Daily</eqn>
+            <display x="598" y="2038" color="blue" />
+        </aux>
+        <aux name="daily__income\nfrom_sales">
+            <doc>How much money do you make from daily sales?&#x0D;&#x0D; In the simulation, your daily income from sales is based on the price you set for a cup of lemonade. This ranges from 300 cups being sold at a price of 50 cents, to none at $1.50 per cup. This information can be found in a graph inside the &quot;possible number of cups able to sell&quot; converter in the &quot;Model Used in Lesson 3.&quot;&#x0D;&#x0D;Type in a new number to change daily income from sales and click OK.</doc>
+            <eqn>0</eqn>
+            <display x="251" y="885" color="black" label_angle="253" />
+        </aux>
+        <flow name="Daily_Profit">
+            <doc>Your daily profit is calculated by taking the amount of money you make in sales minus the expenses incurred in buying supplies. </doc>
+            <eqn>Daily_Income - Daily_Expenses</eqn>
+            <display x="430" y="1805" color="blue" label_side="top" label_angle="63">
+                <pts>
+                    <pt x="397" y="1805" />
+                    <pt x="463" y="1805" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="hours_worked\nper_day">
+            <doc>In this simulation, each batch of lemonade you make requires 2 hours to produce and sell. Hence the number of batches made multiplied by 2 hours produces the total number of hours you work each day. &#x0D;&#x0D;Click &quot;Hide Document&quot; if you would like to change this equation. </doc>
+            <eqn>batches_made * 2</eqn>
+            <display x="440" y="1513" color="blue" />
+        </aux>
+        <aux name="profit\nper_hour">
+            <doc>An interesting statistic is how much profit you make for each hour you work. You calculate that by taking total profit and dividing it by numbers of hours worked. </doc>
+            <eqn>if hours_worked_per_day = 0 then 0 else Daily_Profit / hours_worked_per_day</eqn>
+            <display x="513" y="1526" color="blue" label_side="right" label_angle="348" />
+        </aux>
+        <display page_width="818" page_height="572" page_cols="2" page_rows="4" isee:converter_size="medium" isee:name_only_modules="true" isee:animate_flows="true" isee:animate_stocks="true" interval="DT" report_flows="summed">
+            <connector x="173" y="1457" uid="0" color="black">
+                <from>possible_number_of__cups_able__to_sell</from>
+                <to>Daily_Cups_Actually_Sold</to>
+            </connector>
+            <alias x="489" y="1972" uid="1" color="blue">
+                <of>batches_made</of>
+            </alias>
+            <alias x="443" y="2027" uid="2" color="blue">
+                <of>Daily_Cups_Actually_Sold</of>
+            </alias>
+            <connector x="481" y="1971" uid="3">
+                <from>
+                    <alias uid="1" />
+                </from>
+                <to>Cups_Discarded</to>
+            </connector>
+            <connector x="434" y="2026" uid="4">
+                <from>
+                    <alias uid="2" />
+                </from>
+                <to>Cups_Discarded</to>
+            </connector>
+            <connector x="253" y="1425" uid="5" color="black">
+                <from>price_per_cup</from>
+                <to>possible_number_of__cups_able__to_sell</to>
+            </connector>
+            <connector x="413" y="1432" uid="6">
+                <from>batches_made</from>
+                <to>Daily_Expenses</to>
+            </connector>
+            <alias x="176" y="1945" uid="7" color="blue">
+                <of>Daily_Cups_Actually_Sold</of>
+                <label_side>right</label_side>
+                <label_angle>330</label_angle>
+            </alias>
+            <connector x="175" y="1954" uid="8">
+                <from>
+                    <alias uid="7" />
+                </from>
+                <to>Cups_Sold</to>
+            </connector>
+            <connector x="349" y="1847" uid="10">
+                <from>
+                    <alias uid="9" />
+                </from>
+                <to>Income_Daily</to>
+            </connector>
+            <connector x="411" y="1447" uid="11" color="black">
+                <from>batches_made</from>
+                <to>Daily_Cups_Actually_Sold</to>
+            </connector>
+            <connector x="424" y="1435" uid="12" color="red">
+                <from>batches_made</from>
+                <to>cost_per_batch</to>
+            </connector>
+            <connector x="499" y="1420" uid="13" color="red">
+                <from>cost_per_batch</from>
+                <to>Daily_Expenses</to>
+            </connector>
+            <alias x="728" y="1952" uid="14">
+                <of>Daily_Expenses</of>
+                <label_side>top</label_side>
+                <label_angle>133</label_angle>
+            </alias>
+            <alias x="358" y="1846" uid="9" color="blue">
+                <of>Daily_Income</of>
+            </alias>
+            <alias x="503" y="1839" uid="15" color="blue">
+                <of>Daily_Expenses</of>
+            </alias>
+            <connector x="366" y="1849" uid="16">
+                <from>
+                    <alias uid="9" />
+                </from>
+                <to>Daily_Profit</to>
+            </connector>
+            <connector x="494" y="1841" uid="17">
+                <from>
+                    <alias uid="15" />
+                </from>
+                <to>Daily_Profit</to>
+            </connector>
+            <connector x="474" y="871" uid="18">
+                <from>daily__expenditures</from>
+                <to>Daily__Expenses</to>
+            </connector>
+            <connector x="90" y="2005" uid="19">
+                <from>TOTAL_CUPS_SOLD</from>
+                <to>TOTAL___CUPS_SOLD</to>
+            </connector>
+            <connector x="144" y="1996" uid="20">
+                <from>Cups_Sold</from>
+                <to>TOTAL___CUPS_SOLD</to>
+            </connector>
+            <connector x="329" y="2006" uid="21">
+                <from>TOTAL_CUPS_DISCARDED</from>
+                <to>TOTAL___CUPS_DISCARDED</to>
+            </connector>
+            <connector x="394" y="2000" uid="22">
+                <from>Cups_Discarded</from>
+                <to>TOTAL___CUPS_DISCARDED</to>
+            </connector>
+            <connector x="190" y="1812" uid="23">
+                <from>TOTAL__INCOME</from>
+                <to>TOTAL_INCOME</to>
+            </connector>
+            <connector x="259" y="1806" uid="24">
+                <from>Income_Daily</from>
+                <to>TOTAL_INCOME</to>
+            </connector>
+            <connector x="615" y="1995" uid="25">
+                <from>TOTAL__EXPENSES</from>
+                <to>TOTAL_EXPENSES</to>
+            </connector>
+            <connector x="686" y="1993" uid="26">
+                <from>Expenses__Daily</from>
+                <to>TOTAL_EXPENSES</to>
+            </connector>
+            <connector x="252" y="876" uid="27" color="black">
+                <from>daily__income_from_sales</from>
+                <to>Daily__Income</to>
+            </connector>
+            <connector x="725" y="1960" uid="28">
+                <from>
+                    <alias uid="14" />
+                </from>
+                <to>Expenses__Daily</to>
+            </connector>
+            <connector x="257" y="1418" uid="29">
+                <from>price_per_cup</from>
+                <to>Daily_Income</to>
+            </connector>
+            <connector x="338" y="1463" uid="30">
+                <from>Daily_Cups_Actually_Sold</from>
+                <to>Daily_Income</to>
+            </connector>
+            <connector x="414" y="1449" uid="31" color="blue">
+                <from>batches_made</from>
+                <to>hours_worked_per_day</to>
+            </connector>
+            <alias x="473" y="1573" uid="32">
+                <of>Daily_Profit</of>
+            </alias>
+            <connector x="482" y="1573" uid="33" color="blue">
+                <from>
+                    <alias uid="32" />
+                </from>
+                <to>profit_per_hour</to>
+            </connector>
+            <connector x="449" y="1511" uid="34" color="blue">
+                <from>hours_worked_per_day</from>
+                <to>profit_per_hour</to>
+            </connector>
+            <stacked_container height="260" width="454" uid="35">
+                <graph type="time_series" title="Total $$ in MY ACCOUNT" background="#FFFE91" show_grid="true" plot_numbers="true" isee:use_five_segments="true" hide_detail="true" comparative="true" cleared="true" time_precision="2" from="0" to="5">
+                    <plot index="0" pen_width="3" color="blue" precision="1" show_y_axis="true">
+                        <entity name="MY__ACCOUNT" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="638" y="826" width="26" height="22" color="#008F44" label_side="bottom" label="Graph 1" type="graph" icon_of="35" />
+            <stacked_container height="282" width="492" uid="36">
+                <graph type="time_series" title="Total $$ in MY ACCOUNT" background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="true" hide_detail="true" comparative="true" cleared="true" time_precision="2" from="0" to="5">
+                    <plot index="0" pen_width="3" color="blue" precision="1" show_y_axis="true">
+                        <entity name="MY_ACCOUNT" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="646" y="1315" width="26" height="22" color="#008F44" label_side="bottom" label="Graph 2" type="graph" icon_of="36" />
+            <stacked_container height="286" width="465" uid="37">
+                <table font-size="9" background="#E0E0E0" column_width="102" orientation="vertical" interval="1" report_flows="summed" cleared="true" date_time="2010-12-21T13:38:08Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" precision="max" width="47" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Daily__Income" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="MY__ACCOUNT" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Daily__Expenses" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="710" y="825" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="37" />
+            <stacked_container height="286" width="465" uid="38">
+                <table font-size="9" background="#E0E0E0" column_width="75" orientation="vertical" interval="1" report_flows="summed" cleared="true" date_time="2010-12-21T13:38:08Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" precision="max" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Daily_Income" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="MY_ACCOUNT" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Daily_Expenses" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="726" y="1314" width="26" height="22" color="#008F44" label_side="bottom" label="Table 2" type="table" icon_of="38" />
+            <text_box x="38" y="1542" uid="39" color="#FF7F00" font-family="Arial" font-size="12" font-weight="bold" text-align="center" padding="5" width="272" height="73">Additional parts of the model (scroll down further) are used to calculate TOTALS for all 5 days. </text_box>
+            <button x="275" y="51" width="183" height="30" uid="40" appearance="opaque" background="#0CA0FF" color="white" style="rounded" label="Intro: Build Your Own Model!" font-family="Arial" font-size="12" text-align="center">
+                <popup x="-190" y="34" width="617" height="346" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="16">If you haven&apos;t modeled before, watch our Build Your Own Personal Finance Model video to help you get started with using STELLA modeling software, available at http://clexchange.org/curriculum/dollarsandsense.asp. &#x0D;&#x0D;Choose from 3 options:&#x0D;&#x0D;(1) Use this blank STELLA page to build your own model from scratch. Everything you need is here (icons/buttons for building blocks, tables and graphs, text; Word menus to run and print...);  OR&#x0D;&#x0D;(2) Click on the &quot;Explore Simple Stock and Flow Model&quot; button to see the &quot;core&quot; pre-built stock and flow model (Go ahead and make changes -- insert new numbers, change names, add building blocks!);  OR&#x0D;&#x0D;(3) Click on the &quot;Explore Model Used in Lesson 3&quot; to explore a version of the actual model used in Lesson 3 (it&apos;s a bit more complicated, but everything in it is explained!). &#x0D;&#x0D;Start wherever you want! Play with it and have fun!&#x0D;&#x0D;</text_box>
+                </popup>
+            </button>
+            <button x="461" y="531" width="146" height="31" uid="41" appearance="opaque" background="red" color="white" style="square" label="Explore Model Used in Lesson 3" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="1144" />
+            </button>
+            <button x="299" y="531" width="146" height="31" uid="42" appearance="opaque" background="red" color="white" style="square" label="Explore Simple Stock and Flow Model" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="572" />
+            </button>
+            <button x="480" y="1671" width="146" height="31" uid="43" appearance="opaque" background="#E0E0E0" color="white" style="square" label="Explore Model Used in Lesson 3" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="1150" />
+            </button>
+            <button x="318" y="1671" width="146" height="31" uid="44" appearance="opaque" background="red" color="white" style="square" label="Explore Simple Stock and Flow Model" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="588" />
+            </button>
+            <text_box x="7" y="7" uid="45" color="red" font-family="Arial" font-size="32" font-weight="bold" text-align="center" padding="5" width="748" height="48"> Can I Make Money with a Lemonade Stand? </text_box>
+            <button x="138" y="531" width="147" height="32" uid="46" appearance="opaque" background="#E0E0E0" color="white" style="square" label="Build Your Own Model " font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="0" />
+            </button>
+            <button x="302" y="631" width="129" height="34" uid="47" appearance="opaque" background="#0CA0FF" color="white" style="rounded" label="What can I do with this?" font-family="Arial" font-size="12" text-align="center">
+                <popup x="-116" y="285" width="367" height="187" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="16">Here&apos;s a very simple version of the Stock and Flow model used in Lesson 3. &quot;Daily income from sales&quot; effects the rate that $$ flow into MY SAVINGS. &quot;Daily Expenses&quot; effect the rate that $$ flow out. &#x0D;&#x0D;Explore (e.g., change amounts ($) for deposits or expenses; rename or add new building blocks to make this &quot;your&quot; model). Play with it and have fun!&#x0D;</text_box>
+                </popup>
+            </button>
+            <text_box x="18" y="578" uid="48" color="red" font-family="Comic Sans MS" font-size="32" font-weight="bold" text-align="center" padding="5" width="746" height="56">Simple Stock/Flow Model (used in Lesson 3) </text_box>
+            <button x="293" y="1201" width="129" height="34" uid="49" appearance="opaque" background="#0CA0FF" color="white" style="rounded" label="What can I do with this?" font-family="Arial" font-size="12" text-align="center">
+                <popup x="-124" y="286" width="444" height="222" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="16">This is a version of the model underlying the Lesson 3 Simulation. When you click and open any building block, you will find an explanation for how it works. &#x0D;&#x0D;You will notice that we&apos;ve added factors effecting &quot;Daily Income&quot; (price per cup, Daily Cups Actually Sold) and &quot;Daily Expenses&quot; (batches made, cost per batch).  Why do you think we did that? Click on these building blocks to learn more.&#x0D;&#x0D;Explore how you can make changes (e.g., change numbers; rename or add new building blocks to make this &quot;your&quot; model). Play with it and have fun!&#x0D;</text_box>
+                </popup>
+            </button>
+            <text_box x="13" y="1144" uid="50" color="red" font-family="Comic Sans MS" font-size="32" font-weight="bold" text-align="center" padding="5" width="746" height="56"> Model Used in Lesson 3</text_box>
+            <button x="157" y="1671" width="147" height="32" uid="51" appearance="opaque" background="red" color="white" style="square" label="Build Your Own Model " font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="0" />
+            </button>
+            <button x="634" y="1404" width="65" height="34" uid="52" appearance="opaque" background="#7F00FF" color="white" style="rounded" label="Run" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>run</menu_action>
+            </button>
+            <button x="710" y="1404" width="65" height="34" uid="53" appearance="opaque" background="#7F00FF" color="white" style="rounded" label="Reset" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>restore_all</menu_action>
+            </button>
+            <button x="275" y="959" width="65" height="34" uid="54" appearance="opaque" background="#7F00FF" color="white" style="rounded" label="Run" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>run</menu_action>
+            </button>
+            <button x="449" y="1105" width="146" height="31" uid="55" appearance="opaque" background="red" color="white" style="square" label="Explore Model Used in Lesson 3" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="1144" />
+            </button>
+            <button x="287" y="1105" width="146" height="31" uid="56" appearance="opaque" background="#E0E0E0" color="white" style="square" label="Explore Simple Stock and Flow Model" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="588" />
+            </button>
+            <button x="126" y="1105" width="147" height="32" uid="57" appearance="opaque" background="red" color="white" style="square" label="Build Your Own Model " font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="0" />
+            </button>
+            <button x="352" y="960" width="65" height="34" uid="58" appearance="opaque" background="#7F00FF" color="white" style="rounded" label="Reset" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>restore_all</menu_action>
+            </button>
+            <style font-family="Arial" font-size="12" />
+        </display>
+        <interface show_pages="true" page_cols="4" page_rows="4" page_width="788" page_height="528" zoom="12.5">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="835" y="427" content="35" />
+        <popup x="73" y="82" content="36" />
+        <popup x="678" y="277" content="37" />
+        <popup x="17" y="116" content="38" />
+        <style font-family="Arial" font-size="12" />
+    </model>
+</xmile>

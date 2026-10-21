@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Ramp3.v7</name>
+        <uuid>66eb2c8b-f0c1-4b0c-9881-8fcea6323f94</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Time" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>12</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="1334" height="630" />
+        <isee:security />
+        <isee:print_setup width="583" height="763" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Velocity">
+            <doc>Velocity is an accumulation.  It is increased by the acceleration that flows into it and it is decreased by the deceleration that flows out.  Velocity rises and falls over time as a result of these flows.</doc>
+            <eqn>0</eqn>
+            <inflow>Acceleration</inflow>
+            <outflow>Deceleration</outflow>
+            <non_negative />
+            <display x="284" y="100" color="blue" />
+        </stock>
+        <flow name="Acceleration">
+            <doc>Acceleration makes the velocity grow.  Acceleration is affected by the  force of gravity and the angle of elevation of the ramp.</doc>
+            <eqn>Gravity*SIN(Ramp_angle)</eqn>
+            <non_negative />
+            <display x="207" y="97" color="blue">
+                <pts>
+                    <pt x="150" y="97" />
+                    <pt x="264" y="97" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Ramp_angle">
+            <doc>At the end of the ramp, the angle of elevation becomes 0 as the car continues to roll down the hall.  As long as the &quot;Position&quot; of the car is less than the length of the ramp, the car is still on the ramp and the angle will affect its acceleration and deceleration.</doc>
+            <eqn>IF(Position&lt;Ramp_length)THEN(Angle_converter)ELSE(0)</eqn>
+            <display x="177" y="211" color="blue" />
+        </aux>
+        <aux name="Gravity">
+            <doc>The force of gravity is a constant.</doc>
+            <eqn>9.8</eqn>
+            <display x="275" y="157" color="blue" />
+        </aux>
+        <aux name="Ramp_length">
+            <doc>Our ramp is 3 meters long.</doc>
+            <eqn>3</eqn>
+            <display x="110" y="230" color="blue" />
+        </aux>
+        <stock name="Position">
+            <doc>This tells how far the car has rolled.  It is an accumulation that is built up by velocity.   </doc>
+            <eqn>0</eqn>
+            <inflow>Vel</inflow>
+            <non_negative />
+            <display x="340" y="309" color="blue" />
+        </stock>
+        <flow name="Vel">
+            <doc>This is the same value as the &quot;Velocity&quot; stock.  In this case it is a flow which causes the &quot;Position&quot; to increase. </doc>
+            <eqn>Velocity</eqn>
+            <non_negative />
+            <display x="394" y="306" color="blue">
+                <pts>
+                    <pt x="429" y="306" />
+                    <pt x="360" y="306" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Angle_converter">
+            <doc>This formula converts degrees into radians.</doc>
+            <eqn>Angle_of_elevation*PI/180</eqn>
+            <display x="152" y="252" color="blue" />
+        </aux>
+        <aux name="Angle_of_elevation">
+            <doc>This model works for low angles of elevation, up to 40 degrees.  In our lab, this is as steep as we could go.  This model does not account for the loss of energy into the floor at the end of the ramp which increases at steeper angles.  </doc>
+            <eqn>22</eqn>
+            <display x="128" y="309" color="blue" />
+        </aux>
+        <aux name="Friction_Coefficient">
+            <doc>We established the friction co-efficient for our cars by running the experiment first and then adjusting the &quot;Friction&quot; value on the model until the model replicated the distances we had observed.   </doc>
+            <eqn>.1</eqn>
+            <display x="416" y="162" color="blue" />
+        </aux>
+        <flow name="Deceleration">
+            <doc>Deceleration decreases velocity; it slows the car down.  It is affected by the force of gravity, the angle of elevation, and friction.</doc>
+            <eqn>Friction_Coefficient*Gravity*COS(Ramp_angle)</eqn>
+            <non_negative />
+            <display x="355" y="98" color="blue">
+                <pts>
+                    <pt x="304" y="98" />
+                    <pt x="406" y="98" />
+                </pts>
+            </display>
+        </flow>
+        <display page_width="583" page_height="763" isee:converter_size="large" interval="DT">
+            <connector x="175" y="199" uid="0">
+                <from>Ramp_angle</from>
+                <to>Acceleration</to>
+            </connector>
+            <connector x="263" y="156" uid="1">
+                <from>Gravity</from>
+                <to>Acceleration</to>
+            </connector>
+            <connector x="122" y="228" uid="2">
+                <from>Ramp_length</from>
+                <to>Ramp_angle</to>
+            </connector>
+            <connector x="305" y="83" uid="3">
+                <from>Velocity</from>
+                <to>Vel</to>
+            </connector>
+            <connector x="133" y="298" uid="4">
+                <from>Angle_of_elevation</from>
+                <to>Angle_converter</to>
+            </connector>
+            <connector x="157" y="241" uid="5">
+                <from>Angle_converter</from>
+                <to>Ramp_angle</to>
+            </connector>
+            <connector x="411" y="151" uid="6">
+                <from>Friction_Coefficient</from>
+                <to>Deceleration</to>
+            </connector>
+            <connector x="287" y="155" uid="7">
+                <from>Gravity</from>
+                <to>Deceleration</to>
+            </connector>
+            <connector x="320" y="315" uid="8">
+                <from>Position</from>
+                <to>Ramp_angle</to>
+            </connector>
+            <connector x="186" y="219" uid="9">
+                <from>Ramp_angle</from>
+                <to>Deceleration</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="10">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:05:07Z" cleared="true" time_precision="2" from="0" to="12">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="Position" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <entity name="Velocity" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="504" y="379" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 2" type="graph" icon_of="10" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="1588" page_height="1128" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="13" y="112" content="10" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

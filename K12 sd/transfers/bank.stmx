@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>bank</name>
+        <uuid>aecefd7a-b081-4c4e-9602-9e9033cc61e1</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Months" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>48</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="785" height="529" />
+        <isee:security />
+        <isee:print_setup width="582" height="762" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="My_Account_Balance">
+            <eqn>0</eqn>
+            <inflow>Deposits</inflow>
+            <outflow>Withdrawals</outflow>
+            <non_negative />
+            <display x="240" y="108" color="blue" />
+        </stock>
+        <flow name="Deposits">
+            <eqn>Monthly_earnings+Monthly_Interest_Payments</eqn>
+            <non_negative />
+            <display x="186" y="106" color="blue">
+                <pts>
+                    <pt x="153" y="106" />
+                    <pt x="220" y="106" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Withdrawals">
+            <eqn>Monthly_spending</eqn>
+            <non_negative />
+            <display x="303" y="106" color="blue">
+                <pts>
+                    <pt x="260" y="106" />
+                    <pt x="347" y="106" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Monthly_spending">
+            <eqn>50</eqn>
+            <display x="367" y="146" color="blue" />
+        </aux>
+        <aux name="Monthly_earnings">
+            <eqn>100</eqn>
+            <display x="110" y="150" color="blue" />
+        </aux>
+        <aux name="Monthly_Interest_Payments">
+            <eqn>My_Account_Balance*Monthly_Percent_Interest_Rate/100</eqn>
+            <display x="199" y="178" color="blue" />
+        </aux>
+        <aux name="Monthly_Percent_Interest_Rate">
+            <eqn>.5</eqn>
+            <display x="271" y="224" color="blue" />
+        </aux>
+        <aux name="Price_of_car">
+            <eqn>5000</eqn>
+            <display x="385" y="217" color="blue" />
+        </aux>
+        <display page_width="582" page_height="762" isee:converter_size="large" interval="DT">
+            <connector x="118" y="140" uid="0">
+                <from>Monthly_earnings</from>
+                <to>Deposits</to>
+            </connector>
+            <connector x="358" y="138" uid="1">
+                <from>Monthly_spending</from>
+                <to>Withdrawals</to>
+            </connector>
+            <connector x="193" y="168" uid="2">
+                <from>Monthly_Interest_Payments</from>
+                <to>Deposits</to>
+            </connector>
+            <connector x="244" y="123" uid="3">
+                <from>My_Account_Balance</from>
+                <to>Monthly_Interest_Payments</to>
+            </connector>
+            <connector x="259" y="223" uid="4">
+                <from>Monthly_Percent_Interest_Rate</from>
+                <to>Monthly_Interest_Payments</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="5">
+                <graph type="time_series" title="Can I Buy a Car? " background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:22:24Z" cleared="true" time_precision="2" from="0" to="48">
+                    <plot index="0" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="200" />
+                        <entity name="Deposits" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="200" />
+                        <entity name="Withdrawals" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="#008F44" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="5000" />
+                        <entity name="My_Account_Balance" />
+                    </plot>
+                    <plot index="3" pen_width="1" color="#FF7F00" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="5000" />
+                        <entity name="Price_of_car" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="241" y="313" width="26" height="22" color="fuchsia" label_side="bottom" label="Graph 1" type="graph" icon_of="5" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="13" y="115" visible="true" content="5" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

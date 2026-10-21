@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>baseball.v5</name>
+        <uuid>94d1ae46-723e-4998-b159-1cc3a3bbd4e2</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Time" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>50</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="785" height="529" />
+        <isee:security />
+        <isee:print_setup width="560" height="760" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Displacement">
+            <eqn>0</eqn>
+            <inflow>Veloc</inflow>
+            <display x="236" y="46" color="blue" />
+        </stock>
+        <flow name="Veloc">
+            <eqn>Velocity</eqn>
+            <display x="150" y="47" color="blue">
+                <pts>
+                    <pt x="85" y="47" />
+                    <pt x="216" y="47" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Velocity">
+            <eqn>25</eqn>
+            <scale min="-470" max="30" />
+            <inflow>Acceleration</inflow>
+            <display x="238" y="120" color="blue">
+                <scale min="-470" max="30" />
+            </display>
+        </stock>
+        <flow name="Acceleration">
+            <eqn>-10</eqn>
+            <display x="151" y="121" color="blue">
+                <pts>
+                    <pt x="85" y="121" />
+                    <pt x="218" y="121" />
+                </pts>
+            </display>
+        </flow>
+        <display page_width="560" page_height="760" isee:converter_size="large" interval="DT">
+            <connector x="216" y="114" uid="0">
+                <from>Velocity</from>
+                <to>Veloc</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="1">
+                <graph type="time_series" title="Baseball" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:23:28Z" cleared="true" time_precision="2" from="0" to="6">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="35" />
+                        <entity name="Displacement" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="-30" max="30" />
+                        <entity name="Velocity" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="223" y="220" width="26" height="22" color="fuchsia" label_side="bottom" label="Graph 1" type="graph" icon_of="1" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="13" y="112" visible="true" content="1" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

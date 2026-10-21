@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>CCSolution5.v3</name>
+        <uuid>f204217f-47be-429d-a40c-524a457fbf89</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="RK4" time_units="Years" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>250</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" show_pages="true" />
+    <model>
+        <stock name="POPULATION">
+            <eqn>10000</eqn>
+            <scale min="0" max="100000" />
+            <inflow>Birth_Rate</inflow>
+            <outflow>Mortality_Rate</outflow>
+            <non_negative />
+            <display x="214" y="42" color="black">
+                <scale min="0" max="100000" />
+            </display>
+        </stock>
+        <flow name="Birth_Rate">
+            <eqn>POPULATION*Birth_Fraction</eqn>
+            <non_negative />
+            <display x="154" y="42" color="black" label_side="top">
+                <pts>
+                    <pt x="115" y="42" />
+                    <pt x="194" y="42" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Mortality_Rate">
+            <eqn>POPULATION*Mortality_Fraction+PULSE(15000,150,999)</eqn>
+            <non_negative />
+            <display x="266" y="42" color="black" label_side="top" label_angle="74">
+                <pts>
+                    <pt x="234" y="42" />
+                    <pt x="299" y="42" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Birth_Fraction">
+            <eqn>.03</eqn>
+            <display x="113" y="97" color="blue" />
+        </aux>
+        <aux name="Mortality_Fraction">
+            <eqn>POPULATION</eqn>
+            <gf>
+                <xscale min="0" max="100000" />
+                <yscale min="0" max="0.06" />
+                <ypts>0,0.0050999999999999995,0.0092999999999999992,0.0123,0.014999999999999999,0.021299999999999999,0.024899999999999999,0.028199999999999999,0.0315,0.035699999999999996,0.059999999999999998</ypts>
+            </gf>
+            <display x="256" y="96" color="blue" />
+        </aux>
+        <display show_pages="true" page_width="595" page_height="775" page_order="column" isee:converter_size="medium" interval="DT">
+            <connector x="109" y="89" uid="0">
+                <from>Birth_Fraction</from>
+                <to>Birth_Rate</to>
+            </connector>
+            <connector x="197" y="60" uid="1">
+                <from>POPULATION</from>
+                <to>Birth_Rate</to>
+            </connector>
+            <connector x="207" y="57" uid="2">
+                <from>POPULATION</from>
+                <to>Mortality_Fraction</to>
+            </connector>
+            <connector x="264" y="92" uid="3">
+                <from>Mortality_Fraction</from>
+                <to>Mortality_Rate</to>
+            </connector>
+            <connector x="216" y="59" uid="4">
+                <from>POPULATION</from>
+                <to>Mortality_Rate</to>
+            </connector>
+            <stacked_container height="270" width="478" visible_index="1" uid="5">
+                <graph type="time_series" title="Untitled Graph" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:39:37Z" cleared="true" time_precision="0" from="0" to="250">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <scale min="0" max="100000" />
+                        <entity name="POPULATION" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <scale min="0" max="2500" />
+                        <entity name="Birth_Rate" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="1" show_y_axis="true">
+                        <scale min="0" max="2500" />
+                        <entity name="Mortality_Rate" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled Graph" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:39:37Z" cleared="true" time_precision="0" from="0" to="250" />
+            </stacked_container>
+            <pad_icon x="372" y="46" width="26" height="22" color="black" label_side="bottom" label="Graph 2" type="graph" icon_of="5" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface show_pages="true" page_order="column" page_cols="0" page_rows="0" page_width="788" page_height="528" home_page="0">
+            <simulation_delay>0.1</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="78" content="5" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

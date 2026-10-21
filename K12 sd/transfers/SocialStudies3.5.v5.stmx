@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>SocialStudies3.5.v5</name>
+        <uuid>9765e21f-1860-4a19-8d90-ba7d18ff841a</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Days" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>14</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="1334" height="630" />
+        <isee:security />
+        <isee:print_setup width="552" height="728" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Amount_of_Graffiti">
+            <eqn>100000</eqn>
+            <inflow>New_Graffiti</inflow>
+            <outflow>Graffiti_painted_over</outflow>
+            <non_negative />
+            <display x="200" y="59" color="black" label_side="bottom" label_angle="287" />
+        </stock>
+        <flow name="New_Graffiti">
+            <eqn>Graffiti_artists*New_Graffiti_per_artist</eqn>
+            <non_negative />
+            <display x="121" y="60" color="black" label_side="top">
+                <pts>
+                    <pt x="63" y="60" />
+                    <pt x="180" y="60" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Graffiti_painted_over">
+            <eqn>Area_Painted_per_Scout*Scouts</eqn>
+            <non_negative />
+            <display x="293" y="57" color="black" label_side="top" label_angle="77">
+                <pts>
+                    <pt x="220" y="57" />
+                    <pt x="367" y="57" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Graffiti_artists">
+            <eqn>5+5*(TIME)</eqn>
+            <display x="47" y="108" color="black" />
+        </aux>
+        <aux name="New_Graffiti_per_artist">
+            <eqn>50</eqn>
+            <display x="134" y="155" color="black" />
+        </aux>
+        <aux name="Scouts">
+            <eqn>23+(Graffiti_artists/5)</eqn>
+            <display x="262" y="144" color="black" label_side="left" label_angle="186" />
+        </aux>
+        <aux name="Area_Painted_per_Scout">
+            <eqn>500</eqn>
+            <display x="371" y="115" color="black" />
+        </aux>
+        <display page_width="552" page_height="728" isee:converter_size="large" interval="DT">
+            <connector x="55" y="99" uid="0">
+                <from>Graffiti_artists</from>
+                <to>New_Graffiti</to>
+            </connector>
+            <connector x="132" y="143" uid="1">
+                <from>New_Graffiti_per_artist</from>
+                <to>New_Graffiti</to>
+            </connector>
+            <connector x="270" y="135" uid="2">
+                <from>Scouts</from>
+                <to>Graffiti_painted_over</to>
+            </connector>
+            <connector x="363" y="107" uid="3">
+                <from>Area_Painted_per_Scout</from>
+                <to>Graffiti_painted_over</to>
+            </connector>
+            <connector x="44" y="120" uid="4">
+                <from>Graffiti_artists</from>
+                <to>Scouts</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="5">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:13:21Z" cleared="true" time_precision="2" from="0" to="14">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="100000" />
+                        <entity name="Amount_of_Graffiti" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="477" y="66" width="26" height="22" color="black" label_side="bottom" label="Graph 1" type="graph" icon_of="5" />
+            <stacked_container height="286" width="465" uid="6">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="1" cleared="true" date_time="1997-07-16T22:01:02Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Amount_of_Graffiti" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Graffiti_painted_over" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="New_Graffiti" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="482" y="131" width="26" height="22" color="black" label_side="bottom" label="Table 1" type="table" icon_of="6" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="8" y="51" content="5" />
+        <popup x="8" y="51" content="6" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

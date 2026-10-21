@@ -1,0 +1,78 @@
+Here are the directions for our project:
+
+  j
+
+
+
+1. Game & Level Structure:
+- Use bank_game.py as the flagship game for Levels 2–4 (Balancing, Reinforcing, and Delays).
+- Use Pong or a simple clicker game as a warm-up for Level 1 (Stock/Flow concepts).
+- Yes! Students should "unlock" the next level by reaching a target.level one:buying a car. level 2 buying a sports car level three, stabilizing the bank account against expenses, may require a more difficult savings scenario. or by passing a test as described in passage a below.
+
+- The .stmx models are background logic for now, but I want to turn their math into Pygame code.
+
+2. Documentation Layout:
+- Let's do BOTH. I want a student-friendly narrative story ("How this game was built") and a structured lesson plan section for teachers.
+- Keep the documentation inside the repository using a clean file like LESSONS.md or individual guide files.
+
+3. Repository Focus:
+- The primary users are BOTH students and teachers. Let's create a clear structure so teachers know where the lesson plans are and how to teach and use them, and students know where the games are.
+- Focus on the games + docs first. We will use Pygbag to make them playable on a website later.
+
+Please create the initial repository folders, a master README.md, and a LESSONS.md outline based on this workflow!
+
+
+a
+
+Please create a new test file named `bank_game_assessment.py` that connects directly to my current financial `bank_game.py` structure. 
+
+I want to build an explicit state-variable test based on the stock-flow failure research (Sterman, Weinhardt, etc.). Do NOT use a bathtub analogy—keep it strictly focused on financial variables like balances, deposit rates (inflow), and spending rates (outflow).
+
+Please program this script with the following strict gameplay logic:
+1. It must display multiple-choice questions visually on the Pygame screen with clickable buttons.
+2. The questions must explicitly trick the student into falling for the "correlation heuristic" (e.g., asking if the bank balance is dropping just because the deposit rate graph is sloping downward, even though deposit rate is still higher than spending rate).
+3. Hard Requirement: If a kid gets a question wrong, the game must explain exactly why they fell for the correlation heuristic, wipe their progress, and force them to REPEAT the test from the beginning. They cannot progress back to the game until they achieve a 100% perfect score. We cannot assume that the current game has the nessesary parts to explain the stock flow principle. that is our main task as game designers,and it weill only get hardedr as we get up the systems thinking ladder.
+
+Please write the complete, clean Pygame code with an internal async loop structure so it is ready for web deployment later using pygbag.
+
+
+
+
+
+
+
+
+
+
+
+### 1. Multi-Level Game Experience (linking the games)
+
+You mentioned a planned arc: Level 1 stock/flow → Level 2 balancing loops → Level 3 reinforcing loops → Level 4 delays/tradeoffs → final goal level. Which games should anchor each level, and what's the __goal__ for the final level? For example:
+
+- Should `bank_game.py` be the flagship level (maybe Levels 2–4), with `pong` as a simpler introductory or bonus level?
+- Do you want students to "unlock" the next level by achieving a target in the current one (e.g., "interest covers $50/month expenses for 12 months")?
+- Are the `.stmx` system dynamics models in `K12 sd/` meant to be referenced/visualized within the game, or are they background material for you?
+
+### 2. Documenting the Creation Process
+
+The CODEX.txt captures some of your iterations. Do you want the documentation to be:
+
+- __A narrative story__ (what you built, why, what you learned — readable by students)?
+- __A structured lesson plan__ (objectives, concepts, step-by-step creation guide)?
+- __Both__, with the narrative as a "story" section and the lesson plan as a separate "teacher" section?
+
+Also, should the documentation live __inside the repo__ (e.g., a `LESSONS.md` or `CREATE.md`) or as a separate document?
+
+### 3. K-12 Student Repo
+
+Who is the __primary user__ of this repo?
+
+- __Students__ who will play the games and follow the creation process themselves?
+- __Teachers__ who will use the repo as a curriculum resource?
+- __Both__, with different entry points (e.g., a `student/` folder and a `teacher/` folder)?
+
+And what tech stack should the repo use? You already have Python/Pygame and web-based builds — should the repo focus on:
+
+- Just the games + docs?
+- A runnable web dashboard (like your current localhost:8000)?
+- A full project with setup scripts, README, and student-friendly instructions?

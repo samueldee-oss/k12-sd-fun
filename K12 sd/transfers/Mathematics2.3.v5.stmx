@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Mathematics2.3.v5</name>
+        <uuid>7b66fb8b-f045-4fbf-9033-a5a8d44b906e</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Hours" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>12</stop>
+        <dt>0.1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="817" height="572" />
+        <isee:security />
+        <isee:print_setup width="552" height="728" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Town">
+            <eqn>85</eqn>
+            <non_negative />
+            <display x="273" y="59" color="blue" />
+        </stock>
+        <stock name="Good_Guys&apos;_position">
+            <eqn>35</eqn>
+            <inflow>Good_Guys&apos;_Speed</inflow>
+            <non_negative />
+            <display x="273" y="131" color="blue" />
+        </stock>
+        <flow name="Good_Guys&apos;_Speed">
+            <eqn>8</eqn>
+            <non_negative />
+            <display x="195" y="134" color="blue">
+                <pts>
+                    <pt x="138" y="134" />
+                    <pt x="253" y="134" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Thugs&apos;_position">
+            <eqn>0</eqn>
+            <inflow>Thugs&apos;_Speed</inflow>
+            <non_negative />
+            <display x="273" y="215" color="blue" />
+        </stock>
+        <flow name="Thugs&apos;_Speed">
+            <eqn>13</eqn>
+            <non_negative />
+            <display x="201" y="217" color="blue">
+                <pts>
+                    <pt x="149" y="217" />
+                    <pt x="253" y="217" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Distance_between_thugs_and_good_guys">
+            <eqn>Good_Guys&apos;_position-Thugs&apos;_position</eqn>
+            <display x="388" y="173" color="blue" label_angle="300" />
+        </aux>
+        <display page_width="552" page_height="728" isee:converter_size="large" interval="DT">
+            <connector x="293" y="136" uid="0">
+                <from>Good_Guys&apos;_position</from>
+                <to>Distance_between_thugs_and_good_guys</to>
+            </connector>
+            <connector x="288" y="200" uid="1">
+                <from>Thugs&apos;_position</from>
+                <to>Distance_between_thugs_and_good_guys</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="2">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:53:59Z" cleared="true" time_precision="2" from="0" to="12">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="100" />
+                        <entity name="Thugs&apos;_position" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="100" />
+                        <entity name="Town" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="100" />
+                        <entity name="Good_Guys&apos;_position" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="366" y="112" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="2" />
+            <stacked_container height="286" width="465" uid="3">
+                <table font-size="9" background="#FFFE91" column_width="80" orientation="vertical" interval="0.1" cleared="true" date_time="1997-07-18T16:13:57Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Thugs&apos;_position" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Town" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Good_Guys&apos;_position" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="3">
+                        <entity name="Distance_between_thugs_and_good_guys" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="431" y="112" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="3" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="8" y="51" content="2" />
+        <popup x="8" y="51" content="3" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

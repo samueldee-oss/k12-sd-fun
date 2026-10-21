@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Bathtub.v5</name>
+        <uuid>68ab9c42-125a-4143-b399-1ac1f6072187</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="RK4" time_units="minutes" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>20</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="interface" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="630" height="431" />
+        <isee:security />
+        <isee:print_setup width="576" height="731" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Bathtub">
+            <eqn>0</eqn>
+            <scale min="0" max="100" />
+            <inflow>Faucet</inflow>
+            <outflow>Drain</outflow>
+            <non_negative />
+            <display x="238" y="79" color="blue">
+                <scale min="0" max="100" />
+            </display>
+        </stock>
+        <flow name="Faucet">
+            <eqn>4</eqn>
+            <non_negative />
+            <display x="176" y="82" color="blue">
+                <pts>
+                    <pt x="135" y="82" />
+                    <pt x="218" y="82" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Drain">
+            <eqn>0</eqn>
+            <non_negative />
+            <display x="290" y="80" color="blue">
+                <pts>
+                    <pt x="258" y="80" />
+                    <pt x="323" y="80" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Full_Tub_Level">
+            <eqn>80</eqn>
+            <scale min="0" max="100" />
+            <display x="222" y="158" color="blue">
+                <scale min="0" max="100" />
+            </display>
+        </aux>
+        <display page_width="576" page_height="731" isee:converter_size="large" interval="DT">
+            <text_box x="-32767" y="-32767" uid="0" color="#7F00FF" font-family="Arial" font-size="9" padding="5" border-style="solid" border-width="thin" width="260" height="60">AST30522696</text_box>
+            <text_box x="-32767" y="-32767" uid="1" color="#7F00FF" font-family="Arial" font-size="9" padding="5" border-style="solid" border-width="thin" width="260" height="60">AST30522222</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_width="640" page_height="480" scroll_x="32">
+            <interaction_mode>flight_sim</interaction_mode>
+            <simulation_delay>0</simulation_delay>
+            <stacked_container x="30" y="2" height="254" width="451" uid="2">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:23:50Z" cleared="true" time_precision="2" from="0" to="20">
+                    <plot index="0" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <entity name="Full_Tub_Level" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <entity name="Bathtub" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="21" y="28" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="2" />
+            <knob x="312" y="328" color="blue" width="83" height="91" min="0" max="100" precision="1">
+                <entity name="Bathtub" />
+            </knob>
+            <slider x="131" y="277" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="0" max="10">
+                <entity name="Faucet" />
+            </slider>
+            <slider x="132" y="337" label_side="bottom" isee:navigate_to="true" color="#65483D" width="197" height="43" min="0" max="4">
+                <entity name="Drain" />
+            </slider>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

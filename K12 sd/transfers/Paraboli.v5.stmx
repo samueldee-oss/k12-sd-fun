@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Paraboli.v5</name>
+        <uuid>294da719-e2e1-4442-a154-13eaff11977d</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="x" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>-5</start>
+        <stop>5</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="interface" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="630" height="431" />
+        <isee:security />
+        <isee:print_setup width="576" height="731" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="meaningless">
+            <eqn>0</eqn>
+            <inflow>y</inflow>
+            <display x="240" y="139" color="blue" />
+        </stock>
+        <flow name="y">
+            <eqn>Constant*TIME^2</eqn>
+            <scale min="-150" max="150" />
+            <display x="196" y="151" color="blue">
+                <scale min="-150" max="150" />
+                <pts>
+                    <pt x="172" y="151" />
+                    <pt x="220" y="151" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Constant">
+            <eqn>2</eqn>
+            <display x="188" y="91" color="blue" />
+        </aux>
+        <display page_width="576" page_height="731" isee:converter_size="large">
+            <connector x="189" y="103" uid="0">
+                <from>Constant</from>
+                <to>y</to>
+            </connector>
+            <text_box x="-32767" y="-32767" uid="1" color="#7F00FF" font-family="Arial" font-size="9" padding="5" border-style="solid" border-width="thin" width="260" height="60">AST30522696</text_box>
+            <text_box x="-32767" y="-32767" uid="2" color="#7F00FF" font-family="Arial" font-size="9" padding="5" border-style="solid" border-width="thin" width="260" height="60">AST30522696</text_box>
+            <text_box x="-32767" y="-32767" uid="3" color="#7F00FF" font-family="Arial" font-size="9" padding="5" border-style="solid" border-width="thin" width="260" height="60">AST30522696</text_box>
+            <text_box x="-32767" y="-32767" uid="4" color="#7F00FF" font-family="Arial" font-size="9" padding="5" border-style="solid" border-width="thin" width="260" height="60">AST30522222</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_rows="2" page_width="640" page_height="480">
+            <simulation_delay>0</simulation_delay>
+            <stacked_container height="282" width="492" uid="5">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:02:51Z" cleared="true" time_precision="2" from="-5" to="5">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="meaningless" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="101" y="250" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="5" />
+            <stacked_container x="1" y="444" height="282" width="492" uid="6">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:02:51Z" cleared="true" time_precision="2" from="-5" to="5">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="y" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="17" y="463" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 2" type="graph" icon_of="6" />
+            <stacked_container x="1" y="4" height="313" width="173" uid="7">
+                <table font-size="9" background="#FFFE91" column_width="54" orientation="vertical" interval="1" cleared="true" date_time="1994-06-17T19:58:11Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" header-text-align="center" width="50" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="y" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="51" y="30" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="7" />
+            <slider x="307" y="111" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="-8" max="8">
+                <entity name="Constant" />
+            </slider>
+            <text_box x="188" y="154" uid="8" color="#7F00FF" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="129" height="122">After you have drawn your graph, use the vertical scroll bar to scroll down and compare it to the computer’s graph.</text_box>
+            <text_box x="2" y="393" uid="9" color="#7F00FF" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="208" height="42">Once you have checked your graph, scroll back up and go on to the next data set.</text_box>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="40" y="113" content="5" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

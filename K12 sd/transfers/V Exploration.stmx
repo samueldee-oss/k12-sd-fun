@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>V Exploration</name>
+        <uuid>3c7704a1-0f52-41f9-beda-690e7cc91c84</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Minutes" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>120</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="1334" height="630" />
+        <isee:security />
+        <isee:print_setup width="595" height="744" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Available_Energy">
+            <doc>This value was chosen to meet the needs of this final model.  It will allow volumes up to 500 grams with temperatures up to 100 degrees centigrade.</doc>
+            <eqn>210000&#x0D;{Joules}</eqn>
+            <outflow>Heat_Loss</outflow>
+            <non_negative />
+            <display x="82" y="120" color="blue" />
+        </stock>
+        <flow name="Heat_Loss">
+            <doc>The heat loss is proportional to each of these factors.&#x0D;&#x0D;EDITORS&apos; NOTE:  If a biflow (say labelled, &quot;Heat Change&quot;) were used, a situation in which room temperature exceeded the coffee would result in warming the cup.</doc>
+            <eqn>Breeze*Cup_Factor*Surface_Area*Temperature_Gap</eqn>
+            <non_negative />
+            <display x="226" y="117" color="blue" label_side="top" label_angle="81">
+                <pts>
+                    <pt x="102" y="117" />
+                    <pt x="350" y="117" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Coffee_Temperature">
+            <doc>This calculation determines the number of Joules remaining after providing the designated starting temperature for any mass of coffee.  If the mass of coffee is &gt; 500 grams the equation restricts the Coffee_Temperature to a value less than 100 degrees, regardless of the Desired_Initial_Temperature.&#x0D;&#x0D;EDITORS&apos; NOTE:  This is a modification of the equation provided in Powers&apos; description.  In that original equation, the first part of the expression simplifies to &apos;if (Desired_Initial_Temperature) &lt;= 210000 then...&apos;; that is not a likely condition.</doc>
+            <eqn>IF (Mass_of_Coffee * Specific_Heat * Desired_Initial_Temperature) &lt;= 210000 THEN (Available_Energy - (210000 - (Mass_of_Coffee * Specific_Heat *Desired_Initial_Temperature)))/(Specific_Heat * Mass_of_Coffee) ELSE 210000/(Specific_Heat * Mass_of_Coffee)&#x0D;{Degrees centigrade}</eqn>
+            <display x="74" y="293" color="blue" />
+        </aux>
+        <aux name="Room_Temperature">
+            <doc>This is the conventional value for room temperature.</doc>
+            <eqn>25&#x0D;{degrees centigrade}</eqn>
+            <display x="340" y="297" color="blue" />
+        </aux>
+        <aux name="Temperature_Gap">
+            <eqn>Coffee_Temperature-Room_Temperature</eqn>
+            <display x="272" y="234" color="blue" />
+        </aux>
+        <aux name="Mass_of_Coffee">
+            <doc>One cup is approximately 250 g; the stock of Available_Energy has enough heat to bring a 500 gram mass to 100 degrees.  Larger masses will result in lower initial temperatures.</doc>
+            <eqn>250&#x0D;{grams}</eqn>
+            <display x="101" y="191" color="blue" label_side="top" label_angle="77" />
+        </aux>
+        <aux name="Specific_Heat">
+            <doc>This is the specific heat of water.</doc>
+            <eqn>4.184&#x0D;{Joules/(grams * degree centigrade)}</eqn>
+            <display x="138" y="217" color="blue" />
+        </aux>
+        <aux name="Surface_Area">
+            <doc>See the notes in Powers&apos; document.</doc>
+            <eqn>((Mass_of_Coffee/250) * 193) + 44&#x0D;{Square centimeters}</eqn>
+            <display x="165" y="163" color="blue" label_side="top" label_angle="109" />
+        </aux>
+        <aux name="Desired_Initial_Temperature">
+            <doc>The default is 100 degrees, but this can be varied between 25 - 100 degrees.</doc>
+            <eqn>100</eqn>
+            <display x="224" y="293" color="blue" />
+        </aux>
+        <aux name="Cup_Factor">
+            <doc>This defines a cooling rate dependent on the characteristics of the cup (exposed surface area and insulating properties) and the coffee&apos;s temperature.</doc>
+            <eqn>.15 &#x0D;{Joules/(square centimeter * degree centigrade)}</eqn>
+            <display x="316" y="174" color="blue" />
+        </aux>
+        <aux name="Breeze">
+            <doc>This graphical input enables the simulation of a breeze.  The dynamics of the breeze can be altered by changing the graph.  This factor is contained in a separate Sector so that it will have no impact if Sector 1 alone is run.  To see the effect of this factor, go to the Sector Specs and activate the entire model.</doc>
+            <eqn>time</eqn>
+            <gf>
+                <xscale min="0" max="120" />
+                <yscale min="0" max="5" />
+                <ypts>1,1,1.9099999999999999,1,1,1,1,1,1,1,1,1,1</ypts>
+            </gf>
+            <display x="483" y="300" color="blue" />
+        </aux>
+        <group name="Sector_1">
+            <run>true</run>
+            <entity name="Available_Energy" />
+            <entity name="Heat_Loss" />
+            <entity name="Coffee_Temperature" />
+            <entity name="Room_Temperature" />
+            <entity name="Temperature_Gap" />
+            <entity name="Mass_of_Coffee" />
+            <entity name="Specific_Heat" />
+            <entity name="Surface_Area" />
+            <entity name="Desired_Initial_Temperature" />
+            <entity name="Cup_Factor" />
+            <display x="30" y="83" width="380" height="252" color="red">
+                <item uid="0" />
+                <item uid="1" />
+                <item uid="2" />
+                <item uid="3" />
+                <item uid="4" />
+                <item uid="5" />
+                <item uid="6" />
+                <item uid="7" />
+                <item uid="8" />
+                <item uid="9" />
+                <item uid="10" />
+                <item uid="11" />
+            </display>
+        </group>
+        <group name="Sector_2">
+            <entity name="Breeze" />
+            <display locked="true" x="414" y="271" width="152" height="64" color="red" />
+        </group>
+        <display page_width="595" page_height="744" page_cols="2" page_rows="2" isee:converter_size="large" interval="DT">
+            <connector x="73" y="135" uid="0">
+                <from>Available_Energy</from>
+                <to>Coffee_Temperature</to>
+            </connector>
+            <connector x="84" y="287" uid="1">
+                <from>Coffee_Temperature</from>
+                <to>Temperature_Gap</to>
+            </connector>
+            <connector x="347" y="286" uid="2">
+                <from>Room_Temperature</from>
+                <to>Temperature_Gap</to>
+            </connector>
+            <connector x="276" y="223" uid="3">
+                <from>Temperature_Gap</from>
+                <to>Heat_Loss</to>
+            </connector>
+            <connector x="93" y="200" uid="4">
+                <from>Mass_of_Coffee</from>
+                <to>Coffee_Temperature</to>
+            </connector>
+            <connector x="126" y="220" uid="5">
+                <from>Specific_Heat</from>
+                <to>Coffee_Temperature</to>
+            </connector>
+            <connector x="212" y="291" uid="6">
+                <from>Desired_Initial_Temperature</from>
+                <to>Coffee_Temperature</to>
+            </connector>
+            <connector x="308" y="164" uid="7">
+                <from>Cup_Factor</from>
+                <to>Heat_Loss</to>
+            </connector>
+            <connector x="113" y="191" uid="8">
+                <from>Mass_of_Coffee</from>
+                <to>Surface_Area</to>
+            </connector>
+            <connector x="177" y="162" uid="9">
+                <from>Surface_Area</from>
+                <to>Heat_Loss</to>
+            </connector>
+            <alias x="377" y="197" uid="11">
+                <of>Breeze</of>
+            </alias>
+            <connector x="371" y="187" uid="10">
+                <from>
+                    <alias uid="11" />
+                </from>
+                <to>Heat_Loss</to>
+            </connector>
+            <stacked_container x="44" y="397" height="284" width="498" uid="12">
+                <graph type="time_series" title="Untitled" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:15:37Z" comparative="true" cleared="true" time_precision="2" from="0" to="120">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="100" />
+                        <entity name="Coffee_Temperature" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="166" y="439" width="26" height="22" color="fuchsia" label_side="bottom" label="Graph 1" type="graph" icon_of="12" />
+            <stacked_container x="81" y="791" height="282" width="492" uid="13">
+                <graph type="time_series" title="Untitled" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:15:37Z" comparative="true" cleared="true" time_precision="2" from="0" to="120">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="3600" />
+                        <entity name="Heat_Loss" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="189" y="895" width="26" height="22" color="fuchsia" label_side="bottom" label="Graph 2" type="graph" icon_of="13" />
+            <text_box x="64" y="1" uid="14" color="#7F00FF" font-family="Arial" font-size="14" font-weight="bold" text-align="center" padding="5" width="459" height="61">COOLING COFFEE II&#x0D;Model to Accompany Powers&apos;&#x0D;V.  A Model for Exploration&#x0D;</text_box>
+            <text_box x="3" y="344" uid="15" color="black" font-family="Arial" font-size="12" padding="5" width="593" height="42">EDITORS&apos; NOTE: Experienced modelers might want to develop a Control Panel on the Upper Level map to allow users to modify the various leverage points in this model using sliders and a graphical input device.</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_width="1588" page_height="1128">
+            <simulation_delay>0</simulation_delay>
+            <isee:process_frame x="30" y="75" width="155" height="75" name="Sector_1" color="fuchsia" border-style="solid" border-width="thin" />
+            <isee:process_frame x="310" y="150" width="155" height="75" name="Sector_2" color="fuchsia" border-style="solid" border-width="thin" />
+            <isee:bundled_connector color="red">
+                <from>Sector_2</from>
+                <to>Sector_1</to>
+                <pts>
+                    <pt x="310" y="150" />
+                    <pt x="184" y="150" />
+                </pts>
+            </isee:bundled_connector>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

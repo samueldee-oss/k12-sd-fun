@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>SocialStudies4.2.v5</name>
+        <uuid>2a92648d-7255-4f37-b0a0-d7f6b020d75e</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Months" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>12</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="1334" height="630" />
+        <isee:security />
+        <isee:print_setup width="552" height="728" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Checking_Account">
+            <eqn>0</eqn>
+            <inflow>Income</inflow>
+            <inflow>Second_Income</inflow>
+            <outflow>Expenses</outflow>
+            <outflow>Transfer</outflow>
+            <outflow>Retirement_trandfer</outflow>
+            <outflow>Vacation_Transfer</outflow>
+            <outflow>College_Transfer</outflow>
+            <non_negative />
+            <display x="229" y="149" color="black" label_side="right" label_angle="336" />
+        </stock>
+        <flow name="Income">
+            <eqn>1800</eqn>
+            <non_negative />
+            <display x="155" y="141" color="black">
+                <pts>
+                    <pt x="101" y="141" />
+                    <pt x="209" y="141" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Expenses">
+            <eqn>Food+Housing+Transportation+Utilities+Charities+Clothing</eqn>
+            <non_negative />
+            <display x="396" y="148" color="black" label_side="top" label_angle="106">
+                <pts>
+                    <pt x="249" y="148" />
+                    <pt x="543" y="148" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Housing">
+            <eqn>600</eqn>
+            <display x="383" y="289" color="black" />
+        </aux>
+        <aux name="Food">
+            <eqn>450</eqn>
+            <display x="399" y="240" color="black" />
+        </aux>
+        <aux name="Transportation">
+            <eqn>250</eqn>
+            <display x="465" y="210" color="black" />
+        </aux>
+        <aux name="Utilities">
+            <eqn>150</eqn>
+            <display x="506" y="170" color="black" />
+        </aux>
+        <stock name="Savings_Account">
+            <eqn>0</eqn>
+            <inflow>Transfer</inflow>
+            <inflow>Interest_Income</inflow>
+            <non_negative />
+            <display x="231" y="287" color="black" label_side="bottom" />
+        </stock>
+        <flow name="Transfer">
+            <eqn>Checking_Account*.5</eqn>
+            <non_negative />
+            <display x="230" y="218" color="black" label_side="right" label_angle="27">
+                <pts>
+                    <pt x="230" y="164" />
+                    <pt x="230" y="272" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Interest_Income">
+            <eqn>Savings_Account*Interest_Rate</eqn>
+            <non_negative />
+            <display x="156" y="288" color="black" label_side="top">
+                <pts>
+                    <pt x="101" y="288" />
+                    <pt x="211" y="288" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Interest_Rate">
+            <eqn>.05/12</eqn>
+            <display x="93" y="340" color="black" />
+        </aux>
+        <flow name="Retirement_trandfer">
+            <eqn>.25*Checking_Account</eqn>
+            <non_negative />
+            <display x="142" y="61" color="black" label_side="top" label_angle="106">
+                <pts>
+                    <pt x="213" y="134" />
+                    <pt x="213" y="61" />
+                    <pt x="71" y="61" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Retirement_account">
+            <eqn>0</eqn>
+            <inflow>Retirement_trandfer</inflow>
+            <non_negative />
+            <display x="51" y="61" color="black" />
+        </stock>
+        <flow name="Vacation_Transfer">
+            <eqn>.15*Checking_Account</eqn>
+            <non_negative />
+            <display x="227" y="91" color="black" label_side="top" label_angle="30">
+                <pts>
+                    <pt x="227" y="134" />
+                    <pt x="227" y="49" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Vacation_account">
+            <eqn>0</eqn>
+            <inflow>Vacation_Transfer</inflow>
+            <non_negative />
+            <display x="228" y="34" color="black" />
+        </stock>
+        <flow name="College_Transfer">
+            <eqn>.10*Checking_Account</eqn>
+            <non_negative />
+            <display x="403" y="44" color="black">
+                <pts>
+                    <pt x="249" y="134" />
+                    <pt x="351" y="134" />
+                    <pt x="351" y="44" />
+                    <pt x="455" y="44" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="College_fund">
+            <eqn>0</eqn>
+            <inflow>College_Transfer</inflow>
+            <non_negative />
+            <display x="475" y="42" color="black" />
+        </stock>
+        <aux name="Charities">
+            <eqn>100</eqn>
+            <display x="480" y="79" color="black" label_side="right" label_angle="18" />
+        </aux>
+        <aux name="Clothing">
+            <eqn>200</eqn>
+            <display x="480" y="115" color="black" label_side="right" label_angle="6" />
+        </aux>
+        <flow name="Second_Income">
+            <eqn>600</eqn>
+            <non_negative />
+            <display x="163" y="197" color="black">
+                <pts>
+                    <pt x="111" y="197" />
+                    <pt x="215" y="197" />
+                    <pt x="215" y="164" />
+                </pts>
+            </display>
+        </flow>
+        <display page_width="552" page_height="728" isee:converter_size="large" interval="DT">
+            <connector x="379" y="278" uid="0">
+                <from>Housing</from>
+                <to>Expenses</to>
+            </connector>
+            <connector x="399" y="228" uid="1">
+                <from>Food</from>
+                <to>Expenses</to>
+            </connector>
+            <connector x="453" y="210" uid="2">
+                <from>Transportation</from>
+                <to>Expenses</to>
+            </connector>
+            <connector x="494" y="169" uid="3">
+                <from>Utilities</from>
+                <to>Expenses</to>
+            </connector>
+            <connector x="208" y="299" uid="4">
+                <from>Savings_Account</from>
+                <to>Interest_Income</to>
+            </connector>
+            <connector x="103" y="334" uid="5">
+                <from>Interest_Rate</from>
+                <to>Interest_Income</to>
+            </connector>
+            <connector x="243" y="166" uid="6">
+                <from>Checking_Account</from>
+                <to>Transfer</to>
+            </connector>
+            <connector x="207" y="132" uid="7">
+                <from>Checking_Account</from>
+                <to>Retirement_trandfer</to>
+            </connector>
+            <connector x="233" y="132" uid="8">
+                <from>Checking_Account</from>
+                <to>Vacation_Transfer</to>
+            </connector>
+            <connector x="251" y="137" uid="9">
+                <from>Checking_Account</from>
+                <to>College_Transfer</to>
+            </connector>
+            <connector x="469" y="84" uid="10">
+                <from>Charities</from>
+                <to>Expenses</to>
+            </connector>
+            <connector x="470" y="121" uid="11">
+                <from>Clothing</from>
+                <to>Expenses</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="12">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:13:59Z" cleared="true" time_precision="2" from="0" to="12">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="5000" />
+                        <entity name="Checking_Account" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="5000" />
+                        <entity name="Savings_Account" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="5000" />
+                        <entity name="College_fund" />
+                    </plot>
+                    <plot index="3" pen_width="1" color="#008F44" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="5000" />
+                        <entity name="Retirement_account" />
+                    </plot>
+                    <plot index="4" pen_width="1" color="#FF7F00" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="5000" />
+                        <entity name="Vacation_account" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="37" y="172" width="26" height="22" color="black" label_side="bottom" label="Graph 1" type="graph" icon_of="12" />
+            <stacked_container height="286" width="465" uid="13">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="1" cleared="true" date_time="1997-07-16T23:29:58Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Checking_Account" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Savings_Account" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="College_fund" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="3">
+                        <entity name="Retirement_account" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="4">
+                        <entity name="Vacation_account" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="40" y="112" width="26" height="22" color="black" label_side="bottom" label="Table 1" type="table" icon_of="13" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="8" y="51" content="12" />
+        <popup x="8" y="51" content="13" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

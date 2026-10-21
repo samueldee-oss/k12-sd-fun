@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Gallaher4.2.v5</name>
+        <uuid>bfb90605-56ab-4d00-b7bb-bacfb573c19e</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Time" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>960</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="817" height="572" />
+        <isee:security />
+        <isee:print_setup width="552" height="728" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Drug">
+            <eqn>0</eqn>
+            <inflow>Dose</inflow>
+            <outflow>Metabolism</outflow>
+            <non_negative />
+            <display x="125" y="45" color="black" />
+        </stock>
+        <flow name="Dose">
+            <eqn>.22 { mg per minute}</eqn>
+            <non_negative />
+            <display x="68" y="45" color="black">
+                <pts>
+                    <pt x="31" y="45" />
+                    <pt x="105" y="45" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Metabolism">
+            <eqn>Drug*Ke</eqn>
+            <non_negative />
+            <display x="202" y="45" color="black" label_side="top" label_angle="85">
+                <pts>
+                    <pt x="145" y="45" />
+                    <pt x="260" y="45" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Halftime">
+            <eqn>180 {minutes}</eqn>
+            <display x="123" y="129" color="blue" />
+        </aux>
+        <aux name="Ke">
+            <eqn>.693/Halftime</eqn>
+            <display x="192" y="112" color="blue" />
+        </aux>
+        <aux name="Minimum_Therapeutic_level">
+            <eqn>50</eqn>
+            <display x="70" y="181" color="blue" />
+        </aux>
+        <aux name="Toxic_Level">
+            <eqn>75</eqn>
+            <display x="339" y="179" color="blue" />
+        </aux>
+        <aux name="Maximum_Safe_Therapeutic_Level">
+            <eqn>60</eqn>
+            <display x="218" y="182" color="blue" />
+        </aux>
+        <display page_width="552" page_height="728" isee:converter_size="large" interval="DT">
+            <connector x="147" y="60" uid="0">
+                <from>Drug</from>
+                <to>Metabolism</to>
+            </connector>
+            <connector x="194" y="100" uid="1">
+                <from>Ke</from>
+                <to>Metabolism</to>
+            </connector>
+            <connector x="133" y="123" uid="2">
+                <from>Halftime</from>
+                <to>Ke</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="3">
+                <graph type="time_series" title="Drug Level" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:42:59Z" cleared="true" time_precision="2" from="0" to="960">
+                    <plot index="0" pen_width="1" color="black" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="100" />
+                        <entity name="Drug" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="100" />
+                        <entity name="Minimum_Therapeutic_level" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="#181F65" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="100" />
+                        <entity name="Maximum_Safe_Therapeutic_Level" />
+                    </plot>
+                    <plot index="3" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="100" />
+                        <entity name="Toxic_Level" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="332" y="35" width="26" height="22" color="black" label_side="bottom" label="Drug Level Graph" type="graph" icon_of="3" />
+            <stacked_container height="286" width="465" uid="4">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="1" cleared="true" date_time="1997-07-03T21:04:10Z">
+                    <title>Drug Level</title>
+                    <item type="time" color="black" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Drug" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="332" y="126" width="26" height="22" color="black" label_side="bottom" label="Drug Level Table" type="table" icon_of="4" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="8" y="51" content="3" />
+        <popup x="8" y="51" content="4" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

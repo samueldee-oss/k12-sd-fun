@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>ScienceModel13.0.v5</name>
+        <uuid>9e0516ce-a199-45fb-af3f-d9606f5a0d5f</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Months" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>12</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="1334" height="630" />
+        <isee:security />
+        <isee:print_setup width="552" height="728" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Reservoir">
+            <eqn>1200</eqn>
+            <scale min="0" max="1500" />
+            <inflow>Inflows</inflow>
+            <outflow>Controlled_Outflow</outflow>
+            <outflow>Turbines</outflow>
+            <non_negative />
+            <display x="247" y="151" color="blue" label_side="bottom">
+                <scale min="0" max="1500" />
+            </display>
+        </stock>
+        <flow name="Inflows">
+            <eqn>Conversion_Factor*River_Flow_Data</eqn>
+            <non_negative />
+            <display x="160" y="149" color="blue" label_side="top" label_angle="85">
+                <pts>
+                    <pt x="93" y="149" />
+                    <pt x="227" y="149" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="River_Flow_Data">
+            <eqn>TIME</eqn>
+            <gf>
+                <xscale min="0" max="11" />
+                <yscale min="0" max="100" />
+                <ypts>10204,9086,16505,26363,40837,52065,39402,19501,12673,6952,6082,13570</ypts>
+            </gf>
+            <display x="90" y="215" color="blue" label_side="top" label_angle="145" />
+        </aux>
+        <aux name="Conversion_Factor">
+            <eqn>.0595</eqn>
+            <display x="206" y="213" color="blue" />
+        </aux>
+        <flow name="Controlled_Outflow">
+            <eqn>(IF(Reservoir+Inflows-Turbine_Demand&gt;1400)THEN(Reservoir+Inflows-1400-Turbine_Demand)ELSE(0))+Salmon_Needs</eqn>
+            <non_negative />
+            <display x="351" y="150" color="blue" label_side="top" label_angle="58">
+                <pts>
+                    <pt x="267" y="150" />
+                    <pt x="435" y="150" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Turbines">
+            <eqn>IF((Inflows+Reservoir-Turbine_Demand)&lt;100)THEN(Reservoir+Inflows-100)ELSE(Turbine_Demand)</eqn>
+            <non_negative />
+            <display x="351" y="92" color="blue" label_side="top" label_angle="85">
+                <pts>
+                    <pt x="242" y="136" />
+                    <pt x="242" y="92" />
+                    <pt x="460" y="92" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Turbine_Demand">
+            <eqn>TIME</eqn>
+            <gf>
+                <xscale min="0" max="11" />
+                <yscale min="0" max="100" />
+                <ypts>397,558,649,744,956,863,708,659,558,490,326,383</ypts>
+            </gf>
+            <display x="297" y="38" color="blue" label_side="left" label_angle="183" />
+        </aux>
+        <aux name="Salmon_Needs">
+            <eqn>TIME</eqn>
+            <gf>
+                <xscale min="0" max="11" />
+                <yscale min="0" max="100" />
+                <ypts>0,0,0,0,0,0,150,150,150,0,0,0</ypts>
+            </gf>
+            <display x="430" y="178" color="blue" />
+        </aux>
+        <display page_width="552" page_height="728" isee:converter_size="large" interval="DT">
+            <connector x="100" y="208" uid="0">
+                <from>River_Flow_Data</from>
+                <to>Inflows</to>
+            </connector>
+            <connector x="198" y="204" uid="1">
+                <from>Conversion_Factor</from>
+                <to>Inflows</to>
+            </connector>
+            <connector x="269" y="161" uid="2">
+                <from>Reservoir</from>
+                <to>Controlled_Outflow</to>
+            </connector>
+            <connector x="167" y="154" uid="3">
+                <from>Inflows</from>
+                <to>Controlled_Outflow</to>
+            </connector>
+            <connector x="168" y="145" uid="4">
+                <from>Inflows</from>
+                <to>Turbines</to>
+            </connector>
+            <connector x="269" y="134" uid="5">
+                <from>Reservoir</from>
+                <to>Turbines</to>
+            </connector>
+            <connector x="307" y="45" uid="6">
+                <from>Turbine_Demand</from>
+                <to>Turbines</to>
+            </connector>
+            <connector x="294" y="50" uid="7">
+                <from>Turbine_Demand</from>
+                <to>Controlled_Outflow</to>
+            </connector>
+            <connector x="419" y="176" uid="8">
+                <from>Salmon_Needs</from>
+                <to>Controlled_Outflow</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="9">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:07:27Z" cleared="true" time_precision="2" from="0" to="12">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="Reservoir" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="414" y="231" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="9" />
+            <stacked_container height="286" width="465" uid="10">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="1" cleared="true" date_time="1997-09-07T18:09:27Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Reservoir" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Controlled_Outflow" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Turbines" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="332" y="235" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="10" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="8" y="51" content="9" />
+        <popup x="8" y="51" content="10" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

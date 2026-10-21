@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pong</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="hud" aria-label="Game status">
+      <div class="score">
+        <span class="label">Player</span>
+        <strong id="playerScore">0</strong>
+      </div>
+      <div class="status">
+        <h1>Pong</h1>
+        <p id="message">Press Space to serve</p>
+      </div>
+      <div class="score">
+        <span class="label" id="rightPlayerLabel">CPU</span>
+        <strong id="cpuScore">0</strong>
+      </div>
+    </section>
+
+    <canvas id="game" width="960" height="540" aria-label="Playable Pong game"></canvas>
+
+    <section class="controls" aria-label="Controls">
+      <button id="startButton" type="button">Start</button>
+      <button id="resetButton" type="button">Reset</button>
+      <button id="tournamentButton" type="button">Start Tournament</button>
+      <label>
+        Tournament
+        <select id="tournamentMode">
+          <option value="off" selected>Off</option>
+          <option value="solo">One player bracket</option>
+          <option value="versus">Two player bracket</option>
+        </select>
+      </label>
+      <label>
+        Opponent
+        <select id="opponentMode">
+          <option value="cpu" selected>CPU</option>
+          <option value="player">Player 2</option>
+        </select>
+      </label>
+      <label>
+        Difficulty
+        <select id="difficulty">
+          <option value="0.08">Easy</option>
+          <option value="0.12" selected>Normal</option>
+          <option value="0.17">Hard</option>
+        </select>
+      </label>
+      <label>
+        Balls
+        <select id="ballMode">
+          <option value="1" selected>One</option>
+          <option value="2">Two</option>
+        </select>
+      </label>
+      <label>
+        Ball speed
+        <select id="ballSpeed">
+          <option value="240">Very slow</option>
+          <option value="330">Slow</option>
+          <option value="430" selected>Medium</option>
+          <option value="560">Fast</option>
+          <option value="700">Very fast</option>
+        </select>
+      </label>
+    </section>
+
+    <section class="bracket" aria-label="Tournament bracket">
+      <div class="bracket-header">
+        <strong id="bracketTitle">Tournament off</strong>
+        <span id="bracketRecord">Start a bracket when you are ready.</span>
+      </div>
+      <ol id="bracketRounds">
+        <li>Quarterfinal</li>
+        <li>Semifinal</li>
+        <li>Final</li>
+      </ol>
+    </section>
+
+    <section class="learning" aria-label="Learning curve by difficulty">
+      <div class="learning-header">
+        <div>
+          <strong>Learning curve</strong>
+          <span>Wins and losses by CPU difficulty</span>
+        </div>
+        <button id="resetLearningButton" type="button">Reset Stats</button>
+      </div>
+      <div id="learningRows" class="learning-rows"></div>
+    </section>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>

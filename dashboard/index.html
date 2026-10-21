@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>K12 Game Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="dashboard">
+    <section class="library" aria-label="Game library">
+      <div class="masthead">
+        <p class="eyebrow">K12 SD</p>
+        <h1>Game Dashboard</h1>
+        <p class="subhead">Choose a version, then play it in the browser panel.</p>
+      </div>
+
+      <div class="game-grid">
+        <article class="game-entry">
+          <button class="game-card active" type="button" data-src="../pong/index.html" data-note-id="pong">
+            <span class="tag">HTML</span>
+            <strong>Pong</strong>
+            <span>Already browser-native</span>
+          </button>
+          <textarea class="game-notes" data-note-id="pong" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
+        </article>
+
+        <article class="game-entry">
+          <button class="game-card" type="button" data-src="web_builds/bank-game-current/index.html" data-note-id="bank-game-current">
+            <span class="tag">Pygame</span>
+            <strong>Bank Game Current</strong>
+            <span>Latest APY shops version</span>
+          </button>
+          <textarea class="game-notes" data-note-id="bank-game-current" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
+        </article>
+
+        <article class="game-entry">
+          <button class="game-card" type="button" data-src="web_builds/bank-game-copy-5/index.html" data-note-id="bank-game-copy-5">
+            <span class="tag">Pygame</span>
+            <strong>Bank Game Copy 5</strong>
+            <span>Recent saved version</span>
+          </button>
+          <textarea class="game-notes" data-note-id="bank-game-copy-5" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
+        </article>
+
+        <article class="game-entry">
+          <button class="game-card" type="button" data-src="web_builds/bank-game-copy-4/index.html" data-note-id="bank-game-copy-4">
+            <span class="tag">Pygame</span>
+            <strong>Bank Game Copy 4</strong>
+            <span>Saved iteration</span>
+          </button>
+          <textarea class="game-notes" data-note-id="bank-game-copy-4" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
+        </article>
+
+        <article class="game-entry">
+          <button class="game-card" type="button" data-src="web_builds/bank-game-copy-3/index.html" data-note-id="bank-game-copy-3">
+            <span class="tag">Pygame</span>
+            <strong>Bank Game Copy 3</strong>
+            <span>Saved iteration</span>
+          </button>
+          <textarea class="game-notes" data-note-id="bank-game-copy-3" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
+        </article>
+
+        <article class="game-entry">
+          <button class="game-card" type="button" data-src="web_builds/bank-game-copy-2/index.html" data-note-id="bank-game-copy-2">
+            <span class="tag">Pygame</span>
+            <strong>Bank Game Copy 2</strong>
+            <span>Saved iteration</span>
+          </button>
+          <textarea class="game-notes" data-note-id="bank-game-copy-2" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
+        </article>
+
+        <article class="game-entry">
+          <button class="game-card" type="button" data-src="web_builds/bank-game-copy/index.html" data-note-id="bank-game-copy">
+            <span class="tag">Pygame</span>
+            <strong>Bank Game Copy</strong>
+            <span>Earlier saved version</span>
+          </button>
+          <textarea class="game-notes" data-note-id="bank-game-copy" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
+        </article>
+      </div>
+
+      <div class="build-note">
+        <strong>Pygame builds:</strong>
+        Run <code>.\tools\build_web_games.ps1</code>, then serve this folder with
+        <code>.\tools\serve_dashboard.ps1</code>.
+      </div>
+    </section>
+
+    <section class="player" aria-label="Selected game">
+      <div class="player-toolbar">
+        <div>
+          <span class="toolbar-label">Now Playing</span>
+          <strong id="gameTitle">Pong</strong>
+        </div>
+        <a id="openLink" href="../pong/index.html" target="_blank" rel="noreferrer">Open full page</a>
+      </div>
+      <iframe id="gameFrame" title="Playable selected game" src="../pong/index.html"></iframe>
+    </section>
+  </main>
+
+  <script>
+    const cards = [...document.querySelectorAll(".game-card")];
+    const frame = document.querySelector("#gameFrame");
+    const title = document.querySelector("#gameTitle");
+    const openLink = document.querySelector("#openLink");
+    const notes = [...document.querySelectorAll(".game-notes")];
+
+    cards.forEach((card) => {
+      card.addEventListener("click", () => {
+        cards.forEach((item) => item.classList.remove("active"));
+        card.classList.add("active");
+        const src = card.dataset.src;
+        const name = card.querySelector("strong").textContent;
+        frame.src = src;
+        title.textContent = name;
+        openLink.href = src;
+      });
+    });
+
+    notes.forEach((note) => {
+      const key = `k12-game-note:${note.dataset.noteId}`;
+      note.value = localStorage.getItem(key) || "";
+      note.addEventListener("input", () => {
+        localStorage.setItem(key, note.value);
+      });
+    });
+  </script>
+</body>
+</html>

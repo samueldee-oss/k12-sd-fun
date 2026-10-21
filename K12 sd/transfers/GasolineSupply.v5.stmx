@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>GasolineSupply.v5</name>
+        <uuid>07cbf791-f287-48d8-8389-83df71dac1e4</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Days" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>24</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="817" height="572" />
+        <isee:security />
+        <isee:print_setup width="552" height="728" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Gasoline_Stocks">
+            <eqn>1000</eqn>
+            <scale min="0" max="1000" />
+            <inflow>Gasoline_supplied</inflow>
+            <outflow>Gasoline_used</outflow>
+            <non_negative />
+            <display x="278" y="147" color="blue">
+                <scale min="0" max="1000" />
+            </display>
+        </stock>
+        <flow name="Gasoline_supplied">
+            <eqn>800</eqn>
+            <non_negative />
+            <display x="190" y="140" color="blue">
+                <pts>
+                    <pt x="122" y="140" />
+                    <pt x="258" y="140" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Gasoline_used">
+            <eqn>Gasoline_Stocks</eqn>
+            <non_negative />
+            <gf>
+                <xscale min="0" max="1000" />
+                <yscale min="0" max="1000" />
+                <ypts>0,535.5,750,1000,1000,1000,1000,1000,1000,1000,1000</ypts>
+            </gf>
+            <display x="366" y="145" color="blue">
+                <pts>
+                    <pt x="298" y="145" />
+                    <pt x="434" y="145" />
+                </pts>
+            </display>
+        </flow>
+        <display page_width="552" page_height="728" isee:converter_size="large" interval="DT">
+            <connector x="298" y="164" uid="0">
+                <from>Gasoline_Stocks</from>
+                <to>Gasoline_used</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="1">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:44:48Z" cleared="true" time_precision="2" from="0" to="24">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="Gasoline_Stocks" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="227" y="256" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="1" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="8" y="51" content="1" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

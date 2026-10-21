@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Blender Mode Snake — Single File</title>
+  <style>
+    :root{
+      --bg:#0f1720;
+      --panel:#0b1220;
+      --accent:#22c55e;
+      --muted:#94a3b8;
+      --glass: rgba(255,255,255,0.03);
+      --tile1:#9beaa0;
+      --tile2:#6fd07a;
+      --danger:#ef4444;
+      --gray-obstacle:#9aa0a6;
+      --header-height:72px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#071022 0%, #071523 100%);color:#cbd5e1}
+    .app{
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:20px;
+      gap:18px;
+    }
+    header.topbar{
+      width:100%;
+      max-width:1100px;
+      height:var(--header-height);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:12px 18px;
+      border-radius:12px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+      backdrop-filter: blur(6px);
+    }
+    .stats{
+      display:flex;gap:18px;align-items:center;
+    }
+    .stat{
+      display:flex;flex-direction:column;align-items:flex-start;
+    }
+    .stat .label{font-size:12px;color:var(--muted);}
+    .stat .value{font-size:20px;font-weight:700;color:#e6ffed}
+    .brand{font-weight:700;display:flex;flex-direction:column}
+    .brand .title{font-size:18px}
+    .controls{display:flex;gap:10px;align-items:center}
+    .gear-btn{
+      width:44px;height:44px;border-radius:10px;border:0;background:var(--glass);display:grid;place-items:center;cursor:pointer;transition:transform .12s ease;outline:none;color:var(--muted)
+    }
+    .gear-btn:active{transform:scale(.98)}
+    .play-btn{background:linear-gradient(90deg,var(--accent),#12aa5a);border:0;padding:10px 14px;border-radius:10px;color:#052012;font-weight:700;cursor:pointer}
+
+    /* center area */
+    .stage{
+      width:100%;max-width:1100px;display:flex;gap:20px;align-items:flex-start;flex-direction:column
+    }
+    .canvas-wrap{position:relative;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));padding:20px;border-radius:12px}
+    canvas#board{display:block;width:100%;height:auto;border-radius:8px;background:transparent}
+    .hud-legend{display:flex;gap:12px;align-items:center;margin-top:8px}
+    .legend-item{display:flex;gap:8px;align-items:center}
+    .chip{width:18px;height:18px;border-radius:4px}
+    .chip.apple{background:#ff3945}
+    .chip.snake{background:linear-gradient(90deg,var(--accent),#0ea35c)}
+    .chip.obst{background:var(--gray-obstacle)}
+
+    /* modal */
+    .modal-backdrop{position:fixed;inset:0;background:linear-gradient(180deg,rgba(2,6,23,0.6),rgba(2,6,23,0.85));display:none;align-items:center;justify-content:center;padding:24px;z-index:40}
+    .modal{background:linear-gradient(180deg,#071426,#0b2030);min-width:320px;width:min(720px,96%);border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,0.03)}
+    .modal h2{margin:0 0 10px 0;color:#e6fff0}
+    .mode-desc{color:var(--muted);font-size:14px;margin-bottom:12px}
+    .options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .option{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .opt-left{display:flex;flex-direction:column}
+    .opt-left .title{font-weight:700}
+    .opt-left .small{color:var(--muted);font-size:13px}
+    .switch{position:relative;width:48px;height:28px;border-radius:18px;background:rgba(255,255,255,0.06);cursor:pointer}
+    .switch .knob{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:12px;background:#fff;transition:left .14s cubic-bezier(.2,.9,.2,1);box-shadow:0 3px 8px rgba(2,6,23,0.4)}
+    .switch.on{background:linear-gradient(90deg,var(--accent),#0ea35c)}
+    .switch.on .knob{left:23px;background:#052012}
+    .modal-actions{Display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 12px;border-radius:10px;color:var(--muted);cursor:pointer}
+    .btn-primary{background:linear-gradient(90deg,var(--accent),#12aa5a);border:0;padding:9px 14px;border-radius:10px;color:#052012;font-weight:800;cursor:pointer}
+
+    /* overlays */
+    .overlay-gameover{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(2,6,23,0.4), rgba(2,6,23,0.6));backdrop-filter: blur(4px);border-radius:8px;z-index:10}
+    .gameover-card{background:linear-gradient(180deg,#071523,#04121a);padding:18px;border-radius:12px;text-align:center;border:1px solid rgba(255,255,255,0.03)}
+    .gameover-card h3{margin:0 0 8px 0;color:#ffdede}
+    .try-btn{margin-top:12px;padding:10px 14px;border-radius:10px;background:#ff6b6b;border:0;color:#fff;cursor:pointer}
+
+    /* responsive */
+    @media (max-width:720px){
+      header.topbar{height:84px;padding:14px}
+      .options{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="brand">
+          <div class="title">Blender Mode Snake</div>
+          <div class="label" style="font-size:12px;color:var(--muted)">Responsive single-file demo</div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="label">Score</div><div id="score" class="value">0</div></div>
+        <div class="stat"><div class="label">High Score</div><div id="hi-score" class="value">0</div></div>
+        <div class="stat"><div class="label">Length</div><div id="length" class="value">1</div></div>
+        <div class="controls">
+          <button class="gear-btn" id="open-settings" title="Blender Mode Settings">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06A2 2 0 1 1 4.29 17.1l.06-.06A1.65 1.65 0 0 0 4 15.4 1.65 1.65 0 0 0 2.5 14V13a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4 7.6 1.65 1.65 0 0 0 3.67 5.78L3.61 5.72A2 2 0 1 1 6.44 2.9l.06.06A1.65 1.65 0 0 0 8.3 2.5H9a2 2 0 0 1 4 0h.09c.4 0 .78.15 1.06.44l.06.06A1.65 1.65 0 0 0 15 4.6c.11.57.5 1.06 1.06 1.51l.06.04A2 2 0 1 1 19.4 8.6l-.06-.06A1.65 1.65 0 0 0 19.4 7z"></path>
+            </svg>
+          </button>
+          <button class="play-btn" id="start-btn">Start</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="stage">
+      <div class="canvas-wrap">
+        <canvas id="board" width="600" height="600"></canvas>
+
+        <div class="overlay-gameover" id="gameover">
+          <div class="gameover-card">
+            <h3 id="go-title">Game Over</h3>
+            <div style="color:var(--muted);">Score: <span id="go-score">0</span></div>
+            <button class="try-btn" id="try-again">Try Again</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="hud-legend">
+        <div class="legend-item"><div class="chip snake"></div><div style="color:var(--muted)">Snake</div></div>
+        <div class="legend-item"><div class="chip apple"></div><div style="color:var(--muted)">Apple</div></div>
+        <div class="legend-item"><div class="chip obst"></div><div style="color:var(--muted)">Obstacle</div></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-backdrop" id="modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+      <h2 id="mTitle">Blender Mode</h2>
+      <div class="mode-desc">Pick modifiers to remix the classic Snake. Toggle any combination, then "Apply & Play" to start.</div>
+      <div class="options">
+        <div class="option">
+          <div class="opt-left"><div class="title">Wall Mode</div><div class="small">Adds a few static obstacles on the board</div></div>
+          <div class="switch" data-key="wallMode" id="sw-wall"><div class="knob"></div></div>
+        </div>
+        <div class="option">
+          <div class="opt-left"><div class="title">Portal Mode</div><div class="small">Hitting a wall teleports to opposite side</div></div>
+          <div class="switch" data-key="portalMode" id="sw-portal"><div class="knob"></div></div>
+        </div>
+        <div class="option">
+          <div class="opt-left"><div class="title">Speed Booster</div><div class="small">Increase base speed for a faster game</div></div>
+          <div class="switch" data-key="speedBooster" id="sw-speed"><div class="knob"></div></div>
+        </div>
+        <div class="option">
+          <div class="opt-left"><div class="title">Multi-Apple</div><div class="small">Spawns 3 apples at a time</div></div>
+          <div class="switch" data-key="multiApple" id="sw-multi"><div class="knob"></div></div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-ghost" id="cancel-settings">Cancel</button>
+        <button class="btn-primary" id="apply-settings">Apply & Play</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* Core game variables and helpers */
+    (function(){
+      // Elements
+      const board = document.getElementById('board');
+      const ctx = board.getContext('2d');
+      const startBtn = document.getElementById('start-btn');
+      const openSettings = document.getElementById('open-settings');
+      const modal = document.getElementById('modal');
+      const applyBtn = document.getElementById('apply-settings');
+      const cancelBtn = document.getElementById('cancel-settings');
+      const tryAgain = document.getElementById('try-again');
+      const gameover = document.getElementById('gameover');
+      const goScore = document.getElementById('go-score');
+      const scoreEl = document.getElementById('score');
+      const hiScoreEl = document.getElementById('hi-score');
+      const lenEl = document.getElementById('length');
+      const goTitle = document.getElementById('go-title');
+
+      // Switch elements
+      const switches = {
+        wallMode: document.getElementById('sw-wall'),
+        portalMode: document.getElementById('sw-portal'),
+        speedBooster: document.getElementById('sw-speed'),
+        multiApple: document.getElementById('sw-multi')
+      };
+
+      // Settings state (default)
+      let settings = {
+        wallMode:false,
+        portalMode:false,
+        speedBooster:false,
+        multiApple:false
+      };
+
+      // Game state
+      let cols = 20; // will adapt for responsiveness
+      let rows = 20;
+      let tileSize = 24; // px logical
+      let dpr = window.devicePixelRatio || 1;
+      let snake = [];
+      let dir = {x:1,y:0};
+      let nextDir = {x:1,y:0};
+      let apples = [];
+      let obstacles = [];
+      let score = 0;
+      let hiScore = parseInt(localStorage.getItem('snakeHi') || '0',10) || 0;
+      hiScoreEl.textContent = hiScore;
+      let running = false;
+      let tickMs = 180; // base ms per move
+      const baseTick = 180;
+      let timer = null;
+      // queued growth counter: number of ticks to keep from popping tail
+      let pendingGrowth = 0;
+
+      /**
+       * Move the snake based on the velocity and growth queue.
+       * Rules:
+       * - Inserts a new head at front according to `velocity`.
+       * - If `eatingFood` is true, increments the pending growth by `foodValue`.
+       * - If pendingGrowth > 0, it is decremented and the tail is not removed (snake grows by 1 that tick).
+       * - Otherwise the tail is removed (normal movement).
+       *
+       * Returns the new head coordinate.
+       */
+      function updateSnakePosition(snakeArr, velocity, eatingFood, foodValue){
+        const newHead = { x: snakeArr[0].x + velocity.x, y: snakeArr[0].y + velocity.y };
+        // insert head
+        snakeArr.unshift(newHead);
+        // register growth from food collision (deferred)
+        if (eatingFood){
+          pendingGrowth += (Number.isFinite(foodValue) ? foodValue : 1);
+        }
+        // if we have pending growth, consume one growth unit this tick and DO NOT pop tail
+        if (pendingGrowth > 0){
+          pendingGrowth -= 1;
+        } else {
+          // normal move: remove tail
+          snakeArr.pop();
+        }
+        return newHead;
+      }
+
+      // responsive resize
+      function resizeCanvas(){
+        // choose grid size based on container width
+        const containerWidth = Math.min(window.innerWidth - 80, 1000);
+        // ensure square canvas, tile count fixed but tile size adapts
+        const maxSide = Math.floor(containerWidth);
+        tileSize = Math.floor(maxSide / cols);
+        if (tileSize < 14){
+          // make grid smaller on narrow screens by reducing cols/rows
+          cols = rows = 16;
+          tileSize = Math.floor(maxSide / cols);
+        }
+        const size = tileSize * cols;
+        dpr = window.devicePixelRatio || 1;
+        board.width = size * dpr;
+        board.height = size * dpr;
+        board.style.width = size + 'px';
+        board.style.height = size + 'px';
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+        draw();
+      }
+
+      window.addEventListener('resize', ()=>{
+        resizeCanvas();
+      });
+
+      // Draw grid and entities
+      function draw(){
+        const w = cols*tileSize;
+        const h = rows*tileSize;
+        // clear
+        ctx.clearRect(0,0,w,h);
+        // draw checkered green
+        for(let r=0;r<rows;r++){
+          for(let c=0;c<cols;c++){
+            const even = (r + c) % 2 === 0;
+            ctx.fillStyle = even ? getComputedStyle(document.documentElement).getPropertyValue('--tile1').trim() : getComputedStyle(document.documentElement).getPropertyValue('--tile2').trim();
+            ctx.fillRect(c*tileSize, r*tileSize, tileSize, tileSize);
+          }
+        }
+
+        // draw obstacles
+        obstacles.forEach(p=>{
+          drawRect(p.x,p.y, getComputedStyle(document.documentElement).getPropertyValue('--gray-obstacle').trim(), true);
+        });
+
+        // draw apples
+        apples.forEach(a=>{
+          drawCircle(a.x,a.y, '#ff3945');
+        });
+
+        // draw snake
+        for(let i=0;i<snake.length;i++){
+          const seg = snake[i];
+          const gradient = ctx.createLinearGradient(seg.x*tileSize, seg.y*tileSize, (seg.x+1)*tileSize, (seg.y+1)*tileSize);
+          gradient.addColorStop(0, i===0? '#8affb6': 'var(--accent)');
+          gradient.addColorStop(1, i===0? '#0ea35c': '#0b8f50');
+          ctx.fillStyle = i===0 ? '#0b8f50' : '#0ea35c';
+          drawRect(seg.x, seg.y, ctx.fillStyle, true);
+        }
+      }
+
+      function drawRect(x,y,color,rounded){
+        const pad = Math.max(1, Math.floor(tileSize*0.08));
+        const rx = x*tileSize + pad;
+        const ry = y*tileSize + pad;
+        const size = tileSize - pad*2;
+        ctx.fillStyle = color;
+        if (rounded){
+          const r = Math.max(2, Math.floor(size*0.15));
+          roundRect(ctx, rx, ry, size, size, r);
+        } else ctx.fillRect(rx,ry,size,size);
+      }
+
+      function drawCircle(x,y,color){
+        const cx = x*tileSize + tileSize/2;
+        const cy = y*tileSize + tileSize/2;
+        const r = tileSize*0.36;
+        ctx.beginPath();
+        ctx.fillStyle = color;
+        ctx.arc(cx,cy,r,0,Math.PI*2);
+        ctx.fill();
+      }
+
+      function roundRect(ctx,x,y,w,h,r){
+        ctx.beginPath();
+        ctx.moveTo(x+r,y);
+        ctx.arcTo(x+w,y,x+w,y+h,r);
+        ctx.arcTo(x+w,y+h,x,y+h,r);
+        ctx.arcTo(x,y+h,x,y,r);
+        ctx.arcTo(x,y,x+w,y,r);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // Utility
+      function randInt(max){return Math.floor(Math.random()*max)}
+      function eq(a,b){return a.x===b.x && a.y===b.y}
+      function posToKey(p){return p.x+','+p.y}
+
+      // Game initialization
+      function resetGame(){
+        // Grid reset
+        cols = Math.max(12, cols);
+        rows = cols;
+        snake = [{x:Math.floor(cols/2), y:Math.floor(rows/2)}];
+        dir = {x:1,y:0};
+        nextDir = {x:1,y:0};
+        apples = [];
+        obstacles = [];
+        score = 0;
+        running = false;
+        scoreEl.textContent = score;
+        lenEl.textContent = snake.length;
+        gameover.style.display = 'none';
+
+        // spawn obstacles if wallMode
+        if (settings.wallMode){
+          const count = Math.max(3, Math.floor((cols*rows) * 0.03)); // a few
+          let tries = 0;
+          const used = new Set();
+          // avoid center starting area
+          used.add(posToKey(snake[0]));
+          while(obstacles.length < count && tries < 1000){
+            tries++;
+            const p = {x:randInt(cols), y:randInt(rows)};
+            if (used.has(posToKey(p))) continue;
+            used.add(posToKey(p));
+            obstacles.push(p);
+          }
+        }
+
+        // spawn apples
+        spawnApples(settings.multiApple?3:1);
+
+        // set speed
+        tickMs = baseTick;
+        if (settings.speedBooster) tickMs = Math.max(50, Math.floor(baseTick * 0.55));
+
+        resizeCanvas();
+        draw();
+      }
+
+      function spawnApples(n){
+        apples = apples || [];
+        const blocked = new Set();
+        snake.forEach(s=>blocked.add(posToKey(s)));
+        obstacles.forEach(o=>blocked.add(posToKey(o)));
+        apples.forEach(a=>blocked.add(posToKey(a)));
+        let tries = 0;
+        while(apples.length < n && tries < 2000){
+          tries++;
+          const p = {x:randInt(cols), y:randInt(rows)};
+          if (blocked.has(posToKey(p))) continue;
+          // ensure not adjacent to snake head if possible
+          apples.push(p);
+          blocked.add(posToKey(p));
+        }
+      }
+
+      // Input handling
+      let keysLocked = false;
+      window.addEventListener('keydown', (e)=>{
+        if (!running) return;
+        const code = e.key;
+        let nd = null;
+        if (code === 'ArrowUp' || code.toLowerCase() === 'w') nd = {x:0,y:-1};
+        if (code === 'ArrowDown' || code.toLowerCase() === 's') nd = {x:0,y:1};
+        if (code === 'ArrowLeft' || code.toLowerCase() === 'a') nd = {x:-1,y:0};
+        if (code === 'ArrowRight' || code.toLowerCase() === 'd') nd = {x:1,y:0};
+        if (nd){
+          // prevent reversing
+          if (nd.x === -dir.x && nd.y === -dir.y) return;
+          nextDir = nd;
+        }
+      });
+
+      // Core step
+      function step(){
+        // move
+        dir = nextDir;
+        const head = {x:snake[0].x + dir.x, y:snake[0].y + dir.y};
+
+        // wall handling
+        if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows){
+          if (settings.portalMode){
+            head.x = (head.x + cols) % cols;
+            head.y = (head.y + rows) % rows;
+          } else {
+            return endGame('You hit the wall');
+          }
+        }
+
+        // obstacle collision
+        for(const o of obstacles){
+          if (head.x === o.x && head.y === o.y){
+            // in portal mode, only walls teleport—not obstacles. So obstacle kills.
+            return endGame('Crashed into an obstacle');
+          }
+        }
+
+        // self collision
+        for(let i=0;i<snake.length;i++){
+          if (eq(head, snake[i])) return endGame('You bit yourself');
+        }
+
+        // check for apple at the computed head BEFORE mutating snake
+        let ateIndex = -1;
+        for(let i=0;i<apples.length;i++){
+          if (eq(head, apples[i])){ ateIndex = i; break; }
+        }
+        if (ateIndex >= 0){
+          // remove apple and update score
+          apples.splice(ateIndex,1);
+          score += 10;
+          scoreEl.textContent = score;
+          if (score > hiScore){ hiScore = score; localStorage.setItem('snakeHi', hiScore); hiScoreEl.textContent = hiScore; }
+          // spawn replacement apples
+          if (settings.multiApple){ spawnApples(3); } else spawnApples(1);
+        }
+
+        // now update snake position using queued-growth helper; foodValue = 1 per apple
+        updateSnakePosition(snake, dir, ateIndex >= 0, 1);
+
+        // update length UI and redraw
+        lenEl.textContent = snake.length;
+        draw();
+      }
+
+      function endGame(reason){
+        running = false;
+        clearInterval(timer);
+        timer = null;
+        goScore.textContent = score;
+        goTitle.textContent = 'Game Over';
+        gameover.style.display = 'flex';
+      }
+
+      // start / stop
+      function startGame(){
+        if (running) return;
+        resetGame();
+        running = true;
+        // schedule ticks
+        if (timer) clearInterval(timer);
+        timer = setInterval(step, tickMs);
+      }
+
+      function stopGame(){
+        running = false;
+        if (timer) clearInterval(timer);
+        timer = null;
+      }
+
+      // UI interactions
+      openSettings.addEventListener('click', ()=>{
+        // toggle modal
+        showModal();
+      });
+      startBtn.addEventListener('click', ()=>{
+        // apply current settings and start
+        running = false;
+        applySettings(false);
+        startGame();
+      });
+      tryAgain.addEventListener('click', ()=>{
+        // restart with same settings
+        gameover.style.display='none';
+        startGame();
+      });
+
+      function showModal(){
+        // sync switches
+        for(const k in switches){
+          const el = switches[k];
+          setSwitchState(el, settings[k]);
+        }
+        modal.style.display = 'flex';
+      }
+      function hideModal(){ modal.style.display = 'none'; }
+
+      // switch toggles
+      function setSwitchState(el, on){
+        if(on) el.classList.add('on'); else el.classList.remove('on');
+      }
+      Object.keys(switches).forEach(k=>{
+        const el = switches[k];
+        el.addEventListener('click', ()=>{
+          const on = !el.classList.contains('on');
+          setSwitchState(el,on);
+          settings[k] = on;
+        });
+      });
+
+      cancelBtn.addEventListener('click', ()=>{ hideModal(); });
+      applyBtn.addEventListener('click', ()=>{ applySettings(true); });
+
+      function applySettings(andStart){
+        // read switches
+        for(const k in switches){ settings[k] = switches[k].classList.contains('on'); }
+        hideModal();
+        // reset game with new settings
+        resetGame();
+        if (andStart){ startGame(); }
+      }
+
+      // click outside modal to close
+      modal.addEventListener('click', (ev)=>{
+        if (ev.target === modal){ hideModal(); }
+      });
+
+      // helper: set initial local switch visual to false
+      for(const k in switches) setSwitchState(switches[k], settings[k]);
+
+      // initial setup
+      resizeCanvas();
+      resetGame();
+
+      // expose for debugging (optional)
+      window._snakeGame = {start:startGame, stop:stopGame, settings, reset:resetGame};
+
+      // small touch: pause on visibility hidden
+      document.addEventListener('visibilitychange', ()=>{
+        if (document.hidden){ if (running) stopGame(); }
+      });
+
+      // accelerate speed if SpeedBooster toggled during run (dynamic)
+      // we watch settings.speedBooster and adjust tick interval
+      function adjustSpeed(){
+        const newTick = settings.speedBooster ? Math.max(50, Math.floor(baseTick * 0.55)) : baseTick;
+        if (newTick !== tickMs){
+          tickMs = newTick;
+          if (running){
+            clearInterval(timer);
+            timer = setInterval(step, tickMs);
+          }
+        }
+      }
+      // observe setting changes
+      const settingObserver = new Proxy(settings, {
+        set(target, prop, value){
+          target[prop]=value;
+          if(prop === 'speedBooster') adjustSpeed();
+          return true;
+        }
+      });
+      settings = settingObserver;
+
+      // Also allow clicking board to open settings (small UX)
+      board.addEventListener('dblclick', ()=> showModal());
+
+      // show initial hint
+      startBtn.title = 'Start game (Arrow keys or WASD)';
+
+    })();
+  </script>
+</body>
+</html>

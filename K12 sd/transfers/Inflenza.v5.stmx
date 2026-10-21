@@ -1,0 +1,704 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Inflenza.v5</name>
+        <uuid>c6881e53-dbd8-4b08-ad36-5c54ea8e3dd4</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="RK4" time_units="Days" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>1</start>
+        <stop>60</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="621" height="382" />
+        <isee:security />
+        <isee:print_setup width="576" height="747" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" show_documentation="true" />
+    <model>
+        <stock name="Vaccinated">
+            <doc>This stock represents the people in the United States who have chosen to  become vaccinated.  The vaccine does cause allergic reactions in 5 - !0% of vaccinated people.  People suffering from these side effects are included in the Vaccinated population.</doc>
+            <eqn>0</eqn>
+            <inflow>become_vaccinated</inflow>
+            <outflow>people_get_sick</outflow>
+            <outflow>success</outflow>
+            <outflow>death_2</outflow>
+            <non_negative />
+            <display x="316" y="152" color="black" label_side="left" label_angle="154" />
+        </stock>
+        <flow name="new">
+            <doc>This inflow represents the new people who are being added to the initial and new population.</doc>
+            <eqn>non_immune_people+births</eqn>
+            <non_negative />
+            <display x="81" y="242" color="black">
+                <pts>
+                    <pt x="37" y="242" />
+                    <pt x="125" y="242" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="people_get_sick">
+            <doc>This represents the vaccinated people who are being infected with the influenza virus.</doc>
+            <eqn>Infected*fault_rate*number_of_contacts*prob_of_contraction*prob_that_person_is_uninfected</eqn>
+            <non_negative />
+            <display x="469" y="154" color="black" label_angle="267">
+                <pts>
+                    <pt x="336" y="154" />
+                    <pt x="603" y="154" />
+                    <pt x="603" y="218" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Non_Vaccinated">
+            <doc>This stock represents the people in the United States who have chosen not become vaccinated against the influenza virus and are, therefore, susceptible.</doc>
+            <eqn>0</eqn>
+            <inflow>not_vaccinated</inflow>
+            <outflow>death</outflow>
+            <outflow>people_get_sick_2</outflow>
+            <non_negative />
+            <display x="321" y="342" color="black" />
+        </stock>
+        <flow name="not_vaccinated">
+            <doc>This flow represents the people choosing not to become vaccinated.</doc>
+            <eqn>Initial_and_New*non_vacc_perc</eqn>
+            <non_negative />
+            <display x="222" y="342" color="black">
+                <pts>
+                    <pt x="143" y="258" />
+                    <pt x="143" y="342" />
+                    <pt x="301" y="342" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="become_vaccinated">
+            <doc>This flow represents the people who are choosing to become vaccinated.  The protection against the influenza virus appears one to two weeks after vaccination.</doc>
+            <eqn>Initial_and_New*vaccine_perc</eqn>
+            <non_negative />
+            <display x="219" y="154" color="black" label_angle="295">
+                <pts>
+                    <pt x="143" y="228" />
+                    <pt x="143" y="154" />
+                    <pt x="296" y="154" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Infected">
+            <doc>This stock represents people who are infected with the influenza virus, but aren&apos;t yet showing symptoms.  People are infected by inhaling the water droplets from sneezes and coughs of infected people.</doc>
+            <eqn>1</eqn>
+            <inflow>people_get_sick</inflow>
+            <inflow>people_get_sick_2</inflow>
+            <outflow>show_symptoms</outflow>
+            <outflow>death_3</outflow>
+            <non_negative />
+            <display x="614" y="233" color="black" label_side="left" />
+        </stock>
+        <stock name="Immune">
+            <doc>This stock represents people who have been infected and are now immune.</doc>
+            <eqn>0</eqn>
+            <inflow>become_immune</inflow>
+            <outflow>death_5</outflow>
+            <non_negative />
+            <display x="760" y="382" color="black" label_side="bottom" label_angle="267" />
+        </stock>
+        <aux name="fault_rate">
+            <doc>This represents the probability that the vaccine is not effective against the influenza strain.  Although some vaccinated people do become infected regardless of their vaccination, those who are vaccinated usually have milder cases.</doc>
+            <eqn>.2</eqn>
+            <display x="381" y="178" color="black" label_angle="277" />
+        </aux>
+        <flow name="show_symptoms">
+            <doc>This flow represents the people who have been infected and are now showing symptoms and becoming ill.</doc>
+            <eqn>Infected*inverse</eqn>
+            <non_negative />
+            <display x="684" y="233" color="black" label_side="top">
+                <pts>
+                    <pt x="634" y="233" />
+                    <pt x="735" y="233" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Ill">
+            <doc>This stock represents the infected people who are now showing symptoms of influenza.  It is assumed that once people have become ill, they stay at their homes and don&apos;t risk the infection of others.  Amantadine and rimantadine are to drugs perscribed to decrease the severity of influenza infection and prevent complications.  Because they do not rid the body of infection, people who have taken these drugs are included in the Ill population.</doc>
+            <eqn>0</eqn>
+            <inflow>show_symptoms</inflow>
+            <outflow>die</outflow>
+            <outflow>death_4</outflow>
+            <outflow>become_immune</outflow>
+            <non_negative />
+            <display x="755" y="232" color="black" label_angle="117" />
+        </stock>
+        <stock name="Initial_and_New">
+            <doc>This stock represents the initial population of the United States and new additions through births and people who haven&apos;t become immune.</doc>
+            <eqn>270000000</eqn>
+            <inflow>new</inflow>
+            <outflow>not_vaccinated</outflow>
+            <outflow>become_vaccinated</outflow>
+            <non_negative />
+            <display x="145" y="243" color="black" label_side="right" label_angle="352" />
+        </stock>
+        <aux name="vaccine_perc">
+            <doc>This represents the average percentage of people in the United States who become vaccinated against the influenza virus.</doc>
+            <eqn>.25</eqn>
+            <display x="291" y="222" color="black" label_side="left" label_angle="183" />
+        </aux>
+        <aux name="incubation_period">
+            <doc>This represents the average time it takes for the virus to show symptoms after the body has been infected (2 days).</doc>
+            <eqn>2</eqn>
+            <display x="654" y="312" color="black" />
+        </aux>
+        <aux name="births">
+            <doc>This represents the total amount of daily births in the United States.</doc>
+            <eqn>birth_rate*total_population</eqn>
+            <display x="73" y="312" color="black" />
+        </aux>
+        <flow name="people_get_sick_2">
+            <doc>This flow represents the non vaccinated people who are being infected with the influenza virus.</doc>
+            <eqn>Infected*number_of_contacts*prob_of_contraction*prob_that_pers_is_uninfected</eqn>
+            <non_negative />
+            <display x="472" y="343" color="black" label_angle="215">
+                <pts>
+                    <pt x="341" y="343" />
+                    <pt x="604" y="343" />
+                    <pt x="604" y="248" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="non_immune_people">
+            <doc>This represents the people who haven&apos;t become immune to the particular strain of influenza virus.</doc>
+            <eqn>1-become_immune</eqn>
+            <display x="38" y="196" color="black" label_side="right" />
+        </aux>
+        <flow name="death">
+            <doc>This outflow represents the people dying for reasons unrelated to the influenza virus.</doc>
+            <eqn>Non_Vaccinated*death_rate_2</eqn>
+            <non_negative />
+            <display x="318" y="410" color="black" label_angle="283">
+                <pts>
+                    <pt x="318" y="357" />
+                    <pt x="318" y="463" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="number_of_contacts">
+            <doc>This represents the average number of people that a person comes in contact with daily.</doc>
+            <eqn>75</eqn>
+            <display x="567" y="296" color="black" label_side="left" label_angle="153" />
+        </aux>
+        <stock name="Dead_from_Disease">
+            <doc>This stock represents the people who have died because of the influenza virus.  The main reasons for death are respitory and heart failure and kidney disease .  The people who die because of influenza are most often among the elderly, young, diabetic, cancer affected, and HIV infected.</doc>
+            <eqn>0</eqn>
+            <inflow>die</inflow>
+            <non_negative />
+            <display x="919" y="235" color="black" />
+        </stock>
+        <flow name="die">
+            <doc>This represents the people that are dying because of the influenza virus.  </doc>
+            <eqn>Ill*death_rate</eqn>
+            <non_negative />
+            <display x="837" y="233" color="black">
+                <pts>
+                    <pt x="775" y="233" />
+                    <pt x="899" y="233" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="death_rate">
+            <doc>This represents the rate at which people die from the influenza virus.</doc>
+            <eqn>.0199753425</eqn>
+            <display x="868" y="180" color="black" label_side="left" />
+        </aux>
+        <aux name="immune_%">
+            <doc>This represents the average percentage of people that build immunity towards this particular strain of influenza.</doc>
+            <eqn>.99</eqn>
+            <display x="714" y="339" color="black" />
+        </aux>
+        <aux name="prob_of_contraction">
+            <doc>This represents the probability that a person who has come in contact with an infected person will become infected.</doc>
+            <eqn>.1</eqn>
+            <display x="412" y="261" color="black" label_side="right" />
+        </aux>
+        <aux name="prob_that_person_is_uninfected">
+            <doc>This represents the probability that someone who a vaccinated person comes in contact with is uninfected.</doc>
+            <eqn>Vaccinated/(Vaccinated+Infected)</eqn>
+            <display x="459" y="110" color="black" label_side="top" label_angle="93" />
+        </aux>
+        <aux name="prob_that_pers_is_uninfected">
+            <doc>This represents the probability that someone that a non vaccinated person comes in contact with is uninfected.</doc>
+            <eqn>Non_Vaccinated/(Non_Vaccinated+Infected)</eqn>
+            <display x="505" y="425" color="black" />
+        </aux>
+        <flow name="death_3">
+            <doc>This outflow represents the people dying for reasons unrelated to the influenza virus.</doc>
+            <eqn>death_rate_2*Infected</eqn>
+            <non_negative />
+            <display x="617" y="166" color="black" label_side="top" label_angle="68">
+                <pts>
+                    <pt x="617" y="218" />
+                    <pt x="617" y="114" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="birth_rate">
+            <doc>This represents the normal daily birth rate in the United States.</doc>
+            <eqn>.012/365</eqn>
+            <display x="35" y="366" color="black" />
+        </aux>
+        <aux name="death_rate_2">
+            <doc>This represents the normal daily death rate in the United States.</doc>
+            <eqn>.009/365</eqn>
+            <display x="383" y="449" color="black" />
+        </aux>
+        <aux name="total_population">
+            <doc>This represents the total amount of living people in the United States.</doc>
+            <eqn>Ill+Immune+Infected+Non_Vaccinated+Vaccinated+Initial_and_New+Unsucseptible</eqn>
+            <display x="882" y="474" color="black" label_side="left" label_angle="183" />
+        </aux>
+        <aux name="recovery_time">
+            <doc>This represents the average length of time it takes a person to recover from an influenza infection (6 days).  Included in the recovery time is the recovery from side effects such as fever, malaise, and myalgia.</doc>
+            <eqn>6</eqn>
+            <display x="900" y="344" color="black" />
+        </aux>
+        <flow name="death_4">
+            <doc>This outflow represents the people dying for reasons unrelated to the influenza virus.</doc>
+            <eqn>Ill*death_rate_2</eqn>
+            <non_negative />
+            <display x="758" y="166" color="black" label_side="top" label_angle="60">
+                <pts>
+                    <pt x="758" y="217" />
+                    <pt x="758" y="115" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="become_immune">
+            <doc>This represents the people who are recovering from the virus and have built up an immunity towards it.</doc>
+            <eqn>Ill*immune_%*inverse_2</eqn>
+            <non_negative />
+            <display x="759" y="307" color="black" label_side="right" label_angle="3">
+                <pts>
+                    <pt x="759" y="247" />
+                    <pt x="759" y="367" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Unsucseptible">
+            <doc>This stock represents the people with whom the vaccine has worked and are now at no risk of being infected.</doc>
+            <eqn>0</eqn>
+            <inflow>success</inflow>
+            <non_negative />
+            <display x="314" y="45" color="black" label_angle="93" />
+        </stock>
+        <aux name="non_vacc_perc">
+            <doc>This represents the average percentage of people in the United States who don&apos;t recieve vaccinations against the influenza virus.</doc>
+            <eqn>1-vaccine_perc</eqn>
+            <display x="280" y="289" color="black" label_side="left" />
+        </aux>
+        <flow name="death_2">
+            <doc>This outflow represents the people dying for reasons unrelated to the influenza virus.</doc>
+            <eqn>Vaccinated*death_rate_2</eqn>
+            <non_negative />
+            <display x="316" y="214" color="black" label_side="right" label_angle="309">
+                <pts>
+                    <pt x="316" y="167" />
+                    <pt x="316" y="261" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="death_5">
+            <doc>This outflow represents the people dying for reasons unrelated to the influenza virus.</doc>
+            <eqn>Immune*death_rate_2</eqn>
+            <non_negative />
+            <display x="697" y="384" color="black">
+                <pts>
+                    <pt x="740" y="384" />
+                    <pt x="654" y="384" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="inverse">
+            <doc>This represents the fraction of people who are becoming ill daily.</doc>
+            <eqn>1/incubation_period</eqn>
+            <display x="712" y="283" color="black" />
+        </aux>
+        <aux name="inverse_2">
+            <doc>This represents the fraction of people who recover each day.</doc>
+            <eqn>1/recovery_time</eqn>
+            <display x="822" y="342" color="black" />
+        </aux>
+        <flow name="success">
+            <doc>This flow represents the vaccinated people with whom the vaccine has worked.</doc>
+            <eqn>(1-fault_rate)*Vaccinated</eqn>
+            <non_negative />
+            <display x="316" y="98" color="black" label_side="left">
+                <pts>
+                    <pt x="316" y="137" />
+                    <pt x="316" y="60" />
+                </pts>
+            </display>
+        </flow>
+        <display page_width="576" page_height="747" page_cols="3" page_rows="3" isee:converter_size="large" interval="5">
+            <connector x="502" y="413" uid="0">
+                <from>prob_that_pers_is_uninfected</from>
+                <to>people_get_sick_2</to>
+            </connector>
+            <connector x="287" y="211" uid="1">
+                <from>vaccine_perc</from>
+                <to>become_vaccinated</to>
+            </connector>
+            <connector x="392" y="173" uid="2">
+                <from>fault_rate</from>
+                <to>people_get_sick</to>
+            </connector>
+            <connector x="148" y="226" uid="3">
+                <from>Initial_and_New</from>
+                <to>become_vaccinated</to>
+            </connector>
+            <connector x="148" y="260" uid="4">
+                <from>Initial_and_New</from>
+                <to>not_vaccinated</to>
+            </connector>
+            <connector x="275" y="300" uid="5">
+                <from>non_vacc_perc</from>
+                <to>not_vaccinated</to>
+            </connector>
+            <connector x="595" y="216" uid="6">
+                <from>Infected</from>
+                <to>people_get_sick</to>
+            </connector>
+            <connector x="553" y="376" uid="8">
+                <from>
+                    <alias uid="7" />
+                </from>
+                <to>people_get_sick_2</to>
+            </connector>
+            <connector x="45" y="206" uid="9">
+                <from>non_immune_people</from>
+                <to>new</to>
+            </connector>
+            <connector x="765" y="249" uid="10">
+                <from>Ill</from>
+                <to>become_immune</to>
+            </connector>
+            <connector x="636" y="248" uid="11">
+                <from>Infected</from>
+                <to>show_symptoms</to>
+            </connector>
+            <connector x="720" y="329" uid="12">
+                <from>immune_%</from>
+                <to>become_immune</to>
+            </connector>
+            <connector x="83" y="306" uid="13">
+                <from>births</from>
+                <to>new</to>
+            </connector>
+            <connector x="860" y="188" uid="14">
+                <from>death_rate</from>
+                <to>die</to>
+            </connector>
+            <connector x="777" y="243" uid="15">
+                <from>Ill</from>
+                <to>die</to>
+            </connector>
+            <connector x="293" y="234" uid="16">
+                <from>vaccine_perc</from>
+                <to>non_vacc_perc</to>
+            </connector>
+            <alias x="575" y="391" uid="7">
+                <of>Infected</of>
+            </alias>
+            <connector x="540" y="123" uid="18">
+                <from>
+                    <alias uid="17" />
+                </from>
+                <to>prob_that_person_is_uninfected</to>
+            </connector>
+            <connector x="564" y="284" uid="19">
+                <from>number_of_contacts</from>
+                <to>people_get_sick</to>
+            </connector>
+            <connector x="411" y="249" uid="20" color="red">
+                <from>prob_of_contraction</from>
+                <to>people_get_sick</to>
+            </connector>
+            <connector x="413" y="273" uid="21">
+                <from>prob_of_contraction</from>
+                <to>people_get_sick_2</to>
+            </connector>
+            <connector x="557" y="303" uid="22">
+                <from>number_of_contacts</from>
+                <to>people_get_sick_2</to>
+            </connector>
+            <connector x="336" y="146" uid="23">
+                <from>Vaccinated</from>
+                <to>prob_that_person_is_uninfected</to>
+            </connector>
+            <connector x="461" y="122" uid="24">
+                <from>prob_that_person_is_uninfected</from>
+                <to>people_get_sick</to>
+            </connector>
+            <connector x="376" y="439" uid="25">
+                <from>death_rate_2</from>
+                <to>death</to>
+            </connector>
+            <connector x="684" y="137" uid="27">
+                <from>
+                    <alias uid="26" />
+                </from>
+                <to>death_3</to>
+            </connector>
+            <connector x="71" y="152" uid="29">
+                <from>
+                    <alias uid="28" />
+                </from>
+                <to>non_immune_people</to>
+            </connector>
+            <alias x="956" y="529" uid="30">
+                <of>Initial_and_New</of>
+                <label_side>bottom</label_side>
+                <label_angle>316</label_angle>
+            </alias>
+            <connector x="628" y="216" uid="31">
+                <from>Infected</from>
+                <to>death_3</to>
+            </connector>
+            <connector x="331" y="359" uid="32">
+                <from>Non_Vaccinated</from>
+                <to>death</to>
+            </connector>
+            <alias x="955" y="429" uid="33">
+                <of>Non_Vaccinated</of>
+            </alias>
+            <connector x="39" y="355" uid="34">
+                <from>birth_rate</from>
+                <to>births</to>
+            </connector>
+            <alias x="110" y="364" uid="35">
+                <of>total_population</of>
+            </alias>
+            <alias x="886" y="429" uid="36">
+                <of>Infected</of>
+            </alias>
+            <alias x="825" y="427" uid="37">
+                <of>Ill</of>
+            </alias>
+            <connector x="844" y="442" uid="38">
+                <from>
+                    <alias uid="37" />
+                </from>
+                <to>total_population</to>
+            </connector>
+            <connector x="883" y="444" uid="39">
+                <from>
+                    <alias uid="36" />
+                </from>
+                <to>total_population</to>
+            </connector>
+            <connector x="935" y="441" uid="40">
+                <from>
+                    <alias uid="33" />
+                </from>
+                <to>total_population</to>
+            </connector>
+            <alias x="82" y="148" uid="28">
+                <of>become_immune</of>
+                <label_side>top</label_side>
+                <label_angle>77</label_angle>
+            </alias>
+            <connector x="106" y="354" uid="41">
+                <from>
+                    <alias uid="35" />
+                </from>
+                <to>births</to>
+            </connector>
+            <alias x="692" y="128" uid="26">
+                <of>death_rate_2</of>
+                <label_side>top</label_side>
+            </alias>
+            <alias x="839" y="132" uid="42">
+                <of>death_rate_2</of>
+                <label_side>top</label_side>
+                <label_angle>97</label_angle>
+            </alias>
+            <connector x="831" y="140" uid="43">
+                <from>
+                    <alias uid="42" />
+                </from>
+                <to>death_4</to>
+            </connector>
+            <connector x="771" y="215" uid="44">
+                <from>Ill</from>
+                <to>death_4</to>
+            </connector>
+            <alias x="875" y="528" uid="45">
+                <of>Immune</of>
+                <label_side>bottom</label_side>
+                <label_angle>267</label_angle>
+            </alias>
+            <connector x="880" y="513" uid="46">
+                <from>
+                    <alias uid="45" />
+                </from>
+                <to>total_population</to>
+            </connector>
+            <connector x="936" y="515" uid="47">
+                <from>
+                    <alias uid="30" />
+                </from>
+                <to>total_population</to>
+            </connector>
+            <alias x="811" y="525" uid="48">
+                <of>Vaccinated</of>
+                <label_side>bottom</label_side>
+                <label_angle>259</label_angle>
+            </alias>
+            <connector x="831" y="513" uid="49">
+                <from>
+                    <alias uid="48" />
+                </from>
+                <to>total_population</to>
+            </connector>
+            <connector x="340" y="357" uid="50">
+                <from>Non_Vaccinated</from>
+                <to>prob_that_pers_is_uninfected</to>
+            </connector>
+            <alias x="560" y="127" uid="17">
+                <of>Infected</of>
+            </alias>
+            <connector x="555" y="400" uid="51">
+                <from>
+                    <alias uid="7" />
+                </from>
+                <to>prob_that_pers_is_uninfected</to>
+            </connector>
+            <alias x="366" y="271" uid="52">
+                <of>death_rate_2</of>
+            </alias>
+            <connector x="355" y="264" uid="53">
+                <from>
+                    <alias uid="52" />
+                </from>
+                <to>death_2</to>
+            </connector>
+            <connector x="327" y="169" uid="54">
+                <from>Vaccinated</from>
+                <to>death_2</to>
+            </connector>
+            <alias x="634" y="422" uid="55">
+                <of>death_rate_2</of>
+            </alias>
+            <connector x="644" y="415" uid="56">
+                <from>
+                    <alias uid="55" />
+                </from>
+                <to>death_5</to>
+            </connector>
+            <connector x="738" y="397" uid="57">
+                <from>Immune</from>
+                <to>death_5</to>
+            </connector>
+            <connector x="661" y="302" uid="58">
+                <from>incubation_period</from>
+                <to>inverse</to>
+            </connector>
+            <connector x="710" y="271" uid="59">
+                <from>inverse</from>
+                <to>show_symptoms</to>
+            </connector>
+            <connector x="810" y="340" uid="60">
+                <from>inverse_2</from>
+                <to>become_immune</to>
+            </connector>
+            <connector x="889" y="339" uid="61">
+                <from>recovery_time</from>
+                <to>inverse_2</to>
+            </connector>
+            <alias x="377" y="44" uid="62">
+                <of>fault_rate</of>
+            </alias>
+            <connector x="331" y="135" uid="63">
+                <from>Vaccinated</from>
+                <to>success</to>
+            </connector>
+            <alias x="978" y="484" uid="64">
+                <of>Unsucseptible</of>
+            </alias>
+            <connector x="958" y="481" uid="65">
+                <from>
+                    <alias uid="64" />
+                </from>
+                <to>total_population</to>
+            </connector>
+            <connector x="366" y="48" uid="66">
+                <from>
+                    <alias uid="62" />
+                </from>
+                <to>success</to>
+            </connector>
+            <stacked_container x="29" y="520" height="266" width="469" uid="67">
+                <graph type="time_series" title="influenza" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:45:59Z" cleared="true" time_precision="2" from="1" to="60">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="2.7e+008" />
+                        <entity name="Unsucseptible" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="2.7e+008" />
+                        <entity name="Infected" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="2.7e+008" />
+                        <entity name="Immune" />
+                    </plot>
+                    <plot index="3" pen_width="1" color="#008F44" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="2.7e+008" />
+                        <entity name="Dead_from_Disease" />
+                    </plot>
+                    <plot index="4" pen_width="1" color="#FF7F00" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="2.7e+008" />
+                        <entity name="total_population" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="influenza 2" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:45:59Z" cleared="true" time_precision="2" from="1" to="60">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="2.7e+008" />
+                        <entity name="Vaccinated" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="2.7e+008" />
+                        <entity name="Unsucseptible" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="2.7e+008" />
+                        <entity name="Non_Vaccinated" />
+                    </plot>
+                    <plot index="3" pen_width="1" color="#008F44" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="2.7e+008" />
+                        <entity name="Ill" />
+                    </plot>
+                    <plot index="4" pen_width="1" color="#FF7F00" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="2.7e+008" />
+                        <entity name="Immune" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="224" y="663" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="67" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

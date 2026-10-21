@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>SocialScience5.4.v3</name>
+        <uuid>b361f884-7bab-4769-95c6-3c9334279743</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Days" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>100</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Stock_Value">
+            <eqn>1000</eqn>
+            <inflow>Value_Increase</inflow>
+            <outflow>Value_Decrease</outflow>
+            <non_negative />
+            <display x="198" y="115" color="black" />
+        </stock>
+        <flow name="Value_Increase">
+            <eqn>Stock_Value*Rate_of_Increase</eqn>
+            <non_negative />
+            <display x="126" y="114" color="black" label_side="top">
+                <pts>
+                    <pt x="75" y="114" />
+                    <pt x="178" y="114" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Rate_of_Increase">
+            <eqn>RANDOM(2,8)/365</eqn>
+            <display x="121" y="196" color="black" />
+        </aux>
+        <flow name="Value_Decrease">
+            <eqn>(Stock_Value*Value_adjustment/365)+PULSE(1000,50,999)</eqn>
+            <non_negative />
+            <display x="286" y="114" color="black" label_side="top" label_angle="79">
+                <pts>
+                    <pt x="218" y="114" />
+                    <pt x="355" y="114" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Value_adjustment">
+            <eqn>Stock_Value</eqn>
+            <gf>
+                <xscale min="0" max="10000" />
+                <yscale min="0" max="16" />
+                <ypts>0,0,0.16,0.16,0.47999999999999998,8,12.32,14.720000000000001,15.52,15.76,15.68</ypts>
+            </gf>
+            <display x="290" y="190" color="blue" />
+        </aux>
+        <display page_width="595" page_height="775" isee:converter_size="medium" interval="DT">
+            <connector x="176" y="121" uid="0">
+                <from>Stock_Value</from>
+                <to>Value_Increase</to>
+            </connector>
+            <connector x="122" y="187" uid="1">
+                <from>Rate_of_Increase</from>
+                <to>Value_Increase</to>
+            </connector>
+            <connector x="218" y="127" uid="2">
+                <from>Stock_Value</from>
+                <to>Value_adjustment</to>
+            </connector>
+            <connector x="292" y="182" uid="3">
+                <from>Value_adjustment</from>
+                <to>Value_Decrease</to>
+            </connector>
+            <connector x="220" y="119" uid="4">
+                <from>Stock_Value</from>
+                <to>Value_Decrease</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="5">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:50:19Z" cleared="true" time_precision="0" from="0" to="100">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <scale min="0" max="10000" />
+                        <entity name="Stock_Value" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="286" y="39" width="26" height="22" color="black" label_side="bottom" label="Graph 1" type="graph" icon_of="5" />
+            <stacked_container height="286" width="465" uid="6">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="1" cleared="true" date_time="1997-07-17T21:28:40Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" precision="0.01" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Stock_Value" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Rate_of_Increase" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="207" y="37" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="6" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="788" page_height="528" home_page="0">
+            <simulation_delay>0.1</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="78" content="5" />
+        <popup x="16" y="78" content="6" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

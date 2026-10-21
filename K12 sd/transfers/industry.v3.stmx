@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>industry.v3</name>
+        <uuid>c55c1c1d-3318-4893-a9ba-1094a08713f6</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Weeks" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>50</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" show_pages="true" />
+    <model>
+        <stock name="TOTAL_PRODUCTION">
+            <eqn>0</eqn>
+            <inflow>production_rate</inflow>
+            <outflow>sales_rate</outflow>
+            <non_negative />
+            <display x="249" y="144" color="blue" />
+        </stock>
+        <flow name="production_rate">
+            <eqn>(Total_Workers+More_workers)*Per_Worker_Productivity+(Total_Workers*Cost_Benefit_of_New_Tech)</eqn>
+            <non_negative />
+            <display x="170" y="144" color="blue" label_side="top" label_angle="74">
+                <pts>
+                    <pt x="111" y="144" />
+                    <pt x="229" y="144" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Total_Workers">
+            <eqn>20</eqn>
+            <display x="201" y="174" color="blue" label_angle="313" />
+        </aux>
+        <aux name="Per_Worker_Productivity">
+            <eqn>50&#x0D;</eqn>
+            <display x="178" y="216" color="blue" label_angle="303" />
+        </aux>
+        <aux name="Gross_net">
+            <eqn>sales_rate*Price_per_unit</eqn>
+            <display x="710" y="305" color="blue" label_side="right" label_angle="356" />
+        </aux>
+        <flow name="after_expenses">
+            <eqn>Gross_net-Total_Expenses</eqn>
+            <non_negative />
+            <display x="798" y="352" color="blue" label_side="top" label_angle="82">
+                <pts>
+                    <pt x="754" y="352" />
+                    <pt x="843" y="352" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Per_Worker_Cost">
+            <eqn>5</eqn>
+            <display x="721" y="427" color="blue" label_side="left" label_angle="176" />
+        </aux>
+        <aux name="Cost_of_Technology">
+            <eqn>2</eqn>
+            <display x="782" y="497" color="blue" />
+        </aux>
+        <aux name="Raw_materials">
+            <eqn>1</eqn>
+            <display x="861" y="451" color="blue" />
+        </aux>
+        <flow name="sales_rate">
+            <eqn>if TOTAL_PRODUCTION &gt; (TOTAL_BUYERS-Purchases_From_Competition) then TOTAL_BUYERS-Purchases_From_Competition else TOTAL_PRODUCTION</eqn>
+            <non_negative />
+            <display x="356" y="324" color="blue" label_side="right" label_angle="10">
+                <pts>
+                    <pt x="248" y="159" />
+                    <pt x="248" y="324" />
+                    <pt x="465" y="324" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="TOTAL_BUYERS">
+            <eqn>2000</eqn>
+            <display x="351" y="270" color="blue" label_side="right" label_angle="330" />
+        </aux>
+        <aux name="Total_Expenses">
+            <eqn>(Per_Worker_Cost*Total_Workers)+(Raw_materials*production_rate*Cost_of_Technology)+Invest_in_New_Technology</eqn>
+            <display x="807" y="406" color="blue" label_side="right" label_angle="27" />
+        </aux>
+        <stock name="BOTTOM_LINE">
+            <eqn>0</eqn>
+            <inflow>after_expenses</inflow>
+            <outflow>spend</outflow>
+            <non_negative />
+            <display x="863" y="354" color="blue" />
+        </stock>
+        <aux name="Price_per_unit">
+            <eqn>2</eqn>
+            <display x="387" y="243" color="blue" label_side="right" label_angle="348" />
+        </aux>
+        <aux name="Profit_taking">
+            <eqn>0</eqn>
+            <display x="972" y="306" color="blue" label_side="top" label_angle="42" />
+        </aux>
+        <aux name="Purchases_From_Competition">
+            <eqn>if Competition_Price &lt; Price_per_unit  and (TOTAL_BUYERS-Competition_Production) &gt; 0 then Competition_Production else TOTAL_BUYERS-TOTAL_PRODUCTION</eqn>
+            <display x="333" y="185" color="blue" label_side="top" label_angle="53" />
+        </aux>
+        <flow name="spend">
+            <eqn>(More_workers*Per_Worker_Cost)+Invest_in_New_Technology+Profit_taking </eqn>
+            <non_negative />
+            <display x="945" y="351" color="blue" label_side="top" label_angle="106">
+                <pts>
+                    <pt x="883" y="351" />
+                    <pt x="1007" y="351" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="More_workers">
+            <eqn>0</eqn>
+            <display x="987" y="420" color="blue" label_angle="305" />
+        </aux>
+        <aux name="Invest_in_New_Technology">
+            <eqn>0</eqn>
+            <display x="929" y="437" color="blue" label_angle="325" />
+        </aux>
+        <aux name="Competition_Price">
+            <eqn>5</eqn>
+            <display x="455" y="159" color="blue" label_side="top" label_angle="60" />
+        </aux>
+        <aux name="Competition_Production">
+            <eqn>1000</eqn>
+            <display x="416" y="204" color="blue" label_angle="333" />
+        </aux>
+        <aux name="Cost_Benefit_of_New_Tech">
+            <eqn>Invest_in_New_Technology</eqn>
+            <gf>
+                <xscale min="0" max="500" />
+                <yscale min="0" max="1" />
+                <ypts>0,0,0.025000000000000001,0.14000000000000001,0.23000000000000001,0.33500000000000002,0.42999999999999999,0.52000000000000002,0.60499999999999998,0.72499999999999998,0.82499999999999996</ypts>
+            </gf>
+            <display x="92" y="190" color="blue" label_side="top" label_angle="131" />
+        </aux>
+        <display show_pages="true" page_width="595" page_height="775" page_cols="2" isee:converter_size="medium" interval="DT">
+            <connector x="755" y="273" uid="1">
+                <from>
+                    <alias uid="0" />
+                </from>
+                <to>Gross_net</to>
+            </connector>
+            <connector x="917" y="434" uid="2">
+                <from>Invest_in_New_Technology</from>
+                <to>Total_Expenses</to>
+            </connector>
+            <connector x="805" y="397" uid="3">
+                <from>Total_Expenses</from>
+                <to>after_expenses</to>
+            </connector>
+            <connector x="717" y="310" uid="4">
+                <from>Gross_net</from>
+                <to>after_expenses</to>
+            </connector>
+            <alias x="125" y="198" uid="5">
+                <of>More_workers</of>
+            </alias>
+            <connector x="177" y="207" uid="6">
+                <from>Per_Worker_Productivity</from>
+                <to>production_rate</to>
+            </connector>
+            <connector x="193" y="171" uid="7">
+                <from>Total_Workers</from>
+                <to>production_rate</to>
+            </connector>
+            <connector x="657" y="284" uid="9">
+                <from>
+                    <alias uid="8" />
+                </from>
+                <to>Gross_net</to>
+            </connector>
+            <connector x="58" y="208" uid="11">
+                <from>
+                    <alias uid="10" />
+                </from>
+                <to>Cost_Benefit_of_New_Tech</to>
+            </connector>
+            <connector x="377" y="236" uid="12">
+                <from>Price_per_unit</from>
+                <to>Purchases_From_Competition</to>
+            </connector>
+            <connector x="356" y="277" uid="13">
+                <from>TOTAL_BUYERS</from>
+                <to>sales_rate</to>
+            </connector>
+            <connector x="405" y="200" uid="14">
+                <from>Competition_Production</from>
+                <to>Purchases_From_Competition</to>
+            </connector>
+            <connector x="443" y="161" uid="15">
+                <from>Competition_Price</from>
+                <to>Purchases_From_Competition</to>
+            </connector>
+            <connector x="134" y="198" uid="16">
+                <from>
+                    <alias uid="5" />
+                </from>
+                <to>production_rate</to>
+            </connector>
+            <connector x="981" y="413" uid="17">
+                <from>More_workers</from>
+                <to>spend</to>
+            </connector>
+            <connector x="968" y="314" uid="18">
+                <from>Profit_taking</from>
+                <to>spend</to>
+            </connector>
+            <alias x="1042" y="395" uid="19">
+                <of>Per_Worker_Cost</of>
+            </alias>
+            <connector x="1033" y="393" uid="20">
+                <from>
+                    <alias uid="19" />
+                </from>
+                <to>spend</to>
+            </connector>
+            <connector x="328" y="193" uid="21">
+                <from>Purchases_From_Competition</from>
+                <to>sales_rate</to>
+            </connector>
+            <connector x="733" y="424" uid="22">
+                <from>Per_Worker_Cost</from>
+                <to>Total_Expenses</to>
+            </connector>
+            <connector x="785" y="485" uid="23">
+                <from>Cost_of_Technology</from>
+                <to>Total_Expenses</to>
+            </connector>
+            <connector x="852" y="443" uid="24">
+                <from>Raw_materials</from>
+                <to>Total_Expenses</to>
+            </connector>
+            <alias x="705" y="479" uid="25">
+                <of>Total_Workers</of>
+            </alias>
+            <connector x="345" y="261" uid="26">
+                <from>TOTAL_BUYERS</from>
+                <to>Purchases_From_Competition</to>
+            </connector>
+            <connector x="266" y="160" uid="27">
+                <from>TOTAL_PRODUCTION</from>
+                <to>Purchases_From_Competition</to>
+            </connector>
+            <connector x="247" y="161" uid="28">
+                <from>TOTAL_PRODUCTION</from>
+                <to>sales_rate</to>
+            </connector>
+            <connector x="934" y="429" uid="29">
+                <from>Invest_in_New_Technology</from>
+                <to>spend</to>
+            </connector>
+            <alias x="48" y="215" uid="10">
+                <of>Invest_in_New_Technology</of>
+                <label_angle>311</label_angle>
+            </alias>
+            <connector x="100" y="187" uid="30">
+                <from>Cost_Benefit_of_New_Tech</from>
+                <to>production_rate</to>
+            </connector>
+            <connector x="715" y="472" uid="31">
+                <from>
+                    <alias uid="25" />
+                </from>
+                <to>Total_Expenses</to>
+            </connector>
+            <alias x="837" y="536" uid="32">
+                <of>production_rate</of>
+            </alias>
+            <connector x="834" y="524" uid="33">
+                <from>
+                    <alias uid="32" />
+                </from>
+                <to>Total_Expenses</to>
+            </connector>
+            <alias x="767" y="270" uid="0">
+                <of>sales_rate</of>
+                <label_side>right</label_side>
+            </alias>
+            <alias x="646" y="280" uid="8">
+                <of>Price_per_unit</of>
+                <label_side>top</label_side>
+                <label_angle>71</label_angle>
+            </alias>
+            <stacked_container height="282" width="492" visible_index="2" uid="34">
+                <graph type="time_series" title="Production" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:43:31Z" cleared="true" time_precision="0" from="0" to="50">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <entity name="BOTTOM_LINE" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="fuchsia" precision="1" show_y_axis="true">
+                        <entity name="TOTAL_PRODUCTION" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:43:31Z" cleared="true" time_precision="0" from="0" to="50">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <entity name="sales_rate" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <entity name="after_expenses" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="1" show_y_axis="true">
+                        <entity name="spend" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:43:31Z" cleared="true" time_precision="0" from="0" to="50">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <entity name="Total_Expenses" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <entity name="Gross_net" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="600" y="471" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="34" />
+            <text_box x="74" y="4" uid="35" color="#7F00FF" font-family="Arial" font-size="10" padding="5" width="375" height="26">Figure 3. Industrialization </text_box>
+            <text_box x="13" y="29" uid="36" color="#7F00FF" font-family="Arial" font-size="10" padding="5" width="557" height="80">One of the most significant developments in recent history involves industrialization. Regrettably, traditional histories tend to isolate one of the pieces (i.e, invention, increased production) without fully identifying the interconnected components. An overview of the &quot;system&quot; provides a better appreciation for the multiplicity of developments which accompany one or more changes. </text_box>
+            <text_box x="4" y="286" uid="37" color="#7F00FF" font-family="Arial" font-size="10" padding="5" width="193" height="379">Technology figures prominently in the industrial revolution. The shift from individual to collective production arises when technologies permit a group to produce more efficiently than if they labored independently. Recognition of this factor, in term, spurs the quest for technological innovations, with invention intensifying as a result.&#x0D;&#x0D; Yet, efforts to increase production and productivity do not function in a vacuum. The impulse to increase production reflects a perceived discrepancy between supply and demand; efforts to change productivity frequently reflect efforts to reduce costs, either increasing demand or bolstering the margin of profit. &#x0D;&#x0D; As such, decisions around how many people one hires, how much emphasis one places upon seeking technological innovation -- are governed by other elements of the system.</text_box>
+            <text_box x="2" y="254" uid="38" color="#7F00FF" font-family="Arial" font-size="12" padding="5" width="200" height="28">ALTERING PRODUCTION RATES</text_box>
+            <text_box x="204" y="355" uid="39" color="#7F00FF" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="157" height="26">SALES AND MARKETS</text_box>
+            <text_box x="236" y="393" uid="40" color="#7F00FF" font-family="Arial" font-size="10" padding="5" width="320" height="332">Industrialization arises at a point when external markets are likely to have grown far more important than the immediate locale. Likewise, industrialization presumes that there are others who already do produce like goods or will, in the case that  a market for the goods develops, will enter at some later point.&#x0D;&#x0D;Thus, industrialization recognizes that sales will be governed by consumers electing to purchase one product over another. Factors which influence this decision include (1) the number of people who can and would purchase the good at a particular cost; (2) the comparative price of one&apos;s good relative to others like it or substitute items. &#x0D;&#x0D;In turn, these two issues are influenced significantly by a number of factors, including (a) spending power of consumers (which, itself, embraces the health of the economy, purchasing power of differing social groups);  (b) factors effecting price (ie, variable costs of transportation, duties, marketing, etc.).&#x0D;&#x0D;Once again, sales of goods in a complex marketplace can vary significantly depending upon circumstance</text_box>
+            <text_box x="707" y="6" uid="41" color="#7F00FF" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="272" height="26">THE &quot;BOTTOM LINE&quot;: ASSESSING VIABILITY</text_box>
+            <text_box x="595" y="51" uid="42" color="#7F00FF" font-family="Arial" font-size="10" padding="5" border-style="solid" border-width="thin" width="549" height="79">The capacity to make and sell goods is ultimately linked to a third system, which is profitability. Viability dictates that, at the very least, money which comes in must (in the long term) match that which is spent to pay workers,  and to build and maintain machinery, buildings and the like. A preferable scenario--for t he industrial manufacturer--is one in which profits flow to those who ventured the initial capital to pay expenses and, who, presumably, seeks benefits from making decisions linked to production and sales.</text_box>
+            <text_box x="588" y="185" uid="43" color="#7F00FF" font-family="Arial" font-size="10" padding="5" width="253" height="55">STEP ONE: Viability begins by calculating &quot;gross net,&quot; which is the total amount of money which comes into the company as a result of sales. </text_box>
+            <text_box x="589" y="575" uid="44" color="#7F00FF" font-family="Arial" font-size="10" padding="5" width="254" height="133">STEP TWO: The next step involves paying bills. All the expenses associated with the production process -- cost of labor, raw materials, technology, etc -- all need to be paid. Failure to do so (over the long term) will result in one or more of these critical elements of production being withdrawn which, in turn, could hinder or halt production. </text_box>
+            <text_box x="898" y="490" uid="45" color="#7F00FF" font-family="Arial" font-size="10" padding="5" width="216" height="217">STEP THREE: Maintaining viability. Industrial production and sales do not remain static in the long-term. Decisions to withdraw money from the Bottom Line account--either in good times or bad, reflect a critical awareness that changes must be anticipated and preparations must be made. Options include drawing money out to increase production, either through investment in new technologies (designed either to boost production and/or reduce production costs), more workers, or to withdraw profits as a reward for effective sales. </text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface show_pages="true" page_width="788" page_height="528">
+            <simulation_delay>0.1</simulation_delay>
+            <stacked_container height="282" width="492" uid="46">
+                <graph type="time_series" title="Bottom Line" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:43:31Z" cleared="true" time_precision="0" from="0" to="50">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <entity name="BOTTOM_LINE" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <entity name="TOTAL_PRODUCTION" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="274" y="191" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 2" type="graph" icon_of="46" />
+            <slider x="247" y="41" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="0" max="100">
+                <entity name="More_workers" />
+            </slider>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="78" content="46" />
+        <popup x="16" y="78" content="34" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

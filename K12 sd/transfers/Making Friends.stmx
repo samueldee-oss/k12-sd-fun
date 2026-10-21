@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Making Friends</name>
+        <uuid>d25c9f09-477a-4b6b-b1e5-e71b8f073064</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="18" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Rounds" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>12</stop>
+        <dt>1</dt>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="interface" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="905" height="587" />
+        <isee:security />
+        <isee:print_setup width="576" height="768" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="module" />
+    <model>
+        <stock name="Friends_in_game_2">
+            <eqn>1</eqn>
+            <inflow>Making_Friends_in__game_2</inflow>
+            <non_negative />
+            <display x="372" y="364" color="blue" />
+        </stock>
+        <flow name="Making_Friends_in\n_game_2">
+            <eqn>Friends_in_game_2</eqn>
+            <non_negative />
+            <display x="265" y="366" color="blue">
+                <pts>
+                    <pt x="181" y="366" />
+                    <pt x="350" y="366" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Friends_in_game_1">
+            <eqn>1</eqn>
+            <inflow>Making_Friends_in_game_1</inflow>
+            <non_negative />
+            <display x="375" y="146" color="blue" />
+        </stock>
+        <flow name="Making_Friends_in\ngame_1">
+            <eqn>2</eqn>
+            <non_negative />
+            <display x="276" y="149" color="blue">
+                <pts>
+                    <pt x="199" y="149" />
+                    <pt x="353" y="149" />
+                </pts>
+            </display>
+        </flow>
+        <display page_width="576" page_height="768" isee:converter_size="medium" isee:animate_flows="true" isee:animate_stocks="true" isee:animate_converters="true" interval="DT">
+            <connector x="350" y="349" uid="0">
+                <from>Friends_in_game_2</from>
+                <to>Making_Friends_in__game_2</to>
+            </connector>
+            <text_box x="180" y="250" uid="1" color="black" font-family="Arial" font-size="18" text-align="center" padding="5" border-style="solid" border-width="5px" width="260" height="58">Game 2</text_box>
+            <text_box x="182" y="28" uid="2" color="black" font-family="Arial" font-size="18" text-align="center" padding="5" border-style="solid" border-width="5px" width="260" height="58">Game 1</text_box>
+            <style font-family="Arial" font-size="18" />
+        </display>
+        <interface page_cols="2" page_rows="2" page_width="788" page_height="528" scroll_y="528" home_page="3">
+            <simulation_delay>0.1</simulation_delay>
+            <stacked_container x="158" y="46" height="282" width="492" visible_index="2" uid="3">
+                <graph type="time_series" title="Making Friends Game 1" background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" cleared="true" time_precision="2" from="0" to="12">
+                    <plot index="0" pen_width="3" color="blue" precision="1" show_y_axis="true">
+                        <scale min="0" max="100" />
+                        <entity name="Friends_in_game_1" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Making Friends Game 2" background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" cleared="true" time_precision="2" from="0" to="12">
+                    <plot index="0" pen_width="3" color="blue" precision="1" show_y_axis="true">
+                        <scale min="0" max="1000" />
+                        <entity name="Friends_in_game_2" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Comparing Games 1 and 2" background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" cleared="true" time_precision="2" from="0" to="12">
+                    <plot index="0" pen_width="3" color="blue" precision="1" show_y_axis="true">
+                        <scale min="0" max="200" />
+                        <entity name="Friends_in_game_1" />
+                    </plot>
+                    <plot index="1" pen_width="3" color="red" precision="1" show_y_axis="true">
+                        <scale min="0" max="200" />
+                        <entity name="Friends_in_game_2" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="216" y="182" width="26" height="22" color="#008F44" label_side="bottom" label="Graph 1" type="graph" icon_of="3" />
+            <stacked_container x="1045" y="49" height="434" width="383" uid="4">
+                <table font-size="9" background="#E0E0E0" column_width="90" orientation="vertical" interval="1" cleared="true" date_time="2010-12-08T15:21:18Z">
+                    <title>Making Friends</title>
+                    <item type="time" color="black" precision="max" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Friends_in_game_1" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Friends_in_game_2" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="1190" y="227" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="4" />
+            <slider x="398" y="473" color="lime" width="197" height="43" min="1" max="3" precision="1">
+                <entity name="Making_Friends_in_game_1" value="3" />
+            </slider>
+            <button x="574" y="399" width="62" height="45" uid="5" appearance="opaque" background="black" color="white" style="rounded" label="See table" font-family="Arial" font-size="12" text-align="center">
+                <link target="next_page" />
+            </button>
+            <button x="922" y="410" width="85" height="45" uid="6" appearance="opaque" background="black" color="white" style="square" label="Back to graphs" font-family="Arial" font-size="12" text-align="center">
+                <link target="previous_page" />
+            </button>
+            <button x="666" y="123" width="130" height="60" uid="7" appearance="opaque" background="black" color="white" style="rounded" label="Restore Graphs &amp; Tables" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>restore_graphs_tables</menu_action>
+            </button>
+            <text_box x="265" y="338" uid="8" color="black" font-family="Arial" font-size="12" text-align="center" padding="5" border-style="solid" border-width="thin" width="262" height="175">Decide how many new friends will be added each turn in game 1.</text_box>
+            <button x="570" y="349" width="65" height="39" uid="9" appearance="opaque" background="black" color="white" style="rounded" label="Run" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>run</menu_action>
+            </button>
+            <text_box x="7" y="187" uid="10" color="black" font-family="Arial" font-size="12" text-align="center" padding="5" border-style="solid" border-width="thin" width="148" height="163">Click the page turning icon to see a graph of game 1, game 2, or a graph comparing them.&#x0D;&#x0D;&#x0D;------- &gt;</text_box>
+            <text_box x="158" y="554" uid="11" color="black" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="480" height="268">MAKING FRIENDS&#x0D;&#x0D;The activity &quot;Making Friends&quot; is played twice, with a different set of rules for each game.  In Game 1, the rules are similar to &quot;The In and Out Game.&quot;  There is no outflow but a constant inflow grows the Friends team at a steady, linear rate.  Things change in game 2 because of feedback.  The number of friends already on the team (the stock) determines the number of new friends (the inflow) joining the team that round.  As the stock grows each round, so does the number of new friends arriving, further increasing the stock.  This creates a positive feedback, or reinforcing loop.&#x0D;&#x0D;The graph of the growing friends team in game 2 is no longer a straight line, but curves upward becoming more steep each round.  This escalating growth is called &quot;exponential growth.&quot;&#x0D;&#x0D;You can have the computer simulate the Making Friends activity and compare the results in each game.  Click the button below to go to the simulation page.  To see the model or the equations, click one of the tabs on the left.</text_box>
+            <button x="69" y="401" width="77" height="62" uid="12" appearance="opaque" background="black" color="white" style="square" icon="5">
+                <link target="home_page" isee:default_icon="true" />
+            </button>
+            <button x="328" y="841" width="126" height="72" uid="13" appearance="opaque" background="black" color="white" style="square" label='Play the &quot;Making Friends&quot; game' font-family="Arial" font-size="12" text-align="center">
+                <link target="interface" x="0" y="0" />
+            </button>
+            <button x="932" y="310" width="58" height="48" uid="14" appearance="opaque" background="black" color="white" style="square" icon="5">
+                <link target="home_page" isee:default_icon="true" />
+            </button>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="18" />
+    </model>
+</xmile>

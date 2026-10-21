@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>In and Out Game</name>
+        <uuid>996a19fe-4db2-4ed4-a3ed-1895e6fc245b</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Georgia" font-size="10" />
+        <interface font-family="Arial" font-size="12" />
+    </style>
+    <sim_specs method="Euler" time_units="Rounds" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>20</stop>
+        <dt>1</dt>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="false" layer="interface" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1009" height="659" />
+        <isee:security />
+        <isee:print_setup width="576" height="768" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="module" show_pages="true" />
+    <model>
+        <stock name="Players\nin_the_Stock">
+            <eqn>1</eqn>
+            <inflow>Players__going_in</inflow>
+            <outflow>Players__going_out</outflow>
+            <non_negative />
+            <display x="294" y="223" color="blue" />
+        </stock>
+        <flow name="Players_\ngoing_in">
+            <eqn>2</eqn>
+            <non_negative />
+            <display x="197" y="222" color="blue">
+                <pts>
+                    <pt x="123" y="222" />
+                    <pt x="272" y="222" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Players_\ngoing_out">
+            <eqn>1</eqn>
+            <non_negative />
+            <display x="400" y="224" color="blue">
+                <pts>
+                    <pt x="316" y="224" />
+                    <pt x="484" y="224" />
+                </pts>
+            </display>
+        </flow>
+        <display show_pages="true" page_width="576" page_height="768" isee:converter_size="medium" zoom="150" isee:animate_flows="true" isee:animate_stocks="true" isee:animate_converters="true" interval="DT">
+            <style font-family="Georgia" font-size="10" />
+        </display>
+        <interface show_pages="true" page_cols="4" page_rows="4" page_width="1268" page_height="952" home_page="2">
+            <simulation_delay>0.1</simulation_delay>
+            <stacked_container x="9" y="36" height="297" width="518" uid="0">
+                <graph type="time_series" title="Rounds" background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" cleared="true" time_precision="0" from="0" to="20">
+                    <plot index="0" pen_width="3" color="blue" precision="1" show_y_axis="true">
+                        <scale min="0" max="40" />
+                        <entity name="Players_in_the_Stock" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Rounds" background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" cleared="true" time_precision="2" from="0" to="20">
+                    <plot index="0" pen_width="3" color="blue" precision="1" show_y_axis="true">
+                        <scale min="0" max="10" />
+                        <entity name="Players__going_in" />
+                    </plot>
+                    <plot index="1" pen_width="3" color="red" precision="1" show_y_axis="true">
+                        <scale min="0" max="10" />
+                        <entity name="Players__going_out" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="273" y="49" width="26" height="22" color="#008F44" label_side="bottom" label="Graph 1" type="graph" icon_of="0" />
+            <stacked_container x="12" y="819" height="258" width="451" uid="1">
+                <graph type="time_series" title="Challenge 1" background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" cleared="true" time_precision="2" from="0" to="20">
+                    <plot index="0" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <scale min="0" max="40" />
+                        <entity name="Players_in_the_Stock" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="150" y="900" width="26" height="22" color="#008F44" label_side="bottom" label="Graph 2" type="graph" icon_of="1" />
+            <stacked_container x="492" y="818" height="261" width="455" uid="2">
+                <graph type="time_series" title="Challenge 2" background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" cleared="true" time_precision="2" from="0" to="20">
+                    <plot index="0" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <scale min="0" max="40" />
+                        <entity name="Players_in_the_Stock" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="602" y="978" width="26" height="22" color="#008F44" label_side="bottom" label="Graph 3" type="graph" icon_of="2" />
+            <stacked_container x="13" y="1096" height="259" width="453" uid="3">
+                <graph type="time_series" title="Challenge 3" background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" cleared="true" time_precision="2" from="0" to="20">
+                    <plot index="0" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <scale min="0" max="40" />
+                        <entity name="Players_in_the_Stock" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="187" y="1185" width="26" height="22" color="#008F44" label_side="bottom" label="Graph 4" type="graph" icon_of="3" />
+            <stacked_container x="491" y="1095" height="261" width="456" uid="4">
+                <graph type="time_series" title="Challenge 4" background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" cleared="true" time_precision="2" from="0" to="20">
+                    <plot index="0" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <scale min="0" max="40" />
+                        <entity name="Players_in_the_Stock" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="612" y="1177" width="26" height="22" color="#008F44" label_side="bottom" label="Graph 5" type="graph" icon_of="4" />
+            <stacked_container x="555" y="43" height="529" width="473" uid="5">
+                <table font-size="12" background="#FFFFC9" column_width="129" orientation="vertical" interval="DT" cleared="true" date_time="2010-11-22T14:17:54Z">
+                    <title>In and Out Game</title>
+                    <item type="time" color="black" precision="max" width="58" />
+                    <item color="black" precision="1" delimit_000s="true" index="0">
+                        <entity name="Players_in_the_Stock" />
+                    </item>
+                    <item color="black" precision="1" delimit_000s="true" index="1">
+                        <entity name="Players__going_in" />
+                    </item>
+                    <item color="black" precision="1" delimit_000s="true" index="2">
+                        <entity name="Players__going_out" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="799" y="140" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="5" />
+            <knob x="83" y="453" show_name="false" color="black" width="83" height="91" min="0" max="20" precision="1">
+                <entity name="Players_in_the_Stock" value="7" />
+            </knob>
+            <slider x="278" y="411" isee:navigate_to="true" color="#55CB56" width="197" height="43" min="0" max="5" precision="1">
+                <entity name="Players__going_in" value="2" />
+            </slider>
+            <slider x="281" y="494" color="red" width="197" height="43" min="0" max="5" precision="1">
+                <entity name="Players__going_out" />
+            </slider>
+            <text_box x="15" y="356" uid="6" color="black" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="146" height="182">Starting number of&#x0D;         players</text_box>
+            <text_box x="171" y="357" uid="7" color="black" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="215" height="182" />
+            <button x="412" y="384" width="98" height="47" uid="8" appearance="opaque" background="black" color="white" style="rounded" label="Run" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>run</menu_action>
+            </button>
+            <text_box x="1554" y="125" uid="9" color="black" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="516" height="349">&#x0D;THE IN AND OUT GAME&#x0D;&#x0D;This simple activity tracks the number of players in the &quot;stock&quot; of a game.  Rules specify how many players enter the stock each round (inflow) and how many exit the stock (outflow).  As the game proceeds, the number of players in the stock can grow, remain constant, or decrease, depending on the rules.  &#x0D;&#x0D;The flows determine if and how the stock will change.  Once the rules are set, they don&apos;t change until a new game is begun.  The graphs are always straight lines because the inflows and outflows are constant values.&#x0D;&#x0D;Click the button below to play The In and Out Game.  You will set the rules of the game and have the computer run a simulated game.  There are some challenge graphs for you to try to match if you wish.&#x0D;&#x0D;You can click the tabs on the left of the screen to see a stock and flow map, model, or the equations of The In and Out Game.  </text_box>
+            <button x="1754" y="517" width="132" height="57" uid="10" appearance="opaque" background="black" color="white" style="square" label="Play The In and Out Game" font-family="Arial" font-size="12" text-align="center">
+                <link target="interface" x="0" y="0" />
+            </button>
+            <button x="414" y="452" width="95" height="52" uid="11" appearance="opaque" background="black" color="white" style="rounded" label="Restore Graphs &amp; Tables" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>restore_graphs_tables</menu_action>
+            </button>
+            <text_box x="183" y="1725" uid="12" color="black" font-family="Times New Roman" font-size="12" padding="5" border-style="double" border-width="thin" width="512" height="230" />
+            <button x="411" y="527" width="103" height="48" uid="13" appearance="opaque" background="black" color="white" style="rounded" label="View Challenges" font-family="Arial" font-size="12" text-align="center">
+                <link target="interface" x="0" y="720" />
+            </button>
+            <button x="461" y="738" width="122" height="49" uid="14" appearance="opaque" background="black" color="white" style="rounded" label="To Sliders and Graph" font-family="Arial" font-size="12" text-align="center">
+                <link target="interface" x="0" y="0" />
+            </button>
+            <text_box x="30" y="734" uid="15" color="black" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="403" height="61">Challenge: Use the sliders to reproduce each of the graphs below.</text_box>
+            <button x="194" y="577" width="80" height="64" uid="16" appearance="opaque" background="black" color="white" style="square" icon="5">
+                <link target="home_page" isee:default_icon="true" />
+            </button>
+            <button x="649" y="741" width="57" height="48" uid="17" appearance="opaque" background="black" color="white" style="square" icon="5">
+                <link target="home_page" isee:default_icon="true" />
+            </button>
+            <style font-family="Arial" font-size="12" />
+        </interface>
+        <style font-family="Georgia" font-size="10" />
+    </model>
+</xmile>

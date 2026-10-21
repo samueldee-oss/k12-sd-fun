@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>LinearSchools.v7</name>
+        <uuid>6d74a861-fbcf-4d70-bd81-8ccb684d5ac7</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Years" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>12</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="785" height="529" />
+        <isee:security />
+        <isee:print_setup width="582" height="762" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Neptune_population">
+            <eqn>1520</eqn>
+            <scale min="1040" max="1520" />
+            <outflow>Students_leaving</outflow>
+            <non_negative />
+            <display x="238" y="82" color="blue">
+                <scale min="1040" max="1520" />
+            </display>
+        </stock>
+        <flow name="Students_leaving">
+            <eqn>40</eqn>
+            <non_negative />
+            <display x="307" y="86" color="blue">
+                <pts>
+                    <pt x="260" y="86" />
+                    <pt x="355" y="86" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Pioneer_population">
+            <eqn>1150</eqn>
+            <scale min="1040" max="1520" />
+            <inflow>Students_enrolling</inflow>
+            <non_negative />
+            <display x="349" y="222" color="blue">
+                <scale min="1040" max="1520" />
+            </display>
+        </stock>
+        <flow name="Students_enrolling">
+            <eqn>28</eqn>
+            <non_negative />
+            <display x="279" y="219" color="blue">
+                <pts>
+                    <pt x="229" y="219" />
+                    <pt x="329" y="219" />
+                </pts>
+            </display>
+        </flow>
+        <display page_width="582" page_height="762" isee:converter_size="large" interval="DT">
+            <stacked_container height="282" width="492" uid="0">
+                <graph type="time_series" title="Schools" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:50:01Z" cleared="true" time_precision="2" from="0" to="12">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="1000" max="1600" />
+                        <entity name="Neptune_population" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="1000" max="1600" />
+                        <entity name="Pioneer_population" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="129" y="156" width="26" height="22" color="fuchsia" label_side="bottom" label="Graph 1" type="graph" icon_of="0" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="1588" page_height="1128" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="13" y="112" content="0" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

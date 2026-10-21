@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>BasicInfection.v6</name>
+        <uuid>af58d6eb-b610-43dc-81c3-525725e36bae</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Time" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>20</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="interface" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="623" height="425" />
+        <isee:security password="true" />
+        <isee:print_setup width="730" height="552" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="UNINFECTED">
+            <eqn>50000 - initial_#_infected</eqn>
+            <outflow>New_Infections</outflow>
+            <non_negative />
+            <display x="150" y="250" color="blue" />
+        </stock>
+        <stock name="INFECTED">
+            <eqn>initial_#_infected</eqn>
+            <inflow>New_Infections</inflow>
+            <non_negative />
+            <display x="290" y="250" color="blue" />
+        </stock>
+        <flow name="New_Infections">
+            <eqn>INFECTED*number_of_contacts*prob_contact_is_susceptible*prob_of_infection</eqn>
+            <non_negative />
+            <display x="220" y="250" color="blue" label_side="top">
+                <pts>
+                    <pt x="170" y="250" />
+                    <pt x="270" y="250" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="number_of_contacts">
+            <eqn>10</eqn>
+            <display x="150" y="300" color="blue" />
+        </aux>
+        <aux name="prob_of_infection">
+            <eqn>.1</eqn>
+            <display x="240" y="298" color="blue" />
+        </aux>
+        <aux name="prob_contact_is_susceptible">
+            <eqn>UNINFECTED/(INFECTED+UNINFECTED-1)</eqn>
+            <display x="190" y="350" color="blue" />
+        </aux>
+        <aux name="initial_#_infected">
+            <eqn>1</eqn>
+            <display x="369" y="267" color="blue" />
+        </aux>
+        <display page_width="730" page_height="552" page_rows="3" isee:converter_size="large" interval="DT">
+            <connector x="158" y="290" uid="0">
+                <from>number_of_contacts</from>
+                <to>New_Infections</to>
+            </connector>
+            <connector x="268" y="262" uid="1">
+                <from>INFECTED</from>
+                <to>New_Infections</to>
+            </connector>
+            <connector x="242" y="286" uid="2">
+                <from>prob_of_infection</from>
+                <to>New_Infections</to>
+            </connector>
+            <connector x="194" y="339" uid="3">
+                <from>prob_contact_is_susceptible</from>
+                <to>New_Infections</to>
+            </connector>
+            <connector x="294" y="265" uid="4">
+                <from>INFECTED</from>
+                <to>prob_contact_is_susceptible</to>
+            </connector>
+            <connector x="130" y="259" uid="5">
+                <from>UNINFECTED</from>
+                <to>prob_contact_is_susceptible</to>
+            </connector>
+            <text_box x="104" y="137" uid="6" color="blue" font-family="Arial" font-size="12" padding="5" width="287" height="58">Documentation for these building blocks is provided on the cover page of the game in the Higher Level Mapping Layer.</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_rows="6" page_width="640" page_height="480">
+            <simulation_delay>0</simulation_delay>
+            <stacked_container x="25" y="1248" height="252" width="450" uid="7">
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="true" date_time="2025-02-04T09:23:32Z" cleared="true" time_precision="2" from="0" to="20">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="50000" />
+                        <entity name="INFECTED" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="50000" />
+                        <entity name="UNINFECTED" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="50000" />
+                        <entity name="New_Infections" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:23:32Z" comparative="true" cleared="true" time_precision="2" from="0" to="20">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="INFECTED" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:23:32Z" comparative="true" cleared="true" time_precision="2" from="0" to="20">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="50000" />
+                        <entity name="New_Infections" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="199" y="1397" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="7" />
+            <graphics_frame x="22" y="99" uid="8" width="228" height="170" border-color="#0CA0FF" fill="none">
+                <image width="238" height="174">data:image/png;base64,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</image>
+            </graphics_frame>
+            <text_box x="101" y="3" uid="9" color="red" font-family="Arial" font-size="18" font-weight="bold" text-align="center" padding="5" width="382" height="33">Exploring a &quot;Basic Infection&quot; Model</text_box>
+            <text_box x="247" y="77" uid="10" color="black" font-family="Arial" font-size="12" padding="5" width="323" height="250">This model provides you an opportunity to modify the elements that appear to control how rapidly a disease spreads within a population.  In this simulation the size of the total population is 50,000, of whom some number of individuals are initially infected.  &#x0D;&#x0D;Click any of the building blocks to the left to see how it is defined in this model.&#x0D;&#x0D;Click the &quot;Control Panel&quot; button to move to the screen which contains the detailed instructions, the sliders with which you can control the simulation, and the graph pad that will contain the model&apos;s output.</text_box>
+            <slider x="112" y="1225" label_angle="156" color="red" width="197" height="43" min="1" max="50">
+                <entity name="number_of_contacts" />
+            </slider>
+            <slider x="252" y="1182" label_side="right" label_angle="8" color="red" width="197" height="43" min="1" max="100" precision="1">
+                <entity name="initial_#_infected" />
+            </slider>
+            <slider x="387" y="1225" label_angle="22" color="red" width="197" height="43" min="0" max="1" precision="0.01">
+                <entity name="prob_of_infection" />
+            </slider>
+            <button x="481" y="357" width="96" height="25" uid="11" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Control Panel" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="1114" />
+            </button>
+            <text_box x="97" y="1111" uid="12" color="red" font-family="Arial" font-size="18" font-weight="bold" text-align="center" padding="5" width="382" height="33">Exploring a &quot;Basic Infection&quot; Model</text_box>
+            <text_box x="125" y="1133" uid="13" color="red" font-family="Arial" font-size="14" font-weight="bold" text-align="center" padding="5" width="327" height="29">Control Panel</text_box>
+            <text_box x="112" y="24" uid="14" color="red" font-family="Arial" font-size="14" font-weight="bold" text-align="center" padding="5" width="328" height="29">Introduction</text_box>
+            <button x="201" y="121" width="42" height="32" uid="15" appearance="transparent" color="blue" style="square">
+                <popup x="50" y="0" width="250" height="70" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">initial INFECTED = initial # infected&#x0D;&#x0D;{This will be controlled by a slider in the Control Panel}</text_box>
+                </popup>
+            </button>
+            <button x="60" y="121" width="42" height="32" uid="16" appearance="transparent" color="blue" style="square">
+                <popup x="50" y="0" width="300" height="80" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">initial UNINFECTED = 50,000 - initial # infected&#x0D;&#x0D;{This represents everyone in the population of 50,000 other than those who are initially infected as defined by a slider on the Control Panel.}</text_box>
+                </popup>
+            </button>
+            <button x="67" y="174" width="26" height="25" uid="17" appearance="transparent" color="blue" style="rounded">
+                <popup x="34" y="0" width="250" height="55" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">number of contacts:  &#x0D;controlled by a slider on the Control Panel in a range between 1 and 50</text_box>
+                </popup>
+            </button>
+            <button x="159" y="171" width="26" height="25" uid="18" appearance="transparent" color="blue" style="rounded">
+                <popup x="34" y="0" width="250" height="55" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">prob of infection:  &#x0D;controlled by a slider on the Control Panel in a range between 0 and 1.</text_box>
+                </popup>
+            </button>
+            <button x="107" y="224" width="26" height="25" uid="19" appearance="transparent" color="blue" style="rounded">
+                <popup x="34" y="0" width="250" height="40" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">prob contact is susceptible=&#x0D;UNINFECTED/(INFECTED + UNINFECTED - 1)</text_box>
+                </popup>
+            </button>
+            <button x="138" y="140" width="26" height="25" uid="20" appearance="transparent" color="blue" style="rounded">
+                <popup x="34" y="0" width="250" height="55" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">New Infections =&#x0D;INFECTED * number of contacts * prob of infection * prob contact is susceptible</text_box>
+                </popup>
+            </button>
+            <button x="218" y="1212" width="64" height="35" uid="21" appearance="opaque" background="red" color="white" style="rounded" clicking_sound="false" label="Reset Sliders" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <menu_action>restore_sliders</menu_action>
+            </button>
+            <button x="484" y="1267" width="91" height="28" uid="22" appearance="opaque" background="black" color="white" style="rounded" clicking_sound="false" label="Instructions" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <popup x="-465" y="0" width="450" height="150" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">Follow the dynamics of this simulated disease as you change the various controlling parameters.  Explore each of the available factors one at a time to begin.  For instance, what impact is there in the simulation results, as the initial size of the INFECTED population changes?  What about the probability of infection; how will changing that from 0.1 to 0.2, 0.4, or 0.9 affect the course of the disease?  Can you predict the effect of similar changes in the number of contacts converter?&#x0D;&#x0D;Explore a number of factors and after each exploration, please consider (write answers for) the questions posed in the &quot;Debrief&quot; section.</text_box>
+                </popup>
+            </button>
+            <button x="484" y="1372" width="93" height="23" uid="23" appearance="opaque" background="red" color="white" style="rounded" clicking_sound="false" label="Clear Graphs" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <menu_action>restore_graphs_tables</menu_action>
+            </button>
+            <button x="499" y="1343" width="65" height="22" uid="24" appearance="opaque" background="red" color="white" style="rounded" clicking_sound="false" label="Run" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <menu_action>run</menu_action>
+            </button>
+            <button x="495" y="1302" width="69" height="28" uid="25" appearance="opaque" background="black" color="white" style="rounded" clicking_sound="false" label="Multiple Graphs" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <popup x="-315" y="0" width="300" height="100" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">This Graph Pad contains three pages; pages 2 and 3 present comparative graphs of INFECTED and New Infections, respectively.  &#x0D;&#x0D;To switch between pages, click the &quot;dog ear&quot; in the lower left corner of the graphs.</text_box>
+                </popup>
+            </button>
+            <button x="491" y="1439" width="85" height="25" uid="26" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Introduction" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="0" />
+            </button>
+            <button x="491" y="1471" width="85" height="25" uid="27" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Debrief" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="2212" />
+            </button>
+            <button x="491" y="2537" width="85" height="25" uid="28" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Introduction" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="0" />
+            </button>
+            <button x="491" y="2569" width="85" height="25" uid="29" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Control Panel" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="1114" />
+            </button>
+            <text_box x="95" y="2214" uid="30" color="red" font-family="Arial" font-size="18" font-weight="bold" text-align="center" padding="5" width="382" height="33">Exploring a &quot;Basic Infection&quot; Model</text_box>
+            <text_box x="123" y="2236" uid="31" color="red" font-family="Arial" font-size="14" font-weight="bold" text-align="center" padding="5" width="327" height="29">Debrief</text_box>
+            <text_box x="26" y="2278" uid="32" color="black" font-family="Arial" font-size="12" padding="5" width="533" height="250">There were a multitude of experiments you could have pursued in this exercise.  Some parameter settings lead to rapid intense outbreaks of disease in which everyone gets ill very quickly.  Some settings result in much slower development of the disease.  Every setting, however, eventually results in everyone being ill - if the model is given sufficient time to run.  For any experiment, or set of related experiments, you carried out:&#x0D;&#x0D;•  Can you explain why the course(s) of the disease played out the way it(they) did?&#x0D;&#x0D;•  Can you identify a &quot;real world&quot; scenario for which your experiment represents a good model?&#x0D;&#x0D;•  Is a final condition of everyone being ill a particularly accurate result for one of those &quot;real world&quot; scenarios?</text_box>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

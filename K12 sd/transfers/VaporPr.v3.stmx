@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>VaporPr.v3</name>
+        <uuid>37426a9a-6e81-4dbe-8a63-ff6af596100b</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Time" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>30</stop>
+        <dt>0.125</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" show_documentation="true" />
+    <model>
+        <flow name="Evaporation_Rate">
+            <doc>The rate of evaporation is directly proportional to the concentration of water vapor required for achieving the standard vapor pressure.</doc>
+            <eqn>Target_Vapor_Concentration</eqn>
+            <non_negative />
+            <display x="186" y="217" color="blue" label_side="top" label_angle="85">
+                <pts>
+                    <pt x="140" y="183" />
+                    <pt x="140" y="217" />
+                    <pt x="233" y="217" />
+                    <pt x="233" y="181" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Moles_of_Water_Vapor">
+            <doc>The system is initialized without liquid water and, therefore, there is no water vapor.</doc>
+            <eqn>0</eqn>
+            <scale min="0" max="0.0030000000000000001" />
+            <inflow>Evaporation_Rate</inflow>
+            <outflow>Condensation_Rate</outflow>
+            <non_negative />
+            <display x="233" y="166" color="blue" label_side="right">
+                <scale min="0" max="0.0030000000000000001" />
+            </display>
+        </stock>
+        <stock name="Moles_of_Liquid_Water">
+            <doc>The system is initialized in a dry state to illustrate the initial water/water vapor equilibration.</doc>
+            <eqn>0</eqn>
+            <scale min="0" max="55.549999999999997" />
+            <inflow>Condensation_Rate</inflow>
+            <inflow>Water_Source</inflow>
+            <outflow>Evaporation_Rate</outflow>
+            <non_negative />
+            <display x="137" y="168" color="blue" label_side="left" label_angle="198">
+                <scale min="0" max="55.549999999999997" />
+            </display>
+        </stock>
+        <aux name="Moles_Hydrogen">
+            <doc>The system is initialized with .036 moles of hydrogen to provide a gas pressure slightly below standard atmospheric pressure before adding liquid water.</doc>
+            <eqn>.036</eqn>
+            <display x="268" y="44" color="blue" label_side="left" label_angle="164" />
+        </aux>
+        <aux name="Hydrogen_Pressure">
+            <doc>Using the ideal gas law, P = nRT/V.</doc>
+            <eqn>(Moles_Hydrogen*62.32*Temperature)/Volume</eqn>
+            <display x="325" y="59" color="blue" label_side="top" label_angle="60" />
+        </aux>
+        <aux name="Actual_Vapor_Pressure">
+            <doc>Using the ideal gas law, P = nRT/V</doc>
+            <eqn>(Moles_of_Water_Vapor*62.32*Temperature)/Volume</eqn>
+            <display x="372" y="175" color="blue" label_angle="300" />
+        </aux>
+        <aux name="Total_Pressure">
+            <doc>The total pressure within the system is equal to the sum of the partial pressures of the water vapor and hydrogen.</doc>
+            <eqn>Actual_Vapor_Pressure+Hydrogen_Pressure</eqn>
+            <display x="382" y="100" color="blue" label_angle="338" />
+        </aux>
+        <aux name="Volume">
+            <doc>The volume starts at 1 L and is expanded to 2 L at time = 7.5.  To illustrate behavior upon compression, it is returned to 1 L at time = 15.</doc>
+            <eqn>If time &gt; 7.5 and time &lt; 15 then 2 else 1</eqn>
+            <scale min="1" max="2" />
+            <display x="321" y="120" color="blue">
+                <scale min="1" max="2" />
+            </display>
+        </aux>
+        <aux name="Temperature">
+            <doc>The temperature is set at 20°C and then increased to 40°C at time = 22.5.  All temperature calculations must be done using Kelvin values.</doc>
+            <eqn>If time &gt;= 22.5 then 313 else 293</eqn>
+            <display x="472" y="156" color="blue" label_side="right" label_angle="352" />
+        </aux>
+        <aux name="Standard_Vapor_Pressure">
+            <doc>These standard vapor pressure values for water have been obtained from the Handbook of Chemistry and Physics.</doc>
+            <eqn>Temperature</eqn>
+            <gf>
+                <xscale min="273" max="373" />
+                <yscale min="0" max="760" />
+                <ypts>4.5789999999999997,6.7869999999999999,9.5220000000000002,13.461,18.649999999999999,25.649999999999999,34.859999999999999,46.560000000000002,61.799999999999997,81.230000000000004,105.09999999999999,135.40000000000001,172.80000000000001,218,273.69999999999999,338.80000000000001,420.19999999999999,515.89999999999998,626.89999999999998,760</ypts>
+            </gf>
+            <display x="374" y="227" color="blue" label_angle="307" />
+        </aux>
+        <aux name="Actual_Vapor_Concentration">
+            <doc>The water vapor concentration will fluctuate as the system equilibrates initially and in response to volume and temperature changes.  This value is calculated simply by dividing the moles of water vapor within the system by the available volume.</doc>
+            <eqn>Moles_of_Water_Vapor/Volume</eqn>
+            <display x="257" y="97" color="blue" label_side="top" label_angle="103" />
+        </aux>
+        <aux name="Target_Vapor_Concentration">
+            <doc>The concentration of water vapor at equilibrium is equal to PV/(RT).</doc>
+            <eqn>(Standard_Vapor_Pressure*1)/(62.32*Temperature)</eqn>
+            <display x="309" y="283" color="blue" />
+        </aux>
+        <flow name="Water_Source">
+            <doc>The system is initialized in a dry state.  Then 5 mL of liquid water is added at time = 2.  This permits the simulation of the initial vapor pressure equilibrium.</doc>
+            <eqn>If time = 2 then 5/DT else 0</eqn>
+            <non_negative />
+            <display x="84" y="123" color="blue" label_side="top">
+                <pts>
+                    <pt x="42" y="123" />
+                    <pt x="127" y="123" />
+                    <pt x="127" y="153" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Condensation_Rate">
+            <doc>The rate of condensation is directly proportional upon the concentration of the water vapor.</doc>
+            <eqn>Actual_Vapor_Concentration</eqn>
+            <non_negative />
+            <display x="193" y="112" color="blue" label_side="top" label_angle="85">
+                <pts>
+                    <pt x="235" y="151" />
+                    <pt x="235" y="112" />
+                    <pt x="151" y="112" />
+                    <pt x="151" y="153" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Pause_7">
+            <eqn>If time = 6.75 then (2*COUNTER(0, 2*DT)/DT - 1) else 0</eqn>
+            <event_poster min="0" max="1">
+                <threshold value="0">
+                    <event>
+                        <text_box>The simulation has been paused.</text_box>
+                    </event>
+                </threshold>
+                <threshold value="0" direction="decreasing">
+                    <event>
+                        <text_box>The simulation has been paused.</text_box>
+                    </event>
+                </threshold>
+            </event_poster>
+            <display x="231" y="400" color="blue" />
+        </aux>
+        <aux name="Pause_15">
+            <eqn>If time = 14.75 then (2*COUNTER(0, 2*DT)/DT - 1) else 0</eqn>
+            <event_poster min="0" max="1">
+                <threshold value="0">
+                    <event>
+                        <text_box>The simulation has been paused.</text_box>
+                    </event>
+                </threshold>
+                <threshold value="0" direction="decreasing">
+                    <event>
+                        <text_box>The simulation has been paused.</text_box>
+                    </event>
+                </threshold>
+            </event_poster>
+            <display x="281" y="412" color="blue" />
+        </aux>
+        <aux name="Pause_22">
+            <eqn>If time = 22.25 then (2*COUNTER(0, 2*DT)/DT - 1) else 0</eqn>
+            <event_poster min="0" max="1">
+                <threshold value="0">
+                    <event>
+                        <text_box>The simulation has been paused.</text_box>
+                    </event>
+                </threshold>
+                <threshold value="0" direction="decreasing">
+                    <event>
+                        <text_box>The simulation has been paused.</text_box>
+                    </event>
+                </threshold>
+            </event_poster>
+            <display x="348" y="393" color="blue" />
+        </aux>
+        <group name="Pause_Sector">
+            <entity name="Pause_7" />
+            <entity name="Pause_15" />
+            <entity name="Pause_22" />
+            <display x="168" y="376" width="300" height="150" color="red" />
+        </group>
+        <group name="Vapor_Pressure_Sector">
+            <entity name="Moles_of_Water_Vapor" />
+            <entity name="Evaporation_Rate" />
+            <entity name="Moles_of_Liquid_Water" />
+            <entity name="Moles_Hydrogen" />
+            <entity name="Hydrogen_Pressure" />
+            <entity name="Volume" />
+            <entity name="Condensation_Rate" />
+            <entity name="Standard_Vapor_Pressure" />
+            <entity name="Actual_Vapor_Concentration" />
+            <entity name="Target_Vapor_Concentration" />
+            <entity name="Water_Source" />
+            <entity name="Actual_Vapor_Pressure" />
+            <entity name="Total_Pressure" />
+            <entity name="Temperature" />
+            <display x="13" y="27" width="563" height="310" color="red">
+                <item uid="0" />
+                <item uid="1" />
+                <item uid="2" />
+                <item uid="3" />
+                <item uid="4" />
+                <item uid="5" />
+                <item uid="6" />
+                <item uid="7" />
+                <item uid="8" />
+                <item uid="9" />
+                <item uid="10" />
+                <item uid="11" />
+                <item uid="12" />
+                <item uid="13" />
+                <item uid="14" />
+                <item uid="15" />
+                <item uid="16" />
+            </display>
+        </group>
+        <display page_width="595" page_height="775" isee:converter_size="medium" isee:animate_flows="true" isee:animate_stocks="true" isee:animate_converters="true">
+            <connector x="252" y="177" uid="0">
+                <from>Moles_of_Water_Vapor</from>
+                <to>Actual_Vapor_Pressure</to>
+            </connector>
+            <connector x="278" y="50" uid="1">
+                <from>Moles_Hydrogen</from>
+                <to>Hydrogen_Pressure</to>
+            </connector>
+            <connector x="337" y="62" uid="2">
+                <from>Hydrogen_Pressure</from>
+                <to>Total_Pressure</to>
+            </connector>
+            <connector x="300" y="284" uid="3">
+                <from>Target_Vapor_Concentration</from>
+                <to>Evaporation_Rate</to>
+            </connector>
+            <connector x="467" y="168" uid="14">
+                <from>Temperature</from>
+                <to>Standard_Vapor_Pressure</to>
+            </connector>
+            <connector x="253" y="153" uid="4">
+                <from>Moles_of_Water_Vapor</from>
+                <to>Actual_Vapor_Concentration</to>
+            </connector>
+            <connector x="311" y="113" uid="5">
+                <from>Volume</from>
+                <to>Actual_Vapor_Concentration</to>
+            </connector>
+            <connector x="362" y="227" uid="6">
+                <from>Standard_Vapor_Pressure</from>
+                <to>Target_Vapor_Concentration</to>
+            </connector>
+            <connector x="254" y="106" uid="8">
+                <from>Actual_Vapor_Concentration</from>
+                <to>Condensation_Rate</to>
+            </connector>
+            <connector x="474" y="168" uid="9">
+                <from>Temperature</from>
+                <to>Target_Vapor_Concentration</to>
+            </connector>
+            <connector x="471" y="143" uid="10">
+                <from>Temperature</from>
+                <to>Hydrogen_Pressure</to>
+            </connector>
+            <connector x="329" y="113" uid="11">
+                <from>Volume</from>
+                <to>Hydrogen_Pressure</to>
+            </connector>
+            <connector x="333" y="122" uid="12">
+                <from>Volume</from>
+                <to>Actual_Vapor_Pressure</to>
+            </connector>
+            <connector x="377" y="164" uid="15">
+                <from>Actual_Vapor_Pressure</from>
+                <to>Total_Pressure</to>
+            </connector>
+            <connector x="460" y="151" uid="16">
+                <from>Temperature</from>
+                <to>Actual_Vapor_Pressure</to>
+            </connector>
+            <stacked_container height="338" width="585" visible_index="7" uid="7">
+                <graph type="time_series" title="Simulation Volumes" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:51:35Z" cleared="true" time_precision="0" from="0" to="30">
+                    <plot index="0" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="0" max="4" />
+                        <entity name="Volume" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Simulation Temperatures" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:51:35Z" cleared="true" time_precision="0" from="0" to="30">
+                    <plot index="0" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="270" max="320" />
+                        <entity name="Temperature" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Moles of Hydrogen &amp; Changes in Hydrogen Pressure" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:51:35Z" cleared="true" time_precision="0" from="0" to="30">
+                    <plot index="0" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="0" max="0.04" />
+                        <entity name="Moles_Hydrogen" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="0" max="800" />
+                        <entity name="Hydrogen_Pressure" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Water Vapor Pressure Changes During Simulation" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:51:35Z" cleared="true" time_precision="0" from="0" to="30">
+                    <plot index="0" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="0" max="60" />
+                        <entity name="Actual_Vapor_Pressure" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="0" max="60" />
+                        <entity name="Standard_Vapor_Pressure" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Changes in Quantity and Concentration of Water Vapor Molecules" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:51:35Z" cleared="true" time_precision="0" from="0" to="30">
+                    <plot index="0" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <entity name="Moles_of_Water_Vapor" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="0" max="0.003" />
+                        <entity name="Actual_Vapor_Concentration" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Relative Rates of Evaporation &amp; Condensation" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:51:35Z" cleared="true" time_precision="0" from="0" to="30">
+                    <plot index="0" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="0" max="0.003" />
+                        <entity name="Evaporation_Rate" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="0" max="0.003" />
+                        <entity name="Condensation_Rate" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Relative Behaviors of Water Vapor &amp; Hydrogen Pressures" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:51:35Z" cleared="true" time_precision="0" from="0" to="30">
+                    <plot index="0" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="0" max="769" />
+                        <entity name="Hydrogen_Pressure" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="0" max="100" />
+                        <entity name="Actual_Vapor_Pressure" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Changes in Total Gas Pressure" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:51:35Z" cleared="true" time_precision="0" from="0" to="30">
+                    <plot index="0" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="300" max="760" />
+                        <entity name="Total_Pressure" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="300" max="760" />
+                        <entity name="Hydrogen_Pressure" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="0" max="460" />
+                        <entity name="Actual_Vapor_Pressure" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="95" y="244" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 2" type="graph" icon_of="7" />
+            <stacked_container height="294" width="603" uid="13">
+                <table font-size="9" background="#FFFE91" column_width="122" orientation="vertical" interval="1" cleared="true" date_time="1994-03-09T16:23:43Z">
+                    <title>Gas Pressure Simulation Data</title>
+                    <item type="time" color="black" precision="0.01" width="50" />
+                    <item color="black" header-text-align="center" precision="max" display_as="number" index="0">
+                        <entity name="Evaporation_Rate" />
+                    </item>
+                    <item color="black" header-text-align="center" precision="max" display_as="number" index="1">
+                        <entity name="Condensation_Rate" />
+                    </item>
+                    <item color="black" header-text-align="center" precision="max" display_as="number" index="2">
+                        <entity name="Moles_of_Water_Vapor" />
+                    </item>
+                    <item color="black" header-text-align="center" precision="0.01" display_as="number" index="3">
+                        <entity name="Standard_Vapor_Pressure" />
+                    </item>
+                    <item color="black" header-text-align="center" precision="0.01" display_as="number" index="4">
+                        <entity name="Actual_Vapor_Pressure" />
+                    </item>
+                    <item color="black" header-text-align="center" precision="0.01" display_as="number" index="5">
+                        <entity name="Hydrogen_Pressure" />
+                    </item>
+                    <item color="black" header-text-align="center" precision="0.01" display_as="number" index="6">
+                        <entity name="Total_Pressure" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="95" y="286" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="13" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_width="788" page_height="528">
+            <simulation_delay>0.1</simulation_delay>
+            <isee:process_frame x="33" y="95" width="155" height="75" name="Pause_Sector" show_name="false" color="#0CA0FF" border-style="solid" border-width="thin" />
+            <isee:process_frame x="35" y="212" width="155" height="75" name="Vapor_Pressure_Sector" show_name="false" color="#0CA0FF" border-style="solid" border-width="thin" />
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="78" content="7" />
+        <popup x="16" y="78" content="13" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

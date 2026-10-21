@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>JHJP1.v3</name>
+        <uuid>3f9119ca-a616-4db4-be06-a40e14bd43ff</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Years" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>100</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Population">
+            <eqn> { Place initial value here… }</eqn>
+            <inflow>Birth_Rate</inflow>
+            <outflow>Death_Rate</outflow>
+            <non_negative />
+            <display x="198" y="54" color="black" />
+        </stock>
+        <flow name="Birth_Rate">
+            <eqn> { Place right hand side of equation here… }</eqn>
+            <non_negative />
+            <display x="134" y="56" color="black">
+                <pts>
+                    <pt x="91" y="56" />
+                    <pt x="178" y="56" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Birth_Fraction">
+            <eqn> { Place right hand side of equation here… }</eqn>
+            <display x="102" y="123" color="black" />
+        </aux>
+        <flow name="Death_Rate">
+            <eqn> { Place right hand side of equation here… }</eqn>
+            <non_negative />
+            <display x="259" y="53" color="black">
+                <pts>
+                    <pt x="218" y="53" />
+                    <pt x="301" y="53" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Death_Fraction">
+            <eqn> { Place right hand side of equation here… }</eqn>
+            <display x="309" y="123" color="black" />
+        </aux>
+        <display page_width="595" page_height="775" isee:converter_size="medium" interval="DT">
+            <connector x="102" y="114" uid="0">
+                <from>Birth_Fraction</from>
+                <to>Birth_Rate</to>
+            </connector>
+            <connector x="305" y="115" uid="1">
+                <from>Death_Fraction</from>
+                <to>Death_Rate</to>
+            </connector>
+            <connector x="220" y="64" uid="2">
+                <from>Population</from>
+                <to>Death_Rate</to>
+            </connector>
+            <connector x="177" y="71" uid="3">
+                <from>Population</from>
+                <to>Birth_Rate</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="4">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:43:35Z" cleared="true" time_precision="0" from="0" to="100">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <entity name="Population" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="361" y="61" width="26" height="22" color="black" label_side="bottom" label="Graph 1" type="graph" icon_of="4" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="788" page_height="528" home_page="0">
+            <simulation_delay>0.1</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="78" content="4" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

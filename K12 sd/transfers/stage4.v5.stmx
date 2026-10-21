@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>stage4.v5</name>
+        <uuid>55cc9693-4ed3-4627-a52c-c50f777ffa4d</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="sec" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>6</stop>
+        <dt>0.005</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:sensi_specs run="false" runs="5">
+        <method>multivariate</method>
+        <isee:variable max="1.8" min="0.2" type="incremental" name="Initial_water_vol">
+            <num_samples>5</num_samples>
+        </isee:variable>
+    </isee:sensi_specs>
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="630" height="428" />
+        <isee:security />
+        <isee:print_setup width="576" height="756" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Displacement">
+            <eqn>0</eqn>
+            <inflow>Veloc</inflow>
+            <display x="199" y="48" color="blue" />
+        </stock>
+        <flow name="Veloc">
+            <doc>The &quot;If...then&quot; switch turns velocity off when the rocket hits the ground.</doc>
+            <eqn>IF(Displacement&lt;= 0 and Velocity &lt;= 0) THEN(0) ELSE(Velocity)</eqn>
+            <display x="128" y="48" color="blue">
+                <pts>
+                    <pt x="78" y="48" />
+                    <pt x="179" y="48" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Velocity">
+            <eqn>0</eqn>
+            <scale min="-35" max="35" />
+            <inflow>Acceleration</inflow>
+            <display x="204" y="111" color="blue">
+                <scale min="-35" max="35" />
+            </display>
+        </stock>
+        <flow name="Acceleration">
+            <doc>The &quot;if...then&quot; switch turns the acceleration off when the rocket hits the ground.</doc>
+            <eqn>IF(Displacement &lt;=0 and Velocity&lt;0 )THEN(0) ELSE(Total_force/(Mass_of_water+Empty_rocket_mass))</eqn>
+            <display x="135" y="116" color="blue">
+                <pts>
+                    <pt x="87" y="116" />
+                    <pt x="184" y="116" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Air_resistance">
+            <eqn>c2*Velocity^2</eqn>
+            <display x="294" y="118" color="blue" />
+        </aux>
+        <aux name="Total_force">
+            <eqn>if Velocity &gt;= 0 then Thrust-Weight-Air_resistance else Thrust- Weight+Air_resistance</eqn>
+            <display x="200" y="180" color="blue" />
+        </aux>
+        <aux name="Weight">
+            <eqn>(Mass_of_water+Empty_rocket_mass)*Gravity</eqn>
+            <display x="205" y="234" color="blue" />
+        </aux>
+        <aux name="Gravity">
+            <eqn>9.8</eqn>
+            <display x="248" y="246" color="blue" />
+        </aux>
+        <aux name="Empty_rocket_mass">
+            <eqn>.2</eqn>
+            <display x="132" y="197" color="blue" />
+        </aux>
+        <stock name="Volume_of_water">
+            <eqn>Initial_water_vol</eqn>
+            <outflow>Rate_of_water_loss</outflow>
+            <display x="145" y="309" color="blue" />
+        </stock>
+        <flow name="Rate_of_water_loss">
+            <eqn>Flow_through_orifice</eqn>
+            <non_negative />
+            <display x="200" y="308" color="blue">
+                <pts>
+                    <pt x="165" y="308" />
+                    <pt x="235" y="308" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Thrust">
+            <eqn>if Pressure_difference &gt;=0  OR Volume_of_water&gt;= 0 then (Cross_sectional_area_of_hole*Pressure_difference) else 0</eqn>
+            <display x="351" y="221" color="blue" />
+        </aux>
+        <aux name="Atm_pressure_in_psi">
+            <eqn>14.7</eqn>
+            <display x="210" y="379" color="blue" />
+        </aux>
+        <aux name="Density_of_air">
+            <eqn>1</eqn>
+            <display x="395" y="22" color="blue" />
+        </aux>
+        <aux name="Volume_empty_rocket">
+            <eqn>2</eqn>
+            <display x="51" y="412" color="blue" />
+        </aux>
+        <aux name="Rocket_pressure">
+            <doc>In this equation the initial pressure is multiplied by the ratio of the initial air volume to the current air volume.  This is an applicaton of Boyle&apos;s Law.  The pressure changes in inverse proportion to the  change in volume.  The MAX function is there to prevent the pressure in the bottle from dropping below atmospheric pressure. </doc>
+            <eqn>If Volume_of_water &gt;=0 then MAX((Initial_pressure+Atm_pressure)*(Volume_empty_rocket-Initial_water_vol)/(Volume_empty_rocket-Volume_of_water),Atm_pressure) else Atm_pressure</eqn>
+            <display x="121" y="395" color="blue" />
+        </aux>
+        <aux name="Initial_pressure">
+            <doc>Metric conversion</doc>
+            <eqn>Initial_pressure_in_psi*6900</eqn>
+            <display x="116" y="441" color="blue" />
+        </aux>
+        <aux name="Atm_pressure">
+            <doc>metric conversion</doc>
+            <eqn>Atm_pressure_in_psi*6900</eqn>
+            <display x="261" y="421" color="blue" />
+        </aux>
+        <aux name="c2">
+            <eqn>Factor_for_air_resistance* (Density_of_air*Cross_sectional_area_of_rocket)/4</eqn>
+            <display x="332" y="66" color="blue" />
+        </aux>
+        <aux name="Cross_sectional_area_of_rocket">
+            <eqn>(PI*(Rocket_diameter)^2)/4</eqn>
+            <display x="402" y="76" color="blue" />
+        </aux>
+        <aux name="Rocket_diameter">
+            <eqn>.1</eqn>
+            <display x="419" y="122" color="blue" />
+        </aux>
+        <aux name="Initial_pressure_in_psi">
+            <doc>Guage pressure</doc>
+            <eqn>70</eqn>
+            <display x="60" y="456" color="blue" />
+        </aux>
+        <aux name="Initial_water_vol">
+            <eqn>1</eqn>
+            <display x="65" y="360" color="blue" />
+        </aux>
+        <aux name="Density_of_water">
+            <eqn>1</eqn>
+            <display x="48" y="289" color="blue" />
+        </aux>
+        <aux name="Pressure_difference">
+            <eqn>Rocket_pressure-Atm_pressure</eqn>
+            <display x="349" y="421" color="blue" />
+        </aux>
+        <aux name="Mass_of_water">
+            <eqn>Volume_of_water/Density_of_water</eqn>
+            <display x="62" y="220" color="blue" />
+        </aux>
+        <aux name="Factor_for_air_resistance">
+            <doc>This factor relates to nose cone and rocket shapes.</doc>
+            <eqn>1</eqn>
+            <display x="291" y="18" color="blue" label_angle="277" />
+        </aux>
+        <aux name="Flow_through_orifice">
+            <doc>This equation for a flow rate through an orifice comes from Mark&apos;s Engineering Handbook, Sixth Edition, McGraw-Hill, p 3-62</doc>
+            <eqn>1000*.61*Cross_sectional_area_of_hole*(2*Gravity*Equivalent_pressure_head)^.5</eqn>
+            <display x="271" y="337" color="blue" />
+        </aux>
+        <aux name="Cross_sectional_area_of_hole">
+            <eqn>.00034</eqn>
+            <display x="338" y="286" color="blue" label_angle="248" />
+        </aux>
+        <aux name="Equivalent_pressure_head">
+            <doc>Atmospheric pressure will support a column of water 10.3 meters tall.  This formula calculates the equivalent head in the pressurized bottle.</doc>
+            <eqn>10.3*Pressure_difference/Atm_pressure</eqn>
+            <display x="326" y="365" color="blue" />
+        </aux>
+        <display page_width="576" page_height="756" isee:converter_size="large" interval="0.05">
+            <connector x="71" y="370" uid="0">
+                <from>Initial_water_vol</from>
+                <to>Rocket_pressure</to>
+            </connector>
+            <connector x="126" y="406" uid="1">
+                <from>Rocket_pressure</from>
+                <to>Pressure_difference</to>
+            </connector>
+            <connector x="182" y="107" uid="2">
+                <from>Velocity</from>
+                <to>Veloc</to>
+            </connector>
+            <connector x="71" y="227" uid="3">
+                <from>Mass_of_water</from>
+                <to>Weight</to>
+            </connector>
+            <connector x="237" y="250" uid="4">
+                <from>Gravity</from>
+                <to>Weight</to>
+            </connector>
+            <connector x="140" y="206" uid="5">
+                <from>Empty_rocket_mass</from>
+                <to>Weight</to>
+            </connector>
+            <connector x="201" y="223" uid="6">
+                <from>Weight</from>
+                <to>Total_force</to>
+            </connector>
+            <connector x="211" y="126" uid="7">
+                <from>Velocity</from>
+                <to>Total_force</to>
+            </connector>
+            <connector x="188" y="177" uid="8">
+                <from>Total_force</from>
+                <to>Acceleration</to>
+            </connector>
+            <connector x="287" y="128" uid="9">
+                <from>Air_resistance</from>
+                <to>Total_force</to>
+            </connector>
+            <connector x="224" y="102" uid="10">
+                <from>Velocity</from>
+                <to>Air_resistance</to>
+            </connector>
+            <connector x="328" y="77" uid="11">
+                <from>c2</from>
+                <to>Air_resistance</to>
+            </connector>
+            <connector x="129" y="185" uid="12">
+                <from>Empty_rocket_mass</from>
+                <to>Acceleration</to>
+            </connector>
+            <connector x="342" y="215" uid="13">
+                <from>Thrust</from>
+                <to>Total_force</to>
+            </connector>
+            <connector x="260" y="247" uid="14">
+                <from>Gravity</from>
+                <to>Flow_through_orifice</to>
+            </connector>
+            <connector x="165" y="307" uid="15">
+                <from>Volume_of_water</from>
+                <to>Thrust</to>
+            </connector>
+            <connector x="125" y="322" uid="16">
+                <from>Volume_of_water</from>
+                <to>Rocket_pressure</to>
+            </connector>
+            <connector x="117" y="429" uid="17">
+                <from>Initial_pressure</from>
+                <to>Rocket_pressure</to>
+            </connector>
+            <connector x="357" y="412" uid="18">
+                <from>Pressure_difference</from>
+                <to>Thrust</to>
+            </connector>
+            <connector x="63" y="414" uid="19">
+                <from>Volume_empty_rocket</from>
+                <to>Rocket_pressure</to>
+            </connector>
+            <connector x="424" y="111" uid="20">
+                <from>Rocket_diameter</from>
+                <to>Cross_sectional_area_of_rocket</to>
+            </connector>
+            <connector x="392" y="70" uid="21">
+                <from>Cross_sectional_area_of_rocket</from>
+                <to>c2</to>
+            </connector>
+            <connector x="72" y="459" uid="22">
+                <from>Initial_pressure_in_psi</from>
+                <to>Initial_pressure</to>
+            </connector>
+            <connector x="383" y="23" uid="23">
+                <from>Density_of_air</from>
+                <to>c2</to>
+            </connector>
+            <connector x="260" y="332" uid="24">
+                <from>Flow_through_orifice</from>
+                <to>Rate_of_water_loss</to>
+            </connector>
+            <connector x="345" y="276" uid="25">
+                <from>Cross_sectional_area_of_hole</from>
+                <to>Thrust</to>
+            </connector>
+            <connector x="334" y="297" uid="26">
+                <from>Cross_sectional_area_of_hole</from>
+                <to>Flow_through_orifice</to>
+            </connector>
+            <connector x="222" y="380" uid="27">
+                <from>Atm_pressure_in_psi</from>
+                <to>Atm_pressure</to>
+            </connector>
+            <connector x="44" y="278" uid="28">
+                <from>Density_of_water</from>
+                <to>Mass_of_water</to>
+            </connector>
+            <connector x="125" y="305" uid="29">
+                <from>Volume_of_water</from>
+                <to>Mass_of_water</to>
+            </connector>
+            <connector x="67" y="209" uid="30">
+                <from>Mass_of_water</from>
+                <to>Acceleration</to>
+            </connector>
+            <connector x="177" y="59" uid="31">
+                <from>Displacement</from>
+                <to>Veloc</to>
+            </connector>
+            <connector x="302" y="23" uid="32">
+                <from>Factor_for_air_resistance</from>
+                <to>c2</to>
+            </connector>
+            <connector x="177" y="34" uid="33">
+                <from>Displacement</from>
+                <to>Acceleration</to>
+            </connector>
+            <connector x="190" y="128" uid="34">
+                <from>Velocity</from>
+                <to>Acceleration</to>
+            </connector>
+            <connector x="272" y="425" uid="35">
+                <from>Atm_pressure</from>
+                <to>Pressure_difference</to>
+            </connector>
+            <connector x="349" y="409" uid="36">
+                <from>Pressure_difference</from>
+                <to>Equivalent_pressure_head</to>
+            </connector>
+            <connector x="249" y="423" uid="37">
+                <from>Atm_pressure</from>
+                <to>Rocket_pressure</to>
+            </connector>
+            <connector x="317" y="357" uid="38">
+                <from>Equivalent_pressure_head</from>
+                <to>Flow_through_orifice</to>
+            </connector>
+            <connector x="273" y="419" uid="39">
+                <from>Atm_pressure</from>
+                <to>Equivalent_pressure_head</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="40">
+                <graph type="time_series" title="Untitled" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:14:27Z" comparative="true" cleared="true" time_precision="2" from="0" to="6">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="50" />
+                        <entity name="Displacement" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:14:27Z" comparative="true" cleared="true" time_precision="2" from="0" to="3">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="Acceleration" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:14:27Z" comparative="true" cleared="true" time_precision="2" from="0" to="1">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="-25" max="700" />
+                        <entity name="Acceleration" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="536" y="245" width="26" height="22" color="fuchsia" label_side="bottom" label="Graph 8" type="graph" icon_of="40" />
+            <stacked_container height="282" width="492" uid="41">
+                <graph type="time_series" title="Untitled" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:14:27Z" cleared="true" time_precision="2" from="0" to="2">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="3" />
+                        <entity name="Displacement" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="#008F44" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="2" />
+                        <entity name="Volume_of_water" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="#FF7F00" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="600000" />
+                        <entity name="Rocket_pressure" />
+                    </plot>
+                    <plot index="3" pen_width="1" color="#008F44" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="600000" />
+                        <entity name="Atm_pressure" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="531" y="190" width="26" height="22" color="fuchsia" label_side="bottom" label="Graph 10" type="graph" icon_of="41" />
+            <stacked_container height="282" width="492" uid="42">
+                <graph type="time_series" title="Stage 4" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:14:27Z" cleared="true" time_precision="2" from="0" to="6">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="40" />
+                        <entity name="Displacement" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="-35" max="35" />
+                        <entity name="Velocity" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <scale min="-100" max="300" />
+                        <entity name="Acceleration" />
+                    </plot>
+                    <plot index="3" pen_width="1" color="#008F44" precision="0.01" show_y_axis="true">
+                        <entity name="Volume_of_water" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="530" y="136" width="26" height="22" color="fuchsia" label_side="bottom" label="Graph 11" type="graph" icon_of="42" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="13" y="112" visible="true" content="40" />
+        <popup x="13" y="112" visible="true" content="41" />
+        <popup x="13" y="112" visible="true" content="42" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

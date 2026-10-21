@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Lesson5MODELING</name>
+        <uuid>5238697a-6a2c-4700-a082-74cf08cceda7</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="12" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Weeks" pause_interval="1000" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>104</stop>
+        <dt>1</dt>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="857" height="610" />
+        <isee:security />
+        <isee:print_setup width="818" height="572" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="module" />
+    <model>
+        <stock name="MY\nACCOUNT_$">
+            <eqn>initial_account</eqn>
+            <inflow>Income_$</inflow>
+            <outflow>Expenses_$</outflow>
+            <non_negative />
+            <display x="398" y="1323" color="blue" />
+        </stock>
+        <flow name="Income_$">
+            <doc>This equation records weekly income (hours worked per week multiplied by dollars earned per hour).&#x0D;&#x0D;To change this equation, click on &quot;Hide Document,&quot; make desired changes and click OK.</doc>
+            <eqn>(hourly__pay*work_Hours)</eqn>
+            <display x="327" y="1325" color="black" label_side="top" label_angle="79">
+                <pts>
+                    <pt x="279" y="1325" />
+                    <pt x="376" y="1325" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="work_Hours">
+            <doc>This equation uses summer hours for the first 10 weeks of the simulation, then 42 weeks of school year hours, followed again by 10 weeks of summer hours and another 42 weeks of school year hours.&#x0D;&#x0D;To change this equation, click &quot;Hide Document,&quot; make desired changes and click OK.&#x0D;&#x0D;</doc>
+            <eqn>IF time &lt; 10 or time &gt; 52 and time &lt; 63 THEN summer_hours ELSE school_year_hours</eqn>
+            <display x="213" y="1422" color="black" label_side="left" label_angle="184" />
+        </aux>
+        <aux name="initial_account">
+            <doc>This is the initial total of MY ACCOUNT $$.&#x0D;&#x0D;Type in a new number to change the initial total of MY ACCOUNT $$ and click OK. </doc>
+            <eqn>0</eqn>
+            <display x="110" y="754" color="blue" />
+        </aux>
+        <aux name="summer_hours">
+            <doc>This is the number of hours spent working each week during the summer. The maximum in the simulation is 40.In the simulation, this was initially set at 20 hours. &#x0D;&#x0D;Type in a new number to change summer hours worked and click OK.</doc>
+            <eqn>0</eqn>
+            <display x="282" y="1455" color="fuchsia" label_side="right" />
+        </aux>
+        <aux name="school_year_hours">
+            <doc>This is the average number of hours worked during the school year (in the simulation, the maximum is 15). &#x0D;&#x0D;Type in a new number to change school year hours and click OK.</doc>
+            <eqn>0</eqn>
+            <display x="267" y="1515" color="fuchsia" label_side="right" />
+        </aux>
+        <flow name="Expenses_$">
+            <doc>This equation records weekly expenses (total of the 5 different expense categories). &#x0D;&#x0D;To change this equation, click on &quot;Hide Document,&quot; make desired chanages and click OK.</doc>
+            <eqn> clothes+food+movies+music+other_stuff</eqn>
+            <non_negative />
+            <display x="481" y="1323" color="red" label_side="top" label_angle="83">
+                <pts>
+                    <pt x="420" y="1323" />
+                    <pt x="543" y="1323" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="MY__\nACCOUNT_$">
+            <doc>The number of dollars in MY ACCOUNT to start is defined by initial account.</doc>
+            <eqn>initial_account</eqn>
+            <inflow>Weekly_Income_$</inflow>
+            <outflow>Weekly_Expense_$</outflow>
+            <non_negative />
+            <event_poster min="0" max="5000">
+                <threshold value="0.01" direction="decreasing">
+                    <event sim_action="stop">
+                        <text_box>You&apos;re broke! You need to rethink your strategy -- How can you get or keep more money in your account?&#x0D;&#x0D;You may get some help by looking at the information on the Table.</text_box>
+                    </event>
+                </threshold>
+            </event_poster>
+            <display x="358" y="799" color="blue" />
+        </stock>
+        <stock name="TOTAL_HOURS_WORKED">
+            <doc>This Stock is the TOTAL (number of) HOURS WORKED during the simulation.</doc>
+            <eqn>0</eqn>
+            <inflow>Weekly__Chores</inflow>
+            <non_negative />
+            <display x="149" y="1499" color="black" />
+        </stock>
+        <flow name="Weekly_\nChores">
+            <doc>This flow of Weekly Hours Worked is used to define the TOTAL (number of) HOURS WORKED during the simulation. </doc>
+            <eqn>work_Hours</eqn>
+            <non_negative />
+            <display x="194" y="1498" color="black" label_angle="277">
+                <pts>
+                    <pt x="218" y="1498" />
+                    <pt x="171" y="1498" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="hourly_\npay">
+            <doc>This is the number of dollars earned, on average, each hour of work (minus taxes?). Here, 7.6 translates into an hourly wage of $7.60. &#x0D;&#x0D;Type in a new number to change hourly pay and click OK.</doc>
+            <eqn>7.6</eqn>
+            <display x="309" y="1396" color="fuchsia" />
+        </aux>
+        <stock name="TOTAL_EXPENDITURES">
+            <doc>This Stock records TOTAL EXPENDITURES (in dollars) incurred during the simulation. </doc>
+            <eqn>initial_account</eqn>
+            <inflow>Weekly_Expenditures</inflow>
+            <non_negative />
+            <display x="476" y="1507" color="red" label_angle="139" />
+        </stock>
+        <flow name="Weekly\nExpenditures">
+            <doc>This is the sum total of weekly expenses, which flow into the stock of TOTAL EXPENSES. </doc>
+            <eqn>Expenses_$</eqn>
+            <non_negative />
+            <display x="537" y="1509" color="red">
+                <pts>
+                    <pt x="576" y="1509" />
+                    <pt x="498" y="1509" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="TOTAL_INCOME">
+            <doc>This is the Stock of TOTAL INCOME (in dollars) earned during the entire simulation. </doc>
+            <eqn>0</eqn>
+            <inflow>Weekly_Income</inflow>
+            <non_negative />
+            <display x="131" y="1331" color="black" />
+        </stock>
+        <aux name="food">
+            <doc>This is the number of dollars spent (on average) for food each week. In the simulation, this was set at $10 initially. &#x0D;&#x0D;Type in a new number to change  weekly food expenses and click OK.</doc>
+            <eqn>0</eqn>
+            <display x="448" y="1379" color="fuchsia" />
+        </aux>
+        <aux name="week_#">
+            <doc>This simply keeps track of the number of weeks that have elapsed in the simulation. </doc>
+            <eqn>time</eqn>
+            <display x="71" y="1247" color="blue" />
+        </aux>
+        <flow name="Weekly\nIncome">
+            <doc>This flow of Weekly Income (or Income $) is used to define TOTAL INCOME earned during the simulation. </doc>
+            <eqn>Income_$</eqn>
+            <non_negative />
+            <display x="185" y="1331" color="black" label_angle="277">
+                <pts>
+                    <pt x="218" y="1331" />
+                    <pt x="153" y="1331" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="clothes">
+            <doc>This is the number of dollars spent (on average) for clothes each week. In the simulation, this was set at $10 initially. &#x0D;&#x0D;Type in a new number to change weekly clothes expenses and click OK.</doc>
+            <eqn>0</eqn>
+            <display x="482" y="1391" color="fuchsia" />
+        </aux>
+        <aux name="movies">
+            <doc>This is the number of dollars spent (on average) on movies each week. In the simulation, this was set at $10 initially. &#x0D;&#x0D;Type in a new number to change weekly movies expenses and click OK.</doc>
+            <eqn>0</eqn>
+            <display x="545" y="1373" color="fuchsia" />
+        </aux>
+        <aux name="music">
+            <doc>This is the number of dollars spent (on average) on music each week. In the simulation, this was set at $10 initially. &#x0D;&#x0D;Type in a new number to change weekly music expenses and click OK.</doc>
+            <eqn>0</eqn>
+            <display x="580" y="1409" color="fuchsia" />
+        </aux>
+        <aux name="other_stuff">
+            <doc>This is the number of dollars spent (on average) each week for &quot;stuff&quot; other than clothes, music, movies, and food. In the simulation, this was set at $10 initially.  &#x0D;&#x0D;Type in a new number to change weekly expenses for &quot;other stuff&quot; and click OK.</doc>
+            <eqn>0</eqn>
+            <display x="409" y="1406" color="fuchsia" />
+        </aux>
+        <flow name="Weekly\nIncome_$">
+            <doc>Total weekly income equals the number of hours worked multiplied by hourly pay. &#x0D;&#x0D;To change this equation, click &quot;Hide Document,&quot; make desired changes and click OK.</doc>
+            <eqn>hourly_pay_$*hours_worked_weekly</eqn>
+            <display x="281" y="798" color="black" label_side="top" label_angle="79">
+                <pts>
+                    <pt x="226" y="798" />
+                    <pt x="336" y="798" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="hours_worked\nweekly">
+            <doc>This is the number of hours worked, on average, each week. &#x0D;&#x0D;Type in a new number to change hours worked weekly and click OK.</doc>
+            <eqn>0</eqn>
+            <display x="238" y="879" color="black" label_angle="279" />
+        </aux>
+        <aux name="hourly\npay_$">
+            <doc>This is the number of dollars ($) earned each hour (after taxes?). Here, 7.6 equals $7.60 after taxes. &#x0D;&#x0D;Type in a new number to change hourly pay and click OK.</doc>
+            <eqn>7.6</eqn>
+            <display x="292" y="853" color="black" label_angle="279" />
+        </aux>
+        <aux name="weekly_food\nexpenses">
+            <doc>This is the number of dollars spent (on average) on food each week. &#x0D;&#x0D;Type in a new number to change weekly food expenses and click OK.</doc>
+            <eqn>10</eqn>
+            <display x="398" y="863" color="red" label_angle="253" />
+        </aux>
+        <flow name="Weekly\nExpense_$">
+            <doc>The flow of weekly expenses out of MY ACCOUNT are the sum total of all of the individual expenses. &#x0D;&#x0D;To change this equation, click &quot;Hide Document,&quot; make desired changes and click OK.</doc>
+            <eqn>weekly_music_expenses+weekly_movie_expenses+weekly_food_expenses+weekly_clothes_expenses+other_weekly_expenses</eqn>
+            <non_negative />
+            <display x="435" y="798" color="red" label_side="top" label_angle="83">
+                <pts>
+                    <pt x="380" y="798" />
+                    <pt x="490" y="798" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="weekly_clothes\nexpenses">
+            <doc>This is the number of dollars spent (on average) for clothes each week.&#x0D;&#x0D;Type in a new number to change weekly clothes expenses and click OK.</doc>
+            <eqn>10</eqn>
+            <display x="464" y="904" color="red" />
+        </aux>
+        <aux name="weekly_movie\nexpenses">
+            <doc>This is the number of dollars spent on weekly movie expenses.&#x0D;&#x0D;Type in a new number to change weekly movie expenses and click OK.</doc>
+            <eqn>10</eqn>
+            <display x="506" y="855" color="red" label_angle="287" />
+        </aux>
+        <aux name="weekly_music\nexpenses">
+            <doc>This is the number of dollars spent (on average) for music each week.&#x0D;&#x0D;Type in a new number to change weekly music expenses and click OK.</doc>
+            <eqn>10</eqn>
+            <display x="594" y="924" color="red" label_side="right" label_angle="88" />
+        </aux>
+        <aux name="other_weekly\nexpenses">
+            <doc>This is the number of dollars spent (on average) for items other than food, clothes, music, and movies. &#x0D;&#x0D;Type in a new number to change other weekly expenses and click OK.</doc>
+            <eqn>10</eqn>
+            <display x="350" y="905" color="red" />
+        </aux>
+        <display page_width="818" page_height="572" page_cols="2" page_rows="4" isee:converter_size="medium" isee:name_only_modules="true" isee:animate_flows="true" isee:animate_stocks="true" interval="DT">
+            <connector x="217" y="1413" uid="0" color="black">
+                <from>work_Hours</from>
+                <to>Income_$</to>
+            </connector>
+            <connector x="279" y="1446" uid="1" color="black">
+                <from>summer_hours</from>
+                <to>work_Hours</to>
+            </connector>
+            <connector x="267" y="1506" uid="2" color="black">
+                <from>school_year_hours</from>
+                <to>work_Hours</to>
+            </connector>
+            <connector x="307" y="1387" uid="3" color="black">
+                <from>hourly__pay</from>
+                <to>Income_$</to>
+            </connector>
+            <connector x="218" y="1429" uid="4" color="black">
+                <from>work_Hours</from>
+                <to>Weekly__Chores</to>
+            </connector>
+            <alias x="166" y="1249" uid="5">
+                <of>initial_account</of>
+            </alias>
+            <connector x="319" y="1321" uid="6" color="black">
+                <from>Income_$</from>
+                <to>Weekly_Income</to>
+            </connector>
+            <connector x="455" y="1373" uid="7" color="red">
+                <from>food</from>
+                <to>Expenses_$</to>
+            </connector>
+            <connector x="409" y="1397" uid="8" color="red">
+                <from>other_stuff</from>
+                <to>Expenses_$</to>
+            </connector>
+            <connector x="484" y="1382" uid="9" color="red">
+                <from>clothes</from>
+                <to>Expenses_$</to>
+            </connector>
+            <connector x="541" y="1365" uid="10">
+                <from>movies</from>
+                <to>Expenses_$</to>
+            </connector>
+            <connector x="579" y="1400" uid="11">
+                <from>music</from>
+                <to>Expenses_$</to>
+            </connector>
+            <connector x="486" y="1330" uid="12" color="red">
+                <from>Expenses_$</from>
+                <to>Weekly_Expenditures</to>
+            </connector>
+            <connector x="236" y="870" uid="13" color="black">
+                <from>hours_worked_weekly</from>
+                <to>Weekly_Income_$</to>
+            </connector>
+            <connector x="297" y="846" uid="14" color="black">
+                <from>hourly_pay_$</from>
+                <to>Weekly_Income_$</to>
+            </connector>
+            <connector x="397" y="854" uid="15" color="red">
+                <from>weekly_food_expenses</from>
+                <to>Weekly_Expense_$</to>
+            </connector>
+            <connector x="350" y="896" uid="16" color="red">
+                <from>other_weekly_expenses</from>
+                <to>Weekly_Expense_$</to>
+            </connector>
+            <connector x="458" y="898" uid="17" color="red">
+                <from>weekly_clothes_expenses</from>
+                <to>Weekly_Expense_$</to>
+            </connector>
+            <connector x="497" y="852" uid="18" color="red">
+                <from>weekly_movie_expenses</from>
+                <to>Weekly_Expense_$</to>
+            </connector>
+            <connector x="592" y="915" uid="19" color="red">
+                <from>weekly_music_expenses</from>
+                <to>Weekly_Expense_$</to>
+            </connector>
+            <stacked_container height="260" width="454" uid="20">
+                <graph type="time_series" title="Total number of MY ACCOUNT $$" background="#FFFE91" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" comparative="true" cleared="true" time_precision="2" from="0" to="104">
+                    <plot index="0" pen_width="3" color="blue" precision="1" show_y_axis="true">
+                        <entity name="MY___ACCOUNT_$" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="689" y="788" width="26" height="22" color="#008F44" label_side="bottom" label="Graph 1" type="graph" icon_of="20" />
+            <stacked_container height="282" width="492" uid="21">
+                <graph type="time_series" title="Total number of MY ACCOUNT $$" background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" comparative="true" cleared="true" time_precision="2" from="0" to="104">
+                    <plot index="0" pen_width="3" color="blue" precision="1" show_y_axis="true">
+                        <entity name="MY_ACCOUNT_$" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="692" y="1344" width="26" height="22" color="#008F44" label_side="bottom" label="Graph 2" type="graph" icon_of="21" />
+            <stacked_container height="261" width="363" uid="22">
+                <table font-size="9" background="white" column_width="92" orientation="vertical" interval="1" cleared="true" date_time="2010-12-21T14:31:07Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" precision="max" width="47" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Weekly_Income_$" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="MY___ACCOUNT_$" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Weekly_Expense_$" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="745" y="787" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="22" />
+            <stacked_container height="304" width="394" uid="23">
+                <table font-size="9" background="white" column_width="98" orientation="vertical" interval="1" cleared="true" date_time="2010-12-21T14:31:07Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" precision="max" width="47" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Income_$" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="MY_ACCOUNT_$" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Expenses_$" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="746" y="1343" width="26" height="22" color="#008F44" label_side="bottom" label="Table 2" type="table" icon_of="23" />
+            <numeric_display precision="1" delimit_000s="true" color="yellow" show_name="true" retain_ending_value="true" uid="24" x="701" y="1436">
+                <entity name="week_#" />
+            </numeric_display>
+            <button x="463" y="1674" width="146" height="31" uid="25" appearance="opaque" background="#E0E0E0" color="white" style="square" label="Explore Model Used in Lesson 5" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="1176" />
+            </button>
+            <button x="301" y="1674" width="146" height="31" uid="26" appearance="opaque" background="red" color="white" style="square" label="Explore Simple Stock and Flow Model" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="572" />
+            </button>
+            <button x="277" y="58" width="183" height="30" uid="27" appearance="opaque" background="#0CA0FF" color="white" style="rounded" label="Intro: Build Your Own Model!" font-family="Arial" font-size="12" text-align="center">
+                <popup x="-184" y="40" width="617" height="346" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="16">If you haven&apos;t modeled before, watch our Build Your Own Personal Finance Model video to help you get started with using STELLA modeling software, available at http://clexchange.org/curriculum/dollarsandsense.asp. &#x0D;&#x0D;Choose from 3 options:&#x0D;&#x0D;(1) Use this blank STELLA page to build your own model from scratch. Everything you need is here (icons/buttons for building blocks, tables and graphs, text; Word menus to run and print...);  OR&#x0D;&#x0D;(2) Click on the &quot;Explore Simple Stock and Flow Model&quot; button to see the &quot;core&quot; pre-built stock and flow model (Go ahead and make changes -- insert new numbers, change names, add building blocks!);  OR&#x0D;&#x0D;(3) Click on the &quot;Explore Model Used in Lesson 5&quot; to explore a version of the actual model used in Lesson 3 (it&apos;s a bit more complicated, but everything in it is explained!). &#x0D;&#x0D;Start wherever you want! Play with it and have fun!&#x0D;</text_box>
+                </popup>
+            </button>
+            <button x="140" y="1674" width="147" height="32" uid="28" appearance="opaque" background="red" color="white" style="square" label="Build Your Own Model " font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="0" />
+            </button>
+            <numeric_display precision="0.01" display_as="currency" color="blue" show_name="true" retain_ending_value="true" uid="29" x="701" y="1453">
+                <entity name="MY_ACCOUNT_$" />
+            </numeric_display>
+            <text_box x="15" y="581" uid="30" color="red" font-family="Comic Sans MS" font-size="32" font-weight="bold" text-align="center" padding="5" width="746" height="56">Simple Stock/Flow Model (used in Lesson 5) </text_box>
+            <button x="327" y="1019" width="65" height="34" uid="31" appearance="opaque" background="#7F00FF" color="white" style="rounded" label="Run" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>run</menu_action>
+            </button>
+            <button x="403" y="1019" width="65" height="34" uid="32" appearance="opaque" background="#7F00FF" color="white" style="rounded" label="Reset" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>restore_all</menu_action>
+            </button>
+            <button x="474" y="519" width="146" height="31" uid="33" appearance="opaque" background="red" color="white" style="square" label="Explore Model Used in Lesson 5" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="1144" />
+            </button>
+            <text_box x="11" y="3" uid="34" color="red" font-family="Comic Sans MS" font-size="32" font-weight="bold" text-align="center" padding="5" width="756" height="55">Can I Help a Responsible Teen Buy a Car?</text_box>
+            <button x="312" y="519" width="146" height="31" uid="35" appearance="opaque" background="red" color="white" style="square" label="Explore Simple Stock and Flow Model" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="572" />
+            </button>
+            <button x="151" y="519" width="147" height="32" uid="36" appearance="opaque" background="#E0E0E0" color="white" style="square" label="Build Your Own Model " font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="0" />
+            </button>
+            <button x="618" y="1560" width="65" height="34" uid="37" appearance="opaque" background="#7F00FF" color="white" style="rounded" label="Run" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>run</menu_action>
+            </button>
+            <button x="691" y="1559" width="65" height="34" uid="38" appearance="opaque" background="#7F00FF" color="white" style="rounded" label="Reset" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>restore_all</menu_action>
+            </button>
+            <button x="456" y="1104" width="146" height="31" uid="39" appearance="opaque" background="red" color="white" style="square" label="Explore Model Used in Lesson 5" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="1144" />
+            </button>
+            <button x="294" y="1104" width="146" height="31" uid="40" appearance="opaque" background="#E0E0E0" color="white" style="square" label="Explore Simple Stock and Flow Model" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="588" />
+            </button>
+            <button x="133" y="1104" width="147" height="32" uid="41" appearance="opaque" background="red" color="white" style="square" label="Build Your Own Model " font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="0" />
+            </button>
+            <button x="320" y="638" width="129" height="34" uid="42" appearance="opaque" background="#0CA0FF" color="white" style="rounded" label="What can I do with this?" font-family="Arial" font-size="12" text-align="center">
+                <popup x="-113" y="288" width="367" height="187" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="16">Here&apos;s a very simple version of the Stock and Flow model used in Lesson 5. &quot;Weekly Income $&quot; effect the rate that $$ flow into MY ACCOUNT; &quot;Weekly Expense $&quot; effect the rate that $$ flow out. &#x0D;&#x0D;Explore (e.g., change amounts ($) for deposits or expenses; rename or add new building blocks to make this &quot;your&quot; model). Play with it and have fun!&#x0D;</text_box>
+                </popup>
+            </button>
+            <button x="349" y="1203" width="129" height="34" uid="43" appearance="opaque" background="#0CA0FF" color="white" style="rounded" label="What can I do with this?" font-family="Arial" font-size="12" text-align="center">
+                <popup x="-127" y="283" width="422" height="222" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="16">This is a version of the model underlying the Lesson 5 Simulation. When you click and open any building block, you will find an explanation for how it works. &#x0D;&#x0D;Notice that we&apos;ve changed how &quot;Income $&quot; enter MY ACCOUNT. And we&apos;ve added 3 additional &quot;TOTAL&quot; STOCKS. Can you figure out why we made these changes?  Click on these building blocks to learn more. &#x0D; &#x0D;Explore ow you can make changes (e.g., change numbers; rename or add new building blocks to make this &quot;your&quot; model). Play with it and have fun!&#x0D;</text_box>
+                </popup>
+            </button>
+            <text_box x="36" y="1150" uid="44" color="red" font-family="Comic Sans MS" font-size="32" font-weight="bold" text-align="center" padding="5" width="746" height="56"> Model Used in Lesson 5</text_box>
+            <style font-family="Arial" font-size="12" />
+        </display>
+        <interface show_pages="true" page_cols="4" page_rows="4" page_width="788" page_height="528" zoom="12.5">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="760" y="198" content="20" />
+        <popup x="17" y="101" content="21" />
+        <popup x="811" y="211" content="22" />
+        <popup x="641" y="256" content="23" />
+        <style font-family="Arial" font-size="12" />
+    </model>
+</xmile>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Intro2v9</name>
+        <uuid>cee1bfa4-65f1-43b5-814e-b56bc8268838</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="generations" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>10</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="1334" height="630" />
+        <isee:security />
+        <isee:print_setup width="595" height="744" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="stock">
+            <eqn>100</eqn>
+            <inflow>flow</inflow>
+            <non_negative />
+            <display x="152" y="157" color="blue" />
+        </stock>
+        <flow name="flow">
+            <eqn>stock*converter</eqn>
+            <non_negative />
+            <display x="103" y="163" color="blue">
+                <pts>
+                    <pt x="74" y="163" />
+                    <pt x="132" y="163" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="converter">
+            <eqn>.03</eqn>
+            <display x="101" y="246" color="blue" />
+        </aux>
+        <stock name="gerbil_population">
+            <eqn>2</eqn>
+            <inflow>babies_born</inflow>
+            <non_negative />
+            <display x="146" y="378" color="red" />
+        </stock>
+        <flow name="babies_born">
+            <eqn>(gerbil_population/2)*baby_rate</eqn>
+            <non_negative />
+            <display x="92" y="391" color="red" label_side="top" label_angle="99">
+                <pts>
+                    <pt x="58" y="391" />
+                    <pt x="126" y="391" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="baby_rate">
+            <eqn>6</eqn>
+            <display x="100" y="485" color="red" />
+        </aux>
+        <display page_width="595" page_height="744" isee:converter_size="large" interval="DT">
+            <connector x="145" y="174" uid="0" color="blue">
+                <from>stock</from>
+                <to>flow</to>
+            </connector>
+            <connector x="90" y="242" uid="1" color="blue">
+                <from>converter</from>
+                <to>flow</to>
+            </connector>
+            <connector x="138" y="395" uid="2" color="red">
+                <from>gerbil_population</from>
+                <to>babies_born</to>
+            </connector>
+            <connector x="89" y="480" uid="3" color="red">
+                <from>baby_rate</from>
+                <to>babies_born</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="4">
+                <graph type="time_series" title="Gerbil Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:46:37Z" cleared="true" time_precision="2" from="0" to="10">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="gerbil_population" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="279" y="526" width="26" height="22" color="red" label_side="bottom" label="Graph 2" type="graph" icon_of="4" />
+            <stacked_container height="280" width="246" uid="5">
+                <table font-size="9" background="#FFFE91" column_width="88" orientation="vertical" interval="1" cleared="true" date_time="1997-03-24T16:14:41Z">
+                    <title>Gerbil population</title>
+                    <item type="time" color="black" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="gerbil_population" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="188" y="527" width="26" height="22" color="red" label_side="bottom" label_angle="267" label="Table 2" type="table" icon_of="5" />
+            <text_box x="241" y="139" uid="6" color="blue" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="318" height="122">This is a simple model including FEEDBACK from the STOCK to the FLOW.  In other words, the amount in the STOCK affects the next FLOW.  The FLOW is not a constant amount, but a changing amount, depending on the value of the STOCK and the CONVERTER.  This structure produces compound or exponential growth.  That is also known as a geometric sequence.</text_box>
+            <text_box x="240" y="335" uid="7" color="red" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="317" height="106">Population growth is described by this structure.  Imagine a gerbil population that produces 6 offspring in each litter.  Also, the population contained approximately 50% females.  This model shows your results from that illustrative exercise.  Table 2 and Graph 2 show a geometric sequence and an exponential curve.</text_box>
+            <text_box x="74" y="6" uid="8" color="#008F44" font-family="Arial" font-size="14" font-weight="bold" text-align="center" padding="5" width="402" height="44">CLASSROOM DEMONSTRATIONS TO PREPARE FOR STELLA MODELING IN THE COMPUTER LAB - 2</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="1588" page_height="1128" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="116" content="4" />
+        <popup x="16" y="116" content="5" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

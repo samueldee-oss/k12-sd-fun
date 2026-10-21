@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Mathematics3.6.v5</name>
+        <uuid>21f0ab08-619f-4041-b82b-51b2a6111621</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="RK4" time_units="Time" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>26</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="817" height="572" />
+        <isee:security />
+        <isee:print_setup width="552" height="728" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Height">
+            <eqn>0</eqn>
+            <inflow>Speed</inflow>
+            <display x="167" y="44" color="black" />
+        </stock>
+        <stock name="Velocity">
+            <eqn>120</eqn>
+            <outflow>Acceleration</outflow>
+            <display x="166" y="113" color="black" label_angle="76" />
+        </stock>
+        <flow name="Speed">
+            <eqn>Velocity</eqn>
+            <display x="117" y="45" color="black">
+                <pts>
+                    <pt x="87" y="45" />
+                    <pt x="147" y="45" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Acceleration">
+            <eqn>9.8</eqn>
+            <non_negative />
+            <display x="228" y="111" color="black">
+                <pts>
+                    <pt x="186" y="111" />
+                    <pt x="271" y="111" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="The_Red_Baron">
+            <eqn>400</eqn>
+            <display x="298" y="156" color="red" />
+        </aux>
+        <display page_width="552" page_height="728" isee:converter_size="large" interval="DT">
+            <connector x="149" y="96" uid="0" color="black">
+                <from>Velocity</from>
+                <to>Speed</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="1">
+                <graph type="time_series" title="Untitled Graph" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:56:08Z" cleared="true" time_precision="2" from="0" to="26">
+                    <plot index="0" pen_width="1" color="black" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="800" />
+                        <entity name="Height" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="The_Red_Baron" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="76" y="205" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="1" />
+            <stacked_container height="286" width="465" uid="2">
+                <table font-size="9" background="white" column_width="60" orientation="vertical" interval="1" cleared="true" date_time="1997-07-18T16:48:56Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Height" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Velocity" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Acceleration" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="3">
+                        <entity name="Speed" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="166" y="204" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="2" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="8" y="51" content="1" />
+        <popup x="8" y="51" content="2" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

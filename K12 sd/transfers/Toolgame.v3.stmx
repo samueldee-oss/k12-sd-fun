@@ -1,0 +1,827 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Toolgame.v3</name>
+        <uuid>121e1568-86ab-40e4-8f73-9aad2cdcb793</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Weeks" pause_interval="1" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>40</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true" hide_bundled_connectors="true" hide_pads_icons="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" show_pages="true" />
+    <model>
+        <stock name="Assignment_Backlog">
+            <eqn>1e-7</eqn>
+            <scale min="0" max="100" />
+            <inflow>Assignment_Rate</inflow>
+            <outflow>Completion_Rate</outflow>
+            <non_negative />
+            <display x="200" y="348" color="blue">
+                <scale min="0" max="100" />
+            </display>
+        </stock>
+        <stock name="Cumulative_Hours_Worked">
+            <eqn>0</eqn>
+            <scale min="0" max="250" />
+            <inflow>Change_in_Hours_Worked</inflow>
+            <non_negative />
+            <display x="378" y="618" color="blue" label_angle="57">
+                <scale min="0" max="250" />
+            </display>
+        </stock>
+        <stock name="Energy_Level">
+            <eqn>1</eqn>
+            <scale min="0" max="1" />
+            <inflow>EL_Regeneration</inflow>
+            <outflow>E_Depletion</outflow>
+            <non_negative />
+            <event_poster min="0" max="1">
+                <threshold value="0.2" direction="decreasing">
+                    <event>
+                        <text_box>You feel horrible.  Why even bother to go to school?  It&apos;s not worth it, you can&apos;t do anything right.</text_box>
+                    </event>
+                </threshold>
+                <threshold value="0.4" direction="decreasing">
+                    <event>
+                        <text_box>You feel very drained.  You find you have difficulty concentrating in class.  It takes you noticeably longer to do your homework.  You don&apos;t really understand it anyway, but it doesn&apos;t matter, it&apos;s so stupid.</text_box>
+                    </event>
+                </threshold>
+                <threshold value="0.6" direction="decreasing">
+                    <event>
+                        <text_box>Yawn!  You almost doze off in class.  Luckily, you woke up right away.</text_box>
+                    </event>
+                </threshold>
+            </event_poster>
+            <display x="800" y="65" color="blue">
+                <scale min="0" max="1" />
+            </display>
+        </stock>
+        <stock name="Hours_Allocated_Per_Assignment">
+            <eqn>Actual_Desired_HAA</eqn>
+            <scale min="0" max="10" />
+            <inflow>Change_in_Hours_Allocated_Per_Assignment</inflow>
+            <display x="413" y="137" color="blue">
+                <scale min="0" max="10" />
+            </display>
+        </stock>
+        <stock name="Total_Assignments_Completed">
+            <eqn>1e-7</eqn>
+            <scale min="0" max="50" />
+            <inflow>Assigment_Completion_Rate</inflow>
+            <non_negative />
+            <display x="815" y="394" color="blue">
+                <scale min="0" max="50" />
+            </display>
+        </stock>
+        <stock name="Total_Points_Received">
+            <eqn>Points_Per_Assignment*1e-7</eqn>
+            <scale min="0" max="3500" />
+            <inflow>Change_in_Total_Points_Received</inflow>
+            <non_negative />
+            <display x="803" y="499" color="blue">
+                <scale min="0" max="3500" />
+            </display>
+        </stock>
+        <flow name="Assignment_Rate">
+            <eqn>Reference_Assignment_Rate*Assignment_Rate_Function</eqn>
+            <scale min="0" max="100" />
+            <non_negative />
+            <display x="107" y="343" color="blue" label_side="top" label_angle="101">
+                <scale min="0" max="100" />
+                <pts>
+                    <pt x="35" y="343" />
+                    <pt x="180" y="343" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Completion_Rate">
+            <eqn>Effective_Hours_Worked_Per_Week/Hours_Allocated_Per_Assignment</eqn>
+            <scale min="0" max="20" />
+            <non_negative />
+            <display x="275" y="347" color="blue" label_side="top" label_angle="54">
+                <scale min="0" max="20" />
+                <pts>
+                    <pt x="220" y="347" />
+                    <pt x="331" y="347" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="EL_Regeneration">
+            <eqn>EL_Regeneration_Normal*Effect_of_Hours_Worked_on_Regeneration*Effect_of_High_EL_on_Regeneration</eqn>
+            <scale min="0" max="0.5" />
+            <non_negative />
+            <display x="730" y="66" color="blue" label_side="top">
+                <scale min="0" max="0.5" />
+                <pts>
+                    <pt x="680" y="66" />
+                    <pt x="780" y="66" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="E_Depletion">
+            <eqn>Effect_of_Grades_on_EL_Depletion*E_Depletion_Normal*Effect_of_Low_EL_on_Depletion*Effect_of_Hours_Worked_on_Depletion</eqn>
+            <scale min="0" max="0.5" />
+            <non_negative />
+            <display x="879" y="65" color="blue" label_side="top" label_angle="101">
+                <scale min="0" max="0.5" />
+                <pts>
+                    <pt x="820" y="65" />
+                    <pt x="939" y="65" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Change_in_Hours_Allocated_Per_Assignment">
+            <eqn>(Actual_Desired_HAA-Hours_Allocated_Per_Assignment)/Time_to_adjust_HAA</eqn>
+            <display x="345" y="142" color="blue" label_angle="300">
+                <pts>
+                    <pt x="297" y="142" />
+                    <pt x="393" y="142" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Assigment_Completion_Rate">
+            <eqn>Completion_Rate</eqn>
+            <non_negative />
+            <display x="729" y="381" color="blue">
+                <pts>
+                    <pt x="663" y="381" />
+                    <pt x="795" y="381" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Change_in_Total_Points_Received">
+            <eqn>Completion_Rate*Points_Per_Assignment</eqn>
+            <non_negative />
+            <display x="724" y="508" color="blue">
+                <pts>
+                    <pt x="665" y="508" />
+                    <pt x="783" y="508" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Change_in_Hours_Worked">
+            <eqn>Hours_Worked_Per_Week</eqn>
+            <non_negative />
+            <display x="252" y="617" color="blue">
+                <pts>
+                    <pt x="146" y="617" />
+                    <pt x="358" y="617" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Assignment_Rate_Function">
+            <eqn>1</eqn>
+            <display x="165" y="372" color="blue" />
+        </aux>
+        <aux name="Effective_Hours_Worked_Per_Week">
+            <eqn>Hours_Worked_Per_Week*Effect_of_EL_on_Production</eqn>
+            <display x="331" y="412" color="blue" label_side="right" label_angle="348" />
+        </aux>
+        <aux name="Grade_Satisfaction">
+            <eqn>GPA_1/Desired_GPA</eqn>
+            <display x="1053" y="197" color="blue" />
+        </aux>
+        <aux name="Desired_GPA">
+            <eqn>70</eqn>
+            <scale min="0" max="100" />
+            <display x="206" y="112" color="blue">
+                <scale min="0" max="100" />
+            </display>
+        </aux>
+        <aux name="E_Depletion_Normal">
+            <eqn>.1</eqn>
+            <display x="1010" y="80" color="blue" label_angle="327" />
+        </aux>
+        <aux name="EL_Regeneration_Normal">
+            <eqn>.25</eqn>
+            <display x="628" y="85" color="blue" label_angle="251" />
+        </aux>
+        <aux name="GPA">
+            <eqn>Total_Points_Received/Total_Assignments_Completed</eqn>
+            <scale min="0" max="100" />
+            <display x="867" y="435" color="blue">
+                <scale min="0" max="100" />
+            </display>
+        </aux>
+        <aux name="HAA_Ratio">
+            <eqn>Hours_Allocated_Per_Assignment/Reference_HAA</eqn>
+            <display x="931" y="567" color="blue" />
+        </aux>
+        <aux name="Hours_Worked_Per_Week">
+            <eqn>min(Requested_Hours_Worked_Per_Week,Limit_on_Hours_Per_Week)</eqn>
+            <scale min="0" max="100" />
+            <display x="260" y="462" color="blue" label_angle="292">
+                <scale min="0" max="100" />
+            </display>
+        </aux>
+        <aux name="Limit_on_Hours_Per_Week">
+            <eqn>80</eqn>
+            <display x="72" y="47" color="blue" />
+        </aux>
+        <aux name="Normal_Completion_Time">
+            <eqn>100</eqn>
+            <display x="207" y="45" color="blue" />
+        </aux>
+        <aux name="Normal_Time_Per_Assignment">
+            <eqn>100</eqn>
+            <display x="79" y="107" color="blue" />
+        </aux>
+        <aux name="Points_Per_Assignment">
+            <eqn>100*Effect_of_HAA_on_Grades*Effect_of_Energy_on_Grades</eqn>
+            <scale min="0" max="100" />
+            <display x="695" y="594" color="blue">
+                <scale min="0" max="100" />
+            </display>
+        </aux>
+        <aux name="Reference_Assignment_Rate">
+            <eqn>6</eqn>
+            <display x="80" y="167" color="blue" />
+        </aux>
+        <aux name="Requested_Hours_Worked_Per_Week">
+            <eqn>Daily_Study_Time*6.3</eqn>
+            <display x="117" y="465" color="blue" label_side="top" label_angle="43" />
+        </aux>
+        <aux name="Reference_HAA">
+            <eqn>7</eqn>
+            <display x="910" y="523" color="blue" label_side="top" label_angle="127" />
+        </aux>
+        <aux name="Time_to_adjust_HAA">
+            <eqn>1</eqn>
+            <display x="432" y="207" color="blue" />
+        </aux>
+        <aux name="Effect_of_EL_on_Production">
+            <eqn>Energy_Level</eqn>
+            <gf>
+                <xscale min="0" max="1" />
+                <yscale min="0" max="1" />
+                <ypts>0,0.10000000000000001,0.20000000000000001,0.29999999999999999,0.40000000000000002,0.5,0.59999999999999998,0.69999999999999996,0.80000000000000004,0.90000000000000002,1</ypts>
+            </gf>
+            <display x="363" y="502" color="blue" />
+        </aux>
+        <aux name="Effect_of_High_EL_on_Regeneration">
+            <eqn>Energy_Level</eqn>
+            <gf>
+                <xscale min="0.5" max="1" />
+                <yscale min="0" max="1" />
+                <ypts>1,1,1,1,1,0.97499999999999998,0.94499999999999995,0.875,0.79000000000000004,0.59499999999999997,0</ypts>
+            </gf>
+            <display x="755" y="156" color="blue" />
+        </aux>
+        <aux name="Effect_of_Hours_Worked_on_Regeneration">
+            <eqn>Hours_Worked_Per_Week</eqn>
+            <gf>
+                <xscale min="0" max="60" />
+                <yscale min="0" max="1.5" />
+                <ypts>1.2450000000000001,1.1924999999999999,1.0800000000000001,0.90000000000000002,0.72750000000000004,0.56999999999999995,0.33750000000000002,0.1575,0.10000000000000001,0.10000000000000001,0.105</ypts>
+            </gf>
+            <display x="662" y="195" color="blue" label_angle="240" />
+        </aux>
+        <aux name="Effect_of_Low_EL_on_Depletion">
+            <eqn>Energy_Level</eqn>
+            <gf>
+                <xscale min="0" max="0.5" />
+                <yscale min="0" max="1" />
+                <ypts>0,0.40000000000000002,0.69999999999999996,0.90000000000000002,1,1,1,1,1,1,1</ypts>
+            </gf>
+            <display x="866" y="132" color="blue" label_angle="263" />
+        </aux>
+        <aux name="Effect_of_Hours_Worked_on_Depletion">
+            <eqn>Hours_Worked_Per_Week</eqn>
+            <gf>
+                <xscale min="0" max="60" />
+                <yscale min="0" max="4" />
+                <ypts>0.40000000000000002,0.40000000000000002,0.40000000000000002,0.40000000000000002,0.41999999999999998,0.44,0.57999999999999996,0.93999999999999995,1.5600000000000001,2.1000000000000001,3.1800000000000002</ypts>
+            </gf>
+            <display x="882" y="209" color="blue" label_angle="267" />
+        </aux>
+        <aux name="Effect_of_Grades_on_EL_Depletion">
+            <eqn>Grade_Satisfaction</eqn>
+            <gf>
+                <xscale min="0" max="2.5" />
+                <yscale min="0" max="4" />
+                <ypts>3.5,2.5,1.8999999999999999,1.3999999999999999,1,0.80000000000000004,0.69999999999999996,0.63,0.59999999999999998,0.59999999999999998,0.59999999999999998</ypts>
+            </gf>
+            <display x="1014" y="138" color="blue" />
+        </aux>
+        <aux name="Actual_Desired_HAA">
+            <eqn>if Time_Per_Assignment = 0 &#x0D;then 1e-7&#x0D;else Time_Per_Assignment</eqn>
+            <display x="312" y="220" color="blue" />
+        </aux>
+        <aux name="Effect_of_HAA_on_Grades">
+            <eqn>HAA_Ratio</eqn>
+            <gf>
+                <xscale min="0" max="2" />
+                <yscale min="0" max="1" />
+                <ypts>0,0.40000000000000002,0.75,0.87,0.94999999999999996,1,1,1,1,1,1</ypts>
+            </gf>
+            <display x="818" y="591" color="blue" label_angle="292" />
+        </aux>
+        <aux name="Effect_of_Energy_on_Grades">
+            <eqn>Energy_Level</eqn>
+            <gf>
+                <xscale min="0" max="2" />
+                <yscale min="0" max="1" />
+                <ypts>0,0.25,0.59999999999999998,0.80000000000000004,0.96999999999999997,1,1,1,1,1,1</ypts>
+            </gf>
+            <display x="836" y="654" color="blue" label_angle="251" />
+        </aux>
+        <aux name="Time_Per_Assignment">
+            <eqn>4</eqn>
+            <display x="201" y="169" color="blue" />
+        </aux>
+        <aux name="Daily_Study_Time">
+            <eqn>4</eqn>
+            <display x="62" y="474" color="blue" />
+        </aux>
+        <group name="Energy_2">
+            <entity name="EL_Regeneration" />
+            <entity name="EL_Regeneration_Normal" />
+            <entity name="Effect_of_Hours_Worked_on_Regeneration" />
+            <entity name="Energy_Level" />
+            <entity name="E_Depletion" />
+            <entity name="Grade_Satisfaction" />
+            <entity name="E_Depletion_Normal" />
+            <entity name="Effect_of_High_EL_on_Regeneration" />
+            <entity name="Effect_of_Low_EL_on_Depletion" />
+            <entity name="Effect_of_Hours_Worked_on_Depletion" />
+            <entity name="Effect_of_Grades_on_EL_Depletion" />
+            <display locked="true" x="559" y="30" width="541" height="288" color="red">
+                <item uid="0" />
+                <item uid="1" />
+                <item uid="2" />
+                <item uid="3" />
+                <item uid="4" />
+                <item uid="5" />
+                <item uid="6" />
+                <item uid="7" />
+                <item uid="8" />
+                <item uid="9" />
+                <item uid="10" />
+                <item uid="11" />
+                <item uid="12" />
+                <item uid="13" />
+                <item uid="14" />
+                <item uid="15" />
+                <item uid="16" />
+            </display>
+        </group>
+        <group name="INTRO_2">
+            <entity name="Hours_Allocated_Per_Assignment" />
+            <entity name="Change_in_Hours_Allocated_Per_Assignment" />
+            <entity name="Desired_GPA" />
+            <entity name="Limit_on_Hours_Per_Week" />
+            <entity name="Normal_Completion_Time" />
+            <entity name="Normal_Time_Per_Assignment" />
+            <entity name="Reference_Assignment_Rate" />
+            <entity name="Actual_Desired_HAA" />
+            <entity name="Time_Per_Assignment" />
+            <entity name="Time_to_adjust_HAA" />
+            <display locked="true" x="5" y="28" width="514" height="245" color="red">
+                <item uid="17" />
+                <item uid="18" />
+                <item uid="19" />
+                <item uid="20" />
+                <item uid="21" />
+            </display>
+        </group>
+        <group name="Asgnmnt_Backlog">
+            <entity name="Assignment_Backlog" />
+            <entity name="Assignment_Rate" />
+            <entity name="Completion_Rate" />
+            <entity name="Cumulative_Hours_Worked" />
+            <entity name="Change_in_Hours_Worked" />
+            <entity name="Assignment_Rate_Function" />
+            <entity name="Effective_Hours_Worked_Per_Week" />
+            <entity name="Hours_Worked_Per_Week" />
+            <entity name="Requested_Hours_Worked_Per_Week" />
+            <entity name="Effect_of_EL_on_Production" />
+            <entity name="Daily_Study_Time" />
+            <display locked="true" x="4" y="308" width="518" height="381" color="red">
+                <item uid="22" />
+                <item uid="23" />
+                <item uid="24" />
+                <item uid="25" />
+                <item uid="26" />
+                <item uid="27" />
+                <item uid="28" />
+                <item uid="29" />
+                <item uid="30" />
+                <item uid="31" />
+                <item uid="32" />
+                <item uid="33" />
+                <item uid="34" />
+                <item uid="35" />
+                <item uid="36" />
+            </display>
+        </group>
+        <group name="GPA_1">
+            <entity name="Assigment_Completion_Rate" />
+            <entity name="Change_in_Total_Points_Received" />
+            <entity name="Points_Per_Assignment" />
+            <entity name="Total_Assignments_Completed" />
+            <entity name="Total_Points_Received" />
+            <entity name="GPA" />
+            <entity name="HAA_Ratio" />
+            <entity name="Reference_HAA" />
+            <entity name="Effect_of_HAA_on_Grades" />
+            <entity name="Effect_of_Energy_on_Grades" />
+            <display locked="true" x="563" y="360" width="531" height="330" color="red">
+                <item uid="37" />
+                <item uid="38" />
+                <item uid="39" />
+                <item uid="40" />
+                <item uid="41" />
+                <item uid="42" />
+                <item uid="43" />
+                <item uid="44" />
+                <item uid="45" />
+                <item uid="46" />
+                <item uid="47" />
+                <item uid="48" />
+                <item uid="49" />
+                <item uid="50" />
+            </display>
+        </group>
+        <display show_pages="true" page_width="595" page_height="775" page_cols="2" isee:converter_size="medium" interval="DT" scroll_x="528">
+            <connector x="156" y="370" uid="22">
+                <from>Assignment_Rate_Function</from>
+                <to>Assignment_Rate</to>
+            </connector>
+            <connector x="322" y="413" uid="23">
+                <from>Effective_Hours_Worked_Per_Week</from>
+                <to>Completion_Rate</to>
+            </connector>
+            <alias x="409" y="367" uid="26">
+                <of>Hours_Allocated_Per_Assignment</of>
+                <label_angle>40</label_angle>
+            </alias>
+            <connector x="387" y="366" uid="24">
+                <from>
+                    <alias uid="26" />
+                </from>
+                <to>Completion_Rate</to>
+            </connector>
+            <alias x="1082" y="250" uid="15">
+                <of>GPA</of>
+            </alias>
+            <connector x="253" y="468" uid="27">
+                <from>Hours_Worked_Per_Week</from>
+                <to>Change_in_Hours_Worked</to>
+            </connector>
+            <alias x="1016" y="254" uid="9">
+                <of>Desired_GPA</of>
+            </alias>
+            <connector x="1076" y="239" uid="16">
+                <from>
+                    <alias uid="15" />
+                </from>
+                <to>Grade_Satisfaction</to>
+            </connector>
+            <connector x="1023" y="244" uid="10">
+                <from>
+                    <alias uid="9" />
+                </from>
+                <to>Grade_Satisfaction</to>
+            </connector>
+            <connector x="358" y="491" uid="28">
+                <from>Effect_of_EL_on_Production</from>
+                <to>Effective_Hours_Worked_Per_Week</to>
+            </connector>
+            <connector x="267" y="453" uid="29">
+                <from>Hours_Worked_Per_Week</from>
+                <to>Effective_Hours_Worked_Per_Week</to>
+            </connector>
+            <connector x="129" y="465" uid="30">
+                <from>Requested_Hours_Worked_Per_Week</from>
+                <to>Hours_Worked_Per_Week</to>
+            </connector>
+            <alias x="118" y="510" uid="31">
+                <of>Limit_on_Hours_Per_Week</of>
+            </alias>
+            <connector x="129" y="506" uid="32">
+                <from>
+                    <alias uid="31" />
+                </from>
+                <to>Hours_Worked_Per_Week</to>
+            </connector>
+            <connector x="637" y="85" uid="0">
+                <from>EL_Regeneration_Normal</from>
+                <to>EL_Regeneration</to>
+            </connector>
+            <connector x="663" y="186" uid="1">
+                <from>Effect_of_Hours_Worked_on_Regeneration</from>
+                <to>EL_Regeneration</to>
+            </connector>
+            <alias x="767" y="251" uid="11">
+                <of>Hours_Worked_Per_Week</of>
+            </alias>
+            <connector x="756" y="245" uid="2">
+                <from>
+                    <alias uid="11" />
+                </from>
+                <to>Effect_of_Hours_Worked_on_Regeneration</to>
+            </connector>
+            <connector x="1006" y="134" uid="3">
+                <from>Effect_of_Grades_on_EL_Depletion</from>
+                <to>E_Depletion</to>
+            </connector>
+            <connector x="1001" y="80" uid="4">
+                <from>E_Depletion_Normal</from>
+                <to>E_Depletion</to>
+            </connector>
+            <connector x="873" y="125" uid="5">
+                <from>Effect_of_Low_EL_on_Depletion</from>
+                <to>E_Depletion</to>
+            </connector>
+            <connector x="748" y="150" uid="6">
+                <from>Effect_of_High_EL_on_Regeneration</from>
+                <to>EL_Regeneration</to>
+            </connector>
+            <connector x="798" y="80" uid="12">
+                <from>Energy_Level</from>
+                <to>Effect_of_High_EL_on_Regeneration</to>
+            </connector>
+            <connector x="805" y="80" uid="7">
+                <from>Energy_Level</from>
+                <to>Effect_of_Low_EL_on_Depletion</to>
+            </connector>
+            <connector x="778" y="247" uid="13">
+                <from>
+                    <alias uid="11" />
+                </from>
+                <to>Effect_of_Hours_Worked_on_Depletion</to>
+            </connector>
+            <connector x="889" y="203" uid="8">
+                <from>Effect_of_Hours_Worked_on_Depletion</from>
+                <to>E_Depletion</to>
+            </connector>
+            <connector x="1047" y="186" uid="14">
+                <from>Grade_Satisfaction</from>
+                <to>Effect_of_Grades_on_EL_Depletion</to>
+            </connector>
+            <alias x="79" y="225" uid="21">
+                <of>Daily_Study_Time</of>
+            </alias>
+            <connector x="310" y="211" uid="17">
+                <from>Actual_Desired_HAA</from>
+                <to>Change_in_Hours_Allocated_Per_Assignment</to>
+            </connector>
+            <connector x="404" y="154" uid="18">
+                <from>Hours_Allocated_Per_Assignment</from>
+                <to>Change_in_Hours_Allocated_Per_Assignment</to>
+            </connector>
+            <connector x="423" y="206" uid="19">
+                <from>Time_to_adjust_HAA</from>
+                <to>Change_in_Hours_Allocated_Per_Assignment</to>
+            </connector>
+            <alias x="635" y="450" uid="40">
+                <of>Completion_Rate</of>
+            </alias>
+            <connector x="643" y="446" uid="37">
+                <from>
+                    <alias uid="40" />
+                </from>
+                <to>Assigment_Completion_Rate</to>
+            </connector>
+            <connector x="642" y="456" uid="38">
+                <from>
+                    <alias uid="40" />
+                </from>
+                <to>Change_in_Total_Points_Received</to>
+            </connector>
+            <connector x="833" y="409" uid="42">
+                <from>Total_Assignments_Completed</from>
+                <to>GPA</to>
+            </connector>
+            <connector x="816" y="484" uid="43">
+                <from>Total_Points_Received</from>
+                <to>GPA</to>
+            </connector>
+            <connector x="698" y="586" uid="39">
+                <from>Points_Per_Assignment</from>
+                <to>Change_in_Total_Points_Received</to>
+            </connector>
+            <connector x="826" y="647" uid="44">
+                <from>Effect_of_Energy_on_Grades</from>
+                <to>Points_Per_Assignment</to>
+            </connector>
+            <alias x="1028" y="629" uid="45">
+                <of>Energy_Level</of>
+            </alias>
+            <connector x="1008" y="632" uid="46">
+                <from>
+                    <alias uid="45" />
+                </from>
+                <to>Effect_of_Energy_on_Grades</to>
+            </connector>
+            <connector x="806" y="591" uid="47">
+                <from>Effect_of_HAA_on_Grades</from>
+                <to>Points_Per_Assignment</to>
+            </connector>
+            <connector x="919" y="569" uid="48">
+                <from>HAA_Ratio</from>
+                <to>Effect_of_HAA_on_Grades</to>
+            </connector>
+            <connector x="916" y="534" uid="49">
+                <from>Reference_HAA</from>
+                <to>HAA_Ratio</to>
+            </connector>
+            <alias x="1015" y="507" uid="50">
+                <of>Hours_Allocated_Per_Assignment</of>
+            </alias>
+            <connector x="995" y="507" uid="41">
+                <from>
+                    <alias uid="50" />
+                </from>
+                <to>HAA_Ratio</to>
+            </connector>
+            <connector x="73" y="478" uid="33">
+                <from>Daily_Study_Time</from>
+                <to>Requested_Hours_Worked_Per_Week</to>
+            </connector>
+            <alias x="71" y="384" uid="34">
+                <of>Reference_Assignment_Rate</of>
+            </alias>
+            <connector x="78" y="379" uid="25">
+                <from>
+                    <alias uid="34" />
+                </from>
+                <to>Assignment_Rate</to>
+            </connector>
+            <alias x="445" y="485" uid="35">
+                <of>Energy_Level</of>
+            </alias>
+            <connector x="425" y="489" uid="36">
+                <from>
+                    <alias uid="35" />
+                </from>
+                <to>Effect_of_EL_on_Production</to>
+            </connector>
+            <connector x="211" y="176" uid="20">
+                <from>Time_Per_Assignment</from>
+                <to>Actual_Desired_HAA</to>
+            </connector>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface show_pages="true" page_rows="2" page_width="788" page_height="528">
+            <simulation_delay>0.1</simulation_delay>
+            <isee:process_frame x="22" y="387" width="214" height="110" name="Asgnmnt_Backlog" show_name="false" color="#0CA0FF" border-style="solid" border-width="thin">
+                <doc>This represents the number of assignments you are behind.  The teacher gives one new assignment daily.  The number of assignments you complete is based upon how much time you study each day, and how long it takes to complete each assignment.&#x0D;</doc>
+            </isee:process_frame>
+            <isee:process_frame x="279" y="537" width="212" height="110" name="GPA_1" show_name="false" color="#0CA0FF" border-style="solid" border-width="thin">
+                <doc>Your GPA is based upon the number of assignments you have completed and the number of points you have gotten for each.  You are not penalized for incomplete work.  (You always can try to do it later).&#x0D;&#x0D;The purple line is your desired GPA.  The green line is your actual GPA.   The graph above shows the points you get for each assignment.  (As opposed to the cumulative GPA graphed here).</doc>
+            </isee:process_frame>
+            <isee:process_frame x="21" y="30" width="518" height="331" name="INTRO" show_name="false" color="#1D1D1D" border-style="solid" border-width="5px">
+                <image width="426" height="325">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAaoAAAFFCAIAAAAy/z72AAAgAElEQVR4nO2dW5bcKgwA3Tmz/y37fnTGlwAS4g2m6iuhQUhCyIA99ue+7wsA4Dx+ZiuwB5/PJ1r+XDzcCuEVRfr1Wy7V/5aHdaQSRYEoUu923ep7KZMpNQmHqdXVXRqRAs0V+R4sTXpD+jPhpbnorHvmw+fzkbJV+KsRpZWnUnEXG6EnnX1d4YXNXsrvyJ/ZCmyPNxXdRUHy14KO9N6v2BTSpenKeL+WaT6LGm/buyBD7QurvxcyckLq+3p7fbt8N3HnWmrR1mKFVyGaZy3yy3SusSK6j5Gs0Lt7Aaz+9qBsIaOvTYwrF2Wd+Ewbac0rnRIYzYnW95bSdozaJq3QscvPxXNCmRX23vXu3gGrv/dgv0qHW9pZC8bxSLdHemtlka+sH5M3eaSGlvJkzZdlvQfS3zbc962c5V19prHX6fe/9TKr9Wrc+7PG6TfPLVYXp6crNlJ6eRYv2/M+kP7O5a2X9FxaPbwyHemW9763wnvD2V8tWbd6K2da9Jp/yYksulp0T3MsZzrFZ206+kq2VReXvNybkv3b9utKkyQ37HGW0/rB6q8B+v4iuftQTnykvnT5w2LUuOFK1s+VryOdgVZqW0yT7WdSWmX5GOVXg5UwABwKm18AOBTSHwAcCukPAA6F9AcAh0L6A4BDIf0BwKGQ/gDgUEh/AHAopD8AOBTSHwAcCukPAA6F9AcAh0L6A4BDIf0BwKGQ/gDgUEh/AHAopD8AOJQ/15CvBDRnZd0AYAtY/QHAofy5hK+FVX6TbCSsBAGggL9fenu+5+SmQjf3Rb+e5VYL/+1VjooKpYWtdGkAAGX8v/l9MpeU+yzfhPWQct8jKtmFpetQGgBAkn++8/t8IrZJNmkohL0tADRng1sfG51CAsBGrJ7+yH0A0InV058F7vwCQAGm9CfdFfHKC0T16AIAwMJn4r6SjS0ATGT05pd1HAAswoTVH48xA8AKzNz8AgBM5A13fgEACiD9AcChkP4A4FBIfwBwKKQ/ADgU0h8AHArpDwAOhfQHAIdC+gOAQyH9AcChkP4A4FBIfwBwKKQ/ADgU0h8AHMpPukoF3vuc9f8apYWs9s6uw99ivbv5NfpX2r6X63pom5TZttOO6c9VVPo8+fflz0ZjivPmgrzAhF3o7epW8gvkvCyKJHP6mdl39ffA18rPYffZuLv+YGdQ+huA5R360TrJQg+pjr3Tp+RZ+erKh1c/aWUdXSAnKyuqFpRHjzgkD0TbRjH2K3VkdPUluytaP5TvFlp8KMmxh6XSnV4SlucGQJaQqM5hK2872MrD0YYvufXxeF9ZZkbr6A2fcksde6fhZzyTcmoMj6JMgzAcs8oVmaEOBW43DllDVyv1PfllOhfo6bnIYoVL9ItjxQMdvdZWTgrX0rC8VTS+Z/WXRUHE1GCZZvrCxz0krT8KkZJRUlWp08H+vFocpOyo85dQc0uE3LGjdmmRaFdeicb1PXxo+huMJQ7Gx0rIE8rePsJdLLhX42j5GMq621HnwRRc4bx12bIednX71iT97cGAqLJcxr3lg1S+MjvqbMEeId6GsR7PjSt72FPmJWd/uUTPPlbodIpiOpJKK6iaq8OOOjfEvW7pR4f2QQ/P4Jb1cFj+kvT3jEFyCePVsTTUKej0+jdojDpIZ8C6fHssSk2MXVjMb0LukBW4ukyfHjpbQiJc8RWfDEQ7TSqT6+GaEcxVXqlzXT0/c26xrWEUjme88rgLdHByFi9Z/Z3AjpG9wlboHHaMkLl0TH/JJSujZWdTX/XYbEIUPFzAWvdlAACGMe6NL+4ysOzxXWkhaZRwwuVRtzF6TyMs935NigXYlKFvfHG3Qt9b78+/LQK96cpszMJzWuh5L9/ZxwVgU7j1cQThBaNg0c1NDHgZQ1941ZVwc61XCzd3bnmYL/SNfJk+lt2ormdUjhEWd3A4o1d/nfatj9jk7eawjr2tvX5BnWRbY3kPugoHmMXQv/ld88wumqHu1Cs0jM+g91C4EuMSMmoCB4LwJsalvzVz35dHN3vCShpSIHMMUmpec2gA+jEo/W2R+7zyu+IlKyvbW8BqGRygCdz51Uj+Dfkuf9RVthl3TxW9M8ddDAdQmHD296Xtyqhmpea1bdKXRaZUR5JvLLerTf6Cw+GNL0uAHwDGw+Z3GuwfAebS9zkGfVHDkqffaQAAJOExLgA4FDa/AHAopD8AOBTSHwAcCukPAA6F9AcAh0L6A4BDIf0BwKGQ/gDgUEh/AHAopD8AOBTSHwAcCukPAA6F9AcAh0L6A4BD+blSn/T2SnhJ37IwNF/e9BG73mPqyu/9evZZ8an02331l/tO44J3IPPa5PGs7/Pw80y708rnA6ZkczrpMPRTR9CVfdc4XfG+WL8XvXXe0Se5KDZ+wnVv+AZ26dcrtkEOG0pKJOtbBNo7DTXP2vVHS6J9WTYUSh2L/tERNcpJ6qAMsSTZMtDNfSiRHMTx2trDQJKs6Jw1jtEpltTcqx/VpFV8ZkWXsiRURuf5b+HmN9xWPH1EXakMvKW+V0dpEq0TljdB6quHzNy+6nVT2hp9bqGHD/v12ETb6D4uKVmZSjr2KSk1D+v3i8/cNOLpY9Thqfzz/N/dILjtjdfemoDQhUcnm45RDc/qqKWWOp2Qrhn1cgYz0YcF9ND2jm3AXcnDsn9X7Ppb7B0QIf7Zn6dQ2bXR0uou+jC5sYtlp1YS3S12u8rcCxPJmj5rkhVm0r5+ZNz+v/kNV5hZ6+SCi+T9y5Wzpmvrkad3RbilTluVmmwGW8lpwmAfVtJPW2+X55Uv7paG6NNtWNxOe+w5egKyXRfNsejcqs6OFNi1SGYJD6euBbTqQU3sDY7bZunPu2CG5Xp9ywGfpYukWEmTS43FaJ2Cvuy26DLtR7H2Va2Hsa1dt+Y+1Pn8YuxxrrZZMVPQ1iKnpn5lfCbldFoMbvkwVCXhCFnGbJFFxAD6WbqXD/fSFgo45W9+lWsjuW8Me/lwL22hjFPSn7SoJveNYS8f7qUtFHPi5hcA4Or9N79TrqJSp+7mN6mScofkfSw1TPt2NADvXtM1265cfWp07mHvn0d087sqS/H4LusW0lKPzl0HDFMrcNRcXP/X375vp5dP39XfOy65l/Mw+msscnmlUQ9vtW41u3rr00P+/687/f7jll8C4W0eow/seEjNo/X1TWtUB7dCVKy36GuIvpXWn61RrFD2EScMU1SmIkdvJTkqSjhYkvyQXD1r6nuFyVGzB4BRT4lHH9f/7q+551EDxvGP+4MxR3gPghZsJ5P1o4ve5AbWMqmanCCUbaUr2x41TEk5FvmSo9zLYSgnd4By9aysr1DWVtKnSaAqY2GPk37jmL35rUwcuuRwg2nPVsNyn4V79jtOth6mFci6pD3YDSmT3wNLdus3QL39oMt/89ueF5xUELLmMNm1uoteUrKU1eG+9Sq1K5feftDlr/jYc/TsoEbOg2UH0YrnorrsAqeSfsO0Hfcv14bmKPG5tV0W1kp/xlMDuyhvzKJnVRbemsLK6D1M6+AGjBQ8xUFV2bY3I3Xr3Zck/2/6C4+oFhyY3PVU/dT6/OJ1Z9Qkmhqktha3HzVMNcvnmqEv1l86btYHOld+jS1ZdVr5v2Z8e4/jOx9kWweWje+gYBxXG/rV9FmBN9/6mA4B9xo2HUQiUGets783QeTBdF5//60SNr8AcCiDNr/hIWiYdre7QI1UeHHnuIfTRiULmoTNl3WInemGSHPzxeH9+X1on80vlODeKHxi136frqAJeCx4038LXKcNWv294Co9lzc5MHwQ5DuT32Tjppw2BH/TX/SRn/Cn4vJwcftUkzxu2RwpfZW1rSnv2pHnQOkRrbAwLI/W0fuVOvrmrLZzRh93yRZLq9DY0G9Rh0sP9CX7Sro0S6bbxBsCRaylXFdA956uZ9hRUodcmUqhXnJ5m99wMyJtUnLLQ/Q6Fjl6nbK2BXYN60iS6ZF0SEG/XrkrJ6pYqFUBSmaR+k1GXUiTbXh0H5qUnJtPlSGoDLMm5M5Hiw5RmUbH6n770mDzK2lf79neRxu64ySy7KoR2DA0jdQ4vHfuq5Tm7q+bqHrPePONXqEsnpMYvdekL10NS0dRx0oUpr9beBuEVF7cS03zMvnP6LYayKjAMQ7MZXzChQflKmgMiTHxrDCsL3tHekiX3/m9f7n+TbFS+Ra0XcLoAl/mwLY7qeY8/uw0xFf1YCVPigpCopWxFu81d6xEw44K01/0sEMpr6GHzBr5TfQZ6cBcynSwt5LOgHJ7nI67Zve2ZmWimoTECiHUgxq7pLZ/opXCbXZluaKQtDJqUkfCqH99X7kCCwxvQq6BlYvTMn9Wjk40Q+VGgp1WLk1qWGBFgXXJ/J4r01I/apexI9OKNXQibAQDlwXuquF93uOvPvaj7brvHN43e0fySu+R/vaj3yn+i8FXNbzVe/ylEQAcSvvVX6utWQ85BTJ332nurn8rXuOHHoa0lVk540byN/0truUs3rrmn8jISDs2qo81PJf2b3xplSxIOk3AjV/wA4T8XP8+gHr//h1J9Kmip9kd/LnJE15Sk+vfEFR+ypITNtHrSIRtPbdEFdNVVXyiVE6ak1XuaSs9/xUWhuXROnq/Ukef1HtKXOzyo62kqC6zSyGpZ5Zji2Pe7mR9hShtfewBvD5/LsMDjR7eU6OWkAoHxi03ovflycxa/Efb5rqlRgclyHTXJcsVmaEOUjZ0XZHVr+7SAp11+d5P3j8kewvsMuppVL7MQEm+0clZczC6m66ZcYuQvfnNSlgjGTYGd+vXh0jJ6EqZo0zsYmXKqHf7mnFVZtdgWyxKFhhy215ps2PWe3jVhy6fsdl6SB6i5twvelXMXJ0tLKhSiEXJfoZs4SKJ9zz2XL8Ks/Mszfp1qki+f7n+vfZK5Suzo86n4e2X38R70t8hRE9hlPKR5Oqwgs4WXD0tOk+xq4di4dHkJVySl3WLzt/0Fx5jddW1Rxc1MgtWc9FokOQU6CY1MXahnyf2c3vSdUqkWXTOWmjXLCqL7XLr1+8SypxjcXJ9MAzYA/Vm/h+9bey7bTW/Nld+FiOdxgANYM6tjxcM7Y4m7KjzUuC6lzFt9ecuubeLqn3zyNZuP4p9Y2wj5m9+AQCmwJ1fADgU0h8AHArpDwAOhfQHAIdC+gOAQyH9AcChkP4A4FBIfwBwKKQ/ADgU0h8AHArpDwAOhfQHAIdC+gOAQyH9AcCh/POZc4+278LyXr2dlH/g+85WMLmHDivYNYZzLH0HP5czWtMHb7oCHgX6rGYCAEi86ju/u0PSBBhJIv2F+2L9k+9hK/uUflp9nA/LP4XSh+VrynWdPX2UClITo0qXcCbQ1hyp0+hPukCPLN3CMxCpchhdybbSAYulI/dXPbC9YJAshfWx3vrIzWIF366WPh0ZZpYm5Umdo/pcwQxRmhhVitLcHLtLFdw6BbpF01NunNS0VTKaorNyOF6gPKyDafN7/3609BsK+hVyTEDo8vUrvI6eAqIJTqfGFblmuuXj56TebzRg9EWlJd5y1TPWdLt2VWWh9ya6nP1Je4SGRNOue6GOLtkUaUpbCaOZbWesUdUBQ1DQr3SxBJhC3nN/z3VYuRJOvEjev1z5a5/ctiubOUu3ZL8Fg3Kl4q0r3r4+ieUAAdZh78ee3XWQckYTrW8pb0hNF7lmromer1czKjzivAz5d0FDQCE7/SVDwbtiFwi37CXDFUFueZZMu5nhQVVSpSZmWnQz9lVMUo7FOdEmXoUax+o6s3Y7ipLPnBMoDcGZSXARdCJ79Ucs1sMWyQ7xBv3IW/0Ri61w0x/+lCDeoCslm18AgBew951fAIBiSH8AcCikPwA4FNIfABwK6Q8ADoX0BwCHQvoDgEMh/QHAoZD+AOBQSH8AcCikPwA4FNIfABwK6Q8ADoX0BwCH8nPJL5d/vtclfTdywY/pGOtMobfy3kvkm8hpRe9B6RGoykcO6hWbwoDpE/32w7L8XI6KSw0VwAp4n/r9fDJekXnahPLsdd21pisKv/O7mhlbYHEajgUYhin9PQtaaZ2YfHV78pNmuhypuf2V8ZbNkaV3qZdoHa9QcZqnQ/QLc7kqhQZKJVF9lL50mU3cFZWvlyt4AWz3SVLgJVv9lHgrIN2K4vKCzycoTaQpn9VF2FZ3RXS+6JItohRtTbc+nk+dRhV6Qif5mcqnTrS+JMcrL+g3VDisbOy9zANK2k2GUZlKubRycr276gMjpK2vPMmShm6o260oLvdUSpI7Cnq5Z6mUfXRXRE0oSxoWba/iza+E0fUNMQb0fd/hwY0bppbpUWZdc59kzWTP8LIjmDCqdJnNs0xbmVk+UdYRBSNbFmD2jsZPwKgCTwZU9JFckWVC5VWtQfp7gslVaBgNu3sGLFyEz7JOIqpqP3Kt7uGlWZ5v228oTQqwNQPPiJsE63O6Ts1caPPc3/3L1efK3xBv2eyVR4dkNetyV3D2C7KdHjJHspT+UoA1CbxwK9qPkX09PV4Vw9cg/Y23uUyH8AThMjhuBesWwXNF0oc9XPeO4XCtkCx6h6VJ5prZIP21upBKcvTz1FYX8JpeCjSRuqtRNdlE0a2Vk+vdlQyAZGCERPuyXwKT1FjdqjxXt957Aqm7tl3XzKPr4jPnC9Aw/qb3UsN4Ddf3CXSFv/mdw+A1P/M8BJ8A6W8OI4/emech+AQuNr8AcCwNnvt7x4W0zAqplUWape3zb2mnXNa1hRWGtUCHwWqP7G6FEQmp0Uo//ymQGZ07Sv3Gf/VxMl2j8xGr97LmDIEoNdfIFxCaNt5Y0l8VTRZZYQRAMYMzxcjuXpkE+2Fx1//pz5143lojKlGfqPadnS45aoOyxM2VWWlFuDl109lTOHJz9OgQmlzg8NAExWNJmUo4RTsNC6OPj7kCpZ8U9SRNkibc6lt8dKvDgFHGyx3Qgr5CowZMzFY0zBJh/T9eVal2OB5uedKAMKClHnVNkh1lyay34uGR4IoyWuHpU0xUh+vfCMh1eLK8ocxo2wLzw/KCcU/GoZJBLFZ7gxVtKw1obl+KjQ0nZr/c1ypLhPV/nh/sUow9fZ3rusN1kKXHGldKEZMrRLdifTw9+zk8lNMwnIw9rtBdmdXDPGYMaUkTvXyXSfHgb37vUS8RkXq8K150obddc2xCnbv6P3RCjcMVxofTIhQ7cCmPKUvp3CYr429+m3cg7eyUHu9fwlZJatoqtNqfrklzp226FpjIeI81D+kdp0bHv/pwTy6UUwwP/Yitvm2u/DIrsugkVsF1Qo3DQWJlr9pDWrIiLA/P5pY13+Vv+nu0tx8iZtW3S/DKpeVhVltjeSXjD7yyyHVOw76atG04WBZRBW7JbeIGTNLqevWMFMdJj/jvHbT80RscTfP0AUZW8DyvPIDj2GVrBr1h9Qcn4qY/psAspi8ASX8AcCh/n/uT0rB3LnupzyX1zqTTrxWL6OBi0adY54KGXfUZLLOGkfpYJm+lQKUkmiKSvUfv8NTobMSTX/LKg2G6HshSLr1jfyFgZylbNuL1fvMMrImxSv5Jfx/ePpJix6DcUWfYhdzoCpO7sqHsTa8XXtl301+8FaVbmHRN8uktSbJSblmcS3X0n5R+n5JP8IaP8IIZlWbcnhTrbMezRalQPEY9ZBqdYJGZrK8/4veR3wSj9yV1Le1JpXwUKuCVWDa5Rmr8XBAnD/6DL66pycZGos8ZPF5LPtjpVlNw64Ripe50NRT1lDoWnaP9uvorltp90lbn3C68f+TqYByjHjL1vowyk/WjfXl+y+3L4pNdyB07e5w8P/Va/d1170ppNQk99CQ7iybG3rErdic3dsIyFmUWWRZldnJjpj7GGsanMU68am7lhqGlL9Zq4uEpj3bx/OPHa+Ou1O41Xj7RkKizvE3iME08Vw/remWiY1Hvq+QkySU3ZipjbGJ4eAq3nSPGZZoxHqLluuu6/9VHj910Qyauku5frkbOeUTtuPS71LFo7qsact272nAY4yRcK4X/6EpBPOTGiZ/+GlroihrsOB33EnGyDrnM0rlVv5KcXcZiFz11mhwFtBrHaX/zm3UJqh94qbtW8pW+yvRR5Cjyiy8zXf1QqYN9VZsc32R5Qz2T5Umd7forRG2cuxxxlf/IT/zlxkPBmPJHb30pmF3Te/QmXqU0kJjrW0b24o0vPZi4SSmO6Yk6w3jIfV9Y/XXBTSXDPFwZ06HOTJKuzHIvw/pA+gOAQ2HzCwCHQvoDgEMh/QHAoZD+AOBQSH8AcCikPwA4FNIfABwK6Q8ADoX0BwCHQvoDgEMh/QHAoZD+AOBQSH8AcCikPwA4lJ9Lfh258V1YrV4fttpryHJferya/gqSqs1NyPJhtMJqXl1NH49F1GuoRtep9+M2W8R3AEtx5rzItXpBLyVV6vWZ8wKWchw0p2x8iYrD6RoA6fRnfG/7U82tI7WVPt3k/dvSb1Zf0Q+DKm0tSEcH9nfHP+VJt0RbSfrrZloskhTQVfLUkFoZKxujwhIwSS/pRrnfJMuKdkmHKycg7aOQpV5y1jxWW8brauElr4ISNpJkT2HlY3KJWx9P38n5E9aR2nrlCpZ+s/rS80tWjtBtScpUPi2U2yrZV9RMhSau0NvqlfU9S1lEJSNB956nT26kGfWsD8hi9TyVPKvtzeu9JKkUNtetjqrk0X3zWzB4leixlazWj/u+v/nL7Tp5PJFspUdSvZmeAkmFczuVrhwlus6mJtqjGcf9NXcUQuH9giQLi5fGqNQ9/Y0x4wmOkZ2ug7dV3J19h6+V5j0GdJ0gWWd83/Pc3/3LNWPJmYW3F6hsNWC59Hh1zNJs8eHrjeTkmlHYek3dj0HpTznqaiLHIr+VDjW4GxzL2URNq4lkudqrvMUFTGeFSFufwV6KdpdIf/YLTlhHauuVN8HYl3Rimqxj7LeJzFyM/rS7Pap2Mu1mmaxXzs2AFtOajLJdB0ukGUWFPyX1bzLpwkNGo3UWmWXzIteKpEqTP3Oe5YUBqQQUtvD/FkpeFXruYmBvmvhhwmPPxXoz5BNZedatrJtLvZ67WNqJ5ubPWf2FZz2wMuvPul0iqkbP9UdhAG0HevLmFwBgFo03v7kXqOip5LCM/L7L6XiLKnvUm3vn7jUdzUK5fZFsVWx49EZcAQVH8yF38Idr0/n8Pj2+xCsPXL98b+uEnlrNg7AR04Pn6VoK74Z4xro9dvWD22O/XtrynseeYTue9YLlOQb3mcd9MT7T8w5jH5Y15//VX/RMUVpFG1fXrc4p3XkSBlBu72HwhdercPfhyVE8kKxfo3BWuX0RnbTXYkKry340O0j7wXCx4ykZBo+krXHQJR28ygXG6gsoXWGJ0DNfPxh9WNN1tLKS+rOCTapjnJhf/nj6RVXMLbfIzOKxwRutgt698iS5nonWb6hwsjzZkdujEuj27rwKSo8h4UDkDlBSeS94iuVYKMt9TeaIp0M4uEY/1Pjfjiu/INiSdYwT/+epLXVTiSczN2EXk2XRLb9Oo8Yz0YmtE9axKGD32G1764zUnV6eNXBhYLSdb0lpyqB36lFqUh+lkthW6/HmvrJgifnKlOVvfu/WL4TwfKSM1qNGq5nQyqJWcixGRet0GppcNZRy/adh3Bu++Kff4LpJcAtXeCR1rnedv/ktk7IguRZJF8zpnumkgLcpaCgwt1Xzy619L9l8lZRLqyj1ZPa4TE73lUcTNTZ740tXCg6JdKJWW1yR666s+uGZy5U5kcLy8JxF1+eJ3axslWT9MFskd2xE1zH9m/6k41JPg/Awq/kBhDQTwkOHrN6T5Ul9yup7B4gF7jIa0mpGGdUIu2uVwiwOz/WJolv0ApA7Fkk+v+gdWUhepF2Zih8KJkjz9YFEzQQ3yvySOBSQum875QCS9Au57YJ5osLb+UqHx57haLabz+S+hpD+YAM6Tbzt5jO5ry1b3hEHAKjnn1ce1Cf4V14iXonlxkL0356E1cbaqNUU5Wd5rLhfS8M1w8DIyze/BTfpTkC6BWmsvDsjLSICVybyyoNPxTPib5okb8U4+Tcdyk3VXhOLM7d2ePp9f+61yzU1Wu5NLemRorAwLI/W0fuVOoom9Cy7vF/D+qFpUZ8oqcfiluahllz0Sf9VKkf3yMnek8OqeDjsTom0MCosHrZHXbSVG4FPoSXqyqI0ql6BTGU6W6a8xVFdwzvJP5vf+76l850wdKLlSlsPqa1bP7dfr1x5SrPGLomGbZvIzEKSLG2QcyO4ZlivYDZmeUOPioJI1qMuVPsKXGc0v8fsK5bZw1HDwlvix9XjIbpcUiK7h2YK9W6yuDtq1z3j1Re9eaywJxSvbVjekOgEfh+50Vjjh4LIz6pQwJRJlNj83sIrNKTyMTTpLjrn59q1Kfa82aq7YX2NJLrgUKKxxg8FbXtMjenTLfLgi8ejk7vqUcq3QFm1Je2aPmY9qLHircuxFVhqlvVQZq6Bf65/d+DePtyd5y5S+Uh66LCCXRZq9Iyev2RJG7DhteiwxUjl4tplsbHGD1mze+R0Gza4ief+nqniLZekcqVtEyz9RusbdTPKl460o20tfqjUJ5eyoXErt82AWW5v642CSM7q137KbJ9lNbOvWGYPR3UKbzuDVpuzzOtHP4ve5yuANen4Vx/DVrDjaZ6hXuwrgGUZ8cXlL69ZznRanb3SVwArs9kdWwCAVrz8lQcAABKkPwA4FNIfABwK6Q8ADoX0BwCHQvoDgEMh/QHAoZD+AOBQSH8AcCikPwA4FNIfABwK6Q8ADoX0BwCHQvoDgEPRPnXU9oNqxvIygbwhGQBy+X/192QQ72tHAACv5G/6C1dPrKQA4N1onzl3M6D0KnZLeRI3+XqJWH8FPHteACjGdOvD3RdfTkoylhcjyfd+rekCAI4lsvpb85s73OsAgLZEVn/1q7YxbKEkACzLxs/9eatUsiEAZPE3/a3/pIv3Ic5OuQYAAABKSURBVPDwtHFl5QFgQf75zq+XXz6f/3+tvPObvGkr1ZdSnvdvjgIBIBc+cw4Ah7Lx2R8AQA2kPwA4FNIfABwK6Q8ADoX0BwCH8h9jQRd/NvoA5wAAAABJRU5ErkJggg==</image>
+                <doc>Daily Study Time (DST) is the amount of time you spend each night on homework.  The Time Per Assignment (TPA) is the amount of time you take to complete each assignment. &#x0D;&#x0D;This means that if DST is 4 hours and TPA is 2 hours, you will complete 2 assignments every night.  On the other hand, if DST is 2 hours, and TPA is 4 hours, it will take two nights per assignment!&#x0D;&#x0D;Try these strategies for the first half of the simulation (20 weeks).  Then try to recover with good grades and no backlog!&#x0D;&#x0D;Peter Punt:     DST: 0.5 hour     TPA: 0.5 hour&#x0D;Larry Later:    DST: 0.5 hour     TPA: 4 hours&#x0D;Nancy Nerd:    DST: 4 hours      TPA: 4 hours </doc>
+            </isee:process_frame>
+            <isee:bundled_connector color="red">
+                <from>INTRO</from>
+                <to>Asgnmnt_Backlog</to>
+                <pts>
+                    <pt x="543" y="355" />
+                    <pt x="22" y="355" />
+                    <pt x="22" y="365" />
+                </pts>
+            </isee:bundled_connector>
+            <isee:bundled_connector color="red">
+                <from>GPA_1</from>
+                <to>Energy</to>
+                <pts>
+                    <pt x="279" y="591" />
+                    <pt x="236" y="591" />
+                </pts>
+            </isee:bundled_connector>
+            <isee:process_frame x="26" y="536" width="211" height="109" name="Energy" show_name="false" color="#0CA0FF" border-style="solid" border-width="thin">
+                <doc>This is the amount of personal energy that you have.  Too much time spent studying will cause it to decline.  If you lower your time studying, your energy will gradually regenerate.&#x0D;</doc>
+            </isee:process_frame>
+            <isee:bundled_connector color="red">
+                <from>INTRO</from>
+                <to>Energy</to>
+                <pts>
+                    <pt x="17" y="361" />
+                    <pt x="236" y="361" />
+                    <pt x="236" y="515" />
+                </pts>
+            </isee:bundled_connector>
+            <isee:bundled_connector color="red">
+                <from>Asgnmnt_Backlog</from>
+                <to>Energy</to>
+                <pts>
+                    <pt x="141" y="497" />
+                    <pt x="141" y="515" />
+                </pts>
+            </isee:bundled_connector>
+            <isee:bundled_connector color="red">
+                <from>Asgnmnt_Backlog</from>
+                <to>GPA_1</to>
+                <pts>
+                    <pt x="236" y="421" />
+                    <pt x="279" y="421" />
+                    <pt x="279" y="515" />
+                </pts>
+            </isee:bundled_connector>
+            <isee:bundled_connector color="red">
+                <from>Energy</from>
+                <to>GPA_1</to>
+                <pts>
+                    <pt x="236" y="570" />
+                    <pt x="279" y="570" />
+                </pts>
+            </isee:bundled_connector>
+            <isee:bundled_connector color="red">
+                <from>INTRO</from>
+                <to>GPA_1</to>
+                <pts>
+                    <pt x="17" y="361" />
+                    <pt x="491" y="361" />
+                    <pt x="491" y="515" />
+                </pts>
+            </isee:bundled_connector>
+            <isee:bundled_connector color="red">
+                <from>Energy</from>
+                <to>Asgnmnt_Backlog</to>
+                <pts>
+                    <pt x="119" y="515" />
+                    <pt x="119" y="497" />
+                </pts>
+            </isee:bundled_connector>
+            <stacked_container x="23" y="387" height="109" width="212" uid="51">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:51:31Z" cleared="true" time_precision="0" from="0" to="40">
+                    <plot index="0" pen_width="1" color="#008F44" precision="1" show_y_axis="true">
+                        <entity name="Assignment_Backlog" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="401" y="416" width="26" height="22" color="#0CA0FF" label_side="bottom" label_angle="277" label="Graph 1" type="graph" icon_of="51" />
+            <stacked_container x="27" y="536" height="109" width="209" uid="52">
+                <graph type="time_series" title="Untitled Graph" background="#D3D3D3" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:51:31Z" cleared="true" time_precision="0" from="0" to="40">
+                    <plot index="0" pen_width="1" color="#008F44" precision="1" show_y_axis="true">
+                        <entity name="Energy_Level" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="345" y="462" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 2" type="graph" icon_of="52" />
+            <stacked_container x="281" y="388" height="109" width="209" uid="53">
+                <graph type="time_series" title="GPA" background="#D3D3D3" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:51:31Z" cleared="true" time_precision="0" from="0" to="40">
+                    <plot index="0" pen_width="1" color="#008F44" precision="1" show_y_axis="true">
+                        <entity name="Points_Per_Assignment" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="343" y="420" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 3" type="graph" icon_of="53" />
+            <stacked_container x="280" y="537" height="109" width="210" uid="54">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:51:31Z" cleared="true" time_precision="0" from="0" to="40">
+                    <plot index="0" pen_width="1" color="#008F44" precision="1" show_y_axis="true">
+                        <entity name="GPA" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <entity name="Desired_GPA" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="398" y="456" width="26" height="22" color="#0CA0FF" label_side="bottom" label_angle="263" label="Graph 4" type="graph" icon_of="54" />
+            <numeric_display precision="0.01" display_as="number" color="blue" show_name="true" retain_ending_value="false" uid="55" x="114" y="686">
+                <entity name="Energy_Level" />
+            </numeric_display>
+            <text_box x="278" y="366" uid="56" color="#008F44" font-family="Arial" font-size="10" padding="5" width="198" height="27">Points per Each Assignment</text_box>
+            <slider x="392" y="722" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="0" max="9">
+                <entity name="Time_Per_Assignment" />
+            </slider>
+            <numeric_display precision="1" display_as="number" color="blue" show_name="true" retain_ending_value="false" uid="57" x="114" y="724">
+                <entity name="Desired_GPA" />
+            </numeric_display>
+            <numeric_display precision="1" delimit_000s="true" color="blue" show_name="true" retain_ending_value="false" uid="58" x="114" y="667">
+                <entity name="Assignment_Backlog" />
+            </numeric_display>
+            <numeric_display precision="1" delimit_000s="true" color="blue" show_name="true" retain_ending_value="false" uid="59" x="114" y="705">
+                <entity name="GPA" />
+            </numeric_display>
+            <slider x="392" y="676" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="0" max="9">
+                <entity name="Daily_Study_Time" />
+            </slider>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

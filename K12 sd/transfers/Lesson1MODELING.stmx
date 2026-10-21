@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Lesson1MODELING</name>
+        <uuid>f9f4701f-4a2f-44fc-8af7-0cbe8829f253</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="12" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Months" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>24</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="808" height="621" />
+        <isee:security />
+        <isee:print_setup width="768" height="588" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="module" />
+    <model>
+        <stock name="MY_\nSAVINGS">
+            <doc>Type in a new number to change the Initial (or starting) value of MY SAVINGS and click OK. </doc>
+            <eqn>0</eqn>
+            <inflow>Monthly__Saving</inflow>
+            <outflow>Monthly__Spending</outflow>
+            <non_negative />
+            <display x="330" y="815" color="blue" />
+        </stock>
+        <flow name="Monthly_\nSaving">
+            <doc>The rate that Monthly Saving flows into MY SAVINGS is controlled by Monthly Deposits.&#x0D;&#x0D;If you would like to change this, click &quot;Hide Document&quot; to view options. When you are satisfied with a new equation, click OK.</doc>
+            <eqn>Monthly___Deposits</eqn>
+            <non_negative />
+            <display x="257" y="815" color="black" label_angle="281">
+                <pts>
+                    <pt x="206" y="815" />
+                    <pt x="308" y="815" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Monthly_\nSpending">
+            <doc>The rate of Monthly Spending flowing out of MY SAVINGS is determined by Monthly Expenses.&#x0D;&#x0D;If you would like to change this, click &quot;Hide Document&quot; to view options. When you are satisfied with a new equation, click OK.</doc>
+            <eqn>Monthly___Expenses</eqn>
+            <non_negative />
+            <display x="411" y="815" color="red">
+                <pts>
+                    <pt x="352" y="815" />
+                    <pt x="471" y="815" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Monthly__\nDeposits">
+            <doc>Type in a new number to change Monthly Deposits and click OK.</doc>
+            <eqn>0</eqn>
+            <display x="215" y="887" color="black" />
+        </aux>
+        <aux name="Monthly__\nExpenses">
+            <doc>Type in a new number to change Monthly Expenses and click OK.</doc>
+            <eqn>0</eqn>
+            <display x="460" y="896" color="red" label_side="left" label_angle="268" />
+        </aux>
+        <aux name="monthly_itune\npurchases">
+            <doc>How many itunes will you purchase each month, once you reach your goal? &#x0D;&#x0D;Type in a new number to change the amount and click OK. </doc>
+            <eqn>0</eqn>
+            <display x="402" y="1399" color="fuchsia" />
+        </aux>
+        <aux name="one_time_\nmp3_player\npurchase">
+            <doc>&quot;Reaching Goal&quot; will always record a zero, except for the one month it records that the goal is met. On that month, the 1 times the price of the desired mp3 player is deducted from MY SAVINGS and the player is purchased. &#x0D;&#x0D;If you would like to change this equation, click &quot;Hide Document&quot; to view options. When you are satisfied with a new equation, click OK.</doc>
+            <eqn>Reaching_Goal*price_of__desired_mp3_player</eqn>
+            <display x="527" y="1442" color="#FF007F" label_side="right" label_angle="276" />
+        </aux>
+        <aux name="Reached_Goal">
+            <doc>This model has been set up so that spending can not begin until the personal saving goal has been reached.&#x0D;&#x0D;Once we &quot;Reach [our] Goal,&quot; we can purchase new itunes each month. On that month we reach (or exceed our goal), the &quot;Reaching Goal&quot; flow will be &quot;1&quot;; every month after that, the &quot;Reached Goal&quot; stock will have &quot;1&quot; in it. When &quot;Reach Goal&quot; becomes 1 (rather than 0) we can start buying itunes each month.</doc>
+            <eqn>REACH_GOAL+Reaching_Goal</eqn>
+            <display x="604" y="1522" color="blue" label_side="right" label_angle="23" />
+        </aux>
+        <stock name="MY\nSAVINGS">
+            <doc>This is the STOCK of total $$ in MY SAVINGS at any time. In the simultion,  we started with zero. &#x0D;&#x0D;If you would like to change this, type in a new number and click OK.</doc>
+            <eqn>0</eqn>
+            <inflow>Monthly_Saving</inflow>
+            <outflow>Monthly_Spending</outflow>
+            <non_negative />
+            <display x="344" y="1349" color="blue" label_angle="93" />
+        </stock>
+        <flow name="Monthly_Saving">
+            <doc>The flow of Monthly Saving into MY SAVINGS is initially your monthly deposit.  After you reach your personal goal, your decision whether to continue to save or not (which is either a 1 if you do and a 0 if you don&apos;t) is multiplied by the monthly deposit (if you don&apos;t want to continue, 0 times your monthly deposit equals no monthly deposit; 1 times your monthly deposit continues the amount of your monthly deposit). &#x0D;&#x0D;If you would like to change this equation, click &quot;Hide Document&quot; to view options. When you are satisfied with a new equation, click OK.</doc>
+            <eqn>if Reached_Goal &gt;= 1 then (continue_to_save_after_reaching_goal*monthly_deposit) else (monthly_deposit)</eqn>
+            <non_negative />
+            <display x="267" y="1349" color="black" label_side="top">
+                <pts>
+                    <pt x="212" y="1349" />
+                    <pt x="322" y="1349" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Amount_of\nDeposit">
+            <doc>How much will you deposit each time? Type in the number (of $$) and click OK.</doc>
+            <eqn>0</eqn>
+            <display x="170" y="1506" color="fuchsia" />
+        </aux>
+        <aux name="Number_of_Months\nIn_Between_Deposits">
+            <doc>How often will you be making deposits? &#x0D;&#x0D;Type in a new number to change the number of months in between deposits and click OK.</doc>
+            <eqn>1</eqn>
+            <display x="273" y="1534" color="fuchsia" label_angle="261" />
+        </aux>
+        <aux name="monthly\ndeposit">
+            <doc>The &quot;Pulse&quot; function uses your decision on how many months between deposits to calculate which months it will add a deposit (and which months the deposit will be zero.&#x0D;&#x0D;Click on &quot;Hide Document&quot; if you would like to change the equation.  </doc>
+            <eqn>PULSE (Amount_of_Deposit, 0, Number_of_Months_In_Between_Deposits)</eqn>
+            <display x="218" y="1479" color="black" />
+        </aux>
+        <aux name="Personal_Savings\nGoal">
+            <doc>What is my Personal Savings Goal?&#x0D;&#x0D; Type in the number (of $$) you want to save in place of the zero, then click OK.</doc>
+            <eqn>0</eqn>
+            <display x="426" y="1618" color="blue" label_side="left" label_angle="196" />
+        </aux>
+        <aux name="price_of_\ndesired_mp3\nplayer">
+            <doc>How much do you want to spend on an mp3 player?&#x0D;&#x0D;In the simulation, we provided only two options, $50 or $100. You may type in any other number (of $$) you want to spend, and click OK. </doc>
+            <eqn>0</eqn>
+            <display x="437" y="1455" color="fuchsia" />
+        </aux>
+        <flow name="Monthly_Spending">
+            <doc>The outflow of money from MY SAVINGS is determined by my one time mp3 player purchase AND my monthly itune purchases. &#x0D;&#x0D;NOTE: Remember that this simulation does NOT ALLOW SPENDING until you have reached your Personal Savings Goal. In this equation, &quot;&quot;Reach Goal&quot; is calculated as zero before I reach my goal, and 1 afterward. 1 times my monthly itune purchases means those purchases will be taken out of MY SAVINGS each month.&#x0D;&#x0D;If you would like to change this equation, click &quot;Hide Document&quot; to view options. When you are satisfied with a new equation, click OK.</doc>
+            <eqn>(Reached_Goal*monthly_itune_purchases)+one_time__mp3_player_purchase</eqn>
+            <non_negative />
+            <display x="421" y="1349" color="red" label_side="top" label_angle="66">
+                <pts>
+                    <pt x="366" y="1349" />
+                    <pt x="476" y="1349" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="REACH_GOAL">
+            <doc>This STOCK holds on to the &quot;1&quot; that flows into it on the month that the dollars in MY SAVINGS are equal or greater to my personal goal. That &quot;1&quot; will then be used to purchase new itunes each month. </doc>
+            <eqn>0</eqn>
+            <inflow>Reaching_Goal</inflow>
+            <non_negative />
+            <display x="563" y="1568" color="blue" label_side="right" label_angle="352" />
+        </stock>
+        <flow name="Reaching\nGoal">
+            <doc>I reach my Personal Savings GOAL when the number of dollars in MY SAVINGS equals or is greater than my Personal Savings GOAL. We only want this to happen ONCE in this simulation (so that it will trigger the one-time purchase of an mp3 player). That&apos;s why, when the 1 from the Reaching Goal flow enters the &quot;Reached Goal&quot; stock, the flow returns to zero. &#x0D;&#x0D;NOTE: Until you reach your Personal Savings Goal in this simulation, you are NOT ABLE to make any purchases. &#x0D;&#x0D;</doc>
+            <eqn>if MY_SAVINGS &gt;= Personal_Savings_Goal and Personal_Savings_Goal &gt; 0  and REACH_GOAL = 0 then 1 else 0</eqn>
+            <non_negative />
+            <event_poster min="0" max="1">
+                <threshold value="0.9" repeat="once">
+                    <event>
+                        <text_box>You&apos;ve reached your Savings goal -- hurrah! Now, go ahead and select a Spending PLAN, to buy your Mp3 Player and tunes. </text_box>
+                    </event>
+                </threshold>
+            </event_poster>
+            <display x="500" y="1567" color="blue" label_side="left" label_angle="92">
+                <pts>
+                    <pt x="460" y="1567" />
+                    <pt x="541" y="1567" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="continue_to_save\nafter_reaching_goal">
+            <doc>Will you continue to save after you reach your goal? If not, type in a zero (0); if so, type in a &quot;1.&quot; </doc>
+            <eqn>0</eqn>
+            <display x="165" y="1386" color="fuchsia" label_angle="212" />
+        </aux>
+        <display page_width="768" page_height="588" page_cols="2" page_rows="3" isee:converter_size="medium" isee:name_only_modules="true" isee:animate_flows="true" isee:animate_stocks="true" interval="DT">
+            <connector x="212" y="878" uid="0" color="black">
+                <from>Monthly___Deposits</from>
+                <to>Monthly__Saving</to>
+            </connector>
+            <connector x="464" y="888" uid="1">
+                <from>Monthly___Expenses</from>
+                <to>Monthly__Spending</to>
+            </connector>
+            <connector x="553" y="1585" uid="2" color="blue">
+                <from>REACH_GOAL</from>
+                <to>Reaching_Goal</to>
+            </connector>
+            <connector x="342" y="1366" uid="3" color="blue">
+                <from>MY_SAVINGS</from>
+                <to>Reaching_Goal</to>
+            </connector>
+            <connector x="504" y="1558" uid="4" color="blue">
+                <from>Reaching_Goal</from>
+                <to>one_time__mp3_player_purchase</to>
+            </connector>
+            <connector x="607" y="1514" uid="5" color="red">
+                <from>Reached_Goal</from>
+                <to>Monthly_Spending</to>
+            </connector>
+            <connector x="445" y="1459" uid="6">
+                <from>price_of__desired_mp3_player</from>
+                <to>one_time__mp3_player_purchase</to>
+            </connector>
+            <connector x="523" y="1433" uid="7">
+                <from>one_time__mp3_player_purchase</from>
+                <to>Monthly_Spending</to>
+            </connector>
+            <connector x="398" y="1391" uid="8" color="#FFB264">
+                <from>monthly_itune_purchases</from>
+                <to>Monthly_Spending</to>
+            </connector>
+            <connector x="507" y="1561" uid="9" color="blue">
+                <from>Reaching_Goal</from>
+                <to>Reached_Goal</to>
+            </connector>
+            <connector x="585" y="1559" uid="10" color="blue">
+                <from>REACH_GOAL</from>
+                <to>Reached_Goal</to>
+            </connector>
+            <connector x="280" y="1402" uid="12" color="black">
+                <from>
+                    <alias uid="11" />
+                </from>
+                <to>Monthly_Saving</to>
+            </connector>
+            <alias x="278" y="1412" uid="11">
+                <of>Reached_Goal</of>
+            </alias>
+            <connector x="174" y="1498" uid="13" color="black">
+                <from>Amount_of_Deposit</from>
+                <to>monthly_deposit</to>
+            </connector>
+            <connector x="271" y="1525" uid="14" color="black">
+                <from>Number_of_Months_In_Between_Deposits</from>
+                <to>monthly_deposit</to>
+            </connector>
+            <connector x="214" y="1471" uid="15" color="black">
+                <from>monthly_deposit</from>
+                <to>Monthly_Saving</to>
+            </connector>
+            <connector x="431" y="1612" uid="16" color="blue">
+                <from>Personal_Savings_Goal</from>
+                <to>Reaching_Goal</to>
+            </connector>
+            <connector x="172" y="1380" uid="17" color="black">
+                <from>continue_to_save_after_reaching_goal</from>
+                <to>Monthly_Saving</to>
+            </connector>
+            <stacked_container height="260" width="454" uid="18">
+                <graph type="time_series" title="MY SAVINGS (total)" background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" comparative="true" cleared="true" time_precision="2" from="0" to="24">
+                    <plot index="0" pen_width="3" color="blue" precision="1" show_y_axis="true">
+                        <entity name="MY__SAVINGS" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="665" y="879" width="26" height="22" color="#008F44" label_side="bottom" label="Graph 1" type="graph" icon_of="18" />
+            <stacked_container height="282" width="492" uid="19">
+                <graph type="time_series" title="MY SAVINGS (total)" background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" comparative="true" cleared="true" time_precision="2" from="0" to="24">
+                    <plot index="0" pen_width="3" color="blue" precision="1" show_y_axis="true">
+                        <entity name="MY_SAVINGS" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="656" y="1330" width="26" height="22" color="#008F44" label_side="bottom" label="Graph 2" type="graph" icon_of="19" />
+            <stacked_container height="291" width="408" uid="20">
+                <table font-size="9" background="white" column_width="92" orientation="vertical" interval="1" cleared="true" date_time="2010-12-21T13:13:53Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" precision="max" width="47" />
+                    <item color="white" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Monthly__Saving" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="MY__SAVINGS" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Monthly__Spending" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="721" y="879" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="20" />
+            <stacked_container height="385" width="453" uid="21">
+                <table font-size="9" background="white" column_width="100" orientation="vertical" interval="1" cleared="true" date_time="2010-12-21T13:13:53Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" precision="max" width="47" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Monthly_Saving" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="MY_SAVINGS" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Monthly_Spending" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="711" y="1331" width="26" height="22" color="#008F44" label_side="bottom" label="Table 2" type="table" icon_of="21" />
+            <button x="250" y="55" width="183" height="30" uid="22" appearance="opaque" background="#0CA0FF" color="white" style="rounded" label="Intro: Build Your Own Model!" font-family="Arial" font-size="12" text-align="center">
+                <popup x="-184" y="40" width="617" height="346" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="16">If you haven&apos;t modeled before, watch our Build Your Own Personal Finance Model video to help you get started with using STELLA modeling software, available at http://clexchange.org/curriculum/dollarsandsense.asp &#x0D;&#x0D;Choose from 3 options:&#x0D;&#x0D;(1) Use this blank STELLA page to build your own model from scratch. Everything you need is here (icons/buttons for building blocks, tables and graphs, text; Word menus to run and print...);  OR&#x0D;&#x0D;(2) Click on the &quot;Explore Simple Stock and Flow Model&quot; button to see the core pre-built stock and flow model (Go ahead and make changes -- insert new numbers, change names, add building blocks!);  OR&#x0D;&#x0D;(3) Click on the &quot;Explore Model Used in Lesson 1&quot; to explore a version of the actual model used in Lesson 1 (it&apos;s a bit more complicated, but everything in it is explained!). &#x0D;&#x0D;&#x0D;Start wherever you want! And have fun!&#x0D;</text_box>
+                </popup>
+            </button>
+            <button x="485" y="545" width="146" height="31" uid="23" appearance="opaque" background="red" color="white" style="square" label="Explore Model Used in Lesson 1" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="1176" />
+            </button>
+            <text_box x="4" y="1" uid="24" color="red" font-family="Comic Sans MS" font-size="32" font-weight="bold" text-align="center" padding="5" width="756" height="55">Can I Manage My Money and My Music?</text_box>
+            <button x="282" y="651" width="129" height="34" uid="25" appearance="opaque" background="#0CA0FF" color="white" style="rounded" label="What can I do with this?" font-family="Arial" font-size="12" text-align="center">
+                <popup x="-116" y="285" width="367" height="187" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="16">Here&apos;s a very simple version of the Stock and Flow model used in Lesson 1. &quot;Monthly Deposits&quot; effect the rate that $$ flow into MY SAVINGS. &quot;Monthly Expenses&quot; effect the rate that $$ flow out. &#x0D;&#x0D;Explore (e.g., change amounts ($) for deposits or expenses; rename or add new building blocks to make this your model). Play with it and have fun!!&#x0D;</text_box>
+                </popup>
+            </button>
+            <button x="267" y="991" width="65" height="34" uid="26" appearance="opaque" background="#7F00FF" color="white" style="rounded" label="Run" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>run</menu_action>
+            </button>
+            <button x="323" y="545" width="146" height="31" uid="27" appearance="opaque" background="red" color="white" style="square" label="Explore Simple Stock and Flow Model" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="588" />
+            </button>
+            <button x="162" y="545" width="147" height="32" uid="28" appearance="opaque" background="#E0E0E0" color="white" style="square" label="Build Your Own Model " font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="0" />
+            </button>
+            <button x="441" y="1137" width="146" height="31" uid="29" appearance="opaque" background="red" color="white" style="square" label="Explore Model Used in Lesson 1" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="1176" />
+            </button>
+            <button x="279" y="1137" width="146" height="31" uid="30" appearance="opaque" background="#E0E0E0" color="white" style="square" label="Explore Simple Stock and Flow Model" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="588" />
+            </button>
+            <button x="118" y="1137" width="147" height="32" uid="31" appearance="opaque" background="red" color="white" style="square" label="Build Your Own Model " font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="0" />
+            </button>
+            <button x="439" y="1719" width="146" height="31" uid="32" appearance="opaque" background="#E0E0E0" color="white" style="square" label="Explore Model Used in Lesson 1" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="1176" />
+            </button>
+            <button x="277" y="1719" width="146" height="31" uid="33" appearance="opaque" background="red" color="white" style="square" label="Explore Simple Stock and Flow Model" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="588" />
+            </button>
+            <button x="116" y="1719" width="147" height="32" uid="34" appearance="opaque" background="red" color="white" style="square" label="Build Your Own Model " font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="0" />
+            </button>
+            <button x="282" y="1238" width="129" height="34" uid="35" appearance="opaque" background="#0CA0FF" color="white" style="rounded" label="What can I do with this?" font-family="Arial" font-size="12" text-align="center">
+                <popup x="-276" y="-11" width="284" height="489" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="16">This is a version of the model underlying the Lesson 1 Simulation. When you click and open any building block, you will find an explanation for how it works.&#x0D;&#x0D;Remember, this model does NOT allow you to make any purchases UNTIL you reach your Personal Savings Goal. That is why there are additional building blocks recording when you REACH (your personal savings) GOAL. &#x0D;&#x0D;Explore how you can make changes (e.g., change numbers; rename or add new building blocks to make this your model). Play with it and have fun!&#x0D;</text_box>
+                </popup>
+            </button>
+            <text_box x="12" y="594" uid="36" color="red" font-family="Comic Sans MS" font-size="32" font-weight="bold" text-align="center" padding="5" width="746" height="56">Simple Stock/Flow Model (used in Lesson 1) </text_box>
+            <text_box x="11" y="1179" uid="37" color="red" font-family="Comic Sans MS" font-size="32" font-weight="bold" text-align="center" padding="5" width="746" height="56"> Model Used in Lesson 1</text_box>
+            <button x="344" y="992" width="65" height="34" uid="38" appearance="opaque" background="#7F00FF" color="white" style="rounded" label="Reset" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>restore_all</menu_action>
+            </button>
+            <button x="573" y="1654" width="65" height="34" uid="39" appearance="opaque" background="#7F00FF" color="white" style="rounded" label="Run" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>run</menu_action>
+            </button>
+            <button x="649" y="1654" width="65" height="34" uid="40" appearance="opaque" background="#7F00FF" color="white" style="rounded" label="Reset" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>restore_all</menu_action>
+            </button>
+            <style font-family="Arial" font-size="12" />
+        </display>
+        <interface show_pages="true" page_cols="5" page_rows="5" page_width="788" page_height="528" scroll_x="240" scroll_y="192" zoom="75">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="710" y="217" content="18" />
+        <popup x="669" y="292" content="19" />
+        <popup x="748" y="228" content="20" />
+        <popup x="762" y="154" content="21" />
+        <style font-family="Arial" font-size="12" />
+    </model>
+</xmile>

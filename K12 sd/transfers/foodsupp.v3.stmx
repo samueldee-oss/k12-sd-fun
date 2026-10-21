@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>foodsupp.v3</name>
+        <uuid>0a252efb-8720-4acf-9d46-86ff128d81b6</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Months" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>25</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="false" layer="map" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="FOOD_SUPPLY">
+            <eqn>0</eqn>
+            <inflow>Production</inflow>
+            <outflow>Consumption</outflow>
+            <non_negative />
+            <display x="337" y="153" color="blue" />
+        </stock>
+        <flow name="Production">
+            <eqn>Productivity_Per_Laborer*Total_Laborers</eqn>
+            <non_negative />
+            <display x="191" y="146" color="blue" label_side="top" label_angle="69">
+                <pts>
+                    <pt x="65" y="146" />
+                    <pt x="317" y="146" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Consumption">
+            <eqn>if FOOD_SUPPLY &gt;= Total_Desired_Consumption then FOOD_SUPPLY-Total_Desired_Consumption else FOOD_SUPPLY</eqn>
+            <non_negative />
+            <display x="428" y="147" color="blue" label_side="top" label_angle="72">
+                <pts>
+                    <pt x="357" y="147" />
+                    <pt x="500" y="147" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="TOTAL_POPULATION">
+            <eqn>25</eqn>
+            <non_negative />
+            <display x="410" y="213" color="blue" label_side="bottom" label_angle="281" />
+        </stock>
+        <aux name="Total_Laborers">
+            <eqn>20</eqn>
+            <display x="144" y="291" color="blue" label_side="left" />
+        </aux>
+        <aux name="Productivity_Per_Laborer">
+            <eqn>12</eqn>
+            <display x="294" y="237" color="blue" label_angle="277" />
+        </aux>
+        <aux name="Per_Capita_Consumption">
+            <eqn>3</eqn>
+            <display x="495" y="183" color="blue" label_angle="289" />
+        </aux>
+        <aux name="Nature">
+            <eqn> { Place right hand side of equation here… }</eqn>
+            <display x="173" y="456" color="blue" label_angle="283" />
+        </aux>
+        <aux name="Land_Productivity">
+            <eqn> { Place right hand side of equation here… }</eqn>
+            <display x="221" y="437" color="blue" label_side="right" label_angle="35" />
+        </aux>
+        <aux name="Productive_Land">
+            <eqn> { Place right hand side of equation here… }</eqn>
+            <display x="106" y="171" color="blue" label_side="left" />
+        </aux>
+        <display page_width="595" page_height="775" isee:converter_size="medium" interval="DT">
+            <connector x="287" y="232" uid="0">
+                <from>Productivity_Per_Laborer</from>
+                <to>Production</to>
+            </connector>
+            <connector x="416" y="196" uid="1">
+                <from>TOTAL_POPULATION</from>
+                <to>Consumption</to>
+            </connector>
+            <connector x="147" y="283" uid="2">
+                <from>Total_Laborers</from>
+                <to>Production</to>
+            </connector>
+            <connector x="486" y="180" uid="3">
+                <from>Per_Capita_Consumption</from>
+                <to>Consumption</to>
+            </connector>
+            <connector x="174" y="447" uid="4">
+                <from>Nature</from>
+                <to>Production</to>
+            </connector>
+            <connector x="220" y="428" uid="5">
+                <from>Land_Productivity</from>
+                <to>Production</to>
+            </connector>
+            <connector x="115" y="170" uid="6">
+                <from>Productive_Land</from>
+                <to>Production</to>
+            </connector>
+            <connector x="359" y="156" uid="7">
+                <from>FOOD_SUPPLY</from>
+                <to>Consumption</to>
+            </connector>
+            <text_box x="86" y="2" uid="8" color="#7F00FF" font-family="Arial" font-size="10" padding="5" width="376" height="26">Figure 2. The Dynamics of a FOOD SUPPLY</text_box>
+            <text_box x="21" y="486" uid="9" color="#7F00FF" font-family="Arial" font-size="9" padding="5" width="524" height="63">Nature is an ever present factor which effects production. Seasonal variations in climate produce normal variations in production, ranging from bumper crops to those which are significantly below average (such variations can readily be bult into STELLA models using the &quot;RANDOM&quot; feature). Nature can also wreak havoc with production through irregular and unpredictable disasters, ranging from drought to flood to desease. </text_box>
+            <text_box x="256" y="432" uid="10" color="#7F00FF" font-family="Arial" font-size="9" padding="5" width="246" height="49">Land Productivity changes; as it is continually used, nutrients in the soil are depleted; and if not replenished, land productivity falls</text_box>
+            <text_box x="11" y="557" uid="11" color="#7F00FF" font-family="Arial" font-size="10" padding="5" border-style="solid" border-width="thin" width="555" height="137">How and where has food shaped human history? Consider just how and when technological breakthroughs in food production permitted massive increases in population growth. But also think about food production as a limiting or inhibiting factor: What about famines? What about conquest motivated by demands for greater production? &#x0D;&#x0D;Models which address some or all of the factors cited above can be used to study such areas of history as the Irish Potato famine, the Industrial Revolution and its impact on agricultural production and population, economic structures in Colonial America (including tobacco and other non-food agricultural produce); in terms of modernity, this model can be used to illuminate significant differences between industrial countries and underdeveloped nations, as regards capabilities for feeding their respective populations. </text_box>
+            <text_box x="33" y="30" uid="12" color="#7F00FF" font-family="Arial" font-size="10" padding="5" width="516" height="48">Human survival dictates that people consume a certain quantity of food on a regular basis. What are the key factors which govern the system of food production? Consider the mapped model below, focusing upon critical convertors. How and where have such limiting factors influenced human existence?</text_box>
+            <text_box x="16" y="311" uid="13" color="#7F00FF" font-family="Arial" font-size="9" padding="5" width="119" height="39">Equally important is the size of the labor force. </text_box>
+            <text_box x="239" y="271" uid="14" color="#7F00FF" font-family="Arial" font-size="9" padding="5" width="151" height="144">How much food can any one producer be expected to generate on average? Productivity can encompass several factors, including (1) technology, (2) length and nature of actual labor, and (3) quality of labor. Or, if one prefers, productivity can be broken out into several categories.</text_box>
+            <text_box x="421" y="249" uid="15" color="#7F00FF" font-family="Arial" font-size="9" padding="5" width="145" height="68">Total consumption here is either determined by total demand or, if the supply is inadequate, by what is available. </text_box>
+            <text_box x="16" y="102" uid="16" color="#7F00FF" font-family="Arial" font-size="10" padding="5" border-style="solid" border-width="thin" width="272" height="24">STARTING POINT:  LAND, LABOR AND PRODUCTIVITY</text_box>
+            <text_box x="19" y="187" uid="17" color="#7F00FF" font-family="Arial" font-size="9" padding="5" width="110" height="85">Productive land is the primary resource required to undertake agriculture. And, of course, such land is finite.</text_box>
+            <text_box x="40" y="397" uid="18" color="#7F00FF" font-family="Arial" font-size="10" padding="5" border-style="solid" border-width="thin" width="112" height="36">RECOGNIZING OTHER KEY FACTORS</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="788" page_height="528" home_page="0">
+            <simulation_delay>0.1</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

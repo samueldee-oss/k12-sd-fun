@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Deceleration.v9</name>
+        <uuid>48169357-f004-4739-96f9-2017ca7191c5</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Time" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>2500</stop>
+        <dt>10</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:sensi_specs run="true" runs="5">
+        <method>multivariate</method>
+        <isee:variable type="adhoc" name="normal_change">0.000127,0.00022699999999999999,0.00032699999999999998,0.00042700000000000002,0.00052700000000000002</isee:variable>
+    </isee:sensi_specs>
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="1334" height="630" />
+        <isee:security />
+        <isee:print_setup width="552" height="728" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" show_documentation="true" show_pages="true" />
+    <model>
+        <stock name="Rotational_KE">
+            <doc>The initial Rotational Kinetic Energy of the earth presently in 1999 is 2.1339777*10^29 Joules.</doc>
+            <eqn>2.1339777E29 {J}</eqn>
+            <outflow>Change_in_Rotational_KE</outflow>
+            <display x="74" y="409" color="white" label_angle="93" />
+        </stock>
+        <aux name="Earth&apos;s_rotation_Omega">
+            <doc>This is the mean angular rate of rotation for the earth.  We calculated it by recontructing the equation of rotational kinetic energy, &#x0D;RKE= (0.5)((4þ^2)/x^2)(I) to solve for the length of day (x).  &#x0D;&#x0D;x= SQRT((4*þ^2)*(8.026250000E37)/(2*Rotational_KE))&#x0D;&#x0D;The I= inertia of the earth, which is 8.02625E37 kgm^2&#x0D;&#x0D;Once the length of day is found, 2þ is divided by it to find out omega.</doc>
+            <eqn>2*PI/(SQRT((4*PI^2)*(8.026250000E37)/(2*Rotational_KE)))</eqn>
+            <display x="63" y="260" color="white" label_angle="336" />
+        </aux>
+        <aux name="Mismatch_of_Omegas">
+            <doc>This is the difference between the Earth&apos;s rotation omega and the Moon&apos;s orbit omega.  When there is a value for the mismatch of omegas the length of day of the earth will be different than the orbit of the moon.  When the mismatch of omegas equals zero the earth&apos;s rotation will equal the orbit of the moon.</doc>
+            <eqn>Earth&apos;s_rotation_Omega-Moon&apos;s_Orbit_Omega</eqn>
+            <display x="145" y="213" color="black" label_angle="233" />
+        </aux>
+        <aux name="Effect_of_Mismatch">
+            <doc>The effect of drag on earth depends on the effect of the tidal bulge times the mismatch of omegas.  The 0.00007025947 is the mismatch between the omegas initially in the model.  We put this as a fraction over one because initially the effect of the mismatch is one (really zero), having no effect on the Change in Rotational KE.  &#x0D;</doc>
+            <eqn>Mismatch_of_Omegas*(1/.00007025947)</eqn>
+            <display x="217" y="342" color="white" />
+        </aux>
+        <flow name="Change_in_Rotational_KE">
+            <eqn>Rotational_KE*Effect_of_Mismatch*Tidal_bulge_effect             {(rad^2*kg*m^2)/(sec^2)}</eqn>
+            <display x="171" y="408" color="white" label_angle="290">
+                <pts>
+                    <pt x="94" y="408" />
+                    <pt x="249" y="408" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Moon&apos;s_Orbit_Omega">
+            <doc>sideric month of the moon= 27.3217 solar days.&#x0D;&#x0D;60*60*24*27.3217= 2360594.88 seconds for one orbit of the moon around the earth.&#x0D;&#x0D;2þ/2360594.88= w (omega) of the moon&#x0D;                             = 2.661695728E-6</doc>
+            <eqn>.000002661695728 {J/sec}</eqn>
+            <display x="115" y="150" color="white" label_side="top" label_angle="77" />
+        </aux>
+        <stock name="Distance_of_the_Moon&apos;s_Orbit_from_Earth">
+            <doc>The distance from the earth and the moon&apos;s orbit is different at different points on the earth.  The shortest distance is 356,399 kilometers.  The greatest distance is 406,699 kilometers.  The mean distance, which we are using for our initial value, is 384,403 kilometers, which is 384403000 meters.</doc>
+            <eqn>384403000 {m}</eqn>
+            <inflow>Change_in_Distance_of_Moon&apos;s_Orbit_from_Earth</inflow>
+            <non_negative />
+            <display x="382" y="274" color="white" label_angle="24" />
+        </stock>
+        <flow name="Change_in_Distance_of_Moon&apos;s_Orbit_from_Earth">
+            <eqn>37000*Effect_of_the_Missmatch_on_Moon {m/1 million years}</eqn>
+            <non_negative />
+            <display x="459" y="278" color="white" label_angle="225">
+                <pts>
+                    <pt x="517" y="278" />
+                    <pt x="402" y="278" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Effect_of_moon&apos;s_distance">
+            <eqn>Distance_of_the_Moon&apos;s_Orbit_from_Earth</eqn>
+            <gf>
+                <xscale min="0" max="100" />
+                <yscale min="0" max="1" />
+                <ypts>0,0.10000000000000001,0.20000000000000001,0.29999999999999999,0.40000000000000002,0.5,0.59999999999999998,0.69999999999999996,0.80000000000000004,0.90000000000000002,1</ypts>
+            </gf>
+            <display x="335" y="371" color="white" label_side="right" label_angle="354" />
+        </aux>
+        <aux name="Effect_of_the_Missmatch_on_Moon">
+            <eqn>Mismatch_of_Omegas</eqn>
+            <display x="310" y="177" color="black" label_side="top" label_angle="42" />
+        </aux>
+        <aux name="Tidal_bulge_effect">
+            <eqn>normal_change*Effect_of_moon&apos;s_distance</eqn>
+            <display x="95" y="482" color="black" label_side="top" label_angle="156" />
+        </aux>
+        <aux name="normal_change">
+            <eqn>3.27E-4</eqn>
+            <display x="90" y="550" color="black" />
+        </aux>
+        <display show_pages="true" page_width="552" page_height="728" page_rows="3" isee:converter_size="large" interval="DT">
+            <connector x="54" y="400" uid="0" color="white">
+                <from>Rotational_KE</from>
+                <to>Earth&apos;s_rotation_Omega</to>
+            </connector>
+            <connector x="59" y="249" uid="1" color="black">
+                <from>Earth&apos;s_rotation_Omega</from>
+                <to>Mismatch_of_Omegas</to>
+            </connector>
+            <connector x="157" y="213" uid="2" color="black">
+                <from>Mismatch_of_Omegas</from>
+                <to>Effect_of_Mismatch</to>
+            </connector>
+            <connector x="362" y="278" uid="3" color="white">
+                <from>Distance_of_the_Moon&apos;s_Orbit_from_Earth</from>
+                <to>Effect_of_moon&apos;s_distance</to>
+            </connector>
+            <connector x="329" y="382" uid="4" color="white">
+                <from>Effect_of_moon&apos;s_distance</from>
+                <to>Tidal_bulge_effect</to>
+            </connector>
+            <connector x="205" y="341" uid="5" color="white">
+                <from>Effect_of_Mismatch</from>
+                <to>Change_in_Rotational_KE</to>
+            </connector>
+            <connector x="127" y="150" uid="6" color="black">
+                <from>Moon&apos;s_Orbit_Omega</from>
+                <to>Mismatch_of_Omegas</to>
+            </connector>
+            <connector x="156" y="209" uid="7" color="black">
+                <from>Mismatch_of_Omegas</from>
+                <to>Effect_of_the_Missmatch_on_Moon</to>
+            </connector>
+            <connector x="308" y="189" uid="8" color="black">
+                <from>Effect_of_the_Missmatch_on_Moon</from>
+                <to>Change_in_Distance_of_Moon&apos;s_Orbit_from_Earth</to>
+            </connector>
+            <connector x="99" y="470" uid="9" color="black">
+                <from>Tidal_bulge_effect</from>
+                <to>Change_in_Rotational_KE</to>
+            </connector>
+            <connector x="86" y="539" uid="10" color="black">
+                <from>normal_change</from>
+                <to>Tidal_bulge_effect</to>
+            </connector>
+            <connector x="96" y="398" uid="11" color="white">
+                <from>Rotational_KE</from>
+                <to>Change_in_Rotational_KE</to>
+            </connector>
+            <stacked_container x="15" y="1496" height="282" width="492" uid="12">
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:26:43Z" cleared="true" time_precision="2" from="0" to="2500">
+                    <plot index="0" pen_width="1" color="black" precision="0.01" show_y_axis="true">
+                        <entity name="Distance_of_the_Moon&apos;s_Orbit_from_Earth" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="black" precision="0.01" show_y_axis="true">
+                        <entity name="Rotational_KE" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="292" y="638" width="26" height="22" color="white" label_side="bottom" label="kE and Distance moon" type="graph" icon_of="12" />
+            <stacked_container x="26" y="765" height="282" width="492" uid="13">
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:26:43Z" comparative="true" cleared="true" time_precision="2" from="0" to="2500">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="Rotational_KE" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="56" y="863" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="13" />
+            <stacked_container height="299" width="702" uid="14">
+                <table font-size="9" background="#FFFE91" column_width="226" orientation="vertical" interval="10" cleared="true" date_time="1999-04-07T12:18:11Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" width="100" />
+                    <item color="black" precision="max" delimit_000s="true" index="0">
+                        <entity name="Change_in_Rotational_KE" />
+                    </item>
+                    <item color="black" precision="max" delimit_000s="true" index="1">
+                        <entity name="Distance_of_the_Moon&apos;s_Orbit_from_Earth" />
+                    </item>
+                    <item color="black" precision="max" delimit_000s="true" index="2">
+                        <entity name="Rotational_KE" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="3">
+                        <entity name="Change_in_Distance_of_Moon&apos;s_Orbit_from_Earth" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="191" y="647" width="26" height="22" color="black" label_side="bottom" label="Table 1" type="table" icon_of="14" />
+            <stacked_container height="286" width="625" uid="15">
+                <table font-size="9" background="#FFFE91" column_width="244" orientation="vertical" interval="10" cleared="true" date_time="1999-04-07T12:18:11Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" width="50" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Distance_of_the_Moon&apos;s_Orbit_from_Earth" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Rotational_KE" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="394" y="641" width="26" height="22" color="#008F44" label_side="bottom" label="Table 2" type="table" icon_of="15" />
+            <text_box x="119" y="58" uid="16" color="black" font-family="Arial" font-size="18" padding="5" border-style="double" border-width="thick-thin" width="227" height="41">Deceleration of the Earth </text_box>
+            <text_box x="19" y="1074" uid="17" color="black" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="498" height="266">For our sensitivity analysis we will change the normal change which is affected by the unpredictable tidal bulges. Big tidal bulges mean more loss of kinetic energy of the earth and small tidal bulges mean less loss of kinetic energy because the friction on the earth is small and does not interfere greatly with the rotation. From the graph above you can see that the rotational kinetic energy decreases as the normal change increases.   &#x0D;Look at the graph above.  The five curves are similar in shape but have different slopes.  &#x0D;&#x0D;1. Rotational kinetic energy has normal change of 0.000127 .&#x0D;2. Rotational kinetic energy has normal change of 0.000227.&#x0D;3. Rotational kinetic energy has normal change of 0.000327.&#x0D;4. Rotational kinetic energy has normal change of 0.000427.&#x0D;5. Rotational kinetic energy has normal change of 0&#x03;.000527.&#x0D;&#x0D;&#x0D;</text_box>
+            <text_box x="185" y="527" uid="18" color="black" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="260" height="58">Out time specs are from zero to 10,000 {million years}.  Time zero is now, 1999.  The DT we used is 10.</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface show_pages="true" page_width="640" page_height="480">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="68" y="150" content="14" />
+        <popup x="70" y="158" content="15" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

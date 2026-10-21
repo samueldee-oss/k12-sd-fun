@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>SocialStudies1.2.v5</name>
+        <uuid>185147dc-0456-4bd0-9c1a-029316dafc6d</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Weeks" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>36</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="1334" height="630" />
+        <isee:security />
+        <isee:print_setup width="552" height="728" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Papers_to_be_graded">
+            <eqn>0</eqn>
+            <inflow>Honors_Government_papers</inflow>
+            <inflow>US_History_papers</inflow>
+            <inflow>Psychology_papers</inflow>
+            <non_negative />
+            <display x="192" y="72" color="black" label_side="right" label_angle="8" />
+        </stock>
+        <flow name="Honors_Government_papers">
+            <eqn>25</eqn>
+            <non_negative />
+            <display x="104" y="61" color="black" label_side="top" label_angle="148">
+                <pts>
+                    <pt x="36" y="61" />
+                    <pt x="172" y="61" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="US_History_papers">
+            <eqn>25</eqn>
+            <non_negative />
+            <display x="151" y="84" color="black" label_side="left" label_angle="208">
+                <pts>
+                    <pt x="130" y="165" />
+                    <pt x="130" y="84" />
+                    <pt x="172" y="84" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Psychology_papers">
+            <eqn>25</eqn>
+            <non_negative />
+            <display x="195" y="137" color="black" label_angle="336">
+                <pts>
+                    <pt x="195" y="188" />
+                    <pt x="195" y="87" />
+                </pts>
+            </display>
+        </flow>
+        <display page_width="552" page_height="728" isee:converter_size="large" interval="DT">
+            <stacked_container height="282" width="492" uid="0">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:11:50Z" cleared="true" time_precision="2" from="0" to="36">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="2700" />
+                        <entity name="Papers_to_be_graded" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="356" y="51" width="26" height="22" color="black" label_side="right" label_angle="354" label="Graph of papers to be graded" type="graph" icon_of="0" />
+            <stacked_container height="286" width="465" uid="1">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="1" cleared="true" date_time="1997-07-04T14:30:32Z">
+                    <title>Total Papers to be graded</title>
+                    <item type="time" color="black" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Papers_to_be_graded" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="418" y="91" width="26" height="22" color="black" label_side="bottom" label="Table of papers to be graded" type="table" icon_of="1" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="8" y="51" content="0" />
+        <popup x="8" y="51" content="1" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

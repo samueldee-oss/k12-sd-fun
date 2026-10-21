@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Fish.v301</name>
+        <uuid>436d2f77-ab68-43bc-a252-36a1e88fb162</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Years" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>1970</start>
+        <stop>1986</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" show_documentation="true" />
+    <model>
+        <aux name="Area">
+            <doc>The Area is the size of the fish bed in square miles.&#x0D;&#x0D;units: square miles</doc>
+            <eqn> 100</eqn>
+            <display x="48" y="181" color="blue" />
+        </aux>
+        <flow name="Ship_Building_Rate">
+            <doc>The Ship Building Rate is the number of new ships which are built each year.  It is determined by the amount of money invested each year in new ships (profits_each_year*fraction_invested) divided by the ship cost.  The units are ($/year)/($/ship)=(ship/year).&#x0D;&#x0D;units:  ships/year</doc>
+            <eqn>Yearly_Profits*Fraction_Invested/Ship_Cost</eqn>
+            <non_negative />
+            <display x="339" y="156" color="blue" label_side="top">
+                <pts>
+                    <pt x="391" y="156" />
+                    <pt x="288" y="156" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Fish_Death_Rate">
+            <doc>Fish Death Rate is the number of fish per year which die from causes other than fish harvesting.&#x0D;&#x0D;units: fish/year</doc>
+            <eqn>FISH*Death_Fraction</eqn>
+            <scale min="0" max="800" />
+            <non_negative />
+            <display x="224" y="40" color="blue" label_side="top">
+                <scale min="0" max="800" />
+                <pts>
+                    <pt x="162" y="40" />
+                    <pt x="287" y="40" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Density">
+            <doc>Density is the number of fish found per square mile within the fish bed.&#x0D;&#x0D;units: fish/square mile</doc>
+            <eqn> FISH/Area</eqn>
+            <display x="91" y="118" color="blue" />
+        </aux>
+        <aux name="Fraction_Invested">
+            <doc>The Fraction Invested is the fraction of the profits each year which are invested in the purchase of new boats.&#x0D;&#x0D;units: (unitless)</doc>
+            <eqn>.2</eqn>
+            <display x="392" y="226" color="blue" />
+        </aux>
+        <stock name="Total_Profits">
+            <eqn>0</eqn>
+            <scale min="0" max="100000" />
+            <inflow>Profits_each_Year</inflow>
+            <display x="276" y="353" color="blue">
+                <scale min="0" max="100000" />
+            </display>
+        </stock>
+        <aux name="Fish_Price">
+            <doc>Fish Price is the amount of money a fisherman can sell a fish for as soon as it is caught.&#x0D;&#x0D;units:  $/fish</doc>
+            <eqn> 20</eqn>
+            <display x="127" y="226" color="blue" label_side="top" />
+        </aux>
+        <aux name="Revenues">
+            <doc>Revenues are the moneys made each year through the sale of fish.  Revenues are the number of fish sold each year times the price per fish.&#x0D;&#x0D;units: $/year</doc>
+            <eqn> Total_Catch_per_Year*Fish_Price</eqn>
+            <display x="180" y="226" color="blue" />
+        </aux>
+        <aux name="Ship_Cost">
+            <doc>The Ship Cost is the amount of money it costs to build a new fishing ship.&#x0D;&#x0D;units: $/ship</doc>
+            <eqn> 300</eqn>
+            <display x="415" y="180" color="blue" />
+        </aux>
+        <aux name="Costs">
+            <doc>The Total Cost is the number of ships times the operating cost per year of each ship.  The cost per ship per year is 250 dollars.&#x0D;&#x0D;units: $/year</doc>
+            <eqn> SHIPS*250</eqn>
+            <display x="252" y="204" color="blue" />
+        </aux>
+        <aux name="Yearly_Profits">
+            <doc>Profits each year are the difference between revenues and costs.&#x0D;&#x0D;units:  $/year</doc>
+            <eqn> Revenues-Costs</eqn>
+            <scale min="-10000" max="10000" />
+            <display x="312" y="237" color="blue">
+                <scale min="-10000" max="10000" />
+            </display>
+        </aux>
+        <stock name="FISH">
+            <doc>Fish are the number of fish alive within the fishing bed which is being modeled.  At the beginning of the simulation there are initially 1000 fish alive in the bed.&#x0D;&#x0D;units: fish</doc>
+            <eqn> 1000</eqn>
+            <scale min="0" max="1000" />
+            <inflow>Fish_Hatch_Rate</inflow>
+            <outflow>Fish_Death_Rate</outflow>
+            <outflow>Total_Catch_per_Year</outflow>
+            <display x="142" y="40" color="blue">
+                <scale min="0" max="1000" />
+            </display>
+        </stock>
+        <stock name="SHIPS">
+            <doc>There are initially 10 ships at the beginning of simulation.&#x0D;&#x0D;units: ships</doc>
+            <eqn> 10</eqn>
+            <scale min="0" max="60" />
+            <inflow>Ship_Building_Rate</inflow>
+            <display x="268" y="157" color="blue" label_side="bottom">
+                <scale min="0" max="60" />
+            </display>
+        </stock>
+        <flow name="Fish_Hatch_Rate">
+            <doc>The fish birth rate is the number of fish born per year.  It is computed by multiplying the total fish population by a birth fraction.  The birth fraction is the average number of offspring per year per fish.&#x0D;&#x0D;units:  Fish/year</doc>
+            <eqn>FISH*Hatch_Fraction</eqn>
+            <non_negative />
+            <display x="74" y="40" color="blue" label_side="top">
+                <pts>
+                    <pt x="26" y="40" />
+                    <pt x="122" y="40" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Catch_per_Ship">
+            <eqn>Density</eqn>
+            <gf>
+                <xscale min="0" max="12" />
+                <yscale min="0" max="26" />
+                <ypts>0,5,10.375,15.875,20.25,22.125,23.25,23.75,24.25,24.625,25,25.350000000000001,25.48</ypts>
+            </gf>
+            <display x="140" y="146" color="blue" />
+        </aux>
+        <flow name="Profits_each_Year">
+            <eqn>Yearly_Profits</eqn>
+            <display x="218" y="354" color="blue">
+                <pts>
+                    <pt x="181" y="354" />
+                    <pt x="256" y="354" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Total_Catch_per_Year">
+            <doc>Total Catch per Year is the total number of fish which are harvested from the fishing waters each year.  It is computed by multiplying the number of ships by the catch per ship.&#x0D;&#x0D;units: fish/year</doc>
+            <eqn> SHIPS*Catch_per_Ship</eqn>
+            <scale min="0" max="800" />
+            <non_negative />
+            <display x="215" y="91" color="blue" label_side="top">
+                <scale min="0" max="800" />
+                <pts>
+                    <pt x="144" y="55" />
+                    <pt x="144" y="91" />
+                    <pt x="287" y="91" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Hatch_Fraction">
+            <doc>Birth fraction is the average number of offspring per year per fish.  It is the fractional increase in the population per year.  A birth fraction of 6 means that every female fish (half the fish population) will have an average of 12 offspring per year.&#x0D;&#x0D;units:  1/years</doc>
+            <eqn>6</eqn>
+            <display x="36" y="83" color="blue" />
+        </aux>
+        <aux name="Carrying_Capacity">
+            <doc>The carrying capacity is the total number of fish which the ocean environment can support.&#x0D;&#x0D;units:  Fish</doc>
+            <eqn>1200</eqn>
+            <display x="409" y="56" color="blue" label_side="top" />
+        </aux>
+        <aux name="Death_Fraction">
+            <eqn>FISH/Carrying_Capacity</eqn>
+            <gf>
+                <xscale min="0" max="1" />
+                <yscale min="5" max="6" />
+                <ypts>5.2199999999999998,5.2249999999999996,5.2300000000000004,5.2400000000000002,5.2549999999999999,5.29,5.3449999999999998,5.4500000000000002,5.665,5.9400000000000004,6</ypts>
+            </gf>
+            <display x="341" y="56" color="blue" />
+        </aux>
+        <display page_width="595" page_height="775" page_order="column" page_cols="2" isee:converter_size="medium" interval="DT">
+            <connector x="123" y="55" uid="0">
+                <from>FISH</from>
+                <to>Density</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="97" y="128" uid="1">
+                <from>Density</from>
+                <to>Catch_per_Ship</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="208" y="98" uid="2">
+                <from>Total_Catch_per_Year</from>
+                <to>Revenues</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="158" y="57" uid="3">
+                <from>FISH</from>
+                <to>Fish_Death_Rate</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="47" y="169" uid="4">
+                <from>Area</from>
+                <to>Density</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="39" y="74" uid="5">
+                <from>Hatch_Fraction</from>
+                <to>Fish_Hatch_Rate</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="139" y="226" uid="6">
+                <from>Fish_Price</from>
+                <to>Revenues</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="248" y="167" uid="7">
+                <from>SHIPS</from>
+                <to>Costs</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="259" y="214" uid="8">
+                <from>Costs</from>
+                <to>Yearly_Profits</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="191" y="233" uid="9">
+                <from>Revenues</from>
+                <to>Yearly_Profits</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="406" y="179" uid="10">
+                <from>Ship_Cost</from>
+                <to>Ship_Building_Rate</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="319" y="231" uid="11">
+                <from>Yearly_Profits</from>
+                <to>Ship_Building_Rate</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="386" y="220" uid="12">
+                <from>Fraction_Invested</from>
+                <to>Ship_Building_Rate</to>
+                <polarity>-</polarity>
+            </connector>
+            <alias x="147" y="384" uid="13">
+                <of>Yearly_Profits</of>
+            </alias>
+            <connector x="156" y="382" uid="14">
+                <from>
+                    <alias uid="13" />
+                </from>
+                <to>Profits_each_Year</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="261" y="140" uid="15">
+                <from>SHIPS</from>
+                <to>Total_Catch_per_Year</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="149" y="145" uid="16">
+                <from>Catch_per_Ship</from>
+                <to>Total_Catch_per_Year</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="129" y="56" uid="17">
+                <from>FISH</from>
+                <to>Fish_Hatch_Rate</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="161" y="27" uid="18">
+                <from>FISH</from>
+                <to>Death_Fraction</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="397" y="56" uid="19">
+                <from>Carrying_Capacity</from>
+                <to>Death_Fraction</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="332" y="56" uid="20">
+                <from>Death_Fraction</from>
+                <to>Fish_Death_Rate</to>
+                <polarity>-</polarity>
+            </connector>
+            <stacked_container height="282" width="492" visible_index="3" uid="21">
+                <graph type="time_series" title="Fish" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:39:59Z" cleared="true" time_precision="0" from="1970" to="1986">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <entity name="FISH" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Yearly Profits" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:39:59Z" cleared="true" time_precision="0" from="1970" to="1986">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <entity name="Yearly_Profits" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Total Profits" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:39:59Z" cleared="true" time_precision="0" from="1970" to="1986">
+                    <plot index="0" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <entity name="FISH" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="fuchsia" precision="1" show_y_axis="true">
+                        <entity name="Total_Profits" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="SHIPS" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:39:59Z" cleared="true" time_precision="0" from="1970" to="1986">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <entity name="SHIPS" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <entity name="Total_Catch_per_Year" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="324" y="567" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="21" />
+            <stacked_container height="269" width="424" uid="22">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="horizontal" interval="0.25" cleared="true" date_time="1996-01-28T17:53:30Z">
+                    <title>Fishbanks</title>
+                    <item type="time" color="black" precision="0.01" width="100" />
+                    <item color="black" precision="0.01" display_as="number" index="0">
+                        <entity name="FISH" />
+                    </item>
+                    <item color="black" precision="0.01" display_as="number" index="1">
+                        <entity name="SHIPS" />
+                    </item>
+                    <item color="black" precision="0.01" display_as="number" index="2">
+                        <entity name="Fish_Death_Rate" />
+                    </item>
+                    <item color="black" precision="0.01" display_as="number" index="3">
+                        <entity name="Fish_Hatch_Rate" />
+                    </item>
+                    <item color="black" precision="0.01" display_as="number" index="4">
+                        <entity name="Area" />
+                    </item>
+                    <item color="black" precision="0.01" display_as="number" index="5">
+                        <entity name="Costs" />
+                    </item>
+                    <item color="black" precision="0.01" display_as="number" index="6">
+                        <entity name="Density" />
+                    </item>
+                    <item color="black" precision="0.01" display_as="number" index="7">
+                        <entity name="Fraction_Invested" />
+                    </item>
+                    <item color="black" precision="0.01" display_as="number" index="8">
+                        <entity name="Fish_Price" />
+                    </item>
+                    <item color="black" precision="0.01" display_as="number" index="9">
+                        <entity name="Yearly_Profits" />
+                    </item>
+                    <item color="black" precision="0.01" display_as="number" index="10">
+                        <entity name="Revenues" />
+                    </item>
+                    <item color="black" precision="0.01" display_as="number" index="11">
+                        <entity name="Catch_per_Ship" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="338" y="445" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="22" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_order="column" page_cols="0" page_rows="0" page_width="788" page_height="528" home_page="0">
+            <simulation_delay>0.1</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="78" content="21" />
+        <popup x="16" y="78" content="22" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

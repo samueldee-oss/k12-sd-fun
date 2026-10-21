@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Inflfeed.v5</name>
+        <uuid>d2d79817-dc02-42f6-ad32-91c227aa4994</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="RK4" time_units="Days" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>1</start>
+        <stop>60</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="false" layer="map" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="621" height="382" />
+        <isee:security />
+        <isee:print_setup width="552" height="728" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" show_documentation="true" />
+    <model>
+        <aux name="become_immune`">
+            <eqn> { Place right hand side of equation here... }</eqn>
+            <display x="182" y="72" color="white" label_side="top" label_angle="77" />
+        </aux>
+        <aux name="births">
+            <eqn> { Place right hand side of equation here... }</eqn>
+            <display x="104" y="213" color="white" />
+        </aux>
+        <aux name="birth_rate">
+            <eqn> { Place right hand side of equation here... }</eqn>
+            <display x="71" y="257" color="white" />
+        </aux>
+        <aux name="total_population">
+            <eqn> { Place right hand side of equation here... }</eqn>
+            <display x="142" y="258" color="white" />
+        </aux>
+        <flow name="become_vaccinated">
+            <eqn> { Place right hand side of equation here... }</eqn>
+            <non_negative />
+            <display x="484" y="170" color="white" label_angle="298">
+                <pts>
+                    <pt x="420" y="170" />
+                    <pt x="548" y="170" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="death_2">
+            <eqn> { Place right hand side of equation here... }</eqn>
+            <non_negative />
+            <display x="567" y="226" color="white" label_side="right" label_angle="305">
+                <pts>
+                    <pt x="567" y="185" />
+                    <pt x="567" y="268" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="death">
+            <eqn> { Place right hand side of equation here... }</eqn>
+            <non_negative />
+            <display x="244" y="474" color="white" label_angle="286">
+                <pts>
+                    <pt x="244" y="432" />
+                    <pt x="244" y="517" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Infected">
+            <eqn> { Place initial value here... }</eqn>
+            <inflow>people_also_get_sick</inflow>
+            <non_negative />
+            <display x="772" y="173" color="white" />
+        </stock>
+        <flow name="people_also_get_sick">
+            <eqn> { Place right hand side of equation here... }</eqn>
+            <non_negative />
+            <display x="670" y="171" color="white">
+                <pts>
+                    <pt x="588" y="171" />
+                    <pt x="752" y="171" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="prob_that_person_is_uninfected">
+            <eqn> { Place right hand side of equation here... }</eqn>
+            <display x="682" y="129" color="white" label_side="top" />
+        </aux>
+        <stock name="Infected`">
+            <eqn> { Place initial value here... }</eqn>
+            <inflow>people_get_sick</inflow>
+            <non_negative />
+            <display x="430" y="420" color="white" />
+        </stock>
+        <flow name="people_get_sick">
+            <eqn> { Place right hand side of equation here... }</eqn>
+            <non_negative />
+            <display x="335" y="418" color="white" label_side="top">
+                <pts>
+                    <pt x="261" y="418" />
+                    <pt x="410" y="418" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="prob_that_pers_is_uninfected">
+            <eqn> { Place right hand side of equation here... }</eqn>
+            <display x="348" y="496" color="white" />
+        </aux>
+        <stock name="Ill">
+            <eqn> { Place initial value here... }</eqn>
+            <inflow>show_symptons</inflow>
+            <outflow>become_immune</outflow>
+            <outflow>death_4</outflow>
+            <outflow>die</outflow>
+            <non_negative />
+            <display x="750" y="450" color="white" label_angle="119" />
+        </stock>
+        <flow name="show_symptons">
+            <eqn> { Place right hand side of equation here... }</eqn>
+            <non_negative />
+            <display x="684" y="453" color="white" label_side="top" label_angle="93">
+                <pts>
+                    <pt x="638" y="453" />
+                    <pt x="730" y="453" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Immune">
+            <eqn> { Place initial value here... }</eqn>
+            <inflow>become_immune</inflow>
+            <outflow>death_5</outflow>
+            <non_negative />
+            <display x="754" y="557" color="white" label_side="bottom" />
+        </stock>
+        <flow name="become_immune">
+            <eqn> { Place right hand side of equation here... }</eqn>
+            <non_negative />
+            <display x="752" y="503" color="white" label_side="right" label_angle="344">
+                <pts>
+                    <pt x="752" y="465" />
+                    <pt x="752" y="542" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="death_5">
+            <eqn> { Place right hand side of equation here... }</eqn>
+            <non_negative />
+            <display x="691" y="559" color="white">
+                <pts>
+                    <pt x="734" y="559" />
+                    <pt x="649" y="559" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="death_4">
+            <eqn> { Place right hand side of equation here... }</eqn>
+            <non_negative />
+            <display x="754" y="383" color="white" label_side="top" label_angle="47">
+                <pts>
+                    <pt x="754" y="435" />
+                    <pt x="754" y="332" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Dead_from_Disease">
+            <eqn> { Place initial value here... }</eqn>
+            <inflow>die</inflow>
+            <non_negative />
+            <display x="888" y="450" color="white" />
+        </stock>
+        <flow name="die">
+            <eqn> { Place right hand side of equation here... }</eqn>
+            <non_negative />
+            <display x="819" y="450" color="white">
+                <pts>
+                    <pt x="770" y="450" />
+                    <pt x="868" y="450" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Initial_and_New">
+            <doc>This stock represents the initial population of the United States and new additions through births and people who haven&apos;t become immune.</doc>
+            <eqn>270000000</eqn>
+            <inflow>new</inflow>
+            <non_negative />
+            <display x="188" y="150" color="black" />
+        </stock>
+        <flow name="new">
+            <doc>This inflow represents the new people who are being added to the initial and new population.</doc>
+            <eqn>non_immune_people+births</eqn>
+            <non_negative />
+            <display x="124" y="149" color="black">
+                <pts>
+                    <pt x="80" y="149" />
+                    <pt x="168" y="149" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="non_immune_people">
+            <doc>This represents the people who haven&apos;t become immune to the particular strain of influenza virus.</doc>
+            <eqn>1-become_immune`</eqn>
+            <display x="133" y="100" color="black" label_side="left" label_angle="167" />
+        </aux>
+        <stock name="Initial_and_New``">
+            <doc>This stock represents the initial population of the United States and new additions through births and people who haven&apos;t become immune.</doc>
+            <eqn>270000000</eqn>
+            <outflow>become_vaccinated</outflow>
+            <non_negative />
+            <display x="400" y="173" color="black" label_angle="112" />
+        </stock>
+        <stock name="Non_Vaccinated">
+            <doc>This stock represents the people in the United States who have chosen not become vaccinated against the influenza virus and are, therefore, susceptible.</doc>
+            <eqn>0</eqn>
+            <inflow>not_vaccinated</inflow>
+            <outflow>death</outflow>
+            <outflow>people_get_sick</outflow>
+            <non_negative />
+            <display x="241" y="417" color="black" />
+        </stock>
+        <flow name="not_vaccinated">
+            <doc>This flow represents the people choosing not to become vaccinated.</doc>
+            <eqn>Initial_and_New`*non_vacc_perc_2</eqn>
+            <non_negative />
+            <display x="165" y="416" color="black" label_side="top" label_angle="82">
+                <pts>
+                    <pt x="109" y="416" />
+                    <pt x="221" y="416" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Initial_and_New`">
+            <doc>This stock represents the initial population of the United States and new additions through births and people who haven&apos;t become immune.</doc>
+            <eqn>270000000</eqn>
+            <outflow>not_vaccinated</outflow>
+            <non_negative />
+            <display x="89" y="414" color="black" label_angle="99" />
+        </stock>
+        <stock name="Vaccinated`">
+            <doc>This stock represents the people in the United States who have chosen to  become vaccinated.</doc>
+            <eqn>0</eqn>
+            <inflow>become_vaccinated</inflow>
+            <outflow>success</outflow>
+            <outflow>death_2</outflow>
+            <outflow>people_also_get_sick</outflow>
+            <non_negative />
+            <display x="568" y="170" color="black" label_side="left" label_angle="154" />
+        </stock>
+        <stock name="Unsucseptible">
+            <doc>This stock represents the people with whom the vaccine has worked and are now at no risk of being infected.</doc>
+            <eqn>0</eqn>
+            <inflow>success</inflow>
+            <non_negative />
+            <display x="571" y="65" color="black" label_angle="81" />
+        </stock>
+        <flow name="success">
+            <doc>This flow represents the vaccinated people with whom the vaccine has worked.</doc>
+            <eqn>(1-fault_rate)*Vaccinated`</eqn>
+            <non_negative />
+            <display x="568" y="117" color="black" label_side="left">
+                <pts>
+                    <pt x="568" y="155" />
+                    <pt x="568" y="80" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Infected``">
+            <doc>This stock represents people who are infected with the influenza virus, but aren&apos;t yet showing symptoms.</doc>
+            <eqn>1</eqn>
+            <outflow>death_3</outflow>
+            <outflow>show_symptons</outflow>
+            <non_negative />
+            <display x="618" y="451" color="black" label_side="left" />
+        </stock>
+        <flow name="death_3">
+            <doc>This outflow represents the people dying for reasons unrelated to the influenza virus.</doc>
+            <eqn>death_rate_2*Infected``</eqn>
+            <non_negative />
+            <display x="621" y="384" color="black" label_side="top" label_angle="62">
+                <pts>
+                    <pt x="621" y="436" />
+                    <pt x="621" y="332" />
+                </pts>
+            </display>
+        </flow>
+        <display page_width="552" page_height="728" page_cols="5" page_rows="3" isee:converter_size="large" interval="5" scroll_y="303">
+            <connector x="170" y="73" uid="0">
+                <from>become_immune`</from>
+                <to>non_immune_people</to>
+            </connector>
+            <connector x="75" y="245" uid="1">
+                <from>birth_rate</from>
+                <to>births</to>
+            </connector>
+            <connector x="139" y="247" uid="2">
+                <from>total_population</from>
+                <to>births</to>
+            </connector>
+            <connector x="104" y="201" uid="3">
+                <from>births</from>
+                <to>new</to>
+            </connector>
+            <connector x="422" y="187" uid="4">
+                <from>Initial_and_New``</from>
+                <to>become_vaccinated</to>
+            </connector>
+            <connector x="584" y="187" uid="5">
+                <from>Vaccinated`</from>
+                <to>death_2</to>
+            </connector>
+            <connector x="258" y="434" uid="6">
+                <from>Non_Vaccinated</from>
+                <to>death</to>
+            </connector>
+            <connector x="588" y="158" uid="7">
+                <from>Vaccinated`</from>
+                <to>prob_that_person_is_uninfected</to>
+            </connector>
+            <connector x="753" y="190" uid="8">
+                <from>Infected</from>
+                <to>people_also_get_sick</to>
+            </connector>
+            <connector x="680" y="141" uid="9">
+                <from>prob_that_person_is_uninfected</from>
+                <to>people_also_get_sick</to>
+            </connector>
+            <connector x="408" y="435" uid="10">
+                <from>Infected`</from>
+                <to>people_get_sick</to>
+            </connector>
+            <connector x="755" y="158" uid="11">
+                <from>Infected</from>
+                <to>prob_that_person_is_uninfected</to>
+            </connector>
+            <connector x="426" y="435" uid="12">
+                <from>Infected`</from>
+                <to>prob_that_pers_is_uninfected</to>
+            </connector>
+            <connector x="346" y="484" uid="13">
+                <from>prob_that_pers_is_uninfected</from>
+                <to>people_get_sick</to>
+            </connector>
+            <connector x="261" y="428" uid="14">
+                <from>Non_Vaccinated</from>
+                <to>prob_that_pers_is_uninfected</to>
+            </connector>
+            <connector x="640" y="466" uid="15">
+                <from>Infected``</from>
+                <to>show_symptons</to>
+            </connector>
+            <connector x="770" y="467" uid="16">
+                <from>Ill</from>
+                <to>become_immune</to>
+            </connector>
+            <connector x="768" y="433" uid="17">
+                <from>Ill</from>
+                <to>death_4</to>
+            </connector>
+            <connector x="737" y="574" uid="18">
+                <from>Immune</from>
+                <to>death_5</to>
+            </connector>
+            <connector x="772" y="461" uid="19">
+                <from>Ill</from>
+                <to>die</to>
+            </connector>
+            <connector x="126" y="110" uid="20">
+                <from>non_immune_people</from>
+                <to>new</to>
+            </connector>
+            <connector x="100" y="431" uid="21">
+                <from>Initial_and_New`</from>
+                <to>not_vaccinated</to>
+            </connector>
+            <connector x="588" y="153" uid="22">
+                <from>Vaccinated`</from>
+                <to>success</to>
+            </connector>
+            <connector x="639" y="434" uid="23">
+                <from>Infected``</from>
+                <to>death_3</to>
+            </connector>
+            <text_box x="157" y="77" uid="24" color="white" font-family="Arial" font-size="36" padding="1" width="45" height="51" appearance="transparent">-</text_box>
+            <text_box x="131" y="200" uid="25" color="white" font-family="Arial" font-size="24" padding="1" width="36" height="33" appearance="transparent">+</text_box>
+            <text_box x="122" y="405" uid="26" color="white" font-family="Arial" font-size="36" padding="1" width="43" height="50" appearance="transparent">-</text_box>
+            <text_box x="247" y="425" uid="27" color="white" font-family="Arial" font-size="36" padding="1" width="49" height="50" appearance="transparent">-</text_box>
+            <text_box x="294" y="414" uid="28" color="white" font-family="Arial" font-size="36" padding="1" width="43" height="50" appearance="transparent">-</text_box>
+            <text_box x="362" y="452" uid="29" color="white" font-family="Arial" font-size="24" padding="1" width="30" height="33" appearance="transparent">+</text_box>
+            <text_box x="366" y="418" uid="30" color="white" font-family="Arial" font-size="24" padding="1" width="30" height="33" appearance="transparent">+</text_box>
+            <text_box x="440" y="154" uid="31" color="white" font-family="Arial" font-size="36" padding="1" width="43" height="50" appearance="transparent">-</text_box>
+            <text_box x="572" y="112" uid="32" color="white" font-family="Arial" font-size="36" padding="1" width="43" height="50" appearance="transparent">-</text_box>
+            <text_box x="569" y="173" uid="33" color="white" font-family="Arial" font-size="36" padding="1" width="43" height="50" appearance="transparent">-</text_box>
+            <text_box x="643" y="130" uid="34" color="white" font-family="Arial" font-size="36" padding="1" width="43" height="50" appearance="transparent">-</text_box>
+            <text_box x="698" y="141" uid="35" color="white" font-family="Arial" font-size="24" padding="1" width="30" height="33" appearance="transparent">+</text_box>
+            <text_box x="707" y="175" uid="36" color="white" font-family="Arial" font-size="24" padding="1" width="30" height="33" appearance="transparent">+</text_box>
+            <text_box x="711" y="545" uid="37" color="white" font-family="Arial" font-size="36" padding="1" width="43" height="50" appearance="transparent">-</text_box>
+            <text_box x="755" y="456" uid="38" color="white" font-family="Arial" font-size="36" padding="1" width="43" height="50" appearance="transparent">-</text_box>
+            <text_box x="786" y="434" uid="39" color="white" font-family="Arial" font-size="36" padding="1" width="43" height="50" appearance="transparent">-</text_box>
+            <text_box x="627" y="391" uid="40" color="white" font-family="Arial" font-size="36" padding="1" width="43" height="50" appearance="transparent">-</text_box>
+            <text_box x="648" y="437" uid="41" color="white" font-family="Arial" font-size="36" padding="1" width="43" height="50" appearance="transparent">-</text_box>
+            <text_box x="756" y="391" uid="42" color="white" font-family="Arial" font-size="36" padding="1" width="43" height="50" appearance="transparent">-</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

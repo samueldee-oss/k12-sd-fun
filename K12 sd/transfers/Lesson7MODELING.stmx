@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Lesson7MODELING</name>
+        <uuid>5963598b-ced8-41d7-a5d9-f0abd99bd377</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="12" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Age" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>21</start>
+        <stop>65</stop>
+        <dt>1</dt>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="859" height="610" />
+        <isee:security />
+        <isee:print_setup width="818" height="572" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="module" show_pages="true" />
+    <model>
+        <stock name="MY_\nSAVINGS">
+            <doc>This is the number of dollars in MY SAVINGS account.</doc>
+            <eqn>0</eqn>
+            <inflow>Income_and_Interest</inflow>
+            <outflow>Expenses</outflow>
+            <event_poster min="0" max="2e+006">
+                <threshold value="1e+006">
+                    <event sim_action="stop">
+                        <text_box>Congratulations! You&apos;ve succeeded in becoming a millionaire! How long did it take?  Was it easier or harder than you expected? &#x0D;&#x0D;The model has stopped now that you have made your million dollars.</text_box>
+                    </event>
+                </threshold>
+            </event_poster>
+            <display x="341" y="1318" color="blue" />
+        </stock>
+        <flow name="Income\nand_Interest">
+            <doc>Monthly income and interest are added, then multiplied by 12 to determine annual income.&#x0D;&#x0D;To change this equation, click &quot;Hide Document,&quot; make desired changes and click OK. </doc>
+            <eqn>(Monthly_Income+Monthly__Interest)*12</eqn>
+            <non_negative />
+            <display x="265" y="1320" color="black" label_side="top" label_angle="79">
+                <pts>
+                    <pt x="211" y="1320" />
+                    <pt x="319" y="1320" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Monthly_\nInterest">
+            <doc>Because this model runs on a monthly basis, the Annual Interest Rate must be divided into 12 months to calculate Monthly Interest; also, because the per cent interest rate is really a fraction of what is in MY SAVINGS (1% = .01 or 1/100 of what is in MY SAVINGS), the equation must divide the interest rate by 100 to determine the fraction of interest paid. &#x0D;&#x0D;To change this equation, click &quot;Hide Document,&quot; make desired changes and click OK. </doc>
+            <eqn>MY__SAVINGS*(Annual_Interest_Rate_%/100)/12</eqn>
+            <display x="308" y="1374" color="black" label_side="right" label_angle="283" />
+        </aux>
+        <aux name="initial_MY_SAVINGS">
+            <doc>This is the number of $$ you start with in MY SAVINGS. &#x0D;&#x0D;Type in a new number to change my initial savings and click OK. </doc>
+            <eqn>0</eqn>
+            <display x="73" y="1245" color="fuchsia" />
+        </aux>
+        <aux name="Annual\nInterest_Rate_%">
+            <doc>This is the annual interest rate (as a per cent) paid on savings. A &quot;1&quot; indicates an annual interest rate of 1% or 1/100th (0.01) multiplied by the the amount of money in MY SAVINGS. Historical interest rates on Savings have run between 1 and 10 per cent. &#x0D;&#x0D;Type in a new number to change Annual Interest Rate (in per cent) and click OK.</doc>
+            <eqn>1</eqn>
+            <display x="269" y="1432" color="fuchsia" />
+        </aux>
+        <stock name="TOTAL_INTEREST">
+            <doc>This is the Stock of TOTAL (dollars of) INTEREST earned during the simulation.</doc>
+            <eqn>0</eqn>
+            <inflow>Interest_Income</inflow>
+            <non_negative />
+            <display x="405" y="1477" color="black" label_angle="83" />
+        </stock>
+        <flow name="Expenses">
+            <doc>Monthly expenses are multiplied by 12 to calculate annual expenses. The &quot;IF...THEN...ELSE &quot; part of the equation stops expenses when you reach age 65 and the simulation ends.</doc>
+            <eqn>IF time &lt;= 64 THEN Monthly_Expenses*12 ELSE 0</eqn>
+            <non_negative />
+            <display x="417" y="1324" color="red" label_side="top" label_angle="83">
+                <pts>
+                    <pt x="363" y="1324" />
+                    <pt x="472" y="1324" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Monthly_Expenses">
+            <doc>This is the number of dollars I spend monthly on all my expenses (including home or apartment, transportation, food, and other expenses). &#x0D;&#x0D;Type in a new number to change My Monthly Expenses and click OK. </doc>
+            <eqn>3</eqn>
+            <display x="432" y="1378" color="fuchsia" />
+        </aux>
+        <flow name="Interest\nIncome">
+            <doc>In the simulation, you earn interest on your savings each month until you reach the age of 65 and retire. </doc>
+            <eqn>IF time &lt;= 64 THEN Monthly__Interest*12 ELSE 0</eqn>
+            <non_negative />
+            <display x="408" y="1517" color="black" label_side="right" label_angle="16">
+                <pts>
+                    <pt x="408" y="1541" />
+                    <pt x="408" y="1494" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Monthly\nIncome">
+            <doc>This is the number of dollars you earn each month.&#x0D;&#x0D;Type in a new number to change My Monthly Income and click OK. </doc>
+            <eqn>20</eqn>
+            <display x="207" y="1387" color="fuchsia" label_side="left" label_angle="242" />
+        </aux>
+        <stock name="TOTAL_\nEXPENDITURES">
+            <doc>This is the TOTAL (number of dollars of) EXPENDITURES spent during the simulation. </doc>
+            <eqn>initial_MY_SAVINGS</eqn>
+            <inflow>Total_Expenses</inflow>
+            <non_negative />
+            <display x="559" y="1282" color="red" label_side="bottom" label_angle="265" />
+        </stock>
+        <flow name="Total_Expenses">
+            <doc>These are yearly expenses that flow into the stock of TOTAL EXPENSES. </doc>
+            <eqn>Expenses</eqn>
+            <non_negative />
+            <display x="504" y="1286" color="red" label_side="top" label_angle="125">
+                <pts>
+                    <pt x="471" y="1286" />
+                    <pt x="537" y="1286" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="TOTAL_\nEARNINGS">
+            <doc>This is the TOTAL (number of dollars of) EARNINGS  earned during the simulation. </doc>
+            <eqn>0</eqn>
+            <inflow>Earned_Income</inflow>
+            <non_negative />
+            <display x="102" y="1378" color="black" />
+        </stock>
+        <aux name="Expenses_Can&apos;t\nExceed_Income">
+            <doc>If, by mistake, your monthly expenses exceed your monthly income and interest, this triggers a message and stops the simulation. Click on the &quot;Message&quot; button to see how it works!</doc>
+            <eqn>MY__SAVINGS</eqn>
+            <event_poster min="-500" max="100000">
+                <threshold value="-1" direction="decreasing">
+                    <event sim_action="stop">
+                        <text_box>You have spent more than you earned this first year.  Time to rethink what you&apos;re doing!!!&#x0D;&#x0D;Please adjust your income or your expenses so that you can live without going into debt.</text_box>
+                    </event>
+                </threshold>
+            </event_poster>
+            <display x="153" y="1595" color="blue" />
+        </aux>
+        <aux name="Years_Elapsed">
+            <doc>This simply records the number of years you have been saving. Remember, in the simulation, you start saving at age 21. </doc>
+            <eqn>time-21</eqn>
+            <display x="73" y="1290" color="blue" />
+        </aux>
+        <flow name="Earned\nIncome">
+            <doc>This equation says that you will work (and earn Monthly Income) until age 65, then you retire.&#x0D;&#x0D;To change this equation, click &quot;Hide Document,&quot; make desired changes and click OK. </doc>
+            <eqn>IF time &lt;= 64 THEN Monthly_Income*12 ELSE 0</eqn>
+            <non_negative />
+            <display x="105" y="1420" color="black" label_side="left" label_angle="187">
+                <pts>
+                    <pt x="105" y="1446" />
+                    <pt x="105" y="1395" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="my_age">
+            <doc>This records my changing age as time elapses during the simulation</doc>
+            <eqn>time</eqn>
+            <display x="49" y="1525" color="blue" />
+        </aux>
+        <stock name="MY__\nSAVINGS">
+            <doc>This is the total number of dollars in MY SAVINGS at the start of the simulation.&#x0D;&#x0D;Type in a new number to change MY (initial or starting) SAVINGS and click OK.</doc>
+            <eqn>0</eqn>
+            <inflow>My_Annual_Income_and_Interest</inflow>
+            <outflow>My_Annual__Expenses</outflow>
+            <event_poster min="-500" max="2e+006">
+                <threshold value="-1" direction="decreasing">
+                    <event sim_action="stop">
+                        <text_box>You&apos;ve spent more than you have in MY SAVINGS! Please try again. </text_box>
+                    </event>
+                </threshold>
+                <threshold value="999750">
+                    <event sim_action="stop">
+                        <text_box>Congratulations! You&apos;ve succeeded in becoming a millionaire! How long did it take?  Was it easier or harder than you expected? &#x0D;&#x0D;The model has stopped now that you have made your million dollars.</text_box>
+                    </event>
+                </threshold>
+            </event_poster>
+            <display x="372" y="773" color="blue" />
+        </stock>
+        <stock name="TOTAL_DEPOSITS">
+            <doc>This is the Stock of TOTAL (number of dollars of) DEPOSITS deposited in MY SAVINGS over the entire simulation. </doc>
+            <eqn>0</eqn>
+            <inflow>Annual_Deposit</inflow>
+            <non_negative />
+            <display x="675" y="1502" color="black" label_side="bottom" label_angle="267" />
+        </stock>
+        <flow name="Annual_Deposit">
+            <doc>The flow of dollars annually deposited in TOTAL DEPOSITS equals Monthly Deposit multiplied by 12 (months).&#x0D;</doc>
+            <eqn>Monthly_Deposit*12</eqn>
+            <non_negative />
+            <display x="676" y="1450" color="black" label_side="left" label_angle="183">
+                <pts>
+                    <pt x="676" y="1415" />
+                    <pt x="676" y="1485" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="My_Annual_Income\nand_Interest">
+            <doc>The flow of My Income and Interest into MY SAVINGS is calculated on a yearly or annual basis. Hence, this equation takes My Monthly Income and Monthly Interest and multiplies that number by 12. &#x0D;&#x0D;To change this equation, click on &quot;Hide Document,&quot; make desired changes and click OK.</doc>
+            <eqn>(My_Monthly_Income+Monthly___Interest)*12</eqn>
+            <non_negative />
+            <display x="296" y="775" color="black" label_side="top" label_angle="122">
+                <pts>
+                    <pt x="242" y="775" />
+                    <pt x="350" y="775" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Monthly_\n_Interest">
+            <doc>Because this model runs on a monthly basis, the Annual Interest Rate must be divided into 12 months to calculate Monthly Interest; also, because the per cent interest rate is really a fraction of what is in MY SAVINGS (1% = .01 or 1/100 of what is in MY SAVINGS), the equation must divide the interest rate by 100 to determine the fraction of interest paid. &#x0D;&#x0D;To change this equation, click &quot;Hide Document,&quot; make desired changes and click OK. </doc>
+            <eqn>MY___SAVINGS*(Annual__Interest_Rate_%/100)/12</eqn>
+            <display x="339" y="829" color="black" label_side="right" label_angle="283" />
+        </aux>
+        <aux name="Annual_\nInterest_Rate_%">
+            <doc>This is the annual interest rate (as a per cent) paid on MY SAVINGS. A &quot;1&quot; indicates an annual interest rate of 1% or 1/100th (0.01) multiplied by the the amount of money in MY SAVINGS. Historical interest rates on Savings have run between 1 and 10 per cent. &#x0D;&#x0D;Type in a new number to change Annual Interest Rate (in per cent) and click OK.</doc>
+            <eqn>1</eqn>
+            <display x="300" y="887" color="fuchsia" />
+        </aux>
+        <aux name="Monthly_Deposit">
+            <doc>The amount deposited each month represents the difference between Monthly Income (earnings and interest) and Monthly Expenses. </doc>
+            <eqn>Monthly_Income-Monthly_Expenses</eqn>
+            <display x="540" y="1423" color="black" label_side="top" label_angle="19" />
+        </aux>
+        <aux name="Monthly_\nExpenses">
+            <doc>This is the number of dollars I spend each month.&#x0D;&#x0D;Type in a new number to change Monthly Expenses and click OK.</doc>
+            <eqn>0</eqn>
+            <display x="463" y="833" color="fuchsia" />
+        </aux>
+        <aux name="My_Monthly_Income">
+            <doc>This is the number of dollars I earn each month.&#x0D;&#x0D;Type in a new number to change My Monthly Income and click OK. </doc>
+            <eqn>0</eqn>
+            <display x="234" y="838" color="fuchsia" />
+        </aux>
+        <flow name="My_Annual_\nExpenses">
+            <doc>To calculate annual expenses, we multiply monthly expenses by 12. </doc>
+            <eqn>Monthly__Expenses*12 </eqn>
+            <non_negative />
+            <display x="448" y="776" color="red" label_side="top" label_angle="83">
+                <pts>
+                    <pt x="394" y="776" />
+                    <pt x="503" y="776" />
+                </pts>
+            </display>
+        </flow>
+        <display show_pages="true" page_width="818" page_height="572" page_cols="3" page_rows="5" isee:converter_size="medium" isee:name_only_modules="true" isee:animate_flows="true" isee:animate_stocks="true" interval="DT">
+            <connector x="353" y="1335" uid="0" color="black">
+                <from>MY__SAVINGS</from>
+                <to>Monthly__Interest</to>
+            </connector>
+            <connector x="267" y="1423" uid="1" color="black">
+                <from>Annual_Interest_Rate_%</from>
+                <to>Monthly__Interest</to>
+            </connector>
+            <connector x="300" y="1370" uid="2" color="black">
+                <from>Monthly__Interest</from>
+                <to>Income_and_Interest</to>
+            </connector>
+            <connector x="433" y="1369" uid="3" color="red">
+                <from>Monthly_Expenses</from>
+                <to>Expenses</to>
+            </connector>
+            <connector x="426" y="1324" uid="4" color="red">
+                <from>Expenses</from>
+                <to>Total_Expenses</to>
+            </connector>
+            <connector x="198" y="1387" uid="5" color="black">
+                <from>Monthly_Income</from>
+                <to>Earned_Income</to>
+            </connector>
+            <connector x="208" y="1379" uid="6" color="black">
+                <from>Monthly_Income</from>
+                <to>Income_and_Interest</to>
+            </connector>
+            <connector x="308" y="1383" uid="7" color="black">
+                <from>Monthly__Interest</from>
+                <to>Interest_Income</to>
+            </connector>
+            <connector x="85" y="1593" uid="9" color="blue">
+                <from>
+                    <alias uid="8" />
+                </from>
+                <to>Expenses_Can&apos;t_Exceed_Income</to>
+            </connector>
+            <connector x="206" y="1397" uid="10" color="black">
+                <from>Monthly_Income</from>
+                <to>Monthly_Deposit</to>
+            </connector>
+            <alias x="63" y="1610" uid="8">
+                <of>MY__SAVINGS</of>
+                <label_angle>111</label_angle>
+            </alias>
+            <connector x="381" y="790" uid="11" color="black">
+                <from>MY___SAVINGS</from>
+                <to>Monthly___Interest</to>
+            </connector>
+            <connector x="299" y="878" uid="12" color="black">
+                <from>Annual__Interest_Rate_%</from>
+                <to>Monthly___Interest</to>
+            </connector>
+            <connector x="331" y="825" uid="13" color="black">
+                <from>Monthly___Interest</from>
+                <to>My_Annual_Income_and_Interest</to>
+            </connector>
+            <connector x="463" y="824" uid="14">
+                <from>Monthly__Expenses</from>
+                <to>My_Annual__Expenses</to>
+            </connector>
+            <connector x="442" y="1378" uid="15" color="red">
+                <from>Monthly_Expenses</from>
+                <to>Monthly_Deposit</to>
+            </connector>
+            <connector x="237" y="830" uid="16" color="black">
+                <from>My_Monthly_Income</from>
+                <to>My_Annual_Income_and_Interest</to>
+            </connector>
+            <connector x="549" y="1421" uid="17" color="black">
+                <from>Monthly_Deposit</from>
+                <to>Annual_Deposit</to>
+            </connector>
+            <stacked_container height="260" width="454" uid="18">
+                <graph type="time_series" title="Total number of $$ in MY SAVINGS" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" comparative="true" cleared="true" time_precision="2" from="21" to="65">
+                    <plot index="0" pen_width="3" color="blue" precision="1" show_y_axis="true">
+                        <entity name="MY___SAVINGS" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="685" y="882" width="26" height="22" color="#008F44" label_side="bottom" label="Graph 1" type="graph" icon_of="18" />
+            <stacked_container height="282" width="492" uid="19">
+                <graph type="time_series" title="Total number of $$ in MY SAVINGS" background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" comparative="true" cleared="true" time_precision="2" from="21" to="65">
+                    <plot index="0" pen_width="3" color="blue" precision="1" show_y_axis="true">
+                        <entity name="MY__SAVINGS" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="674" y="1317" width="26" height="22" color="#008F44" label_side="bottom" label="Graph 2" type="graph" icon_of="19" />
+            <stacked_container height="269" width="527" uid="20">
+                <table font-size="9" background="#E0E0E0" column_width="131" orientation="vertical" interval="1" cleared="true" date_time="2010-12-22T11:08:27Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" precision="max" width="47" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="My_Annual_Income_and_Interest" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="MY___SAVINGS" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="My_Annual__Expenses" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="744" y="882" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="20" />
+            <stacked_container height="253" width="381" visible_index="1" uid="21">
+                <table font-size="9" background="#FFFE91" column_width="98" orientation="vertical" interval="1" cleared="true" date_time="2010-12-22T11:08:27Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" precision="max" width="47" />
+                    <item color="black" precision="0.01" display_as="currency" index="0">
+                        <entity name="Income_and_Interest" />
+                    </item>
+                    <item color="black" precision="0.01" display_as="currency" index="1">
+                        <entity name="MY__SAVINGS" />
+                    </item>
+                </table>
+                <table font-size="9" background="white" column_width="99" orientation="vertical" interval="1" cleared="true" date_time="2010-12-22T11:08:27Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" precision="max" width="47" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Income_and_Interest" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="MY__SAVINGS" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Expenses" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="738" y="1314" width="26" height="22" color="#008F44" label_side="bottom" label="Table 2" type="table" icon_of="21" />
+            <numeric_display precision="0.01" display_as="currency" color="red" show_name="true" retain_ending_value="true" uid="22" x="689" y="1275">
+                <entity name="MY__SAVINGS" />
+            </numeric_display>
+            <button x="311" y="49" width="183" height="30" uid="23" appearance="opaque" background="#0CA0FF" color="white" style="rounded" label="Intro: Build Your Own Model!" font-family="Arial" font-size="12" text-align="center">
+                <popup x="-184" y="40" width="617" height="346" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="16">If you haven&apos;t modeled before, watch our Build Your Own Personal Finance Model video to help you get started with using STELLA modeling software, available at http://clexchange.org/curriculum/dollarsandsense.asp. &#x0D;&#x0D;Choose from 3 options:&#x0D;&#x0D;(1) Use this blank STELLA page to build your own model from scratch. Everything you need is here (icons/buttons for building blocks, tables and graphs, text; Word menus to run and print...);  OR&#x0D;&#x0D;(2) Click on the &quot;Explore Simple Stock and Flow Model&quot; button to see the core pre-built stock and flow model (Go ahead and make changes -- insert new numbers, change names, add building blocks!);  OR&#x0D;&#x0D;(3) Click on the &quot;Explore Model Used in Lesson 7&quot; to explore a version of the actual model used in Lesson 7 (it&apos;s a bit more complicated, but everything in it is explained!). &#x0D;&#x0D;Start wherever you want! Play with it and have fun!&#x0D;</text_box>
+                </popup>
+            </button>
+            <button x="289" y="1217" width="129" height="34" uid="24" appearance="opaque" background="#0CA0FF" color="white" style="rounded" label="What can I do with this?" font-family="Arial" font-size="12" text-align="center">
+                <popup x="-124" y="286" width="422" height="204" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="16">This is a version of the model underlying the Lesson 7 Simulation. When you click and open any building block, you will find an explanation for how it works. &#x0D;&#x0D;You will notice that we have added several new TOTAL STOCKS.  Why do you think we put those in? Click on these STOCKS to learn more.&#x0D;&#x0D;Explore how you can make changes (e.g., change numbers; rename or add new building blocks to make this your model). Play with it and have fun!&#x0D;</text_box>
+                </popup>
+            </button>
+            <numeric_display precision="1" delimit_000s="true" color="blue" show_name="true" retain_ending_value="true" uid="25" x="689" y="1259">
+                <entity name="Years_Elapsed" />
+            </numeric_display>
+            <button x="476" y="1092" width="146" height="31" uid="26" appearance="opaque" background="red" color="white" style="square" label="Explore Model Used in Lesson 1" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="1144" />
+            </button>
+            <button x="502" y="518" width="146" height="31" uid="27" appearance="opaque" background="red" color="white" style="square" label="Explore Model Used in Lesson 1" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="1144" />
+            </button>
+            <button x="340" y="518" width="146" height="31" uid="28" appearance="opaque" background="red" color="white" style="square" label="Explore Simple Stock and Flow Model" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="588" />
+            </button>
+            <button x="179" y="518" width="147" height="32" uid="29" appearance="opaque" background="#E0E0E0" color="white" style="square" label="Build Your Own Model " font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="0" />
+            </button>
+            <button x="310" y="633" width="129" height="34" uid="30" appearance="opaque" background="#0CA0FF" color="white" style="rounded" label="What can I do with this?" font-family="Arial" font-size="12" text-align="center">
+                <popup x="-121" y="286" width="367" height="187" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="16">Here&apos;s a very simple version of the Stock and Flow model used in Lesson 7. Monthly Income and Interest effect the rate that $$ flow into MY SAVINGS; &quot;Monthly Expenses&quot; determine the rate that $$ flow out. &#x0D;&#x0D;Explore (e.g., change amounts ($) for deposits or expenses; rename or add new building blocks to make this &quot;your&quot; model). Play with it and have fun!&#x0D;</text_box>
+                </popup>
+            </button>
+            <text_box x="32" y="575" uid="31" color="red" font-family="Comic Sans MS" font-size="32" font-weight="bold" text-align="center" padding="5" width="746" height="56">Simple Stock/Flow Model (used in Lesson 7) </text_box>
+            <button x="313" y="1005" width="65" height="34" uid="32" appearance="opaque" background="#7F00FF" color="white" style="rounded" label="Run" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>run</menu_action>
+            </button>
+            <button x="390" y="1006" width="65" height="34" uid="33" appearance="opaque" background="#7F00FF" color="white" style="rounded" label="Reset" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>restore_all</menu_action>
+            </button>
+            <button x="615" y="1578" width="65" height="34" uid="34" appearance="opaque" background="#7F00FF" color="white" style="rounded" label="Run" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>run</menu_action>
+            </button>
+            <button x="687" y="1577" width="65" height="34" uid="35" appearance="opaque" background="#7F00FF" color="white" style="rounded" label="Reset" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>restore_all</menu_action>
+            </button>
+            <button x="314" y="1092" width="146" height="31" uid="36" appearance="opaque" background="#E0E0E0" color="white" style="square" label="Explore Simple Stock and Flow Model" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="588" />
+            </button>
+            <button x="153" y="1092" width="147" height="32" uid="37" appearance="opaque" background="red" color="white" style="square" label="Build Your Own Model " font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="0" />
+            </button>
+            <button x="491" y="1662" width="146" height="31" uid="38" appearance="opaque" background="#E0E0E0" color="white" style="square" label="Explore Model Used in Lesson 1" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="1176" />
+            </button>
+            <button x="329" y="1662" width="146" height="31" uid="39" appearance="opaque" background="red" color="white" style="square" label="Explore Simple Stock and Flow Model" font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="572" />
+            </button>
+            <text_box x="13" y="2" uid="40" color="red" font-family="Arial" font-size="32" font-weight="bold" text-align="center" padding="5" width="771" height="50">Can Compound Interest Make Me a Millionaire?</text_box>
+            <button x="168" y="1662" width="147" height="32" uid="41" appearance="opaque" background="red" color="white" style="square" label="Build Your Own Model " font-family="Arial" font-size="12" text-align="center">
+                <link target="model" x="0" y="0" />
+            </button>
+            <text_box x="15" y="1147" uid="42" color="red" font-family="Comic Sans MS" font-size="32" font-weight="bold" text-align="center" padding="5" width="746" height="56"> Model Used in Lesson 7</text_box>
+            <style font-family="Arial" font-size="12" />
+        </display>
+        <interface show_pages="true" page_cols="3" page_rows="7" page_width="788" page_height="528" zoom="12.5">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="38" y="224" content="18" />
+        <popup x="17" y="142" content="19" />
+        <popup x="511" y="321" content="20" />
+        <popup x="610" y="254" content="21" />
+        <style font-family="Arial" font-size="12" />
+    </model>
+</xmile>

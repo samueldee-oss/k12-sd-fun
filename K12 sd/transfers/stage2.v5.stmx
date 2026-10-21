@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>stage2.v5</name>
+        <uuid>ae244ed2-60f2-4a92-8198-d5161d680f83</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Time" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>5</stop>
+        <dt>0.01</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="630" height="428" />
+        <isee:security />
+        <isee:print_setup width="576" height="756" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Displacement">
+            <eqn>0</eqn>
+            <inflow>Veloc</inflow>
+            <non_negative />
+            <display x="186" y="52" color="blue" />
+        </stock>
+        <flow name="Veloc">
+            <eqn>Velocity</eqn>
+            <display x="119" y="47" color="blue">
+                <pts>
+                    <pt x="72" y="47" />
+                    <pt x="166" y="47" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Velocity">
+            <eqn>0</eqn>
+            <scale min="-25" max="25" />
+            <inflow>Acceleration</inflow>
+            <display x="185" y="122" color="blue">
+                <scale min="-25" max="25" />
+            </display>
+        </stock>
+        <flow name="Acceleration">
+            <eqn>if Velocity&gt;=0 then Accel_due_to_thrust+Accel_due_to_gravity-Accel_due_to_air_resistance else Accel_due_to_gravity+Accel_due_to_air_resistance</eqn>
+            <scale min="-30" max="30" />
+            <display x="119" y="121" color="blue">
+                <scale min="-30" max="30" />
+                <pts>
+                    <pt x="74" y="121" />
+                    <pt x="165" y="121" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Accel_due_to_thrust">
+            <eqn>TIME</eqn>
+            <gf>
+                <xscale min="0" max="0.4" />
+                <yscale min="0" max="100" />
+                <ypts>99.5,80.5,72,68.5,66.5,63.5,61.5,59.5,58,57,56.5,56.5,0</ypts>
+            </gf>
+            <display x="56" y="191" color="blue" />
+        </aux>
+        <aux name="Accel_due_to_gravity">
+            <eqn>-10</eqn>
+            <display x="146" y="208" color="blue" />
+        </aux>
+        <aux name="Accel_due_to_air_resistance">
+            <eqn>k2*Velocity*Velocity</eqn>
+            <display x="232" y="160" color="blue" />
+        </aux>
+        <aux name="k2">
+            <eqn>.001</eqn>
+            <display x="279" y="130" color="blue" />
+        </aux>
+        <display page_width="576" page_height="756" page_cols="2" isee:converter_size="large" interval="DT">
+            <connector x="163" y="110" uid="0">
+                <from>Velocity</from>
+                <to>Veloc</to>
+            </connector>
+            <connector x="57" y="178" uid="1">
+                <from>Accel_due_to_thrust</from>
+                <to>Acceleration</to>
+            </connector>
+            <connector x="135" y="204" uid="2">
+                <from>Accel_due_to_gravity</from>
+                <to>Acceleration</to>
+            </connector>
+            <connector x="221" y="166" uid="3">
+                <from>Accel_due_to_air_resistance</from>
+                <to>Acceleration</to>
+            </connector>
+            <connector x="205" y="127" uid="4">
+                <from>Velocity</from>
+                <to>Accel_due_to_air_resistance</to>
+            </connector>
+            <connector x="272" y="139" uid="5">
+                <from>k2</from>
+                <to>Accel_due_to_air_resistance</to>
+            </connector>
+            <connector x="163" y="136" uid="6">
+                <from>Velocity</from>
+                <to>Acceleration</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="7">
+                <graph type="time_series" title="2: Thrust + Air" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:14:19Z" cleared="true" time_precision="2" from="0" to="5">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="30" />
+                        <entity name="Displacement" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="-30" max="30" />
+                        <entity name="Velocity" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <scale min="-100" max="100" />
+                        <entity name="Acceleration" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="379" y="53" width="26" height="22" color="fuchsia" label_side="bottom" label="Graph 1" type="graph" icon_of="7" />
+            <stacked_container height="282" width="492" uid="8">
+                <graph type="time_series" title="2: Thrust + Air" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:14:19Z" cleared="true" time_precision="2" from="0" to="4">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="30" />
+                        <entity name="Displacement" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="-30" max="30" />
+                        <entity name="Velocity" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <scale min="-100" max="100" />
+                        <entity name="Acceleration" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="382" y="134" width="26" height="22" color="fuchsia" label_side="bottom" label="Graph 3" type="graph" icon_of="8" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="13" y="54" visible="true" content="7" />
+        <popup x="13" y="112" visible="true" content="8" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

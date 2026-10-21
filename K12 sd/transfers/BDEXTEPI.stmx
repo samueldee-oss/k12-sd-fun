@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>BDEXTEPI</name>
+        <uuid>27841430-33d0-4fad-ae9d-6424b909779b</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Time" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>12</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="623" height="425" />
+        <isee:security />
+        <isee:print_setup width="730" height="552" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="UNINFECTED">
+            <eqn>49999</eqn>
+            <outflow>New_Infections</outflow>
+            <non_negative />
+            <display x="150" y="250" color="blue" />
+        </stock>
+        <stock name="INFECTED">
+            <eqn>1</eqn>
+            <inflow>New_Infections</inflow>
+            <non_negative />
+            <display x="290" y="250" color="blue" />
+        </stock>
+        <flow name="New_Infections">
+            <eqn>INFECTED*number_of_contacts*prob_contact_is_susceptible*prob_of_infection</eqn>
+            <non_negative />
+            <display x="220" y="250" color="blue" label_side="top">
+                <pts>
+                    <pt x="170" y="250" />
+                    <pt x="270" y="250" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="number_of_contacts">
+            <eqn>10</eqn>
+            <display x="150" y="300" color="blue" />
+        </aux>
+        <aux name="prob_of_infection">
+            <eqn>.1</eqn>
+            <display x="240" y="298" color="blue" />
+        </aux>
+        <aux name="prob_contact_is_susceptible">
+            <eqn>UNINFECTED/(INFECTED+UNINFECTED-1)</eqn>
+            <display x="190" y="350" color="blue" />
+        </aux>
+        <display page_width="730" page_height="552" page_rows="3" isee:converter_size="large" interval="DT">
+            <connector x="158" y="290" uid="0">
+                <from>number_of_contacts</from>
+                <to>New_Infections</to>
+            </connector>
+            <connector x="268" y="262" uid="1">
+                <from>INFECTED</from>
+                <to>New_Infections</to>
+            </connector>
+            <connector x="242" y="286" uid="2">
+                <from>prob_of_infection</from>
+                <to>New_Infections</to>
+            </connector>
+            <connector x="194" y="339" uid="3">
+                <from>prob_contact_is_susceptible</from>
+                <to>New_Infections</to>
+            </connector>
+            <connector x="294" y="265" uid="4">
+                <from>INFECTED</from>
+                <to>prob_contact_is_susceptible</to>
+            </connector>
+            <connector x="130" y="259" uid="5">
+                <from>UNINFECTED</from>
+                <to>prob_contact_is_susceptible</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="6">
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:24:09Z" cleared="true" time_precision="2" from="0" to="12" />
+            </stacked_container>
+            <pad_icon x="50" y="348" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="6" />
+            <text_box x="43" y="1" uid="7" color="red" font-family="Arial" font-size="18" font-weight="bold" text-align="center" padding="5" width="453" height="33">Building an Extended Epidemic Model</text_box>
+            <text_box x="6" y="29" uid="8" color="black" font-family="Arial" font-size="12" padding="5" width="565" height="170">A limitation of this model is that no INFECTED individual ever recovers.  Adapt this model to provide the following:&#x0D;1.  A pathway by which INFECTED individuals can recover with immunity to the disease.&#x0D;2.  A way you can define the length of time that INFECTED individuals remain ill.&#x0D;3.  A means to define a portion of the original population to be immune to the disease before the simulation begins.&#x0D;4.  A way to conveniently change the size of the total population&#x0D;&#x0D;When the model is built, click the &quot;Down&quot; button for instructions on exploring the new model.  A sample model was provided with the Instructor&apos;s materials.</text_box>
+            <button x="15" y="205" width="52" height="23" uid="9" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Down" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="model" x="0" y="192" />
+            </button>
+            <text_box x="27" y="404" uid="10" color="black" font-family="Arial" font-size="12" padding="5" width="542" height="138">Explore each of the new factors one at a time to begin.  For instance, what impact is there in the simulation results, as initial fraction of the population that is immune changes from 0, to .1, .2, .4. and .6?  What if duration of illness changes, say from 1 day to 10?  Does changing each of the original building blocks still have the same effect on the behavior of the model?&#x0D;&#x0D;Explore a number of factors and after each exploration, please consider (write answers for) the questions posed in the &quot;Debrief&quot; section.</text_box>
+            <button x="524" y="552" width="52" height="23" uid="11" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Up" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="model" x="0" y="0" />
+            </button>
+            <button x="458" y="552" width="59" height="23" uid="12" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Debrief" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="model" x="0" y="876" />
+            </button>
+            <text_box x="37" y="883" uid="13" color="red" font-family="Arial" font-size="18" font-weight="bold" text-align="center" padding="5" width="511" height="33">Extending the Basic Infection Model</text_box>
+            <text_box x="142" y="906" uid="14" color="red" font-family="Arial" font-size="14" font-weight="bold" text-align="center" padding="5" width="296" height="29">Debrief</text_box>
+            <text_box x="27" y="945" uid="15" color="black" font-family="Arial" font-size="12" padding="5" width="532" height="202">There were a multitude of experiments you could have pursued in this exercise.  Some parameter settings lead to rapid intense outbreaks of disease in which everyone eventually gets ill.  Some settings do not lead to any noticable outbreak of disease at all.  Some produce slow-to-develop, relatively minor outbreaks, which fizzle out before everyone is infected.  For any experiment, or set of related experiments, you carried out:&#x0D;&#x0D;•  Can you explain why the course(s) of the disease played out the way it (they) did?&#x0D;&#x0D;•  Can you identify a &quot;real world&quot; scenario for which your experiment represents a good model?</text_box>
+            <button x="524" y="1235" width="52" height="23" uid="16" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Back" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="model" x="0" y="0" />
+            </button>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="13" y="87" content="6" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

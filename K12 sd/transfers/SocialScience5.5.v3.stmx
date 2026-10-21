@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>SocialScience5.5.v3</name>
+        <uuid>22862d4b-34f7-4ec7-bc04-3025f8255198</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Days" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>100</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Stock_Value">
+            <eqn>1000</eqn>
+            <inflow>Value_Increase</inflow>
+            <outflow>Value_Decrease</outflow>
+            <non_negative />
+            <display x="198" y="115" color="black" />
+        </stock>
+        <flow name="Value_Increase">
+            <eqn>Stock_Value*Rate_of_Increase</eqn>
+            <non_negative />
+            <display x="126" y="114" color="black" label_side="top">
+                <pts>
+                    <pt x="75" y="114" />
+                    <pt x="178" y="114" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Rate_of_Increase">
+            <eqn>RANDOM(2,8)/365</eqn>
+            <display x="121" y="196" color="black" />
+        </aux>
+        <flow name="Value_Decrease">
+            <doc>The controller determines when the panic buying and value drop with take place.  When the controller is equal to 1, it takes place.</doc>
+            <eqn>(Stock_Value*Value_adjustment/365)+(IF(Controller=1)THEN(1000)ELSE(0))</eqn>
+            <non_negative />
+            <display x="286" y="114" color="black" label_side="top" label_angle="79">
+                <pts>
+                    <pt x="218" y="114" />
+                    <pt x="355" y="114" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Value_adjustment">
+            <eqn>Stock_Value</eqn>
+            <gf>
+                <xscale min="0" max="10000" />
+                <yscale min="0" max="16" />
+                <ypts>0,0,0.16,0.16,0.47999999999999998,8,12.32,14.720000000000001,15.52,15.76,15.68</ypts>
+            </gf>
+            <display x="290" y="190" color="blue" />
+        </aux>
+        <aux name="Random_number_generator">
+            <doc>This random number generator will randomly generate a number between 0 and 20 every DT.</doc>
+            <eqn>RANDOM(0,20)</eqn>
+            <display x="352" y="306" color="blue" />
+        </aux>
+        <stock name="Controller">
+            <doc>This stock is initially zero.  It is changed two ways.  It will remain zero until the random number generator yields a result &gt;19.  At that point, the flow will increase the value by one.  One the value is 1, the stock will pass information to the flow telling it to increase the stock by 2 each DT.  The value 1 triggers the panic selling, dropping price.</doc>
+            <eqn>0</eqn>
+            <inflow>Actuator</inflow>
+            <non_negative />
+            <display x="486" y="244" color="blue" />
+        </stock>
+        <flow name="Actuator">
+            <doc>If the Random number generator yields a value greater than 19, this flow will have a value 1.  If the controller has a value greater than or equal to 1, the flow will have a value of 2.  Otherwise, it will have a value of 0.</doc>
+            <eqn>IF(Random_number_generator&gt;19)THEN(1)ELSE(IF(Controller&gt;=1)THEN(2)ELSE(0))</eqn>
+            <non_negative />
+            <display x="425" y="245" color="blue">
+                <pts>
+                    <pt x="385" y="245" />
+                    <pt x="466" y="245" />
+                </pts>
+            </display>
+        </flow>
+        <display page_width="595" page_height="775" isee:converter_size="medium" interval="DT">
+            <connector x="176" y="121" uid="0">
+                <from>Stock_Value</from>
+                <to>Value_Increase</to>
+            </connector>
+            <connector x="122" y="187" uid="1">
+                <from>Rate_of_Increase</from>
+                <to>Value_Increase</to>
+            </connector>
+            <connector x="218" y="127" uid="2">
+                <from>Stock_Value</from>
+                <to>Value_adjustment</to>
+            </connector>
+            <connector x="292" y="182" uid="3">
+                <from>Value_adjustment</from>
+                <to>Value_Decrease</to>
+            </connector>
+            <connector x="220" y="119" uid="4">
+                <from>Stock_Value</from>
+                <to>Value_Decrease</to>
+            </connector>
+            <connector x="357" y="298" uid="5">
+                <from>Random_number_generator</from>
+                <to>Actuator</to>
+            </connector>
+            <connector x="464" y="249" uid="6">
+                <from>Controller</from>
+                <to>Actuator</to>
+            </connector>
+            <connector x="464" y="232" uid="7">
+                <from>Controller</from>
+                <to>Value_Decrease</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="8">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:50:23Z" cleared="true" time_precision="0" from="0" to="100">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <scale min="0" max="10000" />
+                        <entity name="Stock_Value" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="286" y="39" width="26" height="22" color="black" label_side="bottom" label="Graph 1" type="graph" icon_of="8" />
+            <stacked_container height="286" width="465" uid="9">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="1" cleared="true" date_time="1997-07-17T21:44:16Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" precision="0.01" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Stock_Value" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Rate_of_Increase" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="207" y="37" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="9" />
+            <stacked_container height="286" width="465" uid="10">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="1" cleared="true" date_time="1997-07-17T21:44:17Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" precision="0.01" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Controller" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Actuator" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Random_number_generator" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="230" y="290" width="26" height="22" color="#008F44" label_side="bottom" label="Table 2" type="table" icon_of="10" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="788" page_height="528" home_page="0">
+            <simulation_delay>0.1</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="78" content="8" />
+        <popup x="16" y="78" content="9" />
+        <popup x="16" y="78" content="10" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

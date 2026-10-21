@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Mathematics5.6.v3</name>
+        <uuid>17c253c3-c1cf-48f4-b7f7-52f5b5c10e9c</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="RK4" time_units="Months" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>25</stop>
+        <dt>0.1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Number_of_Fish">
+            <eqn>100</eqn>
+            <inflow>Change_in_Number_of_fish</inflow>
+            <non_negative />
+            <display x="188" y="108" color="blue" />
+        </stock>
+        <flow name="Change_in_Number_of_fish">
+            <eqn>Rate*(Carrying_Capacity-Number_of_Fish)*Number_of_Fish</eqn>
+            <display x="125" y="105" color="blue">
+                <pts>
+                    <pt x="82" y="105" />
+                    <pt x="168" y="105" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Rate">
+            <eqn>.37/1000</eqn>
+            <display x="49" y="170" color="blue" />
+        </aux>
+        <aux name="Carrying_Capacity">
+            <eqn>1000</eqn>
+            <display x="265" y="173" color="blue" />
+        </aux>
+        <display page_width="595" page_height="775" isee:converter_size="medium" interval="DT">
+            <connector x="52" y="161" uid="0">
+                <from>Rate</from>
+                <to>Change_in_Number_of_fish</to>
+            </connector>
+            <connector x="166" y="113" uid="1">
+                <from>Number_of_Fish</from>
+                <to>Change_in_Number_of_fish</to>
+            </connector>
+            <connector x="257" y="170" uid="2">
+                <from>Carrying_Capacity</from>
+                <to>Change_in_Number_of_fish</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="3">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:46:19Z" cleared="true" time_precision="0" from="0" to="25">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <scale min="0" max="1200" />
+                        <entity name="Number_of_Fish" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="366" y="79" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="3" />
+            <stacked_container height="286" width="465" uid="4">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="0.1" cleared="true" date_time="1997-07-18T19:06:50Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" precision="0.01" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Number_of_Fish" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="296" y="78" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="4" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="788" page_height="528" home_page="0">
+            <simulation_delay>0.1</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="78" content="3" />
+        <popup x="16" y="78" content="4" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

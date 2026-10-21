@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>lesson1v9</name>
+        <uuid>d05ff1c8-e616-41e5-a591-18f5654b2257</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Weeks" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>8</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="1334" height="630" />
+        <isee:security />
+        <isee:print_setup width="595" height="744" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="stock">
+            <eqn>500</eqn>
+            <non_negative />
+            <display x="159" y="73" color="black" />
+        </stock>
+        <stock name="savings">
+            <eqn>100</eqn>
+            <inflow>flow_in</inflow>
+            <non_negative />
+            <display x="200" y="198" color="blue" />
+        </stock>
+        <flow name="flow_in">
+            <eqn>13/4</eqn>
+            <non_negative />
+            <display x="155" y="196" color="blue">
+                <pts>
+                    <pt x="130" y="196" />
+                    <pt x="180" y="196" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="debt">
+            <eqn>65</eqn>
+            <outflow>flow_out</outflow>
+            <non_negative />
+            <display x="131" y="307" color="red" />
+        </stock>
+        <flow name="flow_out">
+            <eqn> 5</eqn>
+            <non_negative />
+            <display x="181" y="307" color="red">
+                <pts>
+                    <pt x="151" y="307" />
+                    <pt x="212" y="307" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="savings_2">
+            <eqn>50</eqn>
+            <inflow>allowance</inflow>
+            <inflow>salary</inflow>
+            <outflow>debt_pymt</outflow>
+            <non_negative />
+            <display x="195" y="438" color="black" />
+        </stock>
+        <flow name="allowance">
+            <eqn>14/4</eqn>
+            <non_negative />
+            <display x="154" y="444" color="black" label_side="top" label_angle="111">
+                <pts>
+                    <pt x="133" y="444" />
+                    <pt x="175" y="444" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="debt_pymt">
+            <eqn>5</eqn>
+            <non_negative />
+            <display x="251" y="443" color="black" label_side="top">
+                <pts>
+                    <pt x="215" y="443" />
+                    <pt x="288" y="443" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="salary">
+            <eqn>20</eqn>
+            <non_negative />
+            <display x="199" y="494" color="black" label_side="left" label_angle="177">
+                <pts>
+                    <pt x="199" y="535" />
+                    <pt x="199" y="453" />
+                </pts>
+            </display>
+        </flow>
+        <display page_width="595" page_height="744" isee:converter_size="large" interval="DT" scroll_x="24">
+            <stacked_container height="326" width="566" uid="0">
+                <graph type="time_series" title="Savings at age 13" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:48:25Z" cleared="true" time_precision="2" from="0" to="8">
+                    <plot index="0" pen_width="1" color="black" precision="0.01" show_y_axis="true">
+                        <entity name="savings" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="83" y="157" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="0" />
+            <stacked_container height="329" width="571" uid="1">
+                <graph type="time_series" title="debt graph in one year" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:48:25Z" cleared="true" time_precision="2" from="0" to="8">
+                    <plot index="0" pen_width="1" color="black" precision="0.01" show_y_axis="true">
+                        <entity name="debt" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="85" y="292" width="26" height="22" color="red" label_side="bottom" label="Graph 2" type="graph" icon_of="1" />
+            <stacked_container height="329" width="571" uid="2">
+                <graph type="time_series" title="Untitled Graph" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:48:25Z" cleared="true" time_precision="2" from="0" to="8">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="savings_2" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="85" y="425" width="26" height="22" color="black" label_side="bottom" label="Graph 3" type="graph" icon_of="2" />
+            <stacked_container height="524" width="352" uid="3">
+                <table font-size="9" background="#FFFFC9" column_width="100" orientation="vertical" interval="1" cleared="true" date_time="1993-09-21T19:45:36Z">
+                    <title>savings table at age 13</title>
+                    <item type="time" color="black" width="100" />
+                    <item color="black" precision="0.01" display_as="number" index="0">
+                        <entity name="savings" />
+                    </item>
+                    <item color="black" precision="0.01" display_as="number" index="1">
+                        <entity name="flow_in" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="84" y="213" width="26" height="22" color="blue" label_side="bottom" label="Table 1" type="table" icon_of="3" />
+            <stacked_container height="343" width="350" uid="4">
+                <table font-size="9" background="#FFFFC9" column_width="86" orientation="vertical" interval="1" cleared="true" date_time="1993-09-21T19:46:50Z">
+                    <title>debt in 13 months</title>
+                    <item type="time" color="black" width="100" />
+                    <item color="black" precision="0.01" display_as="number" index="0">
+                        <entity name="debt" />
+                    </item>
+                    <item color="black" precision="0.01" display_as="number" index="1">
+                        <entity name="flow_out" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="85" y="344" width="26" height="22" color="red" label_side="bottom" label="Table 2" type="table" icon_of="4" />
+            <stacked_container height="275" width="442" uid="5">
+                <table font-size="9" background="#FFFFC9" column_width="78" orientation="vertical" interval="1" cleared="true" date_time="2013-06-18T16:46:25Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="savings_2" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="allowance" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="debt_pymt" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="3">
+                        <entity name="salary" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="84" y="485" width="26" height="22" color="black" label_side="bottom" label="Table 3" type="table" icon_of="5" />
+            <text_box x="233" y="38" uid="6" color="black" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="303" height="81">This rectangle represents a quantity of something, which changes every iteration or time interval. Examples are population, money supply, amount of radioactive substance.</text_box>
+            <text_box x="234" y="139" uid="7" color="blue" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="306" height="106">The arrow flows into the savings.  This represents an amount of money that is added to the savings every iteration (time interval). &#x0D;Equation:  y  = mx + b where y = the stock of &quot;savings&quot;; &#x0D;b = initial value of &quot;savings&quot;; and m = value of &quot;flow in&quot; (representing a positive slope).</text_box>
+            <text_box x="235" y="273" uid="8" color="red" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="301" height="106">The arrow flows out of the debt.  This represents an amount of money that is paid which reduces your debt by the same amount every time period.  Now the equation is still y = mx + b but m is negative, shown by &quot;flow out &quot;(often called &quot;drain&quot; ) which really indicates subtraction. </text_box>
+            <text_box x="241" y="489" uid="9" color="black" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="259" height="84">This is a linear model of more complexity, but very understandable visually to our students.  It is ready for  values and then simulation (a run ).</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="1588" page_height="1128" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="116" content="0" />
+        <popup x="16" y="116" content="1" />
+        <popup x="16" y="116" content="2" />
+        <popup x="80" y="114" content="3" />
+        <popup x="45" y="120" content="4" />
+        <popup x="16" y="116" content="5" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

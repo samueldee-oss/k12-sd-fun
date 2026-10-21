@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Changesl.v5</name>
+        <uuid>60fd09b0-3dd5-4127-8b0f-87f684dbd36d</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="RK4" time_units="Seconds" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>10</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="interface" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="630" height="431" />
+        <isee:security />
+        <isee:print_setup width="576" height="731" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Velocity">
+            <eqn>0</eqn>
+            <scale min="-25" max="25" />
+            <inflow>Acceleration</inflow>
+            <display x="237" y="60" color="black">
+                <scale min="-25" max="25" />
+            </display>
+        </stock>
+        <flow name="Acceleration">
+            <eqn>0</eqn>
+            <display x="143" y="62" color="black">
+                <pts>
+                    <pt x="70" y="62" />
+                    <pt x="217" y="62" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Distance">
+            <eqn>100</eqn>
+            <scale min="-200" max="200" />
+            <inflow>Current_Velocity</inflow>
+            <display x="343" y="108" color="black" label_side="bottom">
+                <scale min="-200" max="200" />
+            </display>
+        </stock>
+        <flow name="Current_Velocity">
+            <eqn>Velocity</eqn>
+            <display x="259" y="113" color="black">
+                <pts>
+                    <pt x="195" y="113" />
+                    <pt x="323" y="113" />
+                </pts>
+            </display>
+        </flow>
+        <display page_width="576" page_height="731" isee:converter_size="large" interval="DT" scroll_y="12">
+            <connector x="243" y="77" uid="0" color="black">
+                <from>Velocity</from>
+                <to>Current_Velocity</to>
+            </connector>
+            <text_box x="-32767" y="-32767" uid="1" color="#7F00FF" font-family="Arial" font-size="9" padding="5" border-style="solid" border-width="thin" width="260" height="58">AST30522696</text_box>
+            <text_box x="-32767" y="-32767" uid="2" color="#7F00FF" font-family="Arial" font-size="9" padding="5" border-style="solid" border-width="thin" width="260" height="58">AST30522696</text_box>
+            <text_box x="-32767" y="-32767" uid="3" color="#7F00FF" font-family="Arial" font-size="9" padding="5" border-style="solid" border-width="thin" width="260" height="58">AST30522696</text_box>
+            <text_box x="-32767" y="-32767" uid="4" color="#7F00FF" font-family="Arial" font-size="9" padding="5" border-style="solid" border-width="thin" width="260" height="58">AST30522222</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_width="640" page_height="480">
+            <simulation_delay>0</simulation_delay>
+            <stacked_container x="1" y="2" height="253" width="456" uid="5">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:26:38Z" cleared="true" time_precision="2" from="0" to="10">
+                    <plot index="0" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <entity name="Distance" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="18" y="3" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="5" />
+            <knob x="50" y="333" color="blue" width="83" height="91" min="-200" max="200">
+                <entity name="Distance" />
+            </knob>
+            <knob x="140" y="333" color="red" width="83" height="91" min="-20" max="20">
+                <entity name="Velocity" />
+            </knob>
+            <slider x="292" y="310" label_side="bottom" isee:navigate_to="true" color="#7F00FF" width="197" height="43" min="-10" max="10">
+                <entity name="Acceleration" />
+            </slider>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

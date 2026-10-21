@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>EXTBASIN</name>
+        <uuid>697a98a3-42c5-45a5-81ce-a245b53dc38b</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Days" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>100</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="interface" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="624" height="430" />
+        <isee:security password="true" />
+        <isee:print_setup width="595" height="744" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="UNINFECTED">
+            <eqn>initial_population_size*(1-initial_fraction_immune)</eqn>
+            <outflow>New_Infections</outflow>
+            <non_negative />
+            <display x="100" y="200" color="blue" />
+        </stock>
+        <stock name="INFECTED">
+            <eqn>1</eqn>
+            <inflow>New_Infections</inflow>
+            <outflow>Recovery</outflow>
+            <non_negative />
+            <display x="240" y="200" color="blue" />
+        </stock>
+        <stock name="IMMUNE">
+            <eqn>initial_population_size*initial_fraction_immune</eqn>
+            <inflow>Recovery</inflow>
+            <non_negative />
+            <display x="380" y="200" color="blue" />
+        </stock>
+        <flow name="New_Infections">
+            <eqn>INFECTED*number_of_contacts*prob_contact_is_susceptible*prob_of_infection</eqn>
+            <non_negative />
+            <display x="170" y="200" color="blue" label_side="top">
+                <pts>
+                    <pt x="120" y="200" />
+                    <pt x="220" y="200" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Recovery">
+            <eqn>INFECTED/duration_of_illness_in_days</eqn>
+            <non_negative />
+            <display x="310" y="200" color="blue">
+                <pts>
+                    <pt x="260" y="200" />
+                    <pt x="360" y="200" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="number_of_contacts">
+            <eqn>10</eqn>
+            <display x="100" y="250" color="blue" />
+        </aux>
+        <aux name="prob_of_infection">
+            <eqn>.1</eqn>
+            <display x="190" y="248" color="blue" />
+        </aux>
+        <aux name="prob_contact_is_susceptible">
+            <eqn>UNINFECTED/(INFECTED+IMMUNE+UNINFECTED-1)</eqn>
+            <display x="140" y="300" color="blue" />
+        </aux>
+        <aux name="duration_of_illness_in_days">
+            <eqn>2</eqn>
+            <display x="300" y="150" color="blue" label_side="top" label_angle="77" />
+        </aux>
+        <aux name="initial_population_size">
+            <eqn>99999</eqn>
+            <display x="103" y="144" color="blue" label_side="top" label_angle="74" />
+        </aux>
+        <aux name="initial_fraction_immune">
+            <eqn>.4</eqn>
+            <display x="198" y="129" color="blue" />
+        </aux>
+        <display page_width="595" page_height="744" isee:converter_size="large" interval="DT">
+            <connector x="108" y="240" uid="0">
+                <from>number_of_contacts</from>
+                <to>New_Infections</to>
+            </connector>
+            <connector x="218" y="212" uid="1">
+                <from>INFECTED</from>
+                <to>New_Infections</to>
+            </connector>
+            <connector x="192" y="236" uid="2">
+                <from>prob_of_infection</from>
+                <to>New_Infections</to>
+            </connector>
+            <connector x="144" y="289" uid="3">
+                <from>prob_contact_is_susceptible</from>
+                <to>New_Infections</to>
+            </connector>
+            <connector x="244" y="215" uid="4">
+                <from>INFECTED</from>
+                <to>prob_contact_is_susceptible</to>
+            </connector>
+            <connector x="80" y="209" uid="5">
+                <from>UNINFECTED</from>
+                <to>prob_contact_is_susceptible</to>
+            </connector>
+            <connector x="262" y="216" uid="6">
+                <from>INFECTED</from>
+                <to>Recovery</to>
+            </connector>
+            <connector x="311" y="156" uid="7">
+                <from>duration_of_illness_in_days</from>
+                <to>Recovery</to>
+            </connector>
+            <connector x="374" y="215" uid="8">
+                <from>IMMUNE</from>
+                <to>prob_contact_is_susceptible</to>
+            </connector>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_rows="6" page_width="640" page_height="480" scroll_y="1102">
+            <simulation_delay>0</simulation_delay>
+            <stacked_container x="7" y="145" height="251" width="450" uid="9">
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:30:27Z" comparative="true" cleared="true" time_precision="2" from="0" to="100">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="IMMUNE" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:30:27Z" comparative="true" cleared="true" time_precision="2" from="0" to="100">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="INFECTED" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:30:27Z" comparative="true" cleared="true" time_precision="2" from="0" to="100">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="New_Infections" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="180" y="326" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="9" />
+            <slider x="109" y="65" label_angle="146" color="red" width="197" height="43" min="1" max="10" precision="1">
+                <entity name="duration_of_illness_in_days" />
+            </slider>
+            <slider x="412" y="64" label_angle="28" color="red" width="197" height="43" min="0" max="0.8" precision="0.01">
+                <entity name="initial_fraction_immune" />
+            </slider>
+            <slider x="259" y="22" label_side="right" label_angle="5" color="red" width="197" height="43" min="0" max="1e+006" precision="10000">
+                <entity name="initial_population_size" />
+            </slider>
+            <slider x="365" y="107" label_side="bottom" color="red" width="197" height="43" min="0" max="50" precision="1">
+                <entity name="number_of_contacts" />
+            </slider>
+            <slider x="168" y="107" label_side="bottom" color="red" width="197" height="43" min="0" max="1" precision="0.01">
+                <entity name="prob_of_infection" />
+            </slider>
+            <button x="489" y="268" width="66" height="33" uid="10" appearance="opaque" background="red" color="white" style="rounded" clicking_sound="false" label="Clear Graphs" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <menu_action>restore_graphs_tables</menu_action>
+            </button>
+            <button x="234" y="48" width="66" height="33" uid="11" appearance="opaque" background="red" color="white" style="rounded" clicking_sound="false" label="Reset Sliders" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <menu_action>restore_sliders</menu_action>
+            </button>
+            <button x="489" y="228" width="66" height="33" uid="12" appearance="opaque" background="red" color="white" style="rounded" clicking_sound="false" label="Run" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <menu_action>run</menu_action>
+            </button>
+            <button x="488" y="309" width="66" height="22" uid="13" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Intro" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="1102" />
+            </button>
+            <button x="490" y="338" width="66" height="22" uid="14" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Debrief" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="2212" />
+            </button>
+            <text_box x="35" y="1103" uid="15" color="red" font-family="Arial" font-size="18" font-weight="bold" text-align="center" padding="5" width="511" height="33">Extending the Basic Infection Model</text_box>
+            <text_box x="13" y="1127" uid="16" color="black" font-family="Arial" font-size="12" padding="5" width="562" height="154">All models are simplifications of some real system.  As such, they treat the reality selectively, focusing on certain aspects, consciously or unconsciously downplaying others.  As each model is developed and explored, the insights it provides suggest additional directions for analysis.  This basic model of a contagious disease is certainly no exception.  That model was designed to capture the essence of the spread of a disease.  As a first step into that process, however, it was greatly  simplified:  Well people get sick and stay sick!  End of story!  That actually was a good first step, but what happens to the dynamics of the system, if people actually get well after a time?  This model extends the initial model to allow that question to be explored.</text_box>
+            <graphics_frame x="7" y="1286" uid="17" width="222" height="177" border-color="#0CA0FF" fill="none">
+                <image width="235" height="172">data:image/png;base64,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</image>
+            </graphics_frame>
+            <text_box x="229" y="1279" uid="18" color="black" font-family="Arial" font-size="12" padding="5" width="343" height="154">To the left is the basic model with which we start.  Notice that once infected, there is no movement from that condition.&#x0D;&#x0D;Below is a slight modification of this model in which the INFECTED population recovers in a user-defined period of time.  Recovered individuals are now &quot;IMMUNE&quot; and no longer available to catch the disease nor to pass it on to others.</text_box>
+            <button x="488" y="1432" width="53" height="19" uid="19" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Down" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="1304" />
+            </button>
+            <graphics_frame x="213" y="1475" uid="20" width="371" height="218" border-color="#0CA0FF" fill="none">
+                <image width="379" height="228">data:image/png;base64,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</image>
+            </graphics_frame>
+            <button x="111" y="1468" width="66" height="22" uid="21" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Debrief" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="2208" />
+            </button>
+            <button x="9" y="1468" width="95" height="22" uid="22" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Control Panel" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="0" />
+            </button>
+            <text_box x="6" y="1526" uid="23" color="black" font-family="Arial" font-size="12" padding="5" width="209" height="122">Click any of the new building blocks to see its definition.  Click the &quot;Control Panel&quot; button to move to a screen that provides the means to explore the behavior of this extended model.</text_box>
+            <button x="15" y="1657" width="45" height="22" uid="24" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Up" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="1104" />
+            </button>
+            <button x="532" y="1549" width="42" height="31" uid="25" appearance="transparent" color="blue" style="square">
+                <popup x="-165" y="0" width="150" height="30" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">initial IMMUNE = 0</text_box>
+                </popup>
+            </button>
+            <button x="265" y="1493" width="25" height="26" uid="26" appearance="transparent" color="blue" style="rounded">
+                <popup x="-215" y="0" width="200" height="70" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">The slider allows you to define the total initial population (SUSCEPTIBLE + INFECTED + IMMUNE) to a wide range of values.</text_box>
+                </popup>
+            </button>
+            <button x="360" y="1479" width="25" height="26" uid="27" appearance="transparent" color="blue" style="rounded">
+                <popup x="-215" y="0" width="200" height="70" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">What proportion (0 - 1) of the total population is already immune to the disease when the simulation begins.</text_box>
+                </popup>
+            </button>
+            <button x="473" y="1565" width="25" height="26" uid="28" appearance="transparent" color="blue" style="rounded">
+                <popup x="-215" y="0" width="200" height="70" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">Recovery = INFECTED/duration of illness in days</text_box>
+                </popup>
+            </button>
+            <button x="460" y="1501" width="25" height="26" uid="29" appearance="transparent" color="blue" style="rounded">
+                <popup x="-215" y="0" width="200" height="70" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">How long (in days) does it take to recover from the disease and no longer be contagious?</text_box>
+                </popup>
+            </button>
+            <button x="476" y="185" width="90" height="31" uid="30" appearance="opaque" background="black" color="white" style="rounded" clicking_sound="false" label="Instructions" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <popup x="-465" y="0" width="450" height="300" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">This control panel provides the means to play a wide diversity of &quot;what-if&quot; games with a simple model of disease transmission.  This new model, presented in the introductory screens (click the &quot;Intro&quot; button), divides a population into three stocks: UNINFECTED, INFECTED, and IMMUNE.  You can control several features of this simulation with the sliders provided:&#x0D;•  &quot;initial population size&quot;&#x0D;•  &quot;duration of illness in days&quot;&#x0D;•&quot;initial fraction immune&quot; (this allocates the total population between UNINFECTED and IMMUNE; 1 individual always begins in INFECTED)&#x0D;• &quot;prob(ability) of infection&quot; (how likely is infection from any given contact?)&#x0D;• &quot;number of contacts&quot; (with how many individuals does each INFECTED come into contact?)&#x0D;&#x0D;There are three graphs provided on the Graph Pad; each is set up to run as a comparative graph so that subsequent runs can be plotted together for comparison.  Cllick the &quot;dogear&quot; in the lower left corner of the graph to move between the available graphs.&#x0D;&#x0D;Explore these factors one at a time to begin.  For instance, what impact is there in the simulation&apos;s results, as &quot;initial fraction immune&quot; changes from 0, to .1, .2, .4. and .6?  What if &quot;duration of illness in days&quot; changes?  Explore a number of factors and after each exploration, please consider (write answers for) the questions posed in the &quot;Debrief&quot; section.</text_box>
+                </popup>
+            </button>
+            <text_box x="33" y="2208" uid="31" color="red" font-family="Arial" font-size="18" font-weight="bold" text-align="center" padding="5" width="511" height="33">Extending the Basic Infection Model</text_box>
+            <text_box x="138" y="2232" uid="32" color="red" font-family="Arial" font-size="14" font-weight="bold" text-align="center" padding="5" width="296" height="27">Debrief</text_box>
+            <text_box x="23" y="2270" uid="33" color="black" font-family="Arial" font-size="12" padding="5" width="532" height="202">There were a multitude of experiments you could have pursued in this exercise.  Some parameter settings lead to rapid intense outbreaks of disease in which everyone eventually gets ill.  Some settings do not lead to any noticable outbreak of disease at all.  Some produce slow-to-develop, relatively minor outbreaks, which fizzle out before everyone is infected.  For any experiment, or set of related experiments, you carried out:&#x0D;&#x0D;•  Can you explain why the course(s) of the disease played out the way it(they) did?&#x0D;&#x0D;•  Can you identify a &quot;real world&quot; scenario for which your experiment represents a good model?</text_box>
+            <button x="225" y="2522" width="95" height="22" uid="34" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Control Panel" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="0" />
+            </button>
+            <button x="333" y="2520" width="66" height="22" uid="35" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Intro" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="1102" />
+            </button>
+            <text_box x="4" y="1288" uid="36" color="blue" font-family="Arial" font-size="9" text-align="center" padding="5" width="79" height="21">UNINFECTED</text_box>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

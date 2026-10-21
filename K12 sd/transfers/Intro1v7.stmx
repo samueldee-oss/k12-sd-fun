@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Intro1v7</name>
+        <uuid>d71dd81a-7f0a-4ab6-955f-547bdc00c257</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Hours" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>8</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="1008" height="667" />
+        <isee:security />
+        <isee:print_setup width="595" height="744" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="stock">
+            <eqn>3</eqn>
+            <non_negative />
+            <display x="131" y="110" color="blue" />
+        </stock>
+        <stock name="stock_2">
+            <eqn>3</eqn>
+            <inflow>flow</inflow>
+            <non_negative />
+            <display x="129" y="191" color="red" />
+        </stock>
+        <flow name="flow">
+            <eqn>1</eqn>
+            <non_negative />
+            <display x="88" y="197" color="red">
+                <pts>
+                    <pt x="67" y="197" />
+                    <pt x="109" y="197" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="savings">
+            <eqn>10</eqn>
+            <inflow>allowance</inflow>
+            <non_negative />
+            <display x="132" y="310" color="black" />
+        </stock>
+        <flow name="allowance">
+            <eqn>9</eqn>
+            <non_negative />
+            <display x="82" y="322" color="black">
+                <pts>
+                    <pt x="55" y="322" />
+                    <pt x="110" y="322" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="cookie_jar_contents">
+            <doc>The cookie jar started with 3 dozen cookies made at NOON one day.  Nathaniel eats 3 cookies every hour.  Mom is recording the change in the cookie jar from noon to 8pm that night.</doc>
+            <eqn>36</eqn>
+            <outflow>cookies_eaten</outflow>
+            <non_negative />
+            <display x="120" y="434" color="blue" />
+        </stock>
+        <flow name="cookies_eaten">
+            <eqn>3</eqn>
+            <non_negative />
+            <display x="181" y="432" color="blue">
+                <pts>
+                    <pt x="142" y="432" />
+                    <pt x="221" y="432" />
+                </pts>
+            </display>
+        </flow>
+        <display page_width="595" page_height="744" isee:converter_size="large" interval="DT">
+            <stacked_container height="348" width="602" uid="0">
+                <graph type="time_series" title="cookie graph" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:46:25Z" cleared="true" time_precision="2" from="0" to="8">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="40" />
+                        <entity name="cookie_jar_contents" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <entity name="cookies_eaten" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="284" y="531" width="26" height="22" color="blue" label_side="bottom" label="Graph 1" type="graph" icon_of="0" />
+            <stacked_container height="233" width="301" uid="1">
+                <table font-size="9" background="#FFFFC9" column_width="96" orientation="vertical" interval="1" cleared="true" date_time="1997-03-27T13:21:16Z">
+                    <title>cookies</title>
+                    <item type="time" color="black" width="62" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="cookie_jar_contents" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="cookies_eaten" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="233" y="532" width="26" height="22" color="blue" label_side="bottom" label="Table 1" type="table" icon_of="1" />
+            <text_box x="265" y="86" uid="2" color="blue" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="262" height="42">This is a STOCK.  It holds an amount of something (in this case 3 units).</text_box>
+            <text_box x="265" y="174" uid="3" color="red" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="263" height="58">This is a STOCK with something flowing into it.  Each time increment the same amount (in this case, 1 unit) will be added to the stock.</text_box>
+            <text_box x="265" y="282" uid="4" color="black" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="266" height="58">The STOCK here is someone&apos;s SAVINGS.  An allowance will be added each time period (maybe each week, maybe each month).</text_box>
+            <text_box x="261" y="397" uid="5" color="blue" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="297" height="106">This is a LINEAR model with STOCK and DRAIN (or FLOW OUT).  This time the total number of cookies in the cookie jar will get reduced (a subtraction by some number of cookies eaten each time period-maybe each day, maybe each hour!)</text_box>
+            <text_box x="52" y="568" uid="6" color="blue" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="441" height="74"> Table 1 and  Graph 1 show the results of &quot;running the cookie model&quot;  which is like &quot;activating the system&quot; (if we think of this as a simple system). This is a &quot;simulation&quot; of a linear model (thus the linear graph).  The table illustrates the arithmetic sequence that is the foundation for a linear graph.</text_box>
+            <text_box x="84" y="5" uid="7" color="#008F44" font-family="Arial" font-size="14" font-weight="bold" text-align="center" padding="5" width="402" height="44">CLASSROOM DEMONSTRATIONS TO PREPARE FOR STELLA MODELING IN THE COMPUTER LAB</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="1588" page_height="1128" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="13" y="112" content="0" />
+        <popup x="13" y="112" content="1" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

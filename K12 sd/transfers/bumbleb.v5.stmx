@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>bumbleb.v5</name>
+        <uuid>7d591f3f-6403-46bd-b1a2-050e3bf5e9f1</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Time" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>12</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="false" layer="map" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="785" height="529" />
+        <isee:security />
+        <isee:print_setup width="582" height="762" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Position_Bee_1">
+            <eqn> { Place initial value here... }</eqn>
+            <inflow>Velocity_1</inflow>
+            <non_negative />
+            <display x="183" y="150" color="blue" />
+        </stock>
+        <flow name="Velocity_1">
+            <eqn> { Place right hand side of equation here... }</eqn>
+            <non_negative />
+            <display x="132" y="146" color="blue">
+                <pts>
+                    <pt x="101" y="146" />
+                    <pt x="163" y="146" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Position_Bee_2">
+            <eqn> { Place initial value here... }</eqn>
+            <inflow>Velocity_2</inflow>
+            <non_negative />
+            <display x="384" y="149" color="blue" />
+        </stock>
+        <flow name="Velocity_2">
+            <eqn> { Place right hand side of equation here... }</eqn>
+            <non_negative />
+            <display x="335" y="148" color="blue">
+                <pts>
+                    <pt x="306" y="148" />
+                    <pt x="364" y="148" />
+                </pts>
+            </display>
+        </flow>
+        <display page_width="582" page_height="762" isee:converter_size="large" interval="DT">
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

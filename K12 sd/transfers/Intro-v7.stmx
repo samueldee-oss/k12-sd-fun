@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Intro-v7</name>
+        <uuid>eff0df09-3b3e-484d-a6b8-7913c7c52f4a</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Time" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>8</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="644" height="663" />
+        <isee:security />
+        <isee:print_setup width="595" height="744" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" show_pages="true" />
+    <model>
+        <stock name="MILES_WALKED">
+            <eqn>0&#x0D;{Total miles walked; zero miles had been walked at the start of the simulation}</eqn>
+            <inflow>Miles_Walked_per_Hour</inflow>
+            <non_negative />
+            <display x="231" y="210" color="blue" />
+        </stock>
+        <flow name="Miles_Walked_per_Hour">
+            <eqn>3&#x0D;{Miles per hour}</eqn>
+            <non_negative />
+            <display x="152" y="220" color="blue">
+                <pts>
+                    <pt x="95" y="220" />
+                    <pt x="209" y="220" />
+                </pts>
+            </display>
+        </flow>
+        <display show_pages="true" page_width="595" page_height="744" isee:converter_size="large" interval="DT">
+            <stacked_container x="45" y="308" height="282" width="492" uid="0">
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:46:20Z" cleared="true" time_precision="2" from="0" to="8">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <scale min="0" max="40" />
+                        <entity name="MILES_WALKED" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="217" y="374" width="26" height="22" color="fuchsia" label_side="bottom" label="Graph 1" type="graph" icon_of="0" />
+            <text_box x="115" y="5" uid="1" color="#7F00FF" font-family="Arial" font-size="14" font-weight="bold" text-align="center" padding="5" width="314" height="78">LINEAR MODELS IN STELLA II&#x0D;Fisher and Rogers, 1992&#x0D;Answer Key for Introductory Scenario</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface show_pages="true" page_cols="0" page_rows="0" page_width="1588" page_height="1128" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Deforest.v5</name>
+        <uuid>69271c44-655f-444e-8e71-e0022220c966</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="RK4" time_units="Years" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>300</stop>
+        <dt>0.1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="785" height="548" />
+        <isee:security />
+        <isee:print_setup width="613" height="811" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" show_documentation="true" show_pages="true" />
+    <model>
+        <stock name="Seedlings">
+            <doc>This stock represents the number of trees which are under five years old and are susceptible to animal consumption.  The value was derived by multiplying the current Oregon harvestable tree population (385,000,000) by ten percent.  The percent used was determined by dividing the seedling lifespan (5 years) by the total lifespan of a harvestable tree from germination to harvesting (50 years).</doc>
+            <eqn>38500000 {Trees}</eqn>
+            <inflow>Regeneration</inflow>
+            <outflow>Seedling_Survivors</outflow>
+            <outflow>Animal_Consumption</outflow>
+            <display x="171" y="52" color="#7F00FF" />
+        </stock>
+        <stock name="Saplings">
+            <doc>This stock represents the number of trees currently in &quot;adolescence;&quot; that is that they are no longer subjects of animal consumption, but have not reached a harvestable maturity.  The value was derived by multiplying the current Oregon population of harvestable trees (385,000,000) by forty percent.  The percent used was determined by dividing the sapling lifespan (20 years) by the total lifespan of a  harvestable tree from germination to harvesting (50 years).</doc>
+            <eqn>154000000 {Trees}</eqn>
+            <inflow>Seedling_Survivors</inflow>
+            <outflow>Matured_Trees</outflow>
+            <display x="331" y="123" color="#7F00FF" />
+        </stock>
+        <stock name="Harvestable_Trees">
+            <doc>This stock represents the current number of trees that have reached harvestable maturity.  The value was derived by multiplying the current Oregon harvestable tree population (385,000,000) by fifty percent.  The percent was determined by dividing the lifespan of a mature, harvestable tree (25 years) by the total lifespan of a harvestable tree from germination to harvesting (50 years).</doc>
+            <eqn>192500000 {Trees}</eqn>
+            <inflow>Matured_Trees</inflow>
+            <outflow>Harvested_Trees</outflow>
+            <outflow>Natural_Deaths</outflow>
+            <display x="429" y="163" color="#7F00FF" />
+        </stock>
+        <flow name="Regeneration">
+            <doc>This inflow represents the number of seedlings that survive the initial manual planting every year.  The equation was determined by multiplying the survival rate of manually planted trees (0.5) by the number of seedlings planted during the year.</doc>
+            <eqn>Trees_Planted*Planted_Tree_Survival_Rate {Trees/Year}</eqn>
+            <non_negative />
+            <display x="107" y="52" color="#7F00FF">
+                <pts>
+                    <pt x="64" y="52" />
+                    <pt x="151" y="52" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Seedling_Survivors">
+            <doc>This flow represents the number of seedlings that survive their first five years of life and move on to the sapling stage.  The equation was derived by subtracting the number of trees eaten by animals per year from the total stock, and then multiplying the remaining seedlings by the reciprocal of the time it takes for the seedling period to begin (5 years). </doc>
+            <eqn>(Seedlings-Animal_Consumption)*(1/Seedling_Lifespan) {Trees/Year}</eqn>
+            <non_negative />
+            <display x="239" y="121" color="#7F00FF">
+                <pts>
+                    <pt x="168" y="67" />
+                    <pt x="168" y="121" />
+                    <pt x="311" y="121" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Matured_Trees">
+            <doc>This flow represents the number of saplings that reach harvestable maturity each year.  The equation was created by multiplying the current population of saplings by the reciprocal of the period of time required for proper growth to occur.</doc>
+            <eqn>Saplings*(1/Maturing_Period) {Trees/Year}</eqn>
+            <non_negative />
+            <display x="371" y="166" color="#7F00FF">
+                <pts>
+                    <pt x="334" y="138" />
+                    <pt x="334" y="166" />
+                    <pt x="409" y="166" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Maturing_Period">
+            <doc>This converter represents the number of years it takes for a sapling  to mature to an age when it can be harvested.  The value was derived from our expert Chris Tercek.</doc>
+            <eqn>20 {1/Years}</eqn>
+            <display x="320" y="230" color="#7F00FF" label_angle="280" />
+        </aux>
+        <flow name="Harvested_Trees">
+            <doc>This flow represents the number of trees that are harvested for human consumption every year.  The equation was created by multiplying the current population of harvestable trees by the annual rate of harvesting for the state of Oregon.</doc>
+            <eqn>Harvestable_Trees*Harvesting_Rate {Trees/Year}</eqn>
+            <non_negative />
+            <display x="508" y="233" color="#7F00FF">
+                <pts>
+                    <pt x="434" y="178" />
+                    <pt x="434" y="233" />
+                    <pt x="582" y="233" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Natural_Deaths">
+            <doc>This flow represents the number of harvestable trees that perish every year due to old age.  The equation was created by multiplying the current Harvestable Tree population by the inverse of its lifespan, which divides the population into age groups, removing the eldest trees every time unit.</doc>
+            <eqn>Harvestable_Trees*(1/Natural_Lifespan) {Trees/Year}</eqn>
+            <non_negative />
+            <display x="515" y="162" color="#7F00FF">
+                <pts>
+                    <pt x="449" y="162" />
+                    <pt x="581" y="162" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Natural_Lifespan">
+            <doc>This converter represents the lifespan of Douglas Firs in Oregon.  This value was provided by Chris Tercek.</doc>
+            <eqn>550 {Years}</eqn>
+            <display x="552" y="135" color="#7F00FF" label_side="top" label_angle="100" />
+        </aux>
+        <aux name="Trees_Planted">
+            <doc>This converter represents the number of trees that are planted in harvestable Oregon forests every year manually.  The equation was created by multiplying the number of harvested trees in the current year by the number of seedlings that are planted per tree harvested.</doc>
+            <eqn>Harvested_Trees*Manual_Regeneration {Trees/Year}</eqn>
+            <display x="158" y="212" color="#7F00FF" />
+        </aux>
+        <aux name="Manual_Regeneration">
+            <doc>This converter represents the number of seedlings that are planted manually for every mature tree that is harvested, based on Oregon&apos;s replanting policy.  Chris Tercek supplied the information for this value.</doc>
+            <eqn>4 {No units}</eqn>
+            <display x="80" y="186" color="#7F00FF" />
+        </aux>
+        <flow name="Animal_Consumption">
+            <doc>This flow represents the number of seedlings that are consumed by animals every year.  The equation was created by multiplying the current population of seedlings by the rate at which animals consume the plants.</doc>
+            <eqn>Seedlings*Consumption_Rate{trees per year}</eqn>
+            <non_negative />
+            <display x="243" y="50" color="#7F00FF">
+                <pts>
+                    <pt x="191" y="50" />
+                    <pt x="295" y="50" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Harvesting_Rate">
+            <doc>This converter represents the annual rate at which harvestable trees are cut down in the state of Orgeon.  Its value was determined by dividing the average number of trees harvested annually (2,000,000) by the total number of harvestable trees in the state (96,250,000).  Chris Tercek supplied the values.</doc>
+            <eqn>0.0208 {1/Year}</eqn>
+            <display x="567" y="277" color="#7F00FF" />
+        </aux>
+        <aux name="Consumption_Rate">
+            <doc>This converter represents the annual rate at which animals consume the seedling population.  The value was provided by our expert Chris Tercek.</doc>
+            <eqn>0.25 {1/Year}</eqn>
+            <display x="275" y="33" color="#7F00FF" label_side="top" label_angle="83" />
+        </aux>
+        <aux name="Planted_Tree_Survival_Rate">
+            <doc>This converter represents the rate at which manually distributed seedlings survive the initial planting.  Due to erosion and other environmental disturbances caused by clear-cutting, a large number of the seedlings die before reaching maturity.  The value was derived from our expert Chris Tercek.</doc>
+            <eqn>0.5 {1/Year}</eqn>
+            <display x="63" y="117" color="#7F00FF" label_angle="289" />
+        </aux>
+        <aux name="Seedling_Lifespan">
+            <doc>This converter represents the number of years required for seedlings to become resistant to animal consumption.  The value was supplied by our expert Chris Tercek.</doc>
+            <eqn>5 {Years}</eqn>
+            <display x="263" y="185" color="#7F00FF" />
+        </aux>
+        <display show_pages="true" page_width="613" page_height="811" isee:converter_size="large" interval="5">
+            <connector x="343" y="140" uid="0" color="#0CA0FF">
+                <from>Saplings</from>
+                <to>Matured_Trees</to>
+            </connector>
+            <connector x="544" y="144" uid="1" color="#0CA0FF">
+                <from>Natural_Lifespan</from>
+                <to>Natural_Deaths</to>
+            </connector>
+            <connector x="450" y="166" uid="2" color="#0CA0FF">
+                <from>Harvestable_Trees</from>
+                <to>Natural_Deaths</to>
+            </connector>
+            <connector x="162" y="201" uid="3" color="#0CA0FF">
+                <from>Trees_Planted</from>
+                <to>Regeneration</to>
+            </connector>
+            <connector x="92" y="183" uid="4" color="#0CA0FF">
+                <from>Manual_Regeneration</from>
+                <to>Trees_Planted</to>
+            </connector>
+            <connector x="500" y="237" uid="5" color="#0CA0FF">
+                <from>Harvested_Trees</from>
+                <to>Trees_Planted</to>
+            </connector>
+            <connector x="320" y="218" uid="6" color="#0CA0FF">
+                <from>Maturing_Period</from>
+                <to>Matured_Trees</to>
+            </connector>
+            <connector x="239" y="58" uid="7" color="#0CA0FF">
+                <from>Animal_Consumption</from>
+                <to>Seedling_Survivors</to>
+            </connector>
+            <connector x="173" y="69" uid="8" color="#0CA0FF">
+                <from>Seedlings</from>
+                <to>Seedling_Survivors</to>
+            </connector>
+            <connector x="264" y="38" uid="9" color="#0CA0FF">
+                <from>Consumption_Rate</from>
+                <to>Animal_Consumption</to>
+            </connector>
+            <connector x="193" y="57" uid="10" color="#0CA0FF">
+                <from>Seedlings</from>
+                <to>Animal_Consumption</to>
+            </connector>
+            <connector x="272" y="178" uid="11" color="#0CA0FF">
+                <from>Seedling_Lifespan</from>
+                <to>Seedling_Survivors</to>
+            </connector>
+            <connector x="64" y="105" uid="12" color="#0CA0FF">
+                <from>Planted_Tree_Survival_Rate</from>
+                <to>Regeneration</to>
+            </connector>
+            <connector x="560" y="267" uid="13" color="#0CA0FF">
+                <from>Harvesting_Rate</from>
+                <to>Harvested_Trees</to>
+            </connector>
+            <connector x="436" y="180" uid="14" color="#0CA0FF">
+                <from>Harvestable_Trees</from>
+                <to>Harvested_Trees</to>
+            </connector>
+            <stacked_container x="9" y="294" height="347" width="598" uid="15">
+                <graph type="time_series" title="Tree Pop" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:27:34Z" cleared="true" time_precision="2" from="0" to="300">
+                    <plot index="0" pen_width="1" color="#008F44" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="2e+008" />
+                        <entity name="Seedlings" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="2e+008" />
+                        <entity name="Saplings" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="2e+008" />
+                        <entity name="Harvestable_Trees" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:27:34Z" cleared="true" time_precision="2" from="0" to="300">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="Harvested_Trees" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <entity name="Matured_Trees" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <entity name="Natural_Deaths" />
+                    </plot>
+                    <plot index="3" pen_width="1" color="#008F44" precision="0.01" show_y_axis="true">
+                        <entity name="Regeneration" />
+                    </plot>
+                    <plot index="4" pen_width="1" color="#FF7F00" precision="0.01" show_y_axis="true">
+                        <entity name="Seedling_Survivors" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="67" y="240" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="15" />
+            <stacked_container height="424" width="535" uid="16">
+                <table font-size="9" background="white" column_width="103" orientation="vertical" interval="5" cleared="true" date_time="1999-04-06T10:37:55Z">
+                    <title>Tree Pop</title>
+                    <item type="time" color="black" width="50" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Seedlings" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Saplings" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Harvestable_Trees" />
+                    </item>
+                </table>
+                <table font-size="9" background="white" column_width="92" orientation="vertical" interval="5" cleared="true" date_time="1999-04-06T10:37:55Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" width="50" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Animal_Consumption" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Harvested_Trees" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Matured_Trees" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="3">
+                        <entity name="Natural_Deaths" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="4">
+                        <entity name="Regeneration" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="5">
+                        <entity name="Seedling_Survivors" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="6">
+                        <entity name="Trees_Planted" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="21" y="241" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Table 1" type="table" icon_of="16" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface show_pages="true" page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="256" y="165" content="16" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

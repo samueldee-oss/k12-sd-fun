@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>OscillationRungeKutta4.v5</name>
+        <uuid>dfcd9798-142f-473f-a561-f052254ea203</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="RK4" time_units="Time" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>16</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="817" height="572" />
+        <isee:security />
+        <isee:print_setup width="552" height="728" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Position">
+            <eqn>4</eqn>
+            <inflow>Rate_of_change_of_Position</inflow>
+            <display x="297" y="68" color="black" />
+        </stock>
+        <flow name="Rate_of_change_of_Position">
+            <eqn>Velocity</eqn>
+            <display x="200" y="65" color="black" label_side="top">
+                <pts>
+                    <pt x="123" y="65" />
+                    <pt x="277" y="65" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Velocity">
+            <eqn>0</eqn>
+            <inflow>Rate_of_Change_of_Velocity</inflow>
+            <display x="304" y="158" color="black" />
+        </stock>
+        <flow name="Rate_of_Change_of_Velocity">
+            <eqn>-(K/m)*Position</eqn>
+            <display x="205" y="157" color="black" label_side="top">
+                <pts>
+                    <pt x="126" y="157" />
+                    <pt x="284" y="157" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="K">
+            <eqn>20</eqn>
+            <display x="79" y="196" color="black" />
+        </aux>
+        <aux name="m">
+            <eqn>5</eqn>
+            <display x="132" y="232" color="black" />
+        </aux>
+        <display page_width="552" page_height="728" isee:converter_size="large" interval="DT">
+            <connector x="282" y="142" uid="0">
+                <from>Velocity</from>
+                <to>Rate_of_change_of_Position</to>
+            </connector>
+            <connector x="318" y="85" uid="1">
+                <from>Position</from>
+                <to>Rate_of_Change_of_Velocity</to>
+            </connector>
+            <connector x="90" y="191" uid="2">
+                <from>K</from>
+                <to>Rate_of_Change_of_Velocity</to>
+            </connector>
+            <connector x="139" y="222" uid="3">
+                <from>m</from>
+                <to>Rate_of_Change_of_Velocity</to>
+            </connector>
+            <stacked_container x="40" y="286" height="282" width="492" uid="4">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:02:37Z" cleared="true" time_precision="2" from="0" to="16">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="-4" max="4" />
+                        <entity name="Position" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="411" y="106" width="26" height="22" color="black" label_side="bottom" label="Graph 1" type="graph" icon_of="4" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

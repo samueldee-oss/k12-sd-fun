@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>ScienceModel5.1.v3</name>
+        <uuid>44f31a82-f57a-44c0-b802-efaf6cffde72</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Hours" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>12</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Bacteria">
+            <eqn>10</eqn>
+            <inflow>Bacteria_reproduction</inflow>
+            <non_negative />
+            <display x="213" y="75" color="black" />
+        </stock>
+        <flow name="Bacteria_reproduction">
+            <eqn>Bacteria*Bacteria_reproduction_rate</eqn>
+            <non_negative />
+            <display x="119" y="74" color="black" label_side="top" label_angle="101">
+                <pts>
+                    <pt x="45" y="74" />
+                    <pt x="193" y="74" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Bacteria_reproduction_rate">
+            <eqn>Growth_Limit-Bacteria</eqn>
+            <gf>
+                <xscale min="0" max="2000" />
+                <yscale min="0" max="1" />
+                <ypts>0,0.10000000000000001,0.20000000000000001,0.29999999999999999,0.40000000000000002,0.5,0.59999999999999998,0.69999999999999996,0.80000000000000004,0.90000000000000002,1</ypts>
+            </gf>
+            <display x="85" y="137" color="black" />
+        </aux>
+        <aux name="Growth_Limit">
+            <eqn>2000</eqn>
+            <display x="191" y="142" color="black" />
+        </aux>
+        <display page_width="595" page_height="775" isee:converter_size="medium" interval="DT">
+            <connector x="90" y="130" uid="0">
+                <from>Bacteria_reproduction_rate</from>
+                <to>Bacteria_reproduction</to>
+            </connector>
+            <connector x="191" y="78" uid="1">
+                <from>Bacteria</from>
+                <to>Bacteria_reproduction</to>
+            </connector>
+            <connector x="179" y="139" uid="2">
+                <from>Growth_Limit</from>
+                <to>Bacteria_reproduction_rate</to>
+            </connector>
+            <connector x="198" y="90" uid="3">
+                <from>Bacteria</from>
+                <to>Bacteria_reproduction_rate</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="4">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:49:16Z" cleared="true" time_precision="0" from="0" to="12">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <scale min="0" max="2000" />
+                        <entity name="Bacteria" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="344" y="73" width="26" height="22" color="black" label_side="bottom" label="Graph 1" type="graph" icon_of="4" />
+            <stacked_container height="286" width="465" uid="5">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="1" cleared="true" date_time="1997-09-28T18:28:30Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" precision="0.01" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Bacteria" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="344" y="125" width="26" height="22" color="black" label_side="bottom" label="Table 1" type="table" icon_of="5" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="788" page_height="528" home_page="0">
+            <simulation_delay>0.1</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="78" content="4" />
+        <popup x="16" y="78" content="5" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

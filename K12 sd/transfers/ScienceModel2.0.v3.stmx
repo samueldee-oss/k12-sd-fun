@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>ScienceModel2.0.v3</name>
+        <uuid>de55a7e8-a8af-40ff-b8f9-7b08ee583bc2</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Days" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>40</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Reservoir">
+            <eqn>1123 {million gallons of water}</eqn>
+            <outflow>Water_removed</outflow>
+            <non_negative />
+            <display x="122" y="72" color="blue" />
+        </stock>
+        <flow name="Water_removed">
+            <eqn>Pumping_Rate</eqn>
+            <non_negative />
+            <display x="215" y="67" color="blue" label_side="top" label_angle="101">
+                <pts>
+                    <pt x="142" y="67" />
+                    <pt x="289" y="67" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Pumping_Rate">
+            <eqn>34 {million gallons of water per day}</eqn>
+            <display x="218" y="137" color="blue" />
+        </aux>
+        <display page_width="595" page_height="775" isee:converter_size="medium" interval="DT">
+            <connector x="217" y="128" uid="0">
+                <from>Pumping_Rate</from>
+                <to>Water_removed</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="1">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:48:55Z" cleared="true" time_precision="0" from="0" to="40">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <scale min="0" max="1250" />
+                        <entity name="Reservoir" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="360" y="59" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="1" />
+            <stacked_container height="286" width="465" uid="2">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="1" cleared="true" date_time="1997-07-19T16:35:38Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" precision="0.01" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Reservoir" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="366" y="122" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="2" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="788" page_height="528" home_page="0">
+            <simulation_delay>0.1</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="78" content="1" />
+        <popup x="16" y="78" content="2" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

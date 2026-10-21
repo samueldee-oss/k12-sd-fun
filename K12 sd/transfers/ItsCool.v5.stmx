@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>ItsCool.v5</name>
+        <uuid>09f1a9ef-ea35-4cc3-a398-1f8c736ca163</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Minutes" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>30</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="785" height="529" />
+        <isee:security />
+        <isee:print_setup width="582" height="762" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Heat">
+            <eqn>95</eqn>
+            <outflow>Heat_Loss</outflow>
+            <non_negative />
+            <display x="206" y="128" color="blue" />
+        </stock>
+        <flow name="Heat_Loss">
+            <eqn>Cooling_Factors*Difference_in_Temperature</eqn>
+            <non_negative />
+            <display x="137" y="129" color="blue">
+                <pts>
+                    <pt x="186" y="129" />
+                    <pt x="88" y="129" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Temperature">
+            <eqn>Heat</eqn>
+            <display x="288" y="152" color="blue" />
+        </aux>
+        <aux name="Cooling_Factors">
+            <eqn>.08</eqn>
+            <display x="92" y="213" color="blue" />
+        </aux>
+        <aux name="Difference_in_Temperature">
+            <eqn>Temperature-Room_Temperature</eqn>
+            <display x="192" y="200" color="blue" />
+        </aux>
+        <aux name="Room_Temperature">
+            <eqn>25</eqn>
+            <display x="304" y="206" color="blue" />
+        </aux>
+        <display page_width="582" page_height="762" isee:converter_size="large" interval="DT">
+            <connector x="226" y="126" uid="0">
+                <from>Heat</from>
+                <to>Temperature</to>
+            </connector>
+            <connector x="92" y="201" uid="1">
+                <from>Cooling_Factors</from>
+                <to>Heat_Loss</to>
+            </connector>
+            <connector x="282" y="162" uid="2">
+                <from>Temperature</from>
+                <to>Difference_in_Temperature</to>
+            </connector>
+            <connector x="294" y="211" uid="3">
+                <from>Room_Temperature</from>
+                <to>Difference_in_Temperature</to>
+            </connector>
+            <connector x="181" y="196" uid="4">
+                <from>Difference_in_Temperature</from>
+                <to>Heat_Loss</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="5">
+                <graph type="time_series" title="Cooling" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:46:45Z" cleared="true" time_precision="2" from="0" to="30">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="100" />
+                        <entity name="Heat" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="100" />
+                        <entity name="Room_Temperature" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="147" y="299" width="26" height="22" color="fuchsia" label_side="bottom" label="Graph 1" type="graph" icon_of="5" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="13" y="112" visible="true" content="5" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

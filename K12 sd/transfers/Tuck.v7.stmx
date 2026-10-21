@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Tuck.v7</name>
+        <uuid>bfe05192-9c1f-4127-9b37-515e76c5a30b</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Years" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>1880</start>
+        <stop>2000</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="785" height="529" />
+        <isee:security />
+        <isee:print_setup width="583" height="763" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Treegap_Population">
+            <eqn>500</eqn>
+            <inflow>Births_per_Year</inflow>
+            <outflow>Deaths_per_Year</outflow>
+            <non_negative />
+            <display x="259" y="130" color="blue" />
+        </stock>
+        <flow name="Births_per_Year">
+            <eqn>Treegap_Population*Birth_Rate</eqn>
+            <non_negative />
+            <display x="194" y="128" color="blue">
+                <pts>
+                    <pt x="150" y="128" />
+                    <pt x="239" y="128" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Deaths_per_Year">
+            <eqn>Treegap_Population*Death_Rate</eqn>
+            <non_negative />
+            <display x="326" y="128" color="blue">
+                <pts>
+                    <pt x="279" y="128" />
+                    <pt x="374" y="128" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Birth_Rate">
+            <eqn>.06</eqn>
+            <display x="141" y="190" color="blue" />
+        </aux>
+        <aux name="Death_Rate">
+            <eqn>.04</eqn>
+            <display x="377" y="187" color="blue" />
+        </aux>
+        <display page_width="583" page_height="763" isee:converter_size="large" interval="DT">
+            <connector x="247" y="147" uid="0">
+                <from>Treegap_Population</from>
+                <to>Births_per_Year</to>
+            </connector>
+            <connector x="271" y="147" uid="1">
+                <from>Treegap_Population</from>
+                <to>Deaths_per_Year</to>
+            </connector>
+            <connector x="144" y="178" uid="2">
+                <from>Birth_Rate</from>
+                <to>Births_per_Year</to>
+            </connector>
+            <connector x="375" y="175" uid="3">
+                <from>Death_Rate</from>
+                <to>Deaths_per_Year</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="4">
+                <graph type="time_series" title="Treegap" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:15:29Z" cleared="true" time_precision="2" from="1880" to="2000">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="Treegap_Population" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="256" y="250" width="26" height="22" color="fuchsia" label_side="bottom" label="Graph 1" type="graph" icon_of="4" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="1588" page_height="1128" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="13" y="112" visible="true" content="4" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

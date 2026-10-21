@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Mathematics5.5.v3</name>
+        <uuid>d65667e0-76ff-4ecb-941a-35a5af8865aa</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="RK4" time_units="Minutes" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>12</stop>
+        <dt>0.1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Coffee_Temperature">
+            <eqn>170</eqn>
+            <inflow>Temperature_Change</inflow>
+            <non_negative />
+            <display x="216" y="100" color="blue" />
+        </stock>
+        <aux name="Air_Temperature">
+            <eqn>35</eqn>
+            <display x="274" y="178" color="blue" />
+        </aux>
+        <flow name="Temperature_Change">
+            <eqn>Rate_of_Change*(Air_Temperature-Coffee_Temperature)</eqn>
+            <display x="134" y="101" color="blue">
+                <pts>
+                    <pt x="73" y="101" />
+                    <pt x="196" y="101" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Rate_of_Change">
+            <eqn>.9</eqn>
+            <display x="124" y="185" color="blue" />
+        </aux>
+        <display page_width="595" page_height="775" isee:converter_size="medium" interval="DT">
+            <connector x="194" y="111" uid="0">
+                <from>Coffee_Temperature</from>
+                <to>Temperature_Change</to>
+            </connector>
+            <connector x="266" y="174" uid="1">
+                <from>Air_Temperature</from>
+                <to>Temperature_Change</to>
+            </connector>
+            <connector x="115" y="187" uid="2">
+                <from>Rate_of_Change</from>
+                <to>Temperature_Change</to>
+            </connector>
+            <stacked_container height="286" width="465" uid="3">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="0.1" cleared="true" date_time="1997-07-18T18:55:44Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" precision="0.01" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Coffee_Temperature" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="384" y="90" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="3" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="788" page_height="528" home_page="0">
+            <simulation_delay>0.1</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="78" content="3" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>II Linear Heat Loss</name>
+        <uuid>1a3362db-3821-457d-8bff-9bdcd2961f6a</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Minutes" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>60</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="1334" height="630" />
+        <isee:security />
+        <isee:print_setup width="595" height="744" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Heat_Available">
+            <doc>This value was chosen to meet the needs of the final model.</doc>
+            <eqn>210000&#x0D;{Joules}</eqn>
+            <outflow>Heat_Loss</outflow>
+            <non_negative />
+            <display x="170" y="137" color="blue" />
+        </stock>
+        <flow name="Heat_Loss">
+            <doc>This constant rate of heat loss will deplete the heat in the cup in slightly more than 1 hour.</doc>
+            <eqn>3000&#x0D;{Joules per minute}</eqn>
+            <non_negative />
+            <display x="265" y="132" color="blue" label_side="top" label_angle="85">
+                <pts>
+                    <pt x="190" y="132" />
+                    <pt x="340" y="132" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Coffee_Temperature">
+            <doc>This is a bit convoluted but it provides an initial energy content of the coffee (104,600 Joules) so that, when divided by the specific heat of water (4.184 Joules/gram * degree centigrade) and the massof 1 cup of coffee (250 grams), the initial temperature is 100 degrees centigrade.</doc>
+            <eqn>(Heat_Available - 105400)/(4.184*250)&#x0D;{Degrees centigrade}</eqn>
+            <display x="201" y="223" color="blue" />
+        </aux>
+        <aux name="Room_Temperature">
+            <doc>This is the conventional value for room temperature.</doc>
+            <eqn>25&#x0D;{degrees centigrade}</eqn>
+            <display x="361" y="223" color="blue" />
+        </aux>
+        <display page_width="595" page_height="744" isee:converter_size="large" interval="DT">
+            <connector x="163" y="152" uid="0">
+                <from>Heat_Available</from>
+                <to>Coffee_Temperature</to>
+            </connector>
+            <stacked_container x="44" y="284" height="282" width="492" uid="1">
+                <graph type="time_series" title="Untitled" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:45:38Z" cleared="true" time_precision="2" from="0" to="60">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="-50" max="100" />
+                        <entity name="Coffee_Temperature" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="-50" max="100" />
+                        <entity name="Room_Temperature" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="166" y="439" width="26" height="22" color="fuchsia" label_side="bottom" label="Graph 1" type="graph" icon_of="1" />
+            <text_box x="158" y="3" uid="2" color="#7F00FF" font-family="Arial" font-size="14" font-weight="bold" text-align="center" padding="5" width="261" height="61">COOLING COFFEE II&#x0D;Model to Accompany Powers&apos;&#x0D;II.  Linear Heat Loss&#x0D;</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="1588" page_height="1128" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

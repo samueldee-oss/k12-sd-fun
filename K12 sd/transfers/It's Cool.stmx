@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>It&apos;s Cool</name>
+        <uuid>25e13abe-1819-4e62-8f4b-5dfb030305cb</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="18" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Minutes" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>60</stop>
+        <dt>0.25</dt>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="interface" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="962" height="585" />
+        <isee:security />
+        <isee:print_setup width="576" height="768" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="module" />
+    <model>
+        <stock name="Heat_in_Water">
+            <eqn>90</eqn>
+            <outflow>Heat_escaping</outflow>
+            <non_negative />
+            <display x="452" y="268" color="blue" />
+        </stock>
+        <flow name="Heat_escaping">
+            <eqn>Effect_of__cooling_factors*Difference</eqn>
+            <display x="313" y="266" color="blue" label_side="top" label_angle="117">
+                <pts>
+                    <pt x="430" y="266" />
+                    <pt x="196" y="266" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Water_temperature">
+            <eqn>Heat_in_Water</eqn>
+            <display x="567" y="344" color="blue" />
+        </aux>
+        <aux name="Effect_of_\ncooling_factors">
+            <eqn>.05</eqn>
+            <display x="172" y="374" color="blue" />
+        </aux>
+        <aux name="Room_temperature">
+            <eqn>20</eqn>
+            <display x="530" y="440" color="blue" />
+        </aux>
+        <aux name="Difference">
+            <eqn>Water_temperature-Room_temperature</eqn>
+            <display x="371" y="372" color="blue" />
+        </aux>
+        <display page_width="576" page_height="768" page_cols="2" isee:converter_size="medium" isee:animate_flows="true" isee:animate_stocks="true" isee:animate_converters="true">
+            <connector x="474" y="269" uid="0">
+                <from>Heat_in_Water</from>
+                <to>Water_temperature</to>
+            </connector>
+            <connector x="177" y="367" uid="1">
+                <from>Effect_of__cooling_factors</from>
+                <to>Heat_escaping</to>
+            </connector>
+            <connector x="558" y="340" uid="2">
+                <from>Water_temperature</from>
+                <to>Difference</to>
+            </connector>
+            <connector x="524" y="435" uid="3">
+                <from>Room_temperature</from>
+                <to>Difference</to>
+            </connector>
+            <connector x="367" y="364" uid="4">
+                <from>Difference</from>
+                <to>Heat_escaping</to>
+            </connector>
+            <style font-family="Arial" font-size="18" />
+        </display>
+        <interface show_pages="true" page_cols="2" page_rows="2" page_width="1012" page_height="696" scroll_y="696" home_page="3">
+            <simulation_delay>0.1</simulation_delay>
+            <stacked_container x="96" y="45" height="282" width="492" uid="5">
+                <graph type="time_series" title="Cooling Experiment" background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" cleared="true" time_precision="2" from="0" to="60">
+                    <plot index="0" pen_width="3" color="blue" precision="1" show_y_axis="true">
+                        <scale min="0" max="100" />
+                        <entity name="Water_temperature" />
+                    </plot>
+                    <plot index="1" pen_width="3" color="red" precision="1" show_y_axis="true">
+                        <scale min="0" max="100" />
+                        <entity name="Room_temperature" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="194" y="230" width="26" height="22" color="#008F44" label_side="bottom" label="Graph 1" type="graph" icon_of="5" />
+            <stacked_container x="1072" y="74" height="286" width="465" uid="6">
+                <table font-size="9" background="#E0E0E0" column_width="96" orientation="vertical" interval="1" cleared="true" date_time="2010-12-01T14:55:14Z">
+                    <title>Cooling Experiment</title>
+                    <item type="time" color="black" precision="max" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Water_temperature" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Room_temperature" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="1112" y="233" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="6" />
+            <button x="1136" y="447" width="101" height="58" uid="7" appearance="opaque" background="black" color="white" style="square" label="Return to the graph" font-family="Arial" font-size="12" text-align="center">
+                <link target="previous_page" />
+            </button>
+            <button x="784" y="397" width="76" height="61" uid="8" appearance="opaque" background="black" color="white" style="rounded" label="See the table" font-family="Arial" font-size="12" text-align="center">
+                <link target="next_page" />
+            </button>
+            <knob x="335" y="437" color="black" width="83" height="91" min="0" max="40" precision="1">
+                <entity name="Room_temperature" value="24" />
+            </knob>
+            <knob x="123" y="437" color="black" width="83" height="91" min="0" max="100" precision="1">
+                <entity name="Heat_in_Water" value="83" />
+            </knob>
+            <slider x="727" y="295" color="lime" width="197" height="43" min="0.01" max="0.25" precision="0.01">
+                <entity name="Effect_of__cooling_factors" />
+            </slider>
+            <button x="436" y="402" width="93" height="66" uid="9" appearance="opaque" background="black" color="white" style="rounded" label="Run" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>run</menu_action>
+            </button>
+            <button x="592" y="400" width="125" height="67" uid="10" appearance="opaque" background="black" color="white" style="rounded" label="Restore Graphs &amp; Tables" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>restore_graphs_tables</menu_action>
+            </button>
+            <text_box x="620" y="127" uid="11" color="black" font-family="Arial" font-size="12" text-align="center" padding="5" border-style="solid" border-width="thin" width="244" height="104">Change the cooling factor effect and see what happens.  The higher the effect of the cooling factors, the slower the heat escapes.</text_box>
+            <button x="830" y="480" width="46" height="49" uid="12" appearance="opaque" background="black" color="white" style="rounded" icon="5">
+                <link target="home_page" isee:default_icon="true" />
+            </button>
+            <text_box x="171" y="755" uid="13" color="black" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="474" height="288">IT&apos;S COOL&#x0D;&#x0D;Heat flows from a higher temperature region to a lower temperature region.  An everyday example is the changing temperature of a hot liquid when it is left to cool. The rate at which this change happens depends on several factors.   In the activity &quot;It&apos;s Cool,&quot; the heat in a cup of hot water is allowed to escape while experimenters measure its temperature.  &#x0D;&#x0D;We can build a simple model to simulate that activity and experiment with some variables.  What happens when the difference between the temperature of the water and the temperature of the air in the room is large?  How about when the difference is small?  What does the behvior over time graph look like when the air is warmer than the water?  What is the effect of insulating the container with more efficient material?&#x0D;&#x0D;Go to the simulation and set the temperatures for the water and the air in the room.  The computer will graph what will happen over 60 minutes.  You can also change the &quot;cooling factors.&quot;  The beginning setting is programmed for a standard, uncovered cup or mug.</text_box>
+            <button x="347" y="1090" width="160" height="41" uid="14" appearance="opaque" background="black" color="white" style="square" label="Try the simulation" font-family="Arial" font-size="12" text-align="center">
+                <link target="interface" x="0" y="0" />
+            </button>
+            <button x="1542" y="453" width="49" height="51" uid="15" appearance="opaque" background="black" color="white" style="square" icon="5">
+                <link target="home_page" isee:default_icon="true" />
+            </button>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="18" />
+    </model>
+</xmile>

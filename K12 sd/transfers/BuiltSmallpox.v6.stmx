@@ -1,0 +1,671 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>BuiltSmallpox.v6</name>
+        <uuid>98829a4f-8cb9-455a-ac51-5e5a985436db</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="fortnights" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>520</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="interface" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="623" height="429" />
+        <isee:security password="true" />
+        <isee:print_setup width="730" height="552" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="SUSCEPTIBLE">
+            <eqn>initial_total_population * (1 - initial_fraction_immune)</eqn>
+            <inflow>Births</inflow>
+            <outflow>Become_Infected</outflow>
+            <outflow>Susceptible_Deaths</outflow>
+            <non_negative />
+            <display x="115" y="130" color="blue" label_angle="142" />
+        </stock>
+        <stock name="INFECTED_BUT_NOT_CONTAGIOUS">
+            <eqn>1</eqn>
+            <inflow>Become_Infected</inflow>
+            <outflow>Rash_Develops</outflow>
+            <non_negative />
+            <display x="243" y="130" color="blue" label_angle="57" />
+        </stock>
+        <flow name="Become_Infected">
+            <eqn>ILL_&amp;_CONTAGIOUS*number_of_contacts*prob_contact_is_susceptible*prob_of_infection</eqn>
+            <non_negative />
+            <display x="179" y="143" color="blue" label_side="top">
+                <pts>
+                    <pt x="135" y="143" />
+                    <pt x="223" y="143" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="number_of_contacts">
+            <eqn>60</eqn>
+            <display x="180" y="215" color="blue" />
+        </aux>
+        <aux name="prob_of_infection">
+            <eqn>.25</eqn>
+            <display x="237" y="198" color="blue" />
+        </aux>
+        <aux name="prob_contact_is_susceptible">
+            <eqn>SUSCEPTIBLE/(total_population-1)</eqn>
+            <display x="190" y="72" color="blue" label_side="top" label_angle="93" />
+        </aux>
+        <stock name="ILL_&amp;_CONTAGIOUS">
+            <eqn>0</eqn>
+            <inflow>Rash_Develops</inflow>
+            <outflow>Recover</outflow>
+            <outflow>Die_of_Smallpox</outflow>
+            <non_negative />
+            <display x="366" y="130" color="blue" label_angle="48" />
+        </stock>
+        <flow name="Rash_Develops">
+            <eqn>INFECTED_BUT_NOT_CONTAGIOUS</eqn>
+            <non_negative />
+            <display x="304" y="135" color="blue" label_side="top">
+                <pts>
+                    <pt x="263" y="135" />
+                    <pt x="346" y="135" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="IMMUNE">
+            <eqn>initial_total_population*initial_fraction_immune</eqn>
+            <inflow>Recover</inflow>
+            <outflow>Immune_Deaths</outflow>
+            <non_negative />
+            <display x="461" y="126" color="blue" />
+        </stock>
+        <stock name="DEAD_FROM_SMALLPOX">
+            <eqn>0</eqn>
+            <inflow>Die_of_Smallpox</inflow>
+            <non_negative />
+            <display x="335" y="244" color="blue" label_side="bottom" label_angle="279" />
+        </stock>
+        <flow name="Recover">
+            <eqn>ILL_&amp;_CONTAGIOUS*(1-smallpox_mortality_fract)</eqn>
+            <non_negative />
+            <display x="413" y="137" color="blue" label_side="top">
+                <pts>
+                    <pt x="386" y="137" />
+                    <pt x="441" y="137" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Die_of_Smallpox">
+            <eqn>ILL_&amp;_CONTAGIOUS*smallpox_mortality_fract</eqn>
+            <non_negative />
+            <display x="354" y="187" color="blue" label_side="left" label_angle="177">
+                <pts>
+                    <pt x="354" y="145" />
+                    <pt x="354" y="229" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="smallpox_mortality_fract">
+            <eqn>.3</eqn>
+            <display x="415" y="225" color="blue" label_angle="292" />
+        </aux>
+        <flow name="Births">
+            <eqn>birth_rate*childbearing_population</eqn>
+            <non_negative />
+            <display x="76" y="128" color="blue">
+                <pts>
+                    <pt x="58" y="128" />
+                    <pt x="95" y="128" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Susceptible_Deaths">
+            <eqn>SUSCEPTIBLE*birth_rate*.99</eqn>
+            <non_negative />
+            <display x="124" y="193" color="blue" label_side="left" label_angle="177">
+                <pts>
+                    <pt x="124" y="145" />
+                    <pt x="124" y="241" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Immune_Deaths">
+            <eqn>IMMUNE*birth_rate*.99</eqn>
+            <non_negative />
+            <display x="451" y="177" color="blue" label_angle="325">
+                <pts>
+                    <pt x="451" y="141" />
+                    <pt x="451" y="214" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="total_population">
+            <eqn>ILL_&amp;_CONTAGIOUS+IMMUNE+INFECTED_BUT_NOT_CONTAGIOUS+SUSCEPTIBLE</eqn>
+            <display x="381" y="378" color="blue" />
+        </aux>
+        <aux name="childbearing_population">
+            <eqn>IMMUNE+SUSCEPTIBLE</eqn>
+            <display x="60" y="283" color="blue" label_side="right" label_angle="9" />
+        </aux>
+        <aux name="birth_rate">
+            <eqn>annual_birth_rate/26</eqn>
+            <display x="28" y="94" color="blue" label_side="top" label_angle="74" />
+        </aux>
+        <aux name="initial_total_population">
+            <eqn>1000000</eqn>
+            <display x="76" y="382" color="blue" />
+        </aux>
+        <aux name="initial_fraction_immune">
+            <eqn>.2</eqn>
+            <display x="75" y="336" color="blue" />
+        </aux>
+        <aux name="annual_birth_rate">
+            <eqn>.03</eqn>
+            <display x="97" y="52" color="blue" label_side="left" label_angle="174" />
+        </aux>
+        <display page_width="730" page_height="552" isee:converter_size="large" interval="DT" scroll_y="32">
+            <connector x="176" y="204" uid="0">
+                <from>number_of_contacts</from>
+                <to>Become_Infected</to>
+            </connector>
+            <connector x="344" y="147" uid="1">
+                <from>ILL_&amp;_CONTAGIOUS</from>
+                <to>Become_Infected</to>
+            </connector>
+            <connector x="225" y="195" uid="2">
+                <from>prob_of_infection</from>
+                <to>Become_Infected</to>
+            </connector>
+            <connector x="178" y="73" uid="3">
+                <from>prob_contact_is_susceptible</from>
+                <to>Become_Infected</to>
+            </connector>
+            <alias x="265" y="65" uid="4">
+                <of>total_population</of>
+                <label_side>right</label_side>
+            </alias>
+            <connector x="117" y="115" uid="5">
+                <from>SUSCEPTIBLE</from>
+                <to>prob_contact_is_susceptible</to>
+            </connector>
+            <connector x="254" y="70" uid="6">
+                <from>
+                    <alias uid="4" />
+                </from>
+                <to>prob_contact_is_susceptible</to>
+            </connector>
+            <connector x="52" y="275" uid="7">
+                <from>childbearing_population</from>
+                <to>Births</to>
+            </connector>
+            <connector x="375" y="147" uid="8">
+                <from>ILL_&amp;_CONTAGIOUS</from>
+                <to>Die_of_Smallpox</to>
+            </connector>
+            <connector x="388" y="147" uid="9">
+                <from>ILL_&amp;_CONTAGIOUS</from>
+                <to>Recover</to>
+            </connector>
+            <connector x="415" y="213" uid="10">
+                <from>smallpox_mortality_fract</from>
+                <to>Die_of_Smallpox</to>
+            </connector>
+            <connector x="419" y="214" uid="11">
+                <from>smallpox_mortality_fract</from>
+                <to>Recover</to>
+            </connector>
+            <connector x="263" y="147" uid="12">
+                <from>INFECTED_BUT_NOT_CONTAGIOUS</from>
+                <to>Rash_Develops</to>
+            </connector>
+            <alias x="228" y="317" uid="13">
+                <of>SUSCEPTIBLE</of>
+            </alias>
+            <alias x="348" y="317" uid="14">
+                <of>INFECTED_BUT_NOT_CONTAGIOUS</of>
+            </alias>
+            <alias x="488" y="317" uid="15">
+                <of>ILL_&amp;_CONTAGIOUS</of>
+            </alias>
+            <alias x="228" y="361" uid="16">
+                <of>IMMUNE</of>
+                <label_side>bottom</label_side>
+                <label_angle>267</label_angle>
+            </alias>
+            <connector x="209" y="318" uid="17">
+                <from>
+                    <alias uid="13" />
+                </from>
+                <to>childbearing_population</to>
+            </connector>
+            <connector x="207" y="358" uid="18">
+                <from>
+                    <alias uid="16" />
+                </from>
+                <to>childbearing_population</to>
+            </connector>
+            <connector x="246" y="332" uid="19">
+                <from>
+                    <alias uid="13" />
+                </from>
+                <to>total_population</to>
+            </connector>
+            <connector x="347" y="332" uid="20">
+                <from>
+                    <alias uid="14" />
+                </from>
+                <to>total_population</to>
+            </connector>
+            <connector x="469" y="318" uid="21">
+                <from>
+                    <alias uid="15" />
+                </from>
+                <to>total_population</to>
+            </connector>
+            <connector x="248" y="373" uid="22">
+                <from>
+                    <alias uid="16" />
+                </from>
+                <to>total_population</to>
+            </connector>
+            <alias x="75" y="231" uid="23">
+                <of>birth_rate</of>
+            </alias>
+            <connector x="137" y="148" uid="24">
+                <from>SUSCEPTIBLE</from>
+                <to>Susceptible_Deaths</to>
+            </connector>
+            <connector x="480" y="143" uid="25">
+                <from>IMMUNE</from>
+                <to>Immune_Deaths</to>
+            </connector>
+            <connector x="36" y="103" uid="26">
+                <from>birth_rate</from>
+                <to>Births</to>
+            </connector>
+            <alias x="449" y="68" uid="27">
+                <of>birth_rate</of>
+                <label_side>top</label_side>
+                <label_angle>74</label_angle>
+            </alias>
+            <connector x="461" y="68" uid="28">
+                <from>
+                    <alias uid="27" />
+                </from>
+                <to>Immune_Deaths</to>
+            </connector>
+            <connector x="87" y="234" uid="29">
+                <from>
+                    <alias uid="23" />
+                </from>
+                <to>Susceptible_Deaths</to>
+            </connector>
+            <connector x="92" y="63" uid="30">
+                <from>annual_birth_rate</from>
+                <to>birth_rate</to>
+            </connector>
+            <stacked_container height="293" width="514" visible_index="1" uid="31">
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:25:05Z" cleared="true" time_precision="2" from="0" to="520">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="1e+006" />
+                        <entity name="SUSCEPTIBLE" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="1e+006" />
+                        <entity name="INFECTED_BUT_NOT_CONTAGIOUS" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="1e+006" />
+                        <entity name="ILL_&amp;_CONTAGIOUS" />
+                    </plot>
+                    <plot index="3" pen_width="1" color="#008F44" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="1e+006" />
+                        <entity name="IMMUNE" />
+                    </plot>
+                    <plot index="4" pen_width="1" color="#FF7F00" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="1e+006" />
+                        <entity name="DEAD_FROM_SMALLPOX" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="true" date_time="2025-02-04T09:25:05Z" comparative="true" cleared="true" time_precision="2" from="0" to="520">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="1.1e+006" />
+                        <entity name="total_population" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:25:05Z" cleared="true" time_precision="2" from="0" to="100">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="100000" />
+                        <entity name="Die_of_Smallpox" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="#FF7F00" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="100000" />
+                        <entity name="Susceptible_Deaths" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="100000" />
+                        <entity name="Immune_Deaths" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:25:05Z" cleared="true" time_precision="2" from="0" to="520">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="250000" />
+                        <entity name="Die_of_Smallpox" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="250000" />
+                        <entity name="Recover" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:25:05Z" cleared="true" time_precision="2" from="0" to="520">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="Births" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="true" date_time="2025-02-04T09:25:05Z" comparative="true" cleared="true" time_precision="2" from="0" to="520">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="DEAD_FROM_SMALLPOX" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="true" date_time="2025-02-04T09:25:05Z" comparative="true" cleared="true" time_precision="2" from="0" to="520">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="20000" />
+                        <entity name="Become_Infected" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="571" y="400" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="31" />
+            <stacked_container height="284" width="693" visible_index="2" uid="32">
+                <table font-size="9" background="#FFFE91" column_width="82" orientation="vertical" interval="0.25" cleared="true" date_time="2001-01-10T12:49:53Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" width="50" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Births" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Susceptible_Deaths" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Become_Infected" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="3">
+                        <entity name="Rash_Develops" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="4">
+                        <entity name="Die_of_Smallpox" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="5">
+                        <entity name="Immune_Deaths" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="6">
+                        <entity name="Recover" />
+                    </item>
+                </table>
+                <table font-size="9" background="#FFFE91" column_width="93" orientation="vertical" interval="0.25" cleared="true" date_time="2001-01-10T12:49:53Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="SUSCEPTIBLE" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="INFECTED_BUT_NOT_CONTAGIOUS" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="ILL_&amp;_CONTAGIOUS" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="3">
+                        <entity name="DEAD_FROM_SMALLPOX" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="4">
+                        <entity name="IMMUNE" />
+                    </item>
+                </table>
+                <table font-size="9" background="#FFFE91" column_width="101" orientation="vertical" interval="0.25" cleared="true" date_time="2001-01-10T12:49:53Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" width="67" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Become_Infected" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="INFECTED_BUT_NOT_CONTAGIOUS" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Rash_Develops" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="3">
+                        <entity name="ILL_&amp;_CONTAGIOUS" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="4">
+                        <entity name="Die_of_Smallpox" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="5">
+                        <entity name="Recover" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="570" y="349" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="32" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="4" page_rows="6" page_width="640" page_height="480">
+            <simulation_delay>0</simulation_delay>
+            <stacked_container x="8" y="1250" height="250" width="450" uid="33">
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:25:05Z" comparative="true" cleared="true" time_precision="2" from="0" to="520">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="400000" />
+                        <entity name="Become_Infected" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:25:05Z" comparative="true" cleared="true" time_precision="2" from="0" to="520">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="1.1e+006" />
+                        <entity name="total_population" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:25:05Z" comparative="true" cleared="true" time_precision="2" from="0" to="520">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="DEAD_FROM_SMALLPOX" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="218" y="1436" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="33" />
+            <text_box x="24" y="1" uid="34" color="red" font-family="Arial" font-size="18" font-weight="bold" text-align="center" padding="5" width="533" height="56">Exploring the Transmission of Smallpox &#x0D;within a Single Population</text_box>
+            <slider x="100" y="1169" color="blue" width="197" height="43" min="0" max="1e+006" precision="10000">
+                <entity name="initial_total_population" />
+            </slider>
+            <slider x="291" y="1169" color="blue" width="197" height="43" min="0" max="1" precision="0.01">
+                <entity name="initial_fraction_immune" />
+            </slider>
+            <slider x="482" y="1169" color="blue" width="197" height="43" min="0" max="0.06" precision="0.001">
+                <entity name="annual_birth_rate" />
+            </slider>
+            <slider x="100" y="1210" label_side="bottom" color="blue" width="197" height="43" min="0" max="200" precision="10">
+                <entity name="number_of_contacts" />
+            </slider>
+            <slider x="291" y="1210" label_side="bottom" color="blue" width="197" height="43" min="0" max="1" precision="0.1">
+                <entity name="prob_of_infection" />
+            </slider>
+            <slider x="482" y="1210" label_side="bottom" color="blue" width="197" height="43" min="0" max="1" precision="0.01">
+                <entity name="smallpox_mortality_fract" />
+            </slider>
+            <button x="486" y="353" width="89" height="32" uid="35" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Control Panel" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="1107" />
+            </button>
+            <button x="487" y="314" width="89" height="32" uid="36" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Model Structure" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="1464" y="0" />
+            </button>
+            <graphics_frame x="1472" y="1" uid="37" width="566" height="395" border-color="#0CA0FF" fill="none">
+                <image width="537" height="381">data:image/png;base64,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</image>
+            </graphics_frame>
+            <button x="1951" y="354" width="89" height="32" uid="38" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Control Panel" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="1106" />
+            </button>
+            <button x="1951" y="315" width="89" height="32" uid="39" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Introduction" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="0" />
+            </button>
+            <text_box x="1" y="62" uid="40" color="black" font-family="Arial" font-size="12" padding="5" width="584" height="250">Two of the fearsome aspects of smallpox outbreaks were 1) the great speed with which a large fraction of a community could be sickened and 2) the high number of deaths that could result from such an outbreak.  Yet, while smallpox was never a trivial concern, it often resulted in more benign outcomes than the decimation of a community that was possible.  &#x0D;&#x0D;Why did some outbreaks result in absolute catastrophes while others were much less severe?&#x0D;&#x0D;Why did some communities get hit exceptionally hard while others nearby in time and space saw little effect?&#x0D;&#x0D;Why were first experiences with smallpox likely to be much more severe than subsequent ones?&#x0D;&#x0D;This simulation provides some clues to answering those questions.</text_box>
+            <text_box x="24" y="318" uid="41" color="blue" font-family="Arial" font-size="12" padding="5" width="433" height="58">&quot;Model Structure&quot; will take you to an annotated illustration of the model that drives this simulation; &quot;Control Panel&quot; will take you to the screen where you can explore the behavior of that model.</text_box>
+            <text_box x="95" y="1107" uid="42" color="red" font-family="Arial" font-size="14" font-weight="bold" text-align="center" padding="5" width="405" height="29">Control Panel</text_box>
+            <button x="470" y="1381" width="108" height="20" uid="43" appearance="opaque" background="red" color="white" style="rounded" clicking_sound="false" label="Reset Sliders" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <menu_action>restore_sliders</menu_action>
+            </button>
+            <button x="467" y="1286" width="108" height="20" uid="44" appearance="opaque" background="black" color="white" style="rounded" clicking_sound="false" label="Instructions" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <popup x="-465" y="0" width="450" height="250" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">On this Control Panel we have provided you a Graph Pad with three comparative graph pages defined to capture:&#x0D;• the rate at which new infections take place,&#x0D;• the size of the total population, and&#x0D;• the total number of individulas who have died of smallpox.&#x0D;&#x0D;We also provide six sliders, each controlling one aspect of the disease transmission.  &#x0D;&#x0D;Please choose one of those six factors and explore how differing values can affect the dynamics of smallpox in this simulated population.  After each set of comparisons, please go to the &quot;Debrief&quot; sections and use those questions to guide your reflection on what the results of your experimentation have shown you about the transmission of disease.&#x0D;&#x0D;Then, move on to another factor (slider) to explore after clearing the graphs and resetting the sliders.</text_box>
+                </popup>
+            </button>
+            <button x="470" y="1328" width="108" height="20" uid="45" appearance="opaque" background="red" color="white" style="rounded" clicking_sound="false" label="Run" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <menu_action>run</menu_action>
+            </button>
+            <button x="470" y="1355" width="108" height="20" uid="46" appearance="opaque" background="red" color="white" style="rounded" clicking_sound="false" label="Clear Graphs" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <menu_action>restore_graphs_tables</menu_action>
+            </button>
+            <button x="485" y="1460" width="89" height="32" uid="47" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Debrief" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="2214" />
+            </button>
+            <button x="486" y="1421" width="89" height="32" uid="48" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Introduction" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="0" />
+            </button>
+            <button x="1579" y="86" width="41" height="32" uid="49" appearance="transparent" color="blue" style="square">
+                <popup x="49" y="0" width="300" height="75" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">initial SUSCEPTIBLE = initial total population * (1 - initial fraction immune)&#x0D;&#x0D;{both elements of this definition are accessible via sliders for manipulation}</text_box>
+                </popup>
+            </button>
+            <button x="1706" y="89" width="41" height="32" uid="50" appearance="transparent" color="blue" style="square">
+                <popup x="49" y="0" width="300" height="30" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">initial INFECTED BUT NOT CONTAGIOUS = 1&#x0D;&#x0D;</text_box>
+                </popup>
+            </button>
+            <button x="1830" y="87" width="41" height="32" uid="51" appearance="transparent" color="blue" style="square">
+                <popup x="-315" y="0" width="300" height="30" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">initial ILL &amp; CONTAGIOUS = 0</text_box>
+                </popup>
+            </button>
+            <button x="1926" y="84" width="41" height="32" uid="52" appearance="transparent" color="blue" style="square">
+                <popup x="-315" y="0" width="300" height="75" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">initial IMMUNE = initial total population * initial fraction immune&#x0D;&#x0D;{both elements of this definition are accessible via sliders for manipulation}&#x0D;&#x0D;</text_box>
+                </popup>
+            </button>
+            <button x="1799" y="201" width="41" height="32" uid="53" appearance="transparent" color="blue" style="square">
+                <popup x="49" y="0" width="300" height="30" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">initial DEAD FROM SMALLPOX = 0&#x0D;&#x0D;</text_box>
+                </popup>
+            </button>
+            <button x="1570" y="15" width="24" height="22" uid="54" appearance="transparent" color="blue" style="rounded">
+                <popup x="0" y="30" width="200" height="100" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">annual birth rate = 0.03&#x0D;&#x0D;{This implies that 3 babies are born to each 100 contributing individuals in the population.  You can change this value with a slider in the upper level.}</text_box>
+                </popup>
+            </button>
+            <button x="1501" y="56" width="24" height="22" uid="55" appearance="transparent" color="blue" style="rounded">
+                <popup x="32" y="0" width="300" height="100" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">birth rate = annual birth rate/26&#x0D;&#x0D;{RECALL:  the model runs with a 2-week time step, so that the annual birth rate needs to be divided by 26 in order to calculate the proper fortnightly rate.}</text_box>
+                </popup>
+            </button>
+            <button x="1549" y="104" width="24" height="22" uid="56" appearance="transparent" color="blue" style="rounded">
+                <popup x="32" y="0" width="300" height="100" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">Births = childbearing population * birth rate&#x0D;&#x0D;{This is a fairly straightforward exponential growth equation.}</text_box>
+                </popup>
+            </button>
+            <button x="1533" y="244" width="24" height="22" uid="57" appearance="transparent" color="blue" style="rounded">
+                <popup x="32" y="0" width="300" height="50" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">childbearing population = SUSCEPTIBLE + IMMUNE&#x0D;&#x0D;</text_box>
+                </popup>
+            </button>
+            <button x="1547" y="299" width="24" height="22" uid="58" appearance="transparent" color="blue" style="rounded">
+                <popup x="32" y="0" width="300" height="100" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">initial fraction immune = a value controlled by a slider on the upper level.  The default value is 0.20, indicating that 20% of the initial population, however big that might be, begins the simulation immune to smallpox.</text_box>
+                </popup>
+            </button>
+            <button x="1548" y="343" width="24" height="22" uid="59" appearance="transparent" color="blue" style="rounded">
+                <popup x="32" y="0" width="300" height="70" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">initial total population = a value controlled by a slider on the upper level.  The default value is 1,000,000, which is also the largest value permitted by the slider.</text_box>
+                </popup>
+            </button>
+            <button x="1662" y="33" width="24" height="22" uid="60" appearance="transparent" color="blue" style="rounded">
+                <popup x="32" y="0" width="300" height="70" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">prob contact is susceptible = SUSCEPTIBLE / ( total population -1)&#x0D;&#x0D;{This logic was developed in Biology Case 1}</text_box>
+                </popup>
+            </button>
+            <button x="1652" y="177" width="24" height="22" uid="61" appearance="transparent" color="blue" style="rounded">
+                <popup x="32" y="0" width="300" height="100" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">number of contacts = a value controlled by a slider on the upper level.  The default value is 60, indicating that, over a two week period, each ILL &amp; CONTAGIOUS individual will have sufficient contact with 60 other individuals to pass on the smallpox virus.</text_box>
+                </popup>
+            </button>
+            <button x="1709" y="159" width="24" height="22" uid="62" appearance="transparent" color="blue" style="rounded">
+                <popup x="32" y="0" width="300" height="100" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">prob of infection = a value controlled by a slider on the upper level.  The default value is 0.25, indicating that 25% of the time a SUSCEPTIBLE individual will be infected by contact with someone from the ILL &amp; CONTAGIOUS stock.</text_box>
+                </popup>
+            </button>
+            <button x="1651" y="122" width="24" height="22" uid="63" appearance="transparent" color="blue" style="rounded">
+                <popup x="32" y="0" width="300" height="100" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">Become Infected = ILL &amp; CONTAGIOUS * number of contacts * prob of infection * prob contact is susceptible&#x0D;&#x0D;{This was developed as part of Biology Case 1.}</text_box>
+                </popup>
+            </button>
+            <button x="1613" y="156" width="24" height="22" uid="64" appearance="transparent" color="blue" style="rounded">
+                <popup x="32" y="0" width="300" height="100" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">Susceptible Deaths = SUSCEPTIBLE * (birth rate * .99)&#x0D;&#x0D;{Apart from smallpox, folks die almost (99%) as quickly as new ones are born.}</text_box>
+                </popup>
+            </button>
+            <button x="1939" y="140" width="24" height="22" uid="65" appearance="transparent" color="blue" style="rounded">
+                <popup x="32" y="0" width="300" height="100" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">Immune Deaths = IMMUNE * (birth rate * .99)&#x0D;&#x0D;{Apart from smallpox, folks die almost (99%) as quickly as new ones are born.}</text_box>
+                </popup>
+            </button>
+            <button x="1777" y="114" width="24" height="22" uid="66" appearance="transparent" color="blue" style="rounded">
+                <popup x="-315" y="0" width="300" height="100" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">Rash Develops = INFECTED BUT NOT CONTAGIOUS&#x0D;&#x0D;{Folks stay in the INFECTED BUT NOT CONTAGIOUS stock for one time unit (2 weeks) and then inevitably move to the next, ILL &amp; CONTAGIOUS, stock.}</text_box>
+                </popup>
+            </button>
+            <button x="1886" y="186" width="24" height="22" uid="67" appearance="transparent" color="blue" style="rounded">
+                <popup x="32" y="0" width="300" height="100" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">smallpox mortality fraction = a value controlled by a slider on the upper level.  The default value is 0.30, indicating that 30% of the ILL &amp; CONTAGIOUS individualS will die.  Therefore, 70% will recover with immunity.}</text_box>
+                </popup>
+            </button>
+            <button x="1842" y="149" width="24" height="22" uid="68" appearance="transparent" color="blue" style="rounded">
+                <popup x="-315" y="0" width="300" height="100" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">Die of Smallpox = ILL &amp; CONTAGIOUS * smallpox mortality fract</text_box>
+                </popup>
+            </button>
+            <button x="1886" y="114" width="24" height="22" uid="69" appearance="transparent" color="blue" style="rounded">
+                <popup x="-315" y="0" width="300" height="100" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">Recover = ILL &amp; CONTAGIOUS * (1 - smallpox mortality fract)&#x0D;&#x0D;{The &quot;1 - smallpox mortality fract&quot; formulation indicates that whoever is ILL but does not die of smallpox will recover.}</text_box>
+                </popup>
+            </button>
+            <button x="1853" y="340" width="24" height="22" uid="70" appearance="transparent" color="blue" style="rounded">
+                <popup x="-315" y="0" width="300" height="50" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">total population = SUSCEPTIBLE + INFECTED BUT NOT CONTAGIOUS + ILL &amp; CONTAGIOUS + IMMUNE&#x0D;&#x0D;</text_box>
+                </popup>
+            </button>
+            <button x="1781" y="9" width="90" height="20" uid="71" appearance="opaque" background="black" color="white" style="rounded" clicking_sound="false" label="Instructions" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <popup x="0" y="28" width="150" height="50" background="yellow" color="black">
+                    <text_box font-family="Arial" font-size="10">Click any of the building blocks to see how it was defined.</text_box>
+                </popup>
+            </button>
+            <button x="487" y="2568" width="89" height="32" uid="72" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Control Panel" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="1107" />
+            </button>
+            <button x="487" y="2529" width="89" height="32" uid="73" appearance="opaque" background="blue" color="white" style="rounded" clicking_sound="false" label="Introduction" font-family="Arial" font-size="10" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="0" />
+            </button>
+            <text_box x="35" y="2215" uid="74" color="red" font-family="Arial" font-size="18" font-weight="bold" text-align="center" padding="5" width="514" height="33">Exploring the Transmission of Smallpox</text_box>
+            <text_box x="90" y="2240" uid="75" color="red" font-family="Arial" font-size="14" font-weight="bold" text-align="center" padding="5" width="405" height="29">Debrief</text_box>
+            <text_box x="22" y="2286" uid="76" color="black" font-family="Arial" font-size="12" padding="5" width="543" height="218">After having had a chance to explore this model, please address a couple questions:&#x0D;&#x0D;What happens over time as a population undergoes repeated smallpox epidemics?&#x0D;&#x0D;What characteristics of the system seem to contribute to preventing an outbreak of smallpox?&#x0D;&#x0D;What factors appear to control the severity and timing of smallpox outbreaks?  How do short-time perspectives differ from longer-time considerations?&#x0D;&#x0D;</text_box>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="47" y="72" content="31" />
+        <popup x="13" y="199" content="32" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

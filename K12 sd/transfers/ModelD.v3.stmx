@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>ModelD.v3</name>
+        <uuid>0e474d82-9d06-45d2-b339-23a1a6ba9e4c</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Years" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>5</stop>
+        <dt>0.001</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Amount_A">
+            <eqn>1000</eqn>
+            <inflow>Interest_A</inflow>
+            <non_negative />
+            <display x="221" y="76" color="blue" />
+        </stock>
+        <flow name="Interest_A">
+            <eqn>Amount_A*Annual_Rate_A</eqn>
+            <non_negative />
+            <display x="143" y="69" color="blue">
+                <pts>
+                    <pt x="86" y="69" />
+                    <pt x="201" y="69" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Annual_Rate_A">
+            <eqn>.06</eqn>
+            <display x="62" y="100" color="blue" />
+        </aux>
+        <stock name="Amount_C">
+            <eqn>1000</eqn>
+            <inflow>Interest_C</inflow>
+            <non_negative />
+            <display x="227" y="334" color="blue" />
+        </stock>
+        <flow name="Interest_C">
+            <eqn>Amount_C*Annual_Rate_C</eqn>
+            <non_negative />
+            <display x="149" y="327" color="blue">
+                <pts>
+                    <pt x="92" y="327" />
+                    <pt x="207" y="327" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Annual_Rate_C">
+            <eqn>.059</eqn>
+            <display x="82" y="360" color="blue" />
+        </aux>
+        <stock name="Amount_B">
+            <eqn>1000</eqn>
+            <inflow>Interest_B</inflow>
+            <non_negative />
+            <display x="225" y="199" color="blue" />
+        </stock>
+        <flow name="Interest_B">
+            <eqn>Amount_B*Annual_Rate_B</eqn>
+            <non_negative />
+            <display x="147" y="192" color="blue">
+                <pts>
+                    <pt x="89" y="192" />
+                    <pt x="205" y="192" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Annual_Rate_B">
+            <eqn>.0595</eqn>
+            <display x="73" y="224" color="blue" />
+        </aux>
+        <group name="Bank_A___6%_Interest___Compounded_Quarterly">
+            <entity name="Amount_A" />
+            <entity name="Interest_A" />
+            <entity name="Annual_Rate_A" />
+            <display x="19" y="38" width="352" height="98" color="red">
+                <item uid="0" />
+                <item uid="1" />
+                <item uid="2" />
+            </display>
+        </group>
+        <group name="Bank_B___5_95%_Interest___Compounded_Daily">
+            <entity name="Amount_B" />
+            <entity name="Interest_B" />
+            <entity name="Annual_Rate_B" />
+            <display x="19" y="156" width="352" height="105" color="red">
+                <item uid="3" />
+                <item uid="4" />
+                <item uid="5" />
+            </display>
+        </group>
+        <group name="Bank_C___5_9%_Interest___Compounded_Continuously_2">
+            <entity name="Amount_C" />
+            <entity name="Interest_C" />
+            <entity name="Annual_Rate_C" />
+            <display x="19" y="281" width="352" height="125" color="red">
+                <item uid="6" />
+                <item uid="7" />
+                <item uid="8" />
+            </display>
+        </group>
+        <display page_width="595" page_height="775" page_cols="2" isee:converter_size="medium" scroll_y="16">
+            <connector x="71" y="98" uid="0">
+                <from>Annual_Rate_A</from>
+                <to>Interest_A</to>
+            </connector>
+            <connector x="199" y="85" uid="1">
+                <from>Amount_A</from>
+                <to>Interest_A</to>
+            </connector>
+            <connector x="91" y="358" uid="6">
+                <from>Annual_Rate_C</from>
+                <to>Interest_C</to>
+            </connector>
+            <connector x="204" y="346" uid="7">
+                <from>Amount_C</from>
+                <to>Interest_C</to>
+            </connector>
+            <connector x="82" y="222" uid="3">
+                <from>Annual_Rate_B</from>
+                <to>Interest_B</to>
+            </connector>
+            <connector x="203" y="208" uid="4">
+                <from>Amount_B</from>
+                <to>Interest_B</to>
+            </connector>
+            <stacked_container height="286" width="465" uid="2">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="1" cleared="true" date_time="1995-09-08T14:48:39Z">
+                    <title>Amount Over Time</title>
+                    <item type="time" color="black" precision="0.01" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Amount_A" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="313" y="63" width="26" height="22" color="#008F44" label_side="bottom" label="Model A" type="table" icon_of="2" />
+            <stacked_container height="286" width="465" uid="8">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="1" cleared="true" date_time="1995-09-08T14:50:24Z">
+                    <title>Untitled Table</title>
+                    <item type="time" color="black" precision="0.01" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Amount_C" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="313" y="326" width="26" height="22" color="#008F44" label_side="bottom" label="Model C" type="table" icon_of="8" />
+            <stacked_container height="286" width="465" uid="5">
+                <table font-size="9" background="#FFFE91" column_width="60" orientation="vertical" interval="1" cleared="true" date_time="1995-09-08T15:00:36Z">
+                    <title>5.95% - Compounded Daily</title>
+                    <item type="time" color="black" precision="0.01" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Amount_B" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="309" y="183" width="26" height="22" color="#008F44" label_side="bottom" label="Model B" type="table" icon_of="5" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_width="788" page_height="528">
+            <simulation_delay>0.1</simulation_delay>
+            <isee:process_frame x="30" y="75" width="155" height="75" name="Bank_A___6%_Interest___Compounded_Quarterly" show_name="false" color="#0CA0FF" border-style="solid" border-width="thin" />
+            <isee:process_frame x="310" y="150" width="155" height="75" name="Bank_B___5_95%_Interest___Compounded_Daily" show_name="false" color="#0CA0FF" border-style="solid" border-width="thin" />
+            <isee:process_frame x="30" y="225" width="155" height="75" name="Bank_C_-_5.9%_Interest_-_Compounded_Continuously" show_name="false" color="#0CA0FF" border-style="solid" border-width="thin" />
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="78" content="2" />
+        <popup x="16" y="78" content="8" />
+        <popup x="16" y="78" content="5" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

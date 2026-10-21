@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>The Rainforest Game</name>
+        <uuid>4ecb92d3-9c5b-4994-ade1-69c8afb47985</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="18" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Years" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>50</stop>
+        <dt>1</dt>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="interface" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="989" height="584" />
+        <isee:security />
+        <isee:print_setup width="576" height="768" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="module" />
+    <model>
+        <stock name="Seeds_in_ground">
+            <eqn>3</eqn>
+            <inflow>Planting__seeds</inflow>
+            <outflow>Sprouting</outflow>
+            <non_negative />
+            <display x="237" y="151" color="blue" />
+        </stock>
+        <flow name="Planting_\nseeds">
+            <eqn>3</eqn>
+            <non_negative />
+            <display x="161" y="161" color="blue" label_side="left" label_angle="264">
+                <pts>
+                    <pt x="107" y="161" />
+                    <pt x="215" y="161" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Sprouts">
+            <eqn>3</eqn>
+            <inflow>Sprouting</inflow>
+            <outflow>Growing</outflow>
+            <non_negative />
+            <display x="386" y="157" color="blue" />
+        </stock>
+        <stock name="Saplings">
+            <eqn>3</eqn>
+            <inflow>Growing</inflow>
+            <outflow>Maturing</outflow>
+            <non_negative />
+            <display x="528" y="159" color="blue" />
+        </stock>
+        <stock name="Mature_trees">
+            <eqn>25</eqn>
+            <inflow>Maturing</inflow>
+            <outflow>Harvesting</outflow>
+            <non_negative />
+            <display x="701" y="159" color="blue" />
+        </stock>
+        <flow name="Sprouting">
+            <eqn>Seeds_in_ground</eqn>
+            <non_negative />
+            <display x="311" y="154" color="blue">
+                <pts>
+                    <pt x="259" y="154" />
+                    <pt x="364" y="154" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Growing">
+            <eqn>Sprouts</eqn>
+            <non_negative />
+            <display x="457" y="159" color="blue">
+                <pts>
+                    <pt x="408" y="159" />
+                    <pt x="506" y="159" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Maturing">
+            <eqn>Saplings</eqn>
+            <non_negative />
+            <display x="614" y="163" color="blue">
+                <pts>
+                    <pt x="550" y="163" />
+                    <pt x="679" y="163" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Harvesting">
+            <eqn>3 + step(2,10)</eqn>
+            <non_negative />
+            <display x="802" y="158" color="blue">
+                <pts>
+                    <pt x="723" y="158" />
+                    <pt x="881" y="158" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Seeds_in_ground_2">
+            <eqn>5</eqn>
+            <inflow>Planting__seeds_2</inflow>
+            <outflow>Sprouting_2</outflow>
+            <non_negative />
+            <display x="230" y="318" color="blue" />
+        </stock>
+        <flow name="Planting_\nseeds_2">
+            <eqn>IF(TIME&lt;6) THEN 5 ELSE(Harvesting_policy_beginning_year_6)</eqn>
+            <non_negative />
+            <display x="154" y="328" color="blue" label_side="left" label_angle="264">
+                <pts>
+                    <pt x="100" y="328" />
+                    <pt x="208" y="328" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Sprouts_2">
+            <eqn>5</eqn>
+            <inflow>Sprouting_2</inflow>
+            <outflow>Growing_2</outflow>
+            <non_negative />
+            <display x="379" y="324" color="blue" />
+        </stock>
+        <stock name="Saplings_2">
+            <eqn>5</eqn>
+            <inflow>Growing_2</inflow>
+            <outflow>Maturing_2</outflow>
+            <non_negative />
+            <display x="521" y="327" color="blue" />
+        </stock>
+        <stock name="Mature_trees_2">
+            <eqn>25</eqn>
+            <inflow>Maturing_2</inflow>
+            <outflow>Harvesting_2</outflow>
+            <non_negative />
+            <display x="694" y="326" color="blue" />
+        </stock>
+        <flow name="Sprouting_2">
+            <eqn>Seeds_in_ground_2</eqn>
+            <non_negative />
+            <display x="304" y="321" color="blue">
+                <pts>
+                    <pt x="252" y="321" />
+                    <pt x="357" y="321" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Growing_2">
+            <eqn>Sprouts_2</eqn>
+            <non_negative />
+            <display x="450" y="326" color="blue">
+                <pts>
+                    <pt x="401" y="326" />
+                    <pt x="499" y="326" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Maturing_2">
+            <eqn>Saplings_2</eqn>
+            <non_negative />
+            <display x="607" y="330" color="blue">
+                <pts>
+                    <pt x="543" y="330" />
+                    <pt x="672" y="330" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Harvesting_2">
+            <eqn>5- Step(5,6)+STEP(Harvesting_policy_beginning_year_6,6)</eqn>
+            <non_negative />
+            <display x="800" y="325" color="blue" label_side="right" label_angle="278">
+                <pts>
+                    <pt x="716" y="325" />
+                    <pt x="885" y="325" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Harvesting_policy_beginning_year_6">
+            <eqn>0</eqn>
+            <display x="791" y="426" color="blue" />
+        </aux>
+        <display page_width="576" page_height="768" page_cols="2" isee:converter_size="medium" isee:animate_flows="true" isee:animate_stocks="true" isee:animate_converters="true" interval="DT">
+            <connector x="259" y="165" uid="0">
+                <from>Seeds_in_ground</from>
+                <to>Sprouting</to>
+            </connector>
+            <connector x="408" y="168" uid="1">
+                <from>Sprouts</from>
+                <to>Growing</to>
+            </connector>
+            <connector x="550" y="172" uid="2">
+                <from>Saplings</from>
+                <to>Maturing</to>
+            </connector>
+            <connector x="252" y="332" uid="3">
+                <from>Seeds_in_ground_2</from>
+                <to>Sprouting_2</to>
+            </connector>
+            <connector x="401" y="335" uid="4">
+                <from>Sprouts_2</from>
+                <to>Growing_2</to>
+            </connector>
+            <connector x="543" y="344" uid="5">
+                <from>Saplings_2</from>
+                <to>Maturing_2</to>
+            </connector>
+            <connector x="776" y="430" uid="6">
+                <from>Harvesting_policy_beginning_year_6</from>
+                <to>Planting__seeds_2</to>
+            </connector>
+            <connector x="789" y="417" uid="7">
+                <from>Harvesting_policy_beginning_year_6</from>
+                <to>Harvesting_2</to>
+            </connector>
+            <style font-family="Arial" font-size="18" />
+        </display>
+        <interface show_pages="true" page_cols="3" page_rows="3" page_width="1012" page_height="696" scroll_x="1012" scroll_y="1392" home_page="8">
+            <simulation_delay>0.233054</simulation_delay>
+            <stacked_container x="40" y="71" height="282" width="492" uid="8">
+                <graph type="time_series" title="Mature Treesin the Forest" background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" cleared="true" time_precision="2" from="0" to="50">
+                    <plot index="0" pen_width="3" color="blue" precision="1" show_y_axis="true">
+                        <scale min="0" max="100" />
+                        <entity name="Mature_trees" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="285" y="235" width="26" height="22" color="#008F44" label_side="bottom" label="Graph 1" type="graph" icon_of="8" />
+            <stacked_container x="70" y="745" height="350" width="610" uid="9">
+                <graph type="time_series" title="When the lumberjack and the planter coordinate ..." background="#FFFFC9" show_grid="true" plot_numbers="true" isee:use_five_segments="false" hide_detail="true" cleared="true" time_precision="2" from="0" to="50">
+                    <plot index="0" pen_width="3" color="blue" precision="1" show_y_axis="true">
+                        <entity name="Mature_trees_2" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="317" y="838" width="26" height="22" color="#008F44" label_side="bottom" label="Graph 2" type="graph" icon_of="9" />
+            <stacked_container x="1084" y="36" height="424" width="628" uid="10">
+                <table font-size="9" background="#E0E0E0" column_width="79" orientation="vertical" interval="1" cleared="true" date_time="2010-12-09T11:44:58Z">
+                    <title>Rainforest Trees</title>
+                    <item type="time" color="black" precision="max" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Planting__seeds" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Seeds_in_ground" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Sprouts" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="3">
+                        <entity name="Saplings" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="4">
+                        <entity name="Mature_trees" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="1153" y="272" width="26" height="22" color="#008F44" label_side="bottom" label="Table 1" type="table" icon_of="10" />
+            <stacked_container x="1102" y="735" height="362" width="705" uid="11">
+                <table font-size="9" background="#E0E0E0" column_width="89" orientation="vertical" interval="1" cleared="true" date_time="2010-12-09T11:44:58Z">
+                    <title>Coordinated Policy</title>
+                    <item type="time" color="black" precision="max" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Planting__seeds_2" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Seeds_in_ground_2" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Sprouts_2" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="3">
+                        <entity name="Saplings_2" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="4">
+                        <entity name="Mature_trees_2" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="5">
+                        <entity name="Harvesting_2" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="1246" y="748" width="26" height="22" color="#008F44" label_side="bottom" label="Table 2" type="table" icon_of="11" />
+            <slider x="158" y="408" color="lime" width="197" height="43" min="1" max="10" precision="1">
+                <entity name="Planting__seeds" />
+            </slider>
+            <button x="716" y="212" width="97" height="58" uid="12" appearance="opaque" background="black" color="white" style="rounded" label="Restore Graphs &amp; Tables" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>restore_graphs_tables</menu_action>
+            </button>
+            <button x="342" y="386" width="65" height="34" uid="13" appearance="opaque" background="black" color="white" style="rounded" label="See a table" font-family="Arial" font-size="12" text-align="center">
+                <link target="next_page" />
+            </button>
+            <button x="1311" y="464" width="91" height="67" uid="14" appearance="opaque" background="black" color="white" style="square" label="Back to policy page" font-family="Arial" font-size="12" text-align="center">
+                <link target="previous_page" />
+            </button>
+            <text_box x="552" y="12" uid="15" color="black" font-family="Arial" font-size="12" text-align="center" padding="5" border-style="solid" border-width="thin" width="298" height="170">Test your policy&#x0D;Choose how many seeds to plant. You need to harvest 3 trees per year until year 10 when you will need to cut 5 per year from then on.&#x0D;Run a simulation for 50 years and see how many trees are in the forest. Can you maintain a forest between 25 and 50 trees?   You can pause and change your policy, then resume the simulation, using the buttons.</text_box>
+            <button x="577" y="211" width="108" height="59" uid="16" appearance="opaque" background="black" color="white" style="rounded" label="Run a simulation" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>run</menu_action>
+            </button>
+            <slider x="257" y="1148" color="lime" width="197" height="43" min="0" max="10" precision="1">
+                <entity name="Harvesting_policy_beginning_year_6" />
+            </slider>
+            <button x="704" y="986" width="93" height="69" uid="17" appearance="opaque" background="black" color="white" style="rounded" label="See this table" font-family="Arial" font-size="12" text-align="center">
+                <link target="next_page" />
+            </button>
+            <text_box x="692" y="787" uid="18" color="black" font-family="Arial" font-size="12" text-align="center" padding="5" border-style="solid" border-width="thin" width="244" height="181">We start with 25 mature trees and plant 5 seeds per year and harvest 5 trees.  Choose how many trees to harvest beginning in year 6.  The lumberjack will report that number and the planter will match it with the same number of seeds. Run a simulation to see what happens to the trees in the forest.</text_box>
+            <button x="440" y="1115" width="88" height="56" uid="19" appearance="opaque" background="black" color="white" style="rounded" label="Run a simulation" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>run</menu_action>
+            </button>
+            <button x="601" y="345" width="91" height="39" uid="20" appearance="opaque" background="black" color="white" style="rounded" label="Pause" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>pause</menu_action>
+            </button>
+            <button x="704" y="346" width="73" height="38" uid="21" appearance="opaque" background="black" color="white" style="rounded" label="Resume" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>resume</menu_action>
+            </button>
+            <button x="710" y="454" width="140" height="58" uid="22" appearance="opaque" background="black" color="white" style="rounded" label="Planter and lumberjack plan together" font-family="Arial" font-size="12" text-align="center">
+                <link target="interface" x="0" y="696" />
+            </button>
+            <button x="1360" y="1135" width="190" height="58" uid="23" appearance="opaque" background="black" color="white" style="square" label="Back to coordinated policy" font-family="Arial" font-size="12" text-align="center">
+                <link target="previous_page" />
+            </button>
+            <button x="829" y="1125" width="64" height="71" uid="24" appearance="opaque" background="black" color="white" style="rounded" icon="5">
+                <link target="home_page" isee:default_icon="true" />
+            </button>
+            <button x="627" y="1131" width="148" height="73" uid="25" appearance="opaque" background="black" color="white" style="rounded" label="Back to policy page" font-family="Arial" font-size="12" text-align="center">
+                <link target="interface" x="0" y="0" />
+            </button>
+            <text_box x="432" y="460" uid="26" color="black" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="262" height="43">Click the button to the right to coordinate the planter and the lumberjack.         -------&gt;</text_box>
+            <button x="860" y="342" width="60" height="59" uid="27" appearance="opaque" background="black" color="white" style="rounded" icon="5">
+                <link target="home_page" isee:default_icon="true" />
+            </button>
+            <text_box x="1187" y="1436" uid="28" color="black" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="528" height="252">THE RAINFOREST GAME&#x0D;&#x0D;Managing a sustainable forest is difficult.  People want to use the resources but taking too much without replenishing the forest will lead to declining numbers of trees.  Trying to account for increased harvesting through increased planting sounds like a balanced plan but tres take time to grow.  In this simulation, the delay between planting a seed and harvesting a tree is built into the computer model.  Planning ahead is crucial.&#x0D;&#x0D;Experiment with the simulation to see how this delay can be difficult for planners. You start with 25 trees and an annual harvest of three trees.  Starting in year 10, you need to harvest five trees per year.  You can pause the simulation using a button, change your planting policy, and then click another button to resume.  There is a slider at the bottom of the screen that adjusts the speed of the simulation.&#x0D;&#x0D;Then you can simulate a situation in which the planting and harvesting are coordinated.&#x0D;&#x0D;</text_box>
+            <button x="1396" y="1727" width="95" height="39" uid="29" appearance="opaque" background="black" color="white" style="rounded" label="Try your policy" font-family="Arial" font-size="12" text-align="center">
+                <link target="interface" x="0" y="0" />
+            </button>
+            <button x="824" y="988" width="84" height="68" uid="30" appearance="opaque" background="black" color="white" style="rounded" label="Restore Graphs &amp; Tables" font-family="Arial" font-size="12" text-align="center">
+                <menu_action>restore_graphs_tables</menu_action>
+            </button>
+            <text_box x="43" y="466" uid="31" color="black" font-family="Arial" font-size="12" padding="5" border-style="solid" border-width="thin" width="279" height="81">Simulation speed controller&#x0D;       l&#x0D;       l&#x0D;       l&#x0D;      V</text_box>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="18" />
+    </model>
+</xmile>

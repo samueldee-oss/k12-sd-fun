@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>ScienceModel8.0.v5</name>
+        <uuid>179968a1-a222-4280-b15a-f0901a2421fe</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="RK4" time_units="Time" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>40</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="1334" height="630" />
+        <isee:security />
+        <isee:print_setup width="552" height="728" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <stock name="Deer">
+            <eqn>40</eqn>
+            <outflow>Deaths</outflow>
+            <non_negative />
+            <display x="128" y="66" color="blue" />
+        </stock>
+        <flow name="Deaths">
+            <eqn>Deer*Death_rate</eqn>
+            <non_negative />
+            <display x="216" y="63" color="blue" label_side="top" label_angle="101">
+                <pts>
+                    <pt x="148" y="63" />
+                    <pt x="284" y="63" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Food_per_Capita">
+            <eqn>Food/Deer</eqn>
+            <display x="154" y="125" color="blue" label_angle="324" />
+        </aux>
+        <aux name="Death_rate">
+            <eqn>Food_per_Capita</eqn>
+            <gf>
+                <xscale min="0" max="10" />
+                <yscale min="0" max="1" />
+                <ypts>1,0.90000000000000002,0.80000000000000004,0.69999999999999996,0.59999999999999998,0.5,0.40000000000000002,0.29999999999999999,0.20000000000000001,0.10000000000000001,0</ypts>
+            </gf>
+            <display x="273" y="123" color="blue" />
+        </aux>
+        <stock name="Food">
+            <eqn>1000</eqn>
+            <outflow>Food_Eaten</outflow>
+            <non_negative />
+            <display x="134" y="210" color="blue" />
+        </stock>
+        <flow name="Food_Eaten">
+            <eqn>Deer*Food_Eaten_per_Deer</eqn>
+            <non_negative />
+            <display x="229" y="206" color="blue">
+                <pts>
+                    <pt x="154" y="206" />
+                    <pt x="305" y="206" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Food_Eaten_per_Deer">
+            <eqn>1</eqn>
+            <display x="185" y="279" color="blue" />
+        </aux>
+        <display page_width="552" page_height="728" isee:converter_size="large" interval="DT">
+            <connector x="142" y="82" uid="0">
+                <from>Deer</from>
+                <to>Food_per_Capita</to>
+            </connector>
+            <connector x="150" y="69" uid="1">
+                <from>Deer</from>
+                <to>Deaths</to>
+            </connector>
+            <connector x="166" y="125" uid="2">
+                <from>Food_per_Capita</from>
+                <to>Death_rate</to>
+            </connector>
+            <connector x="262" y="115" uid="3">
+                <from>Death_rate</from>
+                <to>Deaths</to>
+            </connector>
+            <connector x="114" y="198" uid="4">
+                <from>Food</from>
+                <to>Food_per_Capita</to>
+            </connector>
+            <connector x="119" y="83" uid="5">
+                <from>Deer</from>
+                <to>Food_Eaten</to>
+            </connector>
+            <connector x="183" y="267" uid="6">
+                <from>Food_Eaten_per_Deer</from>
+                <to>Food_Eaten</to>
+            </connector>
+            <stacked_container height="282" width="492" uid="7">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:09:10Z" cleared="true" time_precision="2" from="0" to="40">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="40" />
+                        <entity name="Deer" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <scale min="0" max="1000" />
+                        <entity name="Food" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="386" y="94" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="7" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="640" page_height="480" home_page="0">
+            <simulation_delay>0</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="8" y="51" content="7" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

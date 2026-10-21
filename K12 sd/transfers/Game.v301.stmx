@@ -1,0 +1,759 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Game.v301</name>
+        <uuid>3e16b129-cddc-4272-b7cd-dd298efc7554</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="RK2" time_units="Years" pause_interval="1" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>1980</start>
+        <stop>1990</stop>
+        <dt>0.1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" show_documentation="true" />
+    <model>
+        <aux name="Area">
+            <doc>The Area is the size of the fish bed in square miles.&#x0D;&#x0D;units: square miles</doc>
+            <eqn> 100</eqn>
+            <display x="135" y="621" color="blue" />
+        </aux>
+        <aux name="SHIPS">
+            <doc>SHIPS is the total number of fishing ships in the area.  It is the sum of your and your competitor&apos;s ships.&#x0D;&#x0D;Units:  ships</doc>
+            <eqn>Competitor_Ships+Your_Ships</eqn>
+            <display x="370" y="588" color="blue" />
+        </aux>
+        <flow name="Fish_Death_Rate">
+            <doc>Fish Death Rate is the number of fish per year which die from causes other than fish harvesting.&#x0D;&#x0D;units: fish/year</doc>
+            <eqn>FISH*Death_Fraction</eqn>
+            <scale min="0" max="800" />
+            <non_negative />
+            <display x="311" y="480" color="blue" label_side="top">
+                <scale min="0" max="800" />
+                <pts>
+                    <pt x="249" y="480" />
+                    <pt x="374" y="480" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Density">
+            <doc>Density is the number of fish found per square mile within the fish bed.&#x0D;&#x0D;units: fish/square mile</doc>
+            <eqn> FISH/Area</eqn>
+            <display x="178" y="558" color="blue" />
+        </aux>
+        <aux name="Your_Revenue">
+            <doc>Your_Revenue is the money you earn from selling the fish that you caught in a year.&#x0D;&#x0D;Units:  $</doc>
+            <eqn>Fish_Price*Your_Total_Catch</eqn>
+            <display x="834" y="180" color="blue" label_angle="267" />
+        </aux>
+        <stock name="Your_Total_Profits">
+            <doc>Your_Total_Profits is the total money earned up to the current point in the game.&#x0D;&#x0D;Units:  $</doc>
+            <eqn>0</eqn>
+            <scale min="-32680.580000000002" max="969652.39000000001" />
+            <inflow>Your_Profit_each_Year</inflow>
+            <display x="899" y="281" color="blue">
+                <scale min="-32680.580000000002" max="969652.39000000001" />
+            </display>
+        </stock>
+        <aux name="Fish_Price">
+            <doc>Fish Price is the amount of money a fisherman can sell a fish for as soon as it is caught.&#x0D;&#x0D;units:  $/fish</doc>
+            <eqn> 20</eqn>
+            <display x="430" y="106" color="blue" label_side="top" />
+        </aux>
+        <stock name="Competitor_Ships">
+            <doc>Competitor_Ships is the number of ships currently in your comptitor&apos;s fleet.&#x0D;&#x0D;Units:  ships</doc>
+            <eqn>2</eqn>
+            <inflow>Competitor_Building_Rate</inflow>
+            <non_negative />
+            <display x="239" y="105" color="blue" />
+        </stock>
+        <aux name="Ship_Cost">
+            <doc>The Ship Cost is the amount of money it costs to build a new fishing ship.&#x0D;&#x0D;units: $/ship</doc>
+            <eqn> 300</eqn>
+            <display x="134" y="219" color="blue" />
+        </aux>
+        <stock name="Competitor_Total_Profits">
+            <doc>Competitor_Total_Profits is the total money earned by your competitor up to the current point in the game.&#x0D;&#x0D;Units:  $</doc>
+            <eqn>0</eqn>
+            <scale min="-32680.580000000002" max="969652.39000000001" />
+            <inflow>Competitor_Profit_each_Year</inflow>
+            <display x="416" y="264" color="blue" label_angle="79">
+                <scale min="-32680.580000000002" max="969652.39000000001" />
+            </display>
+        </stock>
+        <flow name="Competitor_Profit_each_Year">
+            <doc>Competitor_Profit_each_Year is the amount of money earned or lost in one year by your competitor&apos;s fishing company.  It is calculated by subtracting his operating and ship building costs from his revenue from fish sales.&#x0D;&#x0D;Units:  $/year</doc>
+            <eqn>Competitor_Revenue-Competitor_Op_Costs-Competitor_Build_costs</eqn>
+            <display x="352" y="265" color="blue" label_angle="282">
+                <pts>
+                    <pt x="308" y="265" />
+                    <pt x="396" y="265" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="FISH">
+            <doc>Fish are the number of fish alive within the fishing bed which is being modeled.  At the beginning of the simulation there are initially 1000 fish alive in the bed.&#x0D;&#x0D;units: fish</doc>
+            <eqn>1000</eqn>
+            <inflow>Fish_Hatch_Rate</inflow>
+            <outflow>Fish_Death_Rate</outflow>
+            <outflow>Total_Catch_per_Year</outflow>
+            <event_poster min="0" max="1033">
+                <threshold value="30" direction="decreasing">
+                    <event sim_action="stop">
+                        <text_box>You have killed all the fish!&#x0D;Both fishing companies fail.</text_box>
+                    </event>
+                </threshold>
+            </event_poster>
+            <display x="229" y="480" color="blue" />
+        </stock>
+        <aux name="Competitor_Revenue">
+            <doc>Competitor_Revenue is the money your competitor earns from selling the fish he catches in a year.&#x0D;&#x0D;Units:  $</doc>
+            <eqn>Competitor_Ships*Catch_per_Ship*Fish_Price</eqn>
+            <display x="337" y="178" color="blue" />
+        </aux>
+        <flow name="Fish_Hatch_Rate">
+            <doc>The fish hatch rate is the number of fish born per year.  It is computed by multiplying the total fish population by a hatch fraction.  The hatch fraction is the average number of offspring per year per fish.&#x0D;&#x0D;units:  Fish/year</doc>
+            <eqn>FISH*Hatch_Fraction</eqn>
+            <non_negative />
+            <display x="161" y="480" color="blue" label_side="top">
+                <pts>
+                    <pt x="113" y="480" />
+                    <pt x="209" y="480" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Catch_per_Ship">
+            <doc>Catch_per_Ship is the number of fish caught by each of your and your competitor&apos;s ships.&#x0D;&#x0D;Units:  fish/ship</doc>
+            <eqn>Density</eqn>
+            <gf>
+                <xscale min="0" max="12" />
+                <yscale min="0" max="26" />
+                <ypts>0,5,10.375,15.875,20.25,22.125,23.25,23.75,24.25,24.625,25,25.350000000000001,25.48</ypts>
+            </gf>
+            <display x="227" y="586" color="blue" />
+        </aux>
+        <flow name="Your_Profit_each_Year">
+            <doc>Your_Profit_each_Year is the amount of money earned or lost in one year by your fishing company.  It is calculated by subtracting your operating and ship building costs from your revenue from fish sales.&#x0D;&#x0D;Units:  $/year</doc>
+            <eqn>Your_Revenue-Your_Op_Costs-Your_Build_Costs</eqn>
+            <display x="841" y="282" color="blue">
+                <pts>
+                    <pt x="804" y="282" />
+                    <pt x="879" y="282" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Total_Catch_per_Year">
+            <doc>Total Catch per Year is the total number of fish which are harvested from the fishing waters each year.  It is computed by multiplying the number of ships by the catch per ship.&#x0D;&#x0D;units: fish/year</doc>
+            <eqn> SHIPS*Catch_per_Ship</eqn>
+            <non_negative />
+            <display x="302" y="531" color="blue" label_side="top">
+                <pts>
+                    <pt x="231" y="495" />
+                    <pt x="231" y="531" />
+                    <pt x="374" y="531" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Hatch_Fraction">
+            <doc>Hatch fraction is the average number of offspring per year per fish.  It is the fractional increase in the population per year.  A hatch fraction of 6 means that every female fish (half the fish population) will have an average of 12 offspring per year.&#x0D;&#x0D;units:  1/years</doc>
+            <eqn>6</eqn>
+            <display x="123" y="523" color="blue" />
+        </aux>
+        <flow name="Competitor_Building_Rate">
+            <doc>Competitor_Building_Rate is the computer&apos;s strategy for the game.  It is based upon your decisions with Your_Build_Rate.&#x0D;&#x0D;Units:  Ships/year</doc>
+            <eqn>IF(Your_Building_Rate)= 0 &#x0D;THEN(0)&#x0D;ELSE(Your_Building_Rate+1)</eqn>
+            <display x="174" y="103" color="blue">
+                <pts>
+                    <pt x="129" y="103" />
+                    <pt x="219" y="103" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Carrying_Capacity">
+            <doc>The carrying capacity is the total number of fish which the ocean environment can support.&#x0D;&#x0D;units:  Fish</doc>
+            <eqn>1200</eqn>
+            <display x="496" y="496" color="blue" label_side="top" />
+        </aux>
+        <aux name="Death_Fraction">
+            <doc>Death_Fraction is the fraction of the fish population that dies from causes other than harvesting each year.  The Death fraction varies with the crowding of the fish population.&#x0D;&#x0D;Units:  1/years</doc>
+            <eqn>FISH/Carrying_Capacity</eqn>
+            <gf>
+                <xscale min="0" max="2" />
+                <yscale min="5" max="11" />
+                <ypts>5.2199999999999998,5.2300000000000004,5.2549999999999999,5.3449999999999998,5.665,6,6.4400000000000004,7.1299999999999999,7.9699999999999998,9.3200000000000003,11</ypts>
+            </gf>
+            <display x="428" y="496" color="blue" />
+        </aux>
+        <stock name="Your_Ships">
+            <doc>Your_Ships represents the number of ships currently in your fleet.&#x0D;&#x0D;Units:  ships</doc>
+            <eqn>2</eqn>
+            <inflow>Your_Building_Rate</inflow>
+            <non_negative />
+            <event_poster min="-13" max="11">
+                <threshold value="0.1" direction="decreasing">
+                    <event>
+                        <text_box>You can&apos;t have fewer than zero ships!!!</text_box>
+                    </event>
+                </threshold>
+            </event_poster>
+            <display x="693" y="105" color="blue" />
+        </stock>
+        <flow name="Your_Building_Rate">
+            <doc>This is your input to the system.  At the beginning of each year, you must specify how many ships you wish to build.  If you do not specify a value, the value from the previous year will be repeated.  If you wish to sell ships instead, simply set Your_Building_Rate equal to a negative number.  For example, Your_Building_Rate = -4 means that you wish to sell 4 ships that year.</doc>
+            <eqn>0</eqn>
+            <display x="642" y="104" color="blue" label_side="top" label_angle="126">
+                <pts>
+                    <pt x="611" y="104" />
+                    <pt x="673" y="104" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Competitor_Op_Costs">
+            <doc>Competitor_Op_Costs is the amount of money your competitor spends each year to operate his fleet.&#x0D;&#x0D;Units:  $</doc>
+            <eqn>Competitor_Ships*250</eqn>
+            <display x="261" y="204" color="blue" />
+        </aux>
+        <aux name="Your_Op_Costs">
+            <doc>Your_Op_Costs is the amount of money you spend each year to operate your fishing fleet.&#x0D;&#x0D;Units:  $&#x0D;</doc>
+            <eqn>Your_Ships*250</eqn>
+            <display x="706" y="179" color="blue" label_angle="237" />
+        </aux>
+        <aux name="Competitor_Build_costs">
+            <doc>Competitor_Build_Costs is the amount of money your competitor spends each year on building new ships.&#x0D;&#x0D;Units:  $</doc>
+            <eqn>Competitor_Building_Rate*Ship_Cost</eqn>
+            <display x="197" y="249" color="blue" label_angle="254" />
+        </aux>
+        <aux name="Your_Build_Costs">
+            <doc>Your_Build_Costs is the amount of money you spend each year on building new ships.&#x0D;&#x0D;Units:  $</doc>
+            <eqn>Your_Building_Rate*Ship_Cost</eqn>
+            <display x="653" y="219" color="blue" label_angle="215" />
+        </aux>
+        <aux name="Your_Total_Catch">
+            <doc>Your_Catch is the number of fish caught in a year by your fishing ships.&#x0D;&#x0D;Units:  fish</doc>
+            <eqn>Your_Ships*Catch_per_Ship</eqn>
+            <display x="769" y="144" color="blue" />
+        </aux>
+        <aux name="Competitor_Total_Assets">
+            <doc>This is the sum of your competitor&apos;s accumulated profits and the total salvage value of his fishing fleet.&#x0D;&#x0D;Units:  dollars</doc>
+            <eqn>Competitor_Ships*Salvage_Value+Competitor_Total_Profits</eqn>
+            <display x="867" y="496" color="blue" />
+        </aux>
+        <aux name="Your_Total_Assets">
+            <doc>This is the sum of your accumulated profits and the total salvage value of your fishing fleet.&#x0D;&#x0D;Units:  dollars</doc>
+            <eqn>Your_Ships*Salvage_Value+Your_Total_Profits</eqn>
+            <display x="865" y="635" color="blue" />
+        </aux>
+        <aux name="Salvage_Value">
+            <doc>This is the salvage value of each ship.  The combined salvage value of all your ships is added to your total assets.&#x0D;&#x0D;Units:  dollars/ship</doc>
+            <eqn>250</eqn>
+            <display x="971" y="574" color="blue" />
+        </aux>
+        <group name="You">
+            <entity name="Your_Op_Costs" />
+            <entity name="Your_Ships" />
+            <entity name="Your_Building_Rate" />
+            <entity name="Your_Build_Costs" />
+            <entity name="Your_Total_Profits" />
+            <entity name="Your_Profit_each_Year" />
+            <entity name="Your_Revenue" />
+            <entity name="Your_Total_Catch" />
+            <display locked="true" x="568" y="49" width="410" height="314" color="red">
+                <item uid="0" />
+                <item uid="1" />
+                <item uid="2" />
+                <item uid="3" />
+                <item uid="4" />
+                <item uid="5" />
+                <item uid="6" />
+                <item uid="7" />
+                <item uid="8" />
+                <item uid="9" />
+                <item uid="10" />
+                <item uid="11" />
+                <item uid="12" />
+            </display>
+        </group>
+        <group name="Competitor_2">
+            <entity name="Ship_Cost" />
+            <entity name="Competitor_Op_Costs" />
+            <entity name="Competitor_Ships" />
+            <entity name="Competitor_Profit_each_Year" />
+            <entity name="Competitor_Build_costs" />
+            <entity name="Competitor_Building_Rate" />
+            <entity name="Competitor_Revenue" />
+            <entity name="Fish_Price" />
+            <entity name="Competitor_Total_Profits" />
+            <display locked="true" x="84" y="49" width="424" height="311" color="red">
+                <item uid="13" />
+                <item uid="14" />
+                <item uid="15" />
+                <item uid="16" />
+                <item uid="17" />
+                <item uid="18" />
+                <item uid="19" />
+                <item uid="20" />
+                <item uid="21" />
+                <item uid="22" />
+                <item uid="23" />
+                <item uid="24" />
+            </display>
+        </group>
+        <group name="The_Fish_2">
+            <entity name="Area" />
+            <entity name="Fish_Death_Rate" />
+            <entity name="Density" />
+            <entity name="FISH" />
+            <entity name="Fish_Hatch_Rate" />
+            <entity name="Catch_per_Ship" />
+            <entity name="Hatch_Fraction" />
+            <entity name="Total_Catch_per_Year" />
+            <entity name="SHIPS" />
+            <entity name="Carrying_Capacity" />
+            <entity name="Death_Fraction" />
+            <display locked="true" x="80" y="432" width="475" height="249" color="red">
+                <item uid="25" />
+                <item uid="26" />
+                <item uid="27" />
+                <item uid="28" />
+                <item uid="29" />
+                <item uid="30" />
+                <item uid="31" />
+                <item uid="32" />
+                <item uid="33" />
+                <item uid="34" />
+                <item uid="35" />
+                <item uid="36" />
+                <item uid="37" />
+                <item uid="38" />
+                <item uid="39" />
+            </display>
+        </group>
+        <display page_width="595" page_height="775" page_order="column" page_cols="2" page_rows="3" isee:converter_size="medium" interval="DT">
+            <alias x="596" y="169" uid="4">
+                <of>Ship_Cost</of>
+            </alias>
+            <alias x="823" y="98" uid="9">
+                <of>Catch_per_Ship</of>
+                <label_side>top</label_side>
+                <label_angle>74</label_angle>
+            </alias>
+            <alias x="467" y="567" uid="36">
+                <of>Your_Ships</of>
+            </alias>
+            <connector x="210" y="495" uid="25">
+                <from>FISH</from>
+                <to>Density</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="184" y="568" uid="32">
+                <from>Density</from>
+                <to>Catch_per_Ship</to>
+                <polarity>-</polarity>
+            </connector>
+            <alias x="337" y="102" uid="21">
+                <of>Catch_per_Ship</of>
+                <label_side>top</label_side>
+                <label_angle>115</label_angle>
+            </alias>
+            <connector x="245" y="497" uid="26">
+                <from>FISH</from>
+                <to>Fish_Death_Rate</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="134" y="609" uid="33">
+                <from>Area</from>
+                <to>Density</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="126" y="514" uid="27">
+                <from>Hatch_Fraction</from>
+                <to>Fish_Hatch_Rate</to>
+                <polarity>-</polarity>
+            </connector>
+            <alias x="472" y="628" uid="37">
+                <of>Competitor_Ships</of>
+            </alias>
+            <connector x="448" y="557" uid="35">
+                <from>
+                    <alias uid="36" />
+                </from>
+                <to>SHIPS</to>
+            </connector>
+            <connector x="236" y="585" uid="28">
+                <from>Catch_per_Ship</from>
+                <to>Total_Catch_per_Year</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="216" y="496" uid="29">
+                <from>FISH</from>
+                <to>Fish_Hatch_Rate</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="248" y="467" uid="34">
+                <from>FISH</from>
+                <to>Death_Fraction</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="484" y="496" uid="38">
+                <from>Carrying_Capacity</from>
+                <to>Death_Fraction</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="419" y="496" uid="30">
+                <from>Death_Fraction</from>
+                <to>Fish_Death_Rate</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="367" y="580" uid="31">
+                <from>SHIPS</from>
+                <to>Total_Catch_per_Year</to>
+            </connector>
+            <connector x="452" y="630" uid="39">
+                <from>
+                    <alias uid="37" />
+                </from>
+                <to>SHIPS</to>
+            </connector>
+            <alias x="932" y="107" uid="10">
+                <of>Fish_Price</of>
+                <label_side>top</label_side>
+            </alias>
+            <connector x="713" y="115" uid="5">
+                <from>Your_Ships</from>
+                <to>Your_Total_Catch</to>
+            </connector>
+            <connector x="922" y="114" uid="11">
+                <from>
+                    <alias uid="10" />
+                </from>
+                <to>Your_Revenue</to>
+            </connector>
+            <connector x="425" y="116" uid="22">
+                <from>Fish_Price</from>
+                <to>Competitor_Revenue</to>
+            </connector>
+            <connector x="334" y="113" uid="13">
+                <from>
+                    <alias uid="21" />
+                </from>
+                <to>Competitor_Revenue</to>
+            </connector>
+            <connector x="259" y="119" uid="14">
+                <from>Competitor_Ships</from>
+                <to>Competitor_Revenue</to>
+            </connector>
+            <alias x="156" y="83" uid="23">
+                <of>Your_Building_Rate</of>
+                <label_side>top</label_side>
+                <label_angle>93</label_angle>
+            </alias>
+            <connector x="160" y="91" uid="15">
+                <from>
+                    <alias uid="23" />
+                </from>
+                <to>Competitor_Building_Rate</to>
+            </connector>
+            <connector x="695" y="120" uid="0">
+                <from>Your_Ships</from>
+                <to>Your_Op_Costs</to>
+            </connector>
+            <connector x="241" y="120" uid="16">
+                <from>Competitor_Ships</from>
+                <to>Competitor_Op_Costs</to>
+            </connector>
+            <connector x="177" y="110" uid="17">
+                <from>Competitor_Building_Rate</from>
+                <to>Competitor_Build_costs</to>
+            </connector>
+            <connector x="147" y="221" uid="24">
+                <from>Ship_Cost</from>
+                <to>Competitor_Build_costs</to>
+            </connector>
+            <connector x="338" y="187" uid="18">
+                <from>Competitor_Revenue</from>
+                <to>Competitor_Profit_each_Year</to>
+            </connector>
+            <connector x="269" y="208" uid="19">
+                <from>Competitor_Op_Costs</from>
+                <to>Competitor_Profit_each_Year</to>
+            </connector>
+            <connector x="205" y="253" uid="20">
+                <from>Competitor_Build_costs</from>
+                <to>Competitor_Profit_each_Year</to>
+            </connector>
+            <connector x="814" y="106" uid="12">
+                <from>
+                    <alias uid="9" />
+                </from>
+                <to>Your_Total_Catch</to>
+            </connector>
+            <connector x="640" y="113" uid="1">
+                <from>Your_Building_Rate</from>
+                <to>Your_Build_Costs</to>
+            </connector>
+            <connector x="607" y="174" uid="2">
+                <from>
+                    <alias uid="4" />
+                </from>
+                <to>Your_Build_Costs</to>
+            </connector>
+            <connector x="660" y="225" uid="3">
+                <from>Your_Build_Costs</from>
+                <to>Your_Profit_each_Year</to>
+            </connector>
+            <connector x="713" y="185" uid="6">
+                <from>Your_Op_Costs</from>
+                <to>Your_Profit_each_Year</to>
+            </connector>
+            <connector x="834" y="189" uid="7">
+                <from>Your_Revenue</from>
+                <to>Your_Profit_each_Year</to>
+            </connector>
+            <connector x="781" y="147" uid="8">
+                <from>Your_Total_Catch</from>
+                <to>Your_Revenue</to>
+            </connector>
+            <alias x="736" y="453" uid="40">
+                <of>Competitor_Total_Profits</of>
+            </alias>
+            <alias x="737" y="536" uid="41">
+                <of>Competitor_Ships</of>
+            </alias>
+            <alias x="741" y="672" uid="42">
+                <of>Your_Ships</of>
+            </alias>
+            <alias x="740" y="600" uid="43">
+                <of>Your_Total_Profits</of>
+            </alias>
+            <connector x="761" y="668" uid="44">
+                <from>
+                    <alias uid="42" />
+                </from>
+                <to>Your_Total_Assets</to>
+            </connector>
+            <connector x="760" y="606" uid="45">
+                <from>
+                    <alias uid="43" />
+                </from>
+                <to>Your_Total_Assets</to>
+            </connector>
+            <connector x="757" y="529" uid="46">
+                <from>
+                    <alias uid="41" />
+                </from>
+                <to>Competitor_Total_Assets</to>
+            </connector>
+            <connector x="756" y="459" uid="47">
+                <from>
+                    <alias uid="40" />
+                </from>
+                <to>Competitor_Total_Assets</to>
+            </connector>
+            <connector x="964" y="565" uid="48">
+                <from>Salvage_Value</from>
+                <to>Competitor_Total_Assets</to>
+            </connector>
+            <connector x="962" y="581" uid="49">
+                <from>Salvage_Value</from>
+                <to>Your_Total_Assets</to>
+            </connector>
+            <stacked_container height="282" width="492" visible_index="3" uid="50">
+                <graph type="time_series" title="Annual Profits" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:43:22Z" cleared="true" time_precision="0" from="1980" to="1990">
+                    <plot index="0" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="-10000" max="10000" />
+                        <entity name="Competitor_Profit_each_Year" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="-10000" max="10000" />
+                        <entity name="Your_Profit_each_Year" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Total Profits" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:43:22Z" cleared="true" time_precision="0" from="1980" to="1990">
+                    <plot index="0" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="-13000" max="39000" />
+                        <entity name="Competitor_Total_Profits" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="-13000" max="39000" />
+                        <entity name="Your_Total_Profits" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Your Catch" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:43:22Z" cleared="true" time_precision="0" from="1980" to="1990">
+                    <plot index="0" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="0" max="26" />
+                        <entity name="Catch_per_Ship" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="0" max="750" />
+                        <entity name="Your_Total_Catch" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Your Ships" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:43:22Z" cleared="true" time_precision="0" from="1980" to="1990">
+                    <plot index="0" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="0" max="30" />
+                        <entity name="Your_Ships" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="black" precision="1" show_y_axis="true">
+                        <scale min="-20" max="20" />
+                        <entity name="Your_Building_Rate" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="537" y="379" width="26" height="22" color="black" label_side="bottom" label="Fishing Game Graphs" type="graph" icon_of="50" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_order="column" page_rows="2" page_width="788" page_height="528">
+            <simulation_delay>0.1</simulation_delay>
+            <isee:bundled_connector color="red">
+                <from>Competitor</from>
+                <to>The_Fish</to>
+                <pts>
+                    <pt x="417" y="204" />
+                    <pt x="417" y="49" />
+                    <pt x="230" y="49" />
+                </pts>
+            </isee:bundled_connector>
+            <isee:process_frame x="58" y="227" width="186" height="116" name="You" show_name="false" color="#9FCBA0" border-style="double" border-width="thick-thin">
+                <image size_to_parent="true" width="192" height="120">data:image/png;base64,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</image>
+                <doc>Your goal is to maximize profits in this fishing industry.  Your catch will be influenced by the density of the fish population as well as the number of ships you have.&#x0D;</doc>
+            </isee:process_frame>
+            <isee:process_frame x="286" y="227" width="196" height="113" name="Competitor" show_name="false" color="#6C4098" border-style="double" border-width="thick-thin">
+                <image size_to_parent="true" width="192" height="120">data:image/png;base64,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</image>
+                <doc>Your competitor will attempt to gain more profit than you by aggressively purchasing more ships.</doc>
+            </isee:process_frame>
+            <isee:bundled_connector color="red">
+                <from>Competitor</from>
+                <to>You</to>
+                <pts>
+                    <pt x="276" y="272" />
+                    <pt x="254" y="272" />
+                </pts>
+            </isee:bundled_connector>
+            <isee:bundled_connector color="red">
+                <from>You</from>
+                <to>Competitor</to>
+                <pts>
+                    <pt x="254" y="246" />
+                    <pt x="276" y="246" />
+                </pts>
+            </isee:bundled_connector>
+            <isee:process_frame x="66" y="39" width="162" height="97" name="The_Fish" show_name="false" color="#CB907A" border-style="double" border-width="thick-thin">
+                <image size_to_parent="true" width="203" height="130">data:image/png;base64,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</image>
+                <doc>The fish population is a renewable resource.  As you catch fish, more fish are hatched to bring the population back up to an equilibrium value.  The ability of the fish population to regenerate diminishes with lower population size.</doc>
+            </isee:process_frame>
+            <isee:bundled_connector color="red">
+                <from>You</from>
+                <to>The_Fish</to>
+                <pts>
+                    <pt x="114" y="195" />
+                    <pt x="114" y="146" />
+                </pts>
+            </isee:bundled_connector>
+            <isee:bundled_connector color="red">
+                <from>The_Fish</from>
+                <to>You</to>
+                <pts>
+                    <pt x="158" y="146" />
+                    <pt x="158" y="195" />
+                </pts>
+            </isee:bundled_connector>
+            <isee:bundled_connector color="red">
+                <from>The_Fish</from>
+                <to>Competitor</to>
+                <pts>
+                    <pt x="230" y="95" />
+                    <pt x="364" y="95" />
+                    <pt x="364" y="204" />
+                </pts>
+            </isee:bundled_connector>
+            <stacked_container x="10" y="440" height="268" width="474" visible_index="3" uid="51">
+                <graph type="time_series" title="Yearly Profit" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:43:22Z" cleared="true" time_precision="0" from="1980" to="1990">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <scale min="-10000" max="10000" />
+                        <entity name="Competitor_Profit_each_Year" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <scale min="-10000" max="10000" />
+                        <entity name="Your_Profit_each_Year" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Total Profits" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:43:22Z" cleared="true" time_precision="0" from="1980" to="1990">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <scale min="-13000" max="39000" />
+                        <entity name="Competitor_Total_Profits" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <scale min="-13000" max="39000" />
+                        <entity name="Your_Total_Profits" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:43:22Z" cleared="true" time_precision="0" from="1980" to="1990">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <scale min="0" max="26" />
+                        <entity name="Catch_per_Ship" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <scale min="0" max="750" />
+                        <entity name="Your_Total_Catch" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:43:22Z" cleared="true" time_precision="0" from="1980" to="1990">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <scale min="0" max="30" />
+                        <entity name="Your_Ships" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <scale min="-10" max="10" />
+                        <entity name="Your_Building_Rate" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="168" y="564" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="51" />
+            <text_box x="231" y="55" uid="52" color="#7F00FF" font-family="Arial" font-size="9" padding="5" width="118" height="34">The fish catch depletes &#x0D;the fish population</text_box>
+            <slider x="367" y="734" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="-10" max="10">
+                <entity name="Your_Building_Rate" value="0" />
+                <reset_to after="one_time_unit">0</reset_to>
+            </slider>
+            <numeric_display precision="0.1" delimit_000s="true" color="blue" show_name="true" retain_ending_value="true" uid="53" x="98" y="721">
+                <entity name="Your_Ships" />
+            </numeric_display>
+            <numeric_display precision="1" display_as="currency" color="blue" show_name="true" retain_ending_value="true" uid="54" x="98" y="737">
+                <entity name="Your_Total_Profits" />
+            </numeric_display>
+            <numeric_display precision="1" display_as="currency" color="blue" show_name="true" retain_ending_value="true" uid="55" x="98" y="754">
+                <entity name="Your_Profit_each_Year" />
+            </numeric_display>
+            <numeric_display precision="0.1" delimit_000s="true" color="blue" show_name="true" retain_ending_value="true" uid="56" x="98" y="770">
+                <entity name="Catch_per_Ship" />
+            </numeric_display>
+            <text_box x="165" y="146" uid="57" color="#7F00FF" font-family="Arial" font-size="9" text-align="center" padding="5" width="137" height="34">The density of the fish&#x0D;population affects the catch&#x0D;</text_box>
+            <text_box x="173" y="362" uid="58" color="#7F00FF" font-family="Arial" font-size="14" font-weight="bold" font-style="italic" text-align="center" padding="5" border-style="solid" border-width="thin" width="169" height="32">Scroll Down...</text_box>
+            <numeric_display precision="1" display_as="currency" color="blue" show_name="true" retain_ending_value="true" uid="59" x="97" y="786">
+                <entity name="Your_Total_Assets" />
+            </numeric_display>
+            <numeric_display precision="1" display_as="currency" color="blue" show_name="true" retain_ending_value="true" uid="60" x="97" y="801">
+                <entity name="Competitor_Total_Assets" />
+            </numeric_display>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="78" content="50" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

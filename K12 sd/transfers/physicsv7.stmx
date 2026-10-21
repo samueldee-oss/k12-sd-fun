@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>physicsv7</name>
+        <uuid>5db2ab72-b422-48de-8348-3f9022fe0696</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="RK2" time_units="Hours" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>60</stop>
+        <dt>0.125</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="interface" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="644" height="662" />
+        <isee:security />
+        <isee:print_setup width="595" height="744" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" show_documentation="true" />
+    <model>
+        <stock name="Position">
+            <doc>Initially, the object sits at its rest position.</doc>
+            <eqn>rest_position</eqn>
+            <scale min="0" max="200" />
+            <inflow>velocity</inflow>
+            <non_negative />
+            <display x="302" y="90" color="#652A48">
+                <scale min="0" max="200" />
+            </display>
+        </stock>
+        <flow name="velocity">
+            <eqn>Momentum/mass</eqn>
+            <display x="224" y="87" color="#652A48" label_side="top">
+                <pts>
+                    <pt x="166" y="87" />
+                    <pt x="282" y="87" />
+                </pts>
+            </display>
+        </flow>
+        <stock name="Momentum">
+            <eqn>0</eqn>
+            <scale min="-2500" max="2500" />
+            <inflow>force</inflow>
+            <outflow>restoring_force</outflow>
+            <display x="255" y="211" color="#652A48" label_side="bottom">
+                <scale min="-2500" max="2500" />
+            </display>
+        </stock>
+        <flow name="force">
+            <eqn>mass*acceleration</eqn>
+            <display x="178" y="215" color="#652A48">
+                <pts>
+                    <pt x="121" y="215" />
+                    <pt x="235" y="215" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="mass">
+            <eqn>75</eqn>
+            <display x="150" y="138" color="#652A48" label_side="top" />
+        </aux>
+        <aux name="acceleration">
+            <doc>-9.8 m/s^2 is the gravitational acceleration on the earth.  A value of -2 (m/s^2) approximates the value on the moon.</doc>
+            <eqn>-9.8</eqn>
+            <display x="91" y="250" color="#652A48" />
+        </aux>
+        <flow name="restoring_force">
+            <doc>Hooke&apos;s law says:  f=-kx.  Here, the direction of the restoring force is handled by the directionality of the flow (confirm this in the equation listing)</doc>
+            <eqn>hookes_constant*displacement_from_rest</eqn>
+            <display x="342" y="214" color="#652A48">
+                <pts>
+                    <pt x="275" y="214" />
+                    <pt x="409" y="214" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="rest_position">
+            <doc>The rest position of the object.</doc>
+            <eqn>100</eqn>
+            <display x="417" y="90" color="#652A48" label_side="top" />
+        </aux>
+        <aux name="displacement_from_rest">
+            <doc>This equation calculates the displacement of the object from its rest position.</doc>
+            <eqn>Position-rest_position</eqn>
+            <display x="331" y="157" color="#652A48" label_side="right" label_angle="3" />
+        </aux>
+        <aux name="hookes_constant">
+            <doc>hooke&apos;s constant tells the strength of the spring in a spring-mass system.  Here, with a setting of 20, we&apos;ve got a pretty hefty spring.</doc>
+            <eqn>20</eqn>
+            <display x="447" y="230" color="#652A48" />
+        </aux>
+        <group name="BOING!!">
+            <entity name="Position" />
+            <entity name="velocity" />
+            <entity name="Momentum" />
+            <entity name="force" />
+            <entity name="mass" />
+            <entity name="acceleration" />
+            <entity name="restoring_force" />
+            <entity name="displacement_from_rest" />
+            <entity name="rest_position" />
+            <entity name="hookes_constant" />
+            <display locked="true" x="40" y="37" width="487" height="268" color="red">
+                <image width="484" height="232">data:image/png;base64,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</image>
+                <item uid="0" />
+                <item uid="1" />
+                <item uid="2" />
+                <item uid="3" />
+                <item uid="4" />
+                <item uid="5" />
+                <item uid="6" />
+                <item uid="7" />
+                <item uid="8" />
+            </display>
+        </group>
+        <display page_width="595" page_height="744" page_order="column" isee:converter_size="large" isee:animate_flows="true" isee:animate_stocks="true" isee:animate_converters="true">
+            <connector x="258" y="194" uid="0" color="#652A48">
+                <from>Momentum</from>
+                <to>velocity</to>
+            </connector>
+            <connector x="162" y="140" uid="1" color="#652A48">
+                <from>mass</from>
+                <to>velocity</to>
+            </connector>
+            <connector x="149" y="150" uid="2" color="#652A48">
+                <from>mass</from>
+                <to>force</to>
+            </connector>
+            <connector x="103" y="252" uid="3" color="#652A48">
+                <from>acceleration</from>
+                <to>force</to>
+            </connector>
+            <connector x="294" y="105" uid="4" color="#652A48">
+                <from>Position</from>
+                <to>displacement_from_rest</to>
+            </connector>
+            <connector x="405" y="89" uid="5" color="#652A48">
+                <from>rest_position</from>
+                <to>displacement_from_rest</to>
+            </connector>
+            <connector x="323" y="166" uid="6" color="#652A48">
+                <from>displacement_from_rest</from>
+                <to>restoring_force</to>
+            </connector>
+            <connector x="442" y="219" uid="7" color="#652A48">
+                <from>hookes_constant</from>
+                <to>restoring_force</to>
+            </connector>
+            <stacked_container height="282" width="492" visible_index="1" uid="8">
+                <graph type="time_series" title="Simple Harmonic Oscillation" background="#C9EAFF" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:03:23Z" cleared="true" time_precision="2" from="0" to="60">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="Position" />
+                    </plot>
+                </graph>
+                <graph type="scatter" title="Scatter Graph" background="#FFE4C9" show_grid="true" plot_numbers="false" isee:use_five_segments="false" date_time="2025-02-04T10:03:23Z" cleared="true" time_precision="2">
+                    <plot index="0" pen_width="1" color="#A5CB7A" precision="0.01" show_y_axis="true">
+                        <entity name="Position" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="#C8C8C8" precision="0.01" show_y_axis="true">
+                        <entity name="Momentum" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="85" y="87" width="26" height="22" color="#0CA0FF" label_angle="51" label="Position and momentum" type="graph" icon_of="8" />
+            <text_box x="0" y="682" uid="9" color="black" font-family="Arial" font-size="12" text-align="center" padding="5" width="326" height="38">Physics</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_order="column" page_width="1588" page_height="1128" background="#FFFFC9">
+            <interaction_mode>flight_sim</interaction_mode>
+            <simulation_delay>0.1</simulation_delay>
+            <isee:process_frame x="50" y="31" width="454" height="260" name="BOING!!" color="#653E18" border-style="solid" border-width="5px" />
+            <stacked_container x="52" y="33" height="256" width="450" visible_index="1" uid="10">
+                <graph type="time_series" title="Untitled Graph" background="#C9FFFF" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:03:23Z" cleared="true" time_precision="2" from="0" to="60">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="Position" />
+                    </plot>
+                </graph>
+                <graph type="scatter" title="Untitled Graph" background="#FFD8C9" show_grid="true" plot_numbers="false" isee:use_five_segments="false" date_time="2025-02-04T10:03:23Z" cleared="true" time_precision="2">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="Position" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <entity name="Momentum" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="267" y="129" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="10" />
+            <slider x="408" y="322" label_side="bottom" label_angle="341" isee:navigate_to="true" color="blue" width="197" height="43" min="0" max="200">
+                <entity name="rest_position" />
+            </slider>
+            <slider x="136" y="322" label_side="bottom" label_angle="201" isee:navigate_to="true" color="blue" width="197" height="43" min="0" max="30">
+                <entity name="hookes_constant" />
+            </slider>
+            <slider x="259" y="371" label_side="bottom" isee:navigate_to="true" color="blue" width="197" height="43" min="-9.8" max="-1.63">
+                <entity name="acceleration" />
+            </slider>
+            <text_box x="24" y="363" uid="11" color="blue" font-family="Times New Roman" font-size="12" text-align="right" padding="5" width="137" height="44">Earth&apos;s Gravitational Acceleration</text_box>
+            <text_box x="357" y="364" uid="12" color="blue" font-family="Times New Roman" font-size="12" padding="5" width="152" height="44">The Moon&apos;s Gravitational Acceleration</text_box>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="13" y="112" content="8" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

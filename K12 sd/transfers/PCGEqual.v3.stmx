@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>PCGEqual.v3</name>
+        <uuid>da22e538-af09-45e9-82e7-5e63f5cc8505</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="RK2" time_units="Hours" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>120</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" show_documentation="true" />
+    <model>
+        <aux name="cattle_per_person">
+            <doc>cattle per person {cattle/people} - replaces &quot;cattle per unit area&quot; because cows aren&apos;t hunted as with a &quot;normal&quot; predator prey relationship.  Nomads and their herds are more tightly coupled, and so this variable reflects that closeness.</doc>
+            <eqn>Cattle/People</eqn>
+            <display x="184" y="403" color="blue" />
+        </aux>
+        <flow name="cattle_births">
+            <doc>cattle births {cattle/yr} - A compounding process is used to depict cattle births.  The births flow is defined as the product of Cattle and their natality.  This process works just like compounding interest in a savings account.</doc>
+            <eqn> Cattle*cattle_natality</eqn>
+            <non_negative />
+            <display x="116" y="331" color="blue" label_side="top">
+                <pts>
+                    <pt x="68" y="331" />
+                    <pt x="164" y="331" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="cattle_deaths">
+            <doc>Cattle deaths {cattle/yr} - In this process, cattle die either by being offtaken by people or by dying of natural causes. </doc>
+            <eqn>Cattle*&#x0D;(cattle_mortality/medical_factor+cattle_offtake_percentage)</eqn>
+            <non_negative />
+            <display x="270" y="331" color="blue" label_side="top">
+                <pts>
+                    <pt x="204" y="331" />
+                    <pt x="337" y="331" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="area">
+            <doc>area {ha} - the area of Sahel land being modeled</doc>
+            <eqn>Cattle*nec_area_per_cow</eqn>
+            <display x="388" y="212" color="blue" />
+        </aux>
+        <aux name="cattle_natality">
+            <doc>Cattle Natality {births/cattle*yr} - Each cow in the ecosystem is assumed to produce this number of offspring (on average) per year.  This number must be equal to the amount of cattle that die per year which includes both offtake and natural death.</doc>
+            <eqn>.30</eqn>
+            <display x="60" y="370" color="blue" />
+        </aux>
+        <flow name="people_births">
+            <doc>People births {people/yr} - A compounding process is used to depict births.  The births flow is defined as the product of the population and natality.  This process works just like compounding interest in a savings account.</doc>
+            <eqn> People*people_natality</eqn>
+            <non_negative />
+            <display x="340" y="513" color="blue" label_side="top">
+                <pts>
+                    <pt x="390" y="513" />
+                    <pt x="290" y="513" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="people_deaths">
+            <doc>People deaths {people/yr} - This is a draining process.  Some fraction of the population will die each year.  The PULSE function is used to jolt the system out of its initial steady-state.</doc>
+            <eqn> People*people_mortality/medical_factor</eqn>
+            <non_negative />
+            <display x="200" y="513" color="blue" label_side="top">
+                <pts>
+                    <pt x="250" y="513" />
+                    <pt x="150" y="513" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="people_natality">
+            <doc>People Natality {people per year} - The average number of offpring the population will generate each year per person.  Note that this fraction must be sufficiently high to replenish the number of people that die each year.</doc>
+            <eqn>.04</eqn>
+            <display x="397" y="549" color="blue" />
+        </aux>
+        <stock name="Cattle">
+            <doc>Cattle {cattle} - The initial amount of cattle owned by the Sahel&apos;s nomads.  On the average, there should be between 3 and 4 head of cattle to support each person.</doc>
+            <eqn>300e3</eqn>
+            <inflow>cattle_births</inflow>
+            <outflow>cattle_deaths</outflow>
+            <display x="184" y="335" color="blue" label_side="bottom" />
+        </stock>
+        <stock name="People">
+            <doc>People {people} - The initially amount of people living in the Sahel area considered by this model.</doc>
+            <eqn>75e3</eqn>
+            <inflow>people_births</inflow>
+            <outflow>people_deaths</outflow>
+            <display x="270" y="517" color="blue" label_side="bottom" />
+        </stock>
+        <aux name="cattle_offtake_percentage">
+            <doc>Cattle offtake percentage {%/yr} - the percentage of cattle that are taken from the herd each year for food.  As the number of cattle rises in comparison with the number of people, the percentage decreases.  As the ratio fall, the percentage increases.</doc>
+            <eqn>cattle_per_person</eqn>
+            <gf>
+                <xscale min="0" max="10" />
+                <yscale min="0" max="1" />
+                <ypts>0.59999999999999998,0.45000000000000001,0.34000000000000002,0.26500000000000001,0.20000000000000001,0.155,0.115,0.10000000000000001,0.085000000000000006,0.070000000000000007,0.065000000000000002</ypts>
+            </gf>
+            <display x="306" y="403" color="blue" />
+        </aux>
+        <aux name="people_mortality">
+            <doc>people mortality {%/yr) - the fraction of the human population that dies each year, is assumed to depend on the number of cattle per person.  With fewer cattle, a greater fraction of the human population will starve.</doc>
+            <eqn>cattle_per_person</eqn>
+            <gf>
+                <xscale min="0" max="10" />
+                <yscale min="0" max="1" />
+                <ypts>1,0.59999999999999998,0.29499999999999998,0.074999999999999997,0.025000000000000001,0.021499999999999998,0.02,0.018499999999999999,0.017000000000000001,0.0155,0.014500000000000001</ypts>
+            </gf>
+            <display x="109" y="529" color="blue" />
+        </aux>
+        <aux name="normalized_cattle">
+            <doc>Normalized Cattle {} - A dimensionless ratio showing the number of cattle compared to the initial, steady state number.  </doc>
+            <eqn>Cattle/INIT(Cattle)</eqn>
+            <scale min="0" max="2" />
+            <display x="144" y="280" color="blue" label_side="top">
+                <scale min="0" max="2" />
+            </display>
+        </aux>
+        <aux name="normalized_people">
+            <doc>Normalized People {} - A dimensionless ratio showing the number of people compared to the initial, steady state number.  </doc>
+            <eqn>People/INIT(People)</eqn>
+            <scale min="0" max="2" />
+            <display x="268" y="573" color="blue">
+                <scale min="0" max="2" />
+            </display>
+        </aux>
+        <flow name="grass_growth">
+            <doc>Grass Growth {kg/yr} - A compounding process is used to depict grass growth.  The growth flow is defined as the product of grass and its natality.  This process works just like compounding interest in a savings account.  The max function works simply to limit the amount of grass grown should the cattle population get too low to regulate grass growth.</doc>
+            <eqn> max(1.7-normalized_grass, 0) *Grass*grass_natality*rain_multiplier</eqn>
+            <non_negative />
+            <display x="397" y="137" color="blue">
+                <pts>
+                    <pt x="447" y="137" />
+                    <pt x="347" y="137" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="grass_eaten">
+            <doc>grass eaten {kg/yr} - This is a draining process.  Some fraction of grass will be eaten each year.</doc>
+            <eqn>Cattle*grass_eaten_per_cow</eqn>
+            <non_negative />
+            <display x="253" y="137" color="blue" label_side="top">
+                <pts>
+                    <pt x="307" y="137" />
+                    <pt x="200" y="137" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="grass_natality">
+            <doc>Grass Natality {%/yr} - The average amount of grass grown each year relative to the present amount of grass.  </doc>
+            <eqn>.7</eqn>
+            <display x="474" y="153" color="blue" />
+        </aux>
+        <stock name="Grass">
+            <doc>Grass {kg} - The initial amount of grass in the Sahel area being modeled.  The equation multiplies the area times the normal amount of grass per unit area (hectare).</doc>
+            <eqn>area*initial_range_condition</eqn>
+            <inflow>grass_growth</inflow>
+            <outflow>grass_eaten</outflow>
+            <display x="327" y="141" color="blue" />
+        </stock>
+        <aux name="cattle_mortality">
+            <doc>Cattle mortality {%/yr} - the fraction of the cattle population that dies each year, is assumed to depend on the amount of grass eaten.  With less grass, a greater fraction of the cattle population will starve.</doc>
+            <eqn>grass_eaten_per_cow</eqn>
+            <gf>
+                <xscale min="0" max="2000" />
+                <yscale min="0" max="1" />
+                <ypts>1,0.5,0.29999999999999999,0.20000000000000001,0.12,0.080000000000000002,0.065000000000000002,0.057500000000000002,0.050000000000000003,0.044999999999999998,0.040000000000000001</ypts>
+            </gf>
+            <display x="388" y="347" color="blue" />
+        </aux>
+        <aux name="normalized_grass">
+            <doc>Normalized Grass {} - A dimensionless ratio showing the amount of grass compared to the initial, steady state amount.  </doc>
+            <eqn>Grass/INIT(Grass)</eqn>
+            <scale min="0" max="2" />
+            <display x="341" y="90" color="blue" label_side="top">
+                <scale min="0" max="2" />
+            </display>
+        </aux>
+        <aux name="nec_area_per_cow">
+            <doc>necessary area per cow {ha} - the area of land necessary to maintain one head of cattle.  (from picardi)</doc>
+            <eqn>20</eqn>
+            <display x="443" y="258" color="blue" />
+        </aux>
+        <aux name="grass_density">
+            <doc>This equation calculates the average density of grass in the ecosystem.</doc>
+            <eqn> Grass/area</eqn>
+            <display x="327" y="212" color="blue" />
+        </aux>
+        <aux name="grass_eaten_per_cow">
+            <doc>Grass Eaten Per Cow {kg/cow} - The amount of grass eaten per cow (per year) increases with the density of grass in the ecosystem.  Note that when density is 0 (there are no hares), the grass eaten  per cow must also be 0.</doc>
+            <eqn>grass_density</eqn>
+            <gf>
+                <xscale min="0" max="200" />
+                <yscale min="0" max="2000" />
+                <ypts>0,320,600,800,920,1000,1070,1140,1180,1230,1250</ypts>
+            </gf>
+            <display x="268" y="247" color="blue" />
+        </aux>
+        <aux name="initial_range_condition">
+            <doc>initial range condition {kg/ha} - the amount of grass per unit of Sahel area</doc>
+            <eqn>100</eqn>
+            <display x="135" y="118" color="blue" label_side="top" />
+        </aux>
+        <aux name="medical_factor">
+            <doc>medical multipler {} - a dimensionless number used to represent advances in modern medical technology.  This number, always greater than one, is used to lower the death rate.  Lowering the death rate results in longer life spans and increased population.  &#x0D;&#x0D;max ~ 2  death rate halfed, life expectancy doubled&#x0D;min -  1 {normal, traditional medical levels}</doc>
+            <eqn>TIME</eqn>
+            <gf>
+                <xscale min="0" max="120" />
+                <yscale min="0" max="2" />
+                <ypts>1,1,1,1,1,1,1,1,1,1,1,1,1</ypts>
+            </gf>
+            <display x="159" y="582" color="blue" />
+        </aux>
+        <aux name="rain_multiplier">
+            <doc>rain multiplier {} - a dimensionless number used to represent the effects of rainfall on the Sahel.  This number influences the grass growth rate by modifying grass natality.  &#x0D;&#x0D;max - 2  {double normal rainfall}&#x0D;min - 0   {no rain at all}</doc>
+            <eqn>TIME</eqn>
+            <gf>
+                <xscale min="0" max="120" />
+                <yscale min="0" max="2" />
+                <ypts>1,1,1,1,1,1,1,1,1,1,1,1,1</ypts>
+            </gf>
+            <display x="440" y="109" color="blue" label_side="top" />
+        </aux>
+        <display page_width="595" page_height="775" page_order="column" page_rows="2" isee:converter_size="medium" scroll_x="8" scroll_y="60">
+            <connector x="305" y="394" uid="0" color="#FF7F00">
+                <from>cattle_offtake_percentage</from>
+                <to>cattle_deaths</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="162" y="347" uid="1" color="#FF7F00">
+                <from>Cattle</from>
+                <to>cattle_births</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="66" y="364" uid="2" color="#FF7F00">
+                <from>cattle_natality</from>
+                <to>cattle_births</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="292" y="534" uid="3" color="#FF7F00">
+                <from>People</from>
+                <to>people_births</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="390" y="544" uid="4" color="#FF7F00">
+                <from>people_natality</from>
+                <to>people_births</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="248" y="534" uid="5" color="#FF7F00">
+                <from>People</from>
+                <to>people_deaths</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="118" y="529" uid="6" color="#FF7F00">
+                <from>people_mortality</from>
+                <to>people_deaths</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="270" y="501" uid="7" color="#FF7F00">
+                <from>People</from>
+                <to>cattle_per_person</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="164" y="346" uid="8" color="#FF7F00">
+                <from>Cattle</from>
+                <to>cattle_per_person</to>
+                <polarity>-</polarity>
+            </connector>
+            <alias x="465" y="212" uid="9">
+                <of>Cattle</of>
+                <label_side>bottom</label_side>
+            </alias>
+            <connector x="196" y="403" uid="10" color="#FF7F00">
+                <from>cattle_per_person</from>
+                <to>cattle_offtake_percentage</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="350" y="92" uid="11" color="#FF7F00">
+                <from>normalized_grass</from>
+                <to>grass_growth</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="164" y="326" uid="12" color="#FF7F00">
+                <from>Cattle</from>
+                <to>normalized_cattle</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="250" y="527" uid="13" color="#FF7F00">
+                <from>People</from>
+                <to>normalized_people</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="185" y="318" uid="14" color="#FF7F00">
+                <from>Cattle</from>
+                <to>grass_eaten</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="349" y="153" uid="15" color="blue">
+                <from>Grass</from>
+                <to>grass_growth</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="465" y="153" uid="16" color="#FF7F00">
+                <from>grass_natality</from>
+                <to>grass_growth</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="280" y="248" uid="17" color="#FF7F00">
+                <from>grass_eaten_per_cow</from>
+                <to>cattle_mortality</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="307" y="133" uid="18" color="#FF7F00">
+                <from>Grass</from>
+                <to>normalized_grass</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="376" y="212" uid="19" color="#FF7F00">
+                <from>area</from>
+                <to>grass_density</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="315" y="212" uid="20" color="#FF7F00">
+                <from>grass_density</from>
+                <to>grass_eaten_per_cow</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="327" y="156" uid="21" color="#FF7F00">
+                <from>Grass</from>
+                <to>grass_density</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="379" y="347" uid="22" color="#FF7F00">
+                <from>cattle_mortality</from>
+                <to>cattle_deaths</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="267" y="238" uid="23" color="#FF7F00">
+                <from>grass_eaten_per_cow</from>
+                <to>grass_eaten</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="206" y="349" uid="24" color="blue">
+                <from>Cattle</from>
+                <to>cattle_deaths</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="445" y="212" uid="25" color="#FF7F00">
+                <from>
+                    <alias uid="9" />
+                </from>
+                <to>area</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="436" y="248" uid="26" color="#FF7F00">
+                <from>nec_area_per_cow</from>
+                <to>area</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="161" y="573" uid="27" color="#FF7F00">
+                <from>medical_factor</from>
+                <to>people_deaths</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="172" y="406" uid="28" color="#FF7F00">
+                <from>cattle_per_person</from>
+                <to>people_mortality</to>
+                <polarity>-</polarity>
+            </connector>
+            <alias x="384" y="422" uid="29">
+                <of>medical_factor</of>
+            </alias>
+            <connector x="379" y="415" uid="30" color="#FF7F00">
+                <from>
+                    <alias uid="29" />
+                </from>
+                <to>cattle_deaths</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="434" y="115" uid="31" color="#FF7F00">
+                <from>rain_multiplier</from>
+                <to>grass_growth</to>
+                <polarity>-</polarity>
+            </connector>
+            <stacked_container height="282" width="492" uid="32">
+                <graph type="time_series" title="Untitled Graph" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:47:31Z" cleared="true" time_precision="0" from="0" to="120">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <entity name="normalized_people" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <entity name="normalized_cattle" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="1" show_y_axis="true">
+                        <entity name="normalized_grass" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="96" y="181" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="32" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_order="column" page_cols="0" page_rows="0" page_width="788" page_height="528" home_page="0">
+            <simulation_delay>0.1</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="78" content="32" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

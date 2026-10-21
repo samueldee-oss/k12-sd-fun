@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>ResContrl.v5</name>
+        <uuid>0f5fc7bc-d198-410e-bbc3-27ae63b2f23b</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="RK4" time_units="Months" pause_interval="1" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>0</start>
+        <stop>60</stop>
+        <dt>0.25</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="interface" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="630" height="431" />
+        <isee:security />
+        <isee:print_setup width="576" height="731" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" />
+    <model>
+        <aux name="Inflow">
+            <eqn>TIME</eqn>
+            <gf>
+                <xscale min="0" max="60" />
+                <yscale min="0" max="100" />
+                <ypts>25,20,18,15,10,6,4,2,2,9,26,52,52,28,24,20,15,12,6,4,3,15,27,59,56,32,29,26,22,19,17,14,12,18,36,62,54,26,16,11,6,5,2,1,1,1,6,26,48,47,46,25,20,15,14,3,4,25,48,54,46</ypts>
+            </gf>
+            <display x="127" y="110" color="blue" />
+        </aux>
+        <stock name="Reservoir_Level">
+            <eqn>45</eqn>
+            <scale min="0" max="80" />
+            <inflow>Flow_into_Reservoir</inflow>
+            <outflow>Normal_outflow_and_losses</outflow>
+            <outflow>Water_Released</outflow>
+            <non_negative />
+            <display x="299" y="157" color="blue">
+                <scale min="0" max="80" />
+            </display>
+        </stock>
+        <flow name="Flow_into_Reservoir">
+            <eqn>Inflow</eqn>
+            <scale min="0" max="80" />
+            <non_negative />
+            <display x="245" y="155" color="blue">
+                <scale min="0" max="80" />
+                <pts>
+                    <pt x="212" y="155" />
+                    <pt x="279" y="155" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Normal_outflow_and_losses">
+            <eqn>Reservoir_Level*.08</eqn>
+            <non_negative />
+            <display x="394" y="144" color="blue">
+                <pts>
+                    <pt x="319" y="144" />
+                    <pt x="470" y="144" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Water_Released">
+            <eqn>6</eqn>
+            <non_negative />
+            <display x="310" y="251" color="blue" label_angle="277">
+                <pts>
+                    <pt x="310" y="172" />
+                    <pt x="310" y="330" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Full_Reservoir">
+            <eqn>60</eqn>
+            <scale min="0" max="80" />
+            <display x="256" y="50" color="blue">
+                <scale min="0" max="80" />
+            </display>
+        </aux>
+        <aux name="Minimum_water_level">
+            <eqn>18</eqn>
+            <scale min="0" max="80" />
+            <display x="390" y="57" color="blue">
+                <scale min="0" max="80" />
+            </display>
+        </aux>
+        <display page_width="576" page_height="731" page_cols="2" isee:converter_size="large" interval="DT">
+            <connector x="138" y="115" uid="0">
+                <from>Inflow</from>
+                <to>Flow_into_Reservoir</to>
+            </connector>
+            <connector x="320" y="158" uid="1">
+                <from>Reservoir_Level</from>
+                <to>Normal_outflow_and_losses</to>
+            </connector>
+            <text_box x="-32767" y="-32767" uid="2" color="#7F00FF" font-family="Arial" font-size="9" padding="5" border-style="solid" border-width="thin" width="260" height="60">AST30522696</text_box>
+            <text_box x="-32767" y="-32767" uid="3" color="#7F00FF" font-family="Arial" font-size="9" padding="5" border-style="solid" border-width="thin" width="260" height="60">AST30522222</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="2" page_width="640" page_height="480">
+            <simulation_delay>0</simulation_delay>
+            <stacked_container x="2" y="3" height="261" width="459" uid="4">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:05:21Z" cleared="true" time_precision="2" from="0" to="60">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="Reservoir_Level" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <entity name="Full_Reservoir" />
+                    </plot>
+                    <plot index="2" pen_width="1" color="fuchsia" precision="0.01" show_y_axis="true">
+                        <entity name="Minimum_water_level" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="19" y="17" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="4" />
+            <stacked_container x="657" y="2" height="282" width="492" uid="5">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T10:05:21Z" cleared="true" time_precision="2" from="0" to="60">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="Flow_into_Reservoir" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="768" y="106" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 2" type="graph" icon_of="5" />
+            <slider x="145" y="299" label_side="bottom" isee:navigate_to="true" color="#3D653D" width="197" height="43" min="0" max="60">
+                <entity name="Water_Released" value="6" />
+            </slider>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

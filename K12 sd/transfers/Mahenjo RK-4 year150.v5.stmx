@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Mahenjo RK-4 year150.v5</name>
+        <uuid>e06a63d8-96df-4e9d-b539-61b16d36d0f2</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="RK4" time_units="Years" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>150</start>
+        <stop>600</stop>
+        <dt>0.1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="817" height="572" />
+        <isee:security />
+        <isee:print_setup width="552" height="728" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" show_documentation="true" />
+    <model>
+        <stock name="people">
+            <doc>We set the original  population of Mahenjo daro to 800.  In the shortened version, used as an option in the game, we start in year 150 with 5623 people.</doc>
+            <eqn>800</eqn>
+            <scale min="0" max="40000" />
+            <inflow>birth</inflow>
+            <outflow>death</outflow>
+            <non_negative />
+            <display x="144" y="56" color="blue">
+                <scale min="0" max="40000" />
+            </display>
+        </stock>
+        <flow name="birth">
+            <doc>The total number of people times the birth rate will give us the number of people born each year.</doc>
+            <eqn>people*birth_rate</eqn>
+            <non_negative />
+            <display x="100" y="55" color="blue">
+                <pts>
+                    <pt x="76" y="55" />
+                    <pt x="124" y="55" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="birth_rate">
+            <doc>We set the birthrate to 3.3%.  This is a constant that we did not feel was dependent on outside conditions.</doc>
+            <eqn>.033</eqn>
+            <display x="68" y="114" color="blue" />
+        </aux>
+        <flow name="death">
+            <doc>The number of deaths is equal to the death rate times the population of Mahenjo Daro.  This death rate may include both deaths from natural causes and floods.</doc>
+            <eqn>if flood_level&gt;rain_level then death_rate*people else death_rate*people</eqn>
+            <non_negative />
+            <display x="207" y="56" color="blue" label_angle="282">
+                <pts>
+                    <pt x="164" y="56" />
+                    <pt x="250" y="56" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="death_rate">
+            <doc>If the rainfall exceeds the “flood level”, that is, is high enough to cause a flood based on the current level of deforestation, than a flood will kill 25% of the inhabitants.  Otherwise, 2% die of natural causes.</doc>
+            <eqn>if rain_level &gt; flood_level then .25 else .02</eqn>
+            <display x="233" y="112" color="blue" />
+        </aux>
+        <stock name="forest">
+            <doc>The forest has a initial population of 5 million.  </doc>
+            <eqn>5000000</eqn>
+            <scale min="0" max="5000000" />
+            <inflow>new_trees</inflow>
+            <outflow>trees_used</outflow>
+            <non_negative />
+            <display x="371" y="51" color="blue">
+                <scale min="0" max="5000000" />
+            </display>
+        </stock>
+        <flow name="new_trees">
+            <doc>If the forest is at its maximum (stable size), there is no growth.  Otherwise, the annual growth rate of the forest is .15% of the existing trees.  </doc>
+            <eqn>if forest&gt;5000000 then 0 else forest*.0015</eqn>
+            <non_negative />
+            <display x="321" y="52" color="blue">
+                <pts>
+                    <pt x="292" y="52" />
+                    <pt x="351" y="52" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="fuel_rate">
+            <doc>We assume that each person uses the equivalent of 1.2 trees/year for fuel.</doc>
+            <eqn>1.2</eqn>
+            <display x="507" y="68" color="blue" />
+        </aux>
+        <flow name="trees_used">
+            <doc>The tree use has three parts.  The first is the number of trees used for construction of new buildings.  This is obtained by multiplying the buildings built times the number of trees used to build each building.  The second factor is the use of trees for fuel.  The third is loss of trees due to erosion produced by floods.  Destruction of environment by floods both kills trees and produces an ecosystem in which new trees may not survive.  Both loss rates are combined by multiplying the number of trees by an erosion loss factor.</doc>
+            <eqn>tree_use_rate*new_buildings+fuel_rate*people+forest*Erosion_tree_loss</eqn>
+            <non_negative />
+            <display x="419" y="52" color="blue">
+                <pts>
+                    <pt x="391" y="52" />
+                    <pt x="448" y="52" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="tree_use_rate">
+            <doc>The people of Mahenjo Daro use an average of 4.5 trees for the bricks for every building they build.</doc>
+            <eqn>4.5</eqn>
+            <display x="461" y="112" color="blue" />
+        </aux>
+        <stock name="buildings">
+            <doc>We initially have 120 buildings for 800 people.  In the shortened version of the model for the game we start in year 150 with 843 buildings.</doc>
+            <eqn>120</eqn>
+            <inflow>new_buildings</inflow>
+            <outflow>building_destruction</outflow>
+            <non_negative />
+            <display x="240" y="217" color="blue" />
+        </stock>
+        <flow name="new_buildings">
+            <doc>New buildings are built to deal with increases in population as well as to replace damaged buildings.  The building rate is multiplied by the increase in population (births – deaths) to get the number of new buildings needed.  The number of replacement buildings needed is found by multiplying the number of buildings destroyed by .8 (we assume some buildings can be repaired, others simply will not be rebuilt.</doc>
+            <eqn>building_rate*(birth-death)+0.8*building_destruction</eqn>
+            <non_negative />
+            <display x="193" y="218" color="blue">
+                <pts>
+                    <pt x="166" y="218" />
+                    <pt x="220" y="218" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="building_rate">
+            <doc>This decimal came from our original ratio of 120 buildings for 800 people.  &#x0D;120 buildings/800 people = .15 buildings per person</doc>
+            <eqn>.15</eqn>
+            <display x="174" y="283" color="blue" />
+        </aux>
+        <flow name="building_destruction">
+            <doc>If the forest is reduced to less than 60% of its original size, then floods can take place during heavy rain.  In that case, buildings are destroyed by the heavy rains and the silt.  Otherwise, the sturdy brick buildings survive.</doc>
+            <eqn>if rain_level&gt;flood_level then buildings*0.65 else 0</eqn>
+            <non_negative />
+            <display x="297" y="217" color="blue">
+                <pts>
+                    <pt x="260" y="217" />
+                    <pt x="335" y="217" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="rain_level">
+            <doc>The rain level is amount of rain that falls in one year. It is set as a function with a period of 16 years. Most years yield small values of order one between consecutive large amounts of rain exceeding about 5 times the normal precipitation level. If there is not enough protection from the forest, it leads to destructive flooding.  The function regulating the rain level was developed by Andrew Jonca.</doc>
+            <eqn>7/4+0.8694*cos(pi/8*time)+0.8527*cos(pi/4*time)+0.8253*cos(3/8*pi*time)+0.7878*cos(pi/2*time)</eqn>
+            <display x="410" y="185" color="blue" />
+        </aux>
+        <aux name="flood_level">
+            <doc>We assume that floods take place if the rainfall is extremely heavy and ground cover is reduced in the forest.  As more trees are cut down, floods are more likely.  This function establishes the level of rain necessary to cause a flood by multiplying the forest population by a contant factor.</doc>
+            <eqn>1.2+0.0000012*forest</eqn>
+            <display x="368" y="112" color="blue" />
+        </aux>
+        <aux name="Erosion_tree_loss">
+            <doc>Erosion of forest land both kills trees and reduces the ability of the forest to recover through new growth.  Both factors are combined in this converter.  When the forest is reduced to 30% of its original size due to logging, it is assumed that floods will take place which will reduce the tree population and recovery ability.  It is assumed that this will result in a steady loss of a fraction of the remaining trees.</doc>
+            <eqn>IF(forest&lt;1500000)THEN(.013)ELSE(0)</eqn>
+            <display x="439" y="21" color="blue" label_side="right" label_angle="6" />
+        </aux>
+        <group name="Sector_1">
+            <display locked="true" x="29" y="167" width="112" height="150" color="red">
+                <item uid="0" />
+                <item uid="1" />
+                <item uid="2" />
+            </display>
+        </group>
+        <display page_width="552" page_height="728" isee:converter_size="large" report_flows="summed" scroll_x="24">
+            <connector x="202" y="207" uid="3">
+                <from>new_buildings</from>
+                <to>trees_used</to>
+            </connector>
+            <connector x="67" y="102" uid="4">
+                <from>birth_rate</from>
+                <to>birth</to>
+            </connector>
+            <connector x="230" y="100" uid="5">
+                <from>death_rate</from>
+                <to>death</to>
+            </connector>
+            <connector x="461" y="100" uid="6">
+                <from>tree_use_rate</from>
+                <to>trees_used</to>
+            </connector>
+            <connector x="164" y="276" uid="7">
+                <from>building_rate</from>
+                <to>new_buildings</to>
+            </connector>
+            <connector x="360" y="68" uid="8">
+                <from>forest</from>
+                <to>new_trees</to>
+            </connector>
+            <connector x="104" y="63" uid="9">
+                <from>birth</from>
+                <to>new_buildings</to>
+            </connector>
+            <connector x="262" y="229" uid="10">
+                <from>buildings</from>
+                <to>building_destruction</to>
+            </connector>
+            <connector x="166" y="39" uid="11">
+                <from>people</from>
+                <to>trees_used</to>
+            </connector>
+            <connector x="377" y="66" uid="12">
+                <from>forest</from>
+                <to>flood_level</to>
+            </connector>
+            <connector x="142" y="73" uid="13">
+                <from>people</from>
+                <to>birth</to>
+            </connector>
+            <connector x="153" y="73" uid="14">
+                <from>people</from>
+                <to>death</to>
+            </connector>
+            <connector x="357" y="116" uid="15">
+                <from>flood_level</from>
+                <to>death_rate</to>
+            </connector>
+            <connector x="397" y="184" uid="16">
+                <from>rain_level</from>
+                <to>death_rate</to>
+            </connector>
+            <connector x="358" y="119" uid="17">
+                <from>flood_level</from>
+                <to>building_destruction</to>
+            </connector>
+            <connector x="495" y="68" uid="18">
+                <from>fuel_rate</from>
+                <to>trees_used</to>
+            </connector>
+            <connector x="406" y="196" uid="19">
+                <from>rain_level</from>
+                <to>building_destruction</to>
+            </connector>
+            <connector x="202" y="64" uid="20">
+                <from>death</from>
+                <to>new_buildings</to>
+            </connector>
+            <connector x="291" y="224" uid="21">
+                <from>building_destruction</from>
+                <to>new_buildings</to>
+            </connector>
+            <connector x="356" y="109" uid="22">
+                <from>flood_level</from>
+                <to>death</to>
+            </connector>
+            <connector x="399" y="179" uid="23">
+                <from>rain_level</from>
+                <to>death</to>
+            </connector>
+            <connector x="384" y="36" uid="24">
+                <from>forest</from>
+                <to>Erosion_tree_loss</to>
+            </connector>
+            <connector x="393" y="58" uid="25">
+                <from>forest</from>
+                <to>trees_used</to>
+            </connector>
+            <connector x="439" y="33" uid="26">
+                <from>Erosion_tree_loss</from>
+                <to>trees_used</to>
+            </connector>
+            <alias x="83" y="183" uid="0">
+                <of>birth_rate</of>
+            </alias>
+            <alias x="82" y="226" uid="1">
+                <of>building_rate</of>
+            </alias>
+            <alias x="83" y="275" uid="2">
+                <of>tree_use_rate</of>
+            </alias>
+            <stacked_container height="282" width="492" uid="27">
+                <graph type="time_series" title="Population/Tree Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:51:31Z" cleared="true" time_precision="2" from="150" to="600">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="forest" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="0.01" show_y_axis="true">
+                        <entity name="people" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="467" y="168" width="26" height="22" color="black" label_side="bottom" label="Graph 1" type="graph" icon_of="27" />
+            <stacked_container height="286" width="465" uid="28">
+                <table font-size="9" background="white" column_width="60" orientation="vertical" interval="1" report_flows="summed" cleared="true" date_time="1994-04-17T07:12:45Z">
+                    <title>Buildings/Forest/People</title>
+                    <item type="time" color="black" width="100" />
+                    <item color="black" header-text-align="center" precision="1" display_as="number" index="0">
+                        <entity name="buildings" />
+                    </item>
+                    <item color="black" header-text-align="center" precision="1" display_as="number" index="1">
+                        <entity name="forest" />
+                    </item>
+                    <item color="black" header-text-align="center" precision="1" display_as="number" index="2">
+                        <entity name="people" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="467" y="219" width="26" height="22" color="#1D1D1D" label_side="bottom" label="Table 1" type="table" icon_of="28" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_width="640" page_height="480">
+            <simulation_delay>0</simulation_delay>
+            <isee:process_frame x="30" y="75" width="155" height="75" name="Sector_1" color="#0CA0FF" border-style="solid" border-width="thin" />
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="8" y="51" content="27" />
+        <popup x="8" y="51" content="28" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

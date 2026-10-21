@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>FishBanksModel4.v3</name>
+        <uuid>e0c12822-7d54-4639-99ea-b74622be5c10</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Hours" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>1970</start>
+        <stop>1986</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="model" grid_width="20" grid_height="50" divide_by_zero_alert="true" hide_taskbar="true" show_module_prefix="true">
+        <isee:window width="1366" height="685" />
+        <isee:security />
+        <isee:print_setup width="595" height="775" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" show_documentation="true" />
+    <model>
+        <stock name="Fish">
+            <eqn>1000</eqn>
+            <scale min="0" max="1000" />
+            <inflow>Fish_Births</inflow>
+            <outflow>Fish_Deaths</outflow>
+            <outflow>Total_Catch_per_Year</outflow>
+            <display x="157" y="47" color="blue">
+                <scale min="0" max="1000" />
+            </display>
+        </stock>
+        <flow name="Fish_Births">
+            <eqn>Fish*Birth_Fraction</eqn>
+            <non_negative />
+            <display x="94" y="54" color="blue">
+                <pts>
+                    <pt x="51" y="54" />
+                    <pt x="137" y="54" />
+                </pts>
+            </display>
+        </flow>
+        <flow name="Fish_Deaths">
+            <eqn>Fish*Death_Fraction</eqn>
+            <non_negative />
+            <display x="224" y="55" color="blue">
+                <pts>
+                    <pt x="177" y="55" />
+                    <pt x="271" y="55" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Birth_Fraction">
+            <eqn>6</eqn>
+            <display x="40" y="93" color="blue" />
+        </aux>
+        <aux name="Death_Fraction">
+            <eqn>Fish/Carrying_Capacity</eqn>
+            <gf>
+                <xscale min="0" max="1" />
+                <yscale min="4" max="7" />
+                <ypts>5.2199999999999998,5.2199999999999998,5.2300000000000004,5.2400000000000002,5.2599999999999998,5.29,5.3399999999999999,5.4500000000000002,5.6600000000000001,5.9400000000000004,6</ypts>
+            </gf>
+            <display x="335" y="78" color="blue" />
+        </aux>
+        <aux name="Carrying_Capacity">
+            <eqn>1200</eqn>
+            <display x="415" y="57" color="blue" />
+        </aux>
+        <flow name="Total_Catch_per_Year">
+            <eqn>Catch_per_Ship*Ships</eqn>
+            <scale min="0" max="800" />
+            <non_negative />
+            <display x="227" y="134" color="blue" label_side="top">
+                <scale min="0" max="800" />
+                <pts>
+                    <pt x="156" y="62" />
+                    <pt x="156" y="134" />
+                    <pt x="298" y="134" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Catch_per_Ship">
+            <eqn>Density</eqn>
+            <gf>
+                <xscale min="0" max="10" />
+                <yscale min="0" max="25" />
+                <ypts>0,5,10.4,15.9,20.199999999999999,22.100000000000001,23.199999999999999,23.800000000000001,24.199999999999999,24.600000000000001,25</ypts>
+            </gf>
+            <display x="169" y="170" color="blue" label_side="top" />
+        </aux>
+        <stock name="Ships">
+            <eqn>10</eqn>
+            <scale min="0" max="60" />
+            <inflow>Ship_Building_Rate</inflow>
+            <outflow>Ship_Scrapping_Rate</outflow>
+            <display x="316" y="197" color="blue" label_side="bottom">
+                <scale min="0" max="60" />
+            </display>
+        </stock>
+        <aux name="Density">
+            <eqn>Fish/Area</eqn>
+            <display x="88" y="155" color="blue" />
+        </aux>
+        <aux name="Area">
+            <eqn>100</eqn>
+            <display x="29" y="188" color="blue" />
+        </aux>
+        <flow name="Ship_Building_Rate">
+            <eqn>Yearly_Profits*Fraction_Invested/Ship_Cost</eqn>
+            <non_negative />
+            <display x="382" y="197" color="blue" label_side="top">
+                <pts>
+                    <pt x="429" y="197" />
+                    <pt x="336" y="197" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Ship_Cost">
+            <eqn>300</eqn>
+            <display x="435" y="232" color="blue" />
+        </aux>
+        <aux name="Fraction_Invested">
+            <eqn>.2</eqn>
+            <display x="412" y="277" color="blue" />
+        </aux>
+        <aux name="Yearly_Profits">
+            <eqn>Revenues-Costs</eqn>
+            <scale min="0" max="10000" />
+            <display x="348" y="263" color="blue">
+                <scale min="0" max="10000" />
+            </display>
+        </aux>
+        <aux name="Costs">
+            <eqn>250*Ships</eqn>
+            <display x="270" y="244" color="blue" />
+        </aux>
+        <aux name="Revenues">
+            <eqn>Total_Catch_per_Year*Fish_Price</eqn>
+            <display x="242" y="305" color="blue" />
+        </aux>
+        <aux name="Fish_Price">
+            <eqn>20</eqn>
+            <display x="151" y="294" color="blue" />
+        </aux>
+        <flow name="Ship_Scrapping_Rate">
+            <eqn>Ships/Maximum_Ship_Lifetime</eqn>
+            <non_negative />
+            <display x="248" y="195" color="blue" label_side="top">
+                <pts>
+                    <pt x="296" y="195" />
+                    <pt x="200" y="195" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Maximum_Ship_Lifetime">
+            <eqn>12</eqn>
+            <display x="164" y="241" color="blue" label_side="left" label_angle="225" />
+        </aux>
+        <display page_width="595" page_height="775" isee:converter_size="medium" interval="DT">
+            <connector x="140" y="64" uid="0">
+                <from>Fish</from>
+                <to>Fish_Births</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="45" y="85" uid="1">
+                <from>Birth_Fraction</from>
+                <to>Fish_Births</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="179" y="56" uid="2">
+                <from>Fish</from>
+                <to>Fish_Deaths</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="326" y="77" uid="3">
+                <from>Death_Fraction</from>
+                <to>Fish_Deaths</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="403" y="55" uid="4">
+                <from>Carrying_Capacity</from>
+                <to>Death_Fraction</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="178" y="37" uid="5">
+                <from>Fish</from>
+                <to>Death_Fraction</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="178" y="167" uid="6">
+                <from>Catch_per_Ship</from>
+                <to>Total_Catch_per_Year</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="294" y="185" uid="7">
+                <from>Ships</from>
+                <to>Total_Catch_per_Year</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="148" y="62" uid="8">
+                <from>Fish</from>
+                <to>Density</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="100" y="155" uid="9">
+                <from>Density</from>
+                <to>Catch_per_Ship</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="38" y="180" uid="10">
+                <from>Area</from>
+                <to>Density</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="427" y="229" uid="11">
+                <from>Ship_Cost</from>
+                <to>Ship_Building_Rate</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="408" y="269" uid="12">
+                <from>Fraction_Invested</from>
+                <to>Ship_Building_Rate</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="353" y="256" uid="13">
+                <from>Yearly_Profits</from>
+                <to>Ship_Building_Rate</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="251" y="297" uid="14">
+                <from>Revenues</from>
+                <to>Yearly_Profits</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="305" y="212" uid="15">
+                <from>Ships</from>
+                <to>Costs</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="283" y="242" uid="16">
+                <from>Costs</from>
+                <to>Yearly_Profits</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="223" y="142" uid="17">
+                <from>Total_Catch_per_Year</from>
+                <to>Revenues</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="163" y="295" uid="18">
+                <from>Fish_Price</from>
+                <to>Revenues</to>
+                <polarity>-</polarity>
+            </connector>
+            <connector x="172" y="238" uid="19">
+                <from>Maximum_Ship_Lifetime</from>
+                <to>Ship_Scrapping_Rate</to>
+            </connector>
+            <connector x="294" y="210" uid="20">
+                <from>Ships</from>
+                <to>Ship_Scrapping_Rate</to>
+            </connector>
+            <stacked_container height="282" width="492" visible_index="1" uid="21">
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:40:16Z" cleared="true" time_precision="0" from="1970" to="1986">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <scale min="0" max="60" />
+                        <entity name="Ships" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <scale min="0" max="800" />
+                        <entity name="Total_Catch_per_Year" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Untitled Graph" background="#C8C8C8" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-07T15:40:16Z" cleared="true" time_precision="0" from="1970" to="1986">
+                    <plot index="0" pen_width="1" color="red" precision="1" show_y_axis="true">
+                        <scale min="0" max="1000" />
+                        <entity name="Fish" />
+                    </plot>
+                    <plot index="1" pen_width="1" color="blue" precision="1" show_y_axis="true">
+                        <scale min="0" max="10000" />
+                        <entity name="Yearly_Profits" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="489" y="108" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Graph 1" type="graph" icon_of="21" />
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_cols="0" page_rows="0" page_width="788" page_height="528" home_page="0">
+            <simulation_delay>0.1</simulation_delay>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <popup x="16" y="78" content="21" />
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>

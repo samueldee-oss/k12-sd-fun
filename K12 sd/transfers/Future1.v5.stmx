@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" level="3" xmlns="http://www.systemdynamics.org/XMILE" xmlns:isee="http://iseesystems.com/XMILE">
+    <header>
+        <smile version="1.0" namespace="std, isee">
+            <uses_arrays>1</uses_arrays>
+        </smile>
+        <name>Future1.v5</name>
+        <uuid>9a24b371-5261-4c2b-b849-1fdc2f918dca</uuid>
+        <vendor>isee systems, inc.</vendor>
+        <product version="10.1.2" isee:saved_by_v1="false" lang="en">iThink</product>
+    </header>
+    <style>
+        <model font-family="Arial" font-size="9" />
+        <interface font-family="Arial" font-size="9" />
+    </style>
+    <sim_specs method="Euler" time_units="Age" isee:pause_after_rates="false" isee:instantaneous_flows="false">
+        <start>16</start>
+        <stop>65</stop>
+        <dt>1</dt>
+        <isee:analyze_mode>false</isee:analyze_mode>
+    </sim_specs>
+    <dimensions>
+        <dim name="Dim_Name_1" size="1" />
+    </dimensions>
+    <model_units />
+    <isee:prefs last_model="true" layer="interface" grid_width="20" grid_height="50" divide_by_zero_alert="true" link_high_level_map="true" show_module_prefix="true">
+        <isee:window width="775" height="569" />
+        <isee:security />
+        <isee:print_setup width="552" height="730" />
+    </isee:prefs>
+    <isee:equation_prefs order_by="sector" show_documentation="true" />
+    <model>
+        <stock name="Bank_Account">
+            <eqn>0</eqn>
+            <inflow>Income</inflow>
+            <outflow>Expenses</outflow>
+            <display x="199" y="190" color="blue" />
+        </stock>
+        <flow name="Income">
+            <eqn>IF(Time&gt;(6+Years_of_Education))Then((Salary_Conditional)*Graph_Conditional +(Bank_Account*Positive_Interest))Else(0)</eqn>
+            <non_negative />
+            <display x="107" y="188" color="blue" label_side="top">
+                <pts>
+                    <pt x="35" y="188" />
+                    <pt x="179" y="188" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Salary_Conditional">
+            <doc>The assumption is that starting salary will be commensurate with educational level. The set value was determined from statistical data.</doc>
+            <eqn>if Whole_Number_Rounder = 1 then Type_1_Starting_Salary else if Whole_Number_Rounder = 2 then Type_2_Starting_Salary else Type_3_Starting_Salary</eqn>
+            <display x="121" y="402" color="blue" label_side="left" label_angle="174" />
+        </aux>
+        <flow name="Expenses">
+            <eqn>IF(TIME&gt;(Years_of_Education+6))THEN(12*(Car_Payment+Mortgage_or_Rent+Living_Expenses)*(1.02^(TIME-16))+(Bank_Account*Negative_Interest))ELSE(0)</eqn>
+            <non_negative />
+            <display x="244" y="186" color="blue" label_side="top" label_angle="85">
+                <pts>
+                    <pt x="219" y="186" />
+                    <pt x="269" y="186" />
+                </pts>
+            </display>
+        </flow>
+        <aux name="Positive_Interest">
+            <doc>Interest earned on savings balance.</doc>
+            <eqn>if Bank_Account &gt; 0 then .05 else 0</eqn>
+            <display x="188" y="245" color="blue" />
+        </aux>
+        <aux name="Negative_Interest">
+            <doc>Interest paid on loans.</doc>
+            <eqn>if Bank_Account &lt; 0 then -.15 else 0</eqn>
+            <display x="256" y="276" color="blue" />
+        </aux>
+        <aux name="Car_Payment">
+            <eqn>0</eqn>
+            <display x="391" y="187" color="blue" />
+        </aux>
+        <aux name="Mortgage_or_Rent">
+            <eqn>0</eqn>
+            <display x="394" y="230" color="blue" />
+        </aux>
+        <aux name="Living_Expenses">
+            <eqn>0</eqn>
+            <display x="390" y="278" color="blue" />
+        </aux>
+        <aux name="Type_1_Starting_Salary">
+            <eqn>10000</eqn>
+            <display x="59" y="448" color="blue" />
+        </aux>
+        <aux name="Type_2_Starting_Salary">
+            <eqn>10000</eqn>
+            <display x="118" y="499" color="blue" />
+        </aux>
+        <aux name="Type_3_Starting_Salary">
+            <eqn>14000</eqn>
+            <display x="178" y="448" color="blue" />
+        </aux>
+        <aux name="Whole_Number_Rounder">
+            <doc>All numbers on the slider will be converted to whole numbers 1, 2, or 3.</doc>
+            <eqn>Years_of_Education</eqn>
+            <gf type="discrete">
+                <xscale min="10" max="16" />
+                <yscale min="0" max="3" />
+                <ypts>1,1,2,2,2,3,3</ypts>
+            </gf>
+            <display x="237" y="402" color="blue" label_side="top" label_angle="97" />
+        </aux>
+        <aux name="Years_of_Education">
+            <eqn>10</eqn>
+            <display x="237" y="500" color="blue" label_angle="289" />
+        </aux>
+        <aux name="Graph_Conditional">
+            <doc>The assumption is that growth in salary over a lifetime will vary with education level; slower growth occurring with less education.</doc>
+            <eqn>If Whole_Number_Rounder = 1 then Type_1_Graph else if Whole_Number_Rounder=2 then Type_2_Graph else Type_3_Graph</eqn>
+            <display x="347" y="402" color="blue" label_side="right" label_angle="3" />
+        </aux>
+        <aux name="Type_2_Graph">
+            <doc>The assumption is that individual yearly income starts low due to training and/or apprenticeship, then rises slowly and maximizes at 1.5 * initial value at approximately age 37 with only a slight rise afterwards due to inflation.</doc>
+            <eqn>time</eqn>
+            <gf>
+                <xscale min="16" max="65" />
+                <yscale min="0.5" max="2" />
+                <ypts>0,0.50749999999999995,0.95750000000000002,1.25,1.3474999999999999,1.4299999999999999,1.4675,1.4975000000000001,1.5349999999999999,1.5425,1.5649999999999999,1.5649999999999999,1.5725,1.5800000000000001,1.5874999999999999</ypts>
+            </gf>
+            <display x="350" y="501" color="blue" />
+        </aux>
+        <aux name="Type_3_Graph">
+            <doc>The assumption is that individual yearly income starts low due to college degree program, then rises sharply and maximizes at 2 * initial value at approximately age 40 with following increases due to inflation.</doc>
+            <eqn>time</eqn>
+            <gf>
+                <xscale min="16" max="65" />
+                <yscale min="0" max="3" />
+                <ypts>0,0,0.98999999999999999,1.26,1.4399999999999999,1.6399999999999999,1.8200000000000001,2,2.1000000000000001,2.1499999999999999,2.2000000000000002,2.23,2.2599999999999998,2.2799999999999998,2.2999999999999998</ypts>
+            </gf>
+            <display x="407" y="451" color="blue" />
+        </aux>
+        <aux name="Type_1_Graph">
+            <doc>The assumption is that individual yearly income starts low, rises slowly and maximizes at 1.25 * initial value at approximately age 37 with only a slight rise over the course of the rest of the work years relative to inflation.</doc>
+            <eqn>time</eqn>
+            <gf>
+                <xscale min="16" max="65" />
+                <yscale min="1" max="2" />
+                <ypts>1,1.1000000000000001,1.2,1.22,1.23,1.24,1.25,1.26,1.27,1.2749999999999999,1.28,1.2849999999999999,1.29,1.3,1.3</ypts>
+            </gf>
+            <display x="296" y="450" color="blue" />
+        </aux>
+        <group name="Income_Statement">
+            <entity name="Bank_Account" />
+            <entity name="Income" />
+            <entity name="Expenses" />
+            <entity name="Positive_Interest" />
+            <entity name="Negative_Interest" />
+            <display locked="true" x="4" y="153" width="297" height="155" color="red">
+                <item uid="0" />
+                <item uid="1" />
+                <item uid="2" />
+                <item uid="3" />
+                <item uid="4" />
+                <item uid="5" />
+            </display>
+        </group>
+        <group name="Expenses_1">
+            <entity name="Car_Payment" />
+            <entity name="Mortgage_or_Rent" />
+            <entity name="Living_Expenses" />
+            <display locked="true" x="307" y="171" width="169" height="136" color="red">
+                <item uid="6" />
+                <item uid="7" />
+                <item uid="8" />
+            </display>
+        </group>
+        <group name="Salary_and_Education">
+            <entity name="Salary_Conditional" />
+            <entity name="Type_1_Starting_Salary" />
+            <entity name="Type_2_Starting_Salary" />
+            <entity name="Type_3_Starting_Salary" />
+            <entity name="Whole_Number_Rounder" />
+            <entity name="Years_of_Education" />
+            <entity name="Graph_Conditional" />
+            <entity name="Type_2_Graph" />
+            <entity name="Type_1_Graph" />
+            <entity name="Type_3_Graph" />
+            <display locked="true" x="3" y="389" width="444" height="144" color="red">
+                <item uid="9" />
+                <item uid="10" />
+                <item uid="11" />
+                <item uid="12" />
+                <item uid="13" />
+                <item uid="14" />
+                <item uid="15" />
+                <item uid="16" />
+                <item uid="17" />
+                <item uid="18" />
+                <item uid="19" />
+                <item uid="20" />
+                <item uid="21" />
+            </display>
+        </group>
+        <display page_width="552" page_height="730" page_cols="2" page_rows="2" isee:converter_size="large" isee:animate_flows="true" isee:animate_stocks="true" isee:animate_converters="true" interval="DT" report_balances="ending">
+            <connector x="112" y="394" uid="9">
+                <from>Salary_Conditional</from>
+                <to>Income</to>
+            </connector>
+            <connector x="196" y="205" uid="0">
+                <from>Bank_Account</from>
+                <to>Positive_Interest</to>
+            </connector>
+            <connector x="177" y="240" uid="1">
+                <from>Positive_Interest</from>
+                <to>Income</to>
+            </connector>
+            <connector x="209" y="205" uid="2">
+                <from>Bank_Account</from>
+                <to>Negative_Interest</to>
+            </connector>
+            <connector x="250" y="265" uid="3">
+                <from>Negative_Interest</from>
+                <to>Expenses</to>
+            </connector>
+            <connector x="178" y="193" uid="4">
+                <from>Bank_Account</from>
+                <to>Income</to>
+            </connector>
+            <connector x="221" y="207" uid="5">
+                <from>Bank_Account</from>
+                <to>Expenses</to>
+            </connector>
+            <connector x="382" y="228" uid="6">
+                <from>Mortgage_or_Rent</from>
+                <to>Expenses</to>
+            </connector>
+            <connector x="379" y="272" uid="7">
+                <from>Living_Expenses</from>
+                <to>Expenses</to>
+            </connector>
+            <connector x="69" y="441" uid="10">
+                <from>Type_1_Starting_Salary</from>
+                <to>Salary_Conditional</to>
+            </connector>
+            <connector x="118" y="487" uid="11">
+                <from>Type_2_Starting_Salary</from>
+                <to>Salary_Conditional</to>
+            </connector>
+            <connector x="169" y="440" uid="12">
+                <from>Type_3_Starting_Salary</from>
+                <to>Salary_Conditional</to>
+            </connector>
+            <connector x="225" y="402" uid="13">
+                <from>Whole_Number_Rounder</from>
+                <to>Salary_Conditional</to>
+            </connector>
+            <connector x="237" y="488" uid="14">
+                <from>Years_of_Education</from>
+                <to>Whole_Number_Rounder</to>
+            </connector>
+            <connector x="305" y="442" uid="15">
+                <from>Type_1_Graph</from>
+                <to>Graph_Conditional</to>
+            </connector>
+            <connector x="350" y="489" uid="16">
+                <from>Type_2_Graph</from>
+                <to>Graph_Conditional</to>
+            </connector>
+            <connector x="398" y="443" uid="21">
+                <from>Type_3_Graph</from>
+                <to>Graph_Conditional</to>
+            </connector>
+            <connector x="249" y="402" uid="17">
+                <from>Whole_Number_Rounder</from>
+                <to>Graph_Conditional</to>
+            </connector>
+            <connector x="336" y="398" uid="18">
+                <from>Graph_Conditional</from>
+                <to>Income</to>
+            </connector>
+            <connector x="233" y="489" uid="19">
+                <from>Years_of_Education</from>
+                <to>Expenses</to>
+            </connector>
+            <connector x="379" y="188" uid="8">
+                <from>Car_Payment</from>
+                <to>Expenses</to>
+            </connector>
+            <connector x="229" y="491" uid="20">
+                <from>Years_of_Education</from>
+                <to>Income</to>
+            </connector>
+            <text_box x="141" y="26" uid="22" color="#7F00FF" font-family="Times New Roman" font-size="18" font-weight="bold" text-align="center" padding="5" border-style="double" border-width="thick-thin" width="299" height="68">MODELING YOUR FUTURE:&#x0D;Education and Career Choice Options&#x0D;</text_box>
+            <style font-family="Arial" font-size="9" />
+        </display>
+        <interface page_rows="4" page_width="640" page_height="480">
+            <simulation_delay>0</simulation_delay>
+            <isee:process_frame x="277" y="1422" width="157" height="79" name="Income_Statement" color="#0CA0FF" border-style="solid" border-width="thin" />
+            <isee:process_frame x="48" y="1406" width="152" height="55" name="Expenses_1" color="#0CA0FF" border-style="solid" border-width="thin" />
+            <isee:bundled_connector color="red">
+                <from>Expenses_1</from>
+                <to>Income_Statement</to>
+                <pts>
+                    <pt x="200" y="1401" />
+                    <pt x="277" y="1401" />
+                </pts>
+            </isee:bundled_connector>
+            <isee:process_frame x="51" y="1504" width="148" height="53" name="Salary_and_Education" color="#0CA0FF" border-style="solid" border-width="thin" />
+            <isee:bundled_connector color="red">
+                <from>Salary_and_Education</from>
+                <to>Income_Statement</to>
+                <pts>
+                    <pt x="199" y="1483" />
+                    <pt x="277" y="1483" />
+                </pts>
+            </isee:bundled_connector>
+            <stacked_container x="39" y="264" height="245" width="451" visible_index="1" uid="23">
+                <graph type="time_series" title="Chosen Type Income" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:33:00Z" cleared="true" time_precision="2" from="16" to="65">
+                    <plot index="0" pen_width="1" color="black" precision="0.01" show_y_axis="true">
+                        <entity name="Income" />
+                    </plot>
+                </graph>
+                <graph type="time_series" title="Comparative Income" background="white" show_grid="true" plot_numbers="true" isee:use_five_segments="false" date_time="2025-02-04T09:33:00Z" comparative="true" cleared="true" time_precision="2" from="16" to="65">
+                    <plot index="0" pen_width="1" color="red" precision="0.01" show_y_axis="true">
+                        <entity name="Income" />
+                    </plot>
+                </graph>
+            </stacked_container>
+            <pad_icon x="243" y="330" width="26" height="22" color="#0CA0FF" label_side="bottom" label="Income Graph" type="graph" icon_of="23" />
+            <stacked_container x="3" y="955" height="161" width="466" uid="24">
+                <table font-size="9" background="#FFFE91" column_width="76" orientation="vertical" interval="1" report_balances="ending" cleared="true" date_time="2002-01-07T10:36:58Z">
+                    <title> Table 1</title>
+                    <item type="time" color="black" width="100" />
+                    <item color="black" precision="0.01" delimit_000s="true" index="0">
+                        <entity name="Income" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="1">
+                        <entity name="Expenses" />
+                    </item>
+                    <item color="black" precision="0.01" delimit_000s="true" index="2">
+                        <entity name="Bank_Account" />
+                    </item>
+                </table>
+            </stacked_container>
+            <pad_icon x="230" y="1043" width="26" height="22" color="#008F44" label_side="bottom" label="Table 2" type="table" icon_of="24" />
+            <graphics_frame x="256" y="7" uid="25" width="228" height="234" border-color="#0CA0FF" fill="none">
+                <image width="224" height="231">data:image/png;base64,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</image>
+            </graphics_frame>
+            <graphics_frame x="248" y="851" uid="26" width="278" height="61" border-color="#0CA0FF" fill="none">
+                <image width="244" height="62">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPQAAAA+CAIAAACTPqF7AAAEQklEQVR4nO2d7ZLbIAxFnU7fu/vm7o+0WYw+kAQYrL1ndjKxI0tCljEGJfs6z/MAICO/VjsAwCyQ3CAtSG6Qlt/V9tdriRsAxPkSHhvr5FZEAdgQpTtmkls/AIB90DtiPrmbhwGwnGYXjAdKkBYkN0gLkhukBckN0oLkBmlBcoO0WJP76/X9Zycs/HmvvPHqd2HXrEiOda+pbaC5GwJ7w1qKOM9NuXPmm9pirW8+Gb+5e2u5ITjxYUnVi+ub7OHlm/L14C5rXYy13nSgOpx1iUqWexTJSpi1pQRNd4ltDn1VmlC9d92T2RYZP6UOezPHwXnlz/H9Wu1//5ViVJ7dZJFUNT+lYpJ1habDSksr/WysLO7FxIyNYoUDrW4qqfZLwRmYObrFkk2HJV4ul/75v1dQHQ6PqhW1nV3OyEHz1cmp4/VA8Cd5UuFI7p2pz+V5HO8bnJKI5ugbJT/mwqdnUvdBHXunYGmuJxep8qMVfE3huCAEk7u6QKXNyyEkmrRHtESEPTEX69co69Ylcx8rAckYdkP/NkmspAA2HdNN6yeu3qxS3NmRs/Lh68Q65u5nhs6nWJ/BbS2SDG3iwJgxdw/xi+/51mdwW4v4W0HfqLrfASN3JffS3EqW2ceNLVq+vNBjC8vvIC1IbpAWR3IPnIAcyJ1eeW0pC67SfqOJWKvZaY21THXDk9zpRq6z2Tlim/g21Q13zy0VA9Aqi+qQUpgeSD+lm4pLrPJKTNLfNGH0kG2s7iTd9O63x5M9QUYNSoj6T7GipLdft88dWgo5mpUYFlWuMgNvaYfkua5cd6lZdiI5aay4MPpjPMquwRgipSjI3hBWSdO0Ltw7FWhZV7tsGq7FchHO50xryZNdWrPcGcXWmctOpEM6xaYqsVbpeE6x+PjhWT82MmCe215L8JFpjwT+L9463KBFDi+yZO0vQamU6xYDToqS3YPRgHuSG5YQVYd0utRZoPKmu+cWagl4YdunSlkCba1U2lFeIZXAqBIUezGJUn/C6pfsSnUdRveaZTm1BkOIJKPV7deSHj12ebzjmLXMdmzbhu+DK0QD49l8bqE8aRGn8ya1XH8CVoUoZvdRyT05rMjsJt4QjQppTM+TkhsAF0hukBbfbEls9lGfR9PFArDzCeWeQ3geB8nwfEF48rfiBuZZNdt1XJ2X3oNkOH5xqnqlO8s3tH6AfiSVGejlDWOqDj7Kkdl5sfbcdP7/8in3VWq69G1cICz3V2taxo52yOIteDpjvmZmLM/oz7lYtQP4mdw6W8KuPy9R8q1tj5p9MINIzx3LrdgEBa0YoUrYiRfFVqkTT5aZ8a7Xr8Ly63XgR7HL75b0oA+y0eMCiSckN54dQQgsv4O0ILlBWpDcIC3y/37HBDB4OHxy4ykNJIBJbvTZIAev80QvDXKCB0qQFiQ3SAuSG6QFyQ3SguQGaUFyg7QguUFa/gKEAXpmmNzPkQAAAABJRU5ErkJggg==</image>
+            </graphics_frame>
+            <graphics_frame x="14" y="656" uid="27" width="523" height="73" border-color="#0CA0FF" fill="none">
+                <image width="521" height="76">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgkAAABMCAIAAABoCrNZAAAMp0lEQVR4nO2dP3jbNhrGX99zQ7xZ3qyt8mZvobZ6i5yp3irdVG8nZWq3WjdFW9ybLjdZ3s6ZLHWqMkXyVHeKdFPjKVKnc6bKmeJsvIE0SQEgAJL6n/f35Mkj0QC+DyBEEAD5vRuu64IQQgiJ8JdFO0AIIWTp4NhACCFE5K/yocbG/N0ghBCySBqT2wucNxBCCBHh2EAIIUREsaYU0OATTIQQstbEbSJw3kAIIUREN2/w4NY0IYSsH/qVIfPYYCyCEELIamG86eeaEiGEEBGODYQQQkQ4NhBCCBHh2EAIIUSEYwMhhBARjg2EEEJEUo4NjQ0MuxNfjemnQmNj4t9KEPipdHhpa9HYwHgUfh12J1zt1PxT0KlNZJF7hXDKoidOqLumoZrORMnDLppOqloRQuywer9ByesafhiZk02d1X3ZYuU879VRafmff/tneLxbh1PFURMAbgfo1nF46v9J7hVBrRsb6Vvg6BydKnYPQ8eOzlMWRQixIf2a0k4R/aZ4sN8M7w2Dv0bvH/XJUtxEC7eQF4f+DWZjA6c50USc3eB4cPB24Gc/zRmyR1HmCpCr/7IQ/tXom5ddb8JL8LJgLsdYFwB3Q9zfAcB4hLthePymhfxDm+cd3LTCPyl7RXbyDnK7fsn9JnK7oQOEkJngSjyH/y/4qkzz59D911fup/FEmudw3565ruu+PZvIKBSiTBY1GocywS9V99cXruu6v75w35yEKd+/UZiIs/v2TDzoZX//xly7qHvKXPIHrxzlQaVvrhs2tWxC6YOxHGNdfr/029Nr4bguET2u7BXKXPpyZP4cui+2XNd1X2y5fw4VCQgh9ggXB/lHl37esF3AXgXXP4nHi7Xwfw1ysoZrteYgbzYcNfGujWEXo6twcQPwlyAET5TufXOGYm3i4KMtjK4wHmH3cMIrfe3icskoS9D4BmAzZ2Wi4aorLpRjrAuA/QpuWhiPMDiHYzqhHnG9Ig773aPtApwamg6cGrYLhsSEkIyk328AcHCClwUcnKTJm3oPVnlBdKp49RTfDxV/srErXx+rA/TqOHcA4KiJ/YouuzGXJTa+GU3c36FTw4c+7v7QlRNnTqBwiHYZe+VwRDGSqFdEz6bRn4MT/PYTjnu2nhBCUpNpbNjMoXQ68aSKPVPcmL2/w+Ac1T7aZRz3DFcxS7vbBX8bdtjFq6eRsUGbPS6XJTa+GU1clFA4xFETmznD1dbGnFPF4Byl04mDua90X7P0Cj3embUfpQghqcn6fkOxhlF34kiwYSgw7Pobm0Ky6JOL6SYTnRoOTpB3xEuStykteCLbVdLYwO0AAD7f4dGWbfa4XDL9Ju7v8K4lHjT6ZjTx4b/+xdp4dbYxl3fCRaqAvQquH0aL61PsSeOT3CtmxAo9ykzIapFp3uBRbuHVU//zN2d4/Qyvn/mfA74589N496pxyWyIXgsaLvpNbOb82+fdQ4yucH2KgzoAtCv4/HHChL3d8iUuSvj8EY+2wkUMY3ZlLpmgnJ3HioN634wmgnKcqq6CWU7BwYn/fgMQPswq+hnpFSkQzjIhZM5suK74ywtv5F3/6yr+OFfUbUIImQPBFVK44AcwZgYhhBARjg2EEEJE1nZs4IISIYSkZm3HBkIIIanh2EAIIUSEYwMhC+Z2gFbC1yTXm1bFf4mHLJAFjA16YYDlYf5epbMoyx5MVyhiiu2QsYILZ0aedGLeEbE0rZTHuB34n4OL7LsWLg7V2VObnhaCiaMmOtq3c8gcmMK7bymIEwYgKeCu+9yYRVP3m8gXswYCkR27KOG7N/6H+p0fZUspuLKE/Wczh3wR/aY5ZCeZHYtZU4oTBrDXV5BTviyEt0iehoGMZVFQaU5EUYooZFSM0Fg8zfkzrfEonHWNRzjNhRlt6NZ90Yhg3mZUcZC9UkpKyIoR+pK9LN75UqZUSlzIJQi5bMQt5ARyUUL/aVX86CbKRlD6HKQ0unTzMwpPDPXS90Ylnz9i9xC7h35ogHbFD7Elo6+UbNpSaESZLO6HI9eu8AQ3P9tWlswEZVxvo35DxrjhGmEAe30FIeXbM/ey7P/1suwrOiirZiwqOK6pglKnIYtihMZiVKDiOcLPv1QnchklNzxPfqmGDWVUcZBL00hK2FTcdd3/9d2zx35eTUpZ4kJwQ2nUUtzCeOJebPkefhr7uhGuaziD3pFPY/f3ywQuCXIUSmfiGiHqTPS8eMW+f+O+f+O+2HJ/v3T/U9Jl11RKNm0vNKJMpmwNuXaBXAeZETPUb8iCRhjAUl9BThmN73bTjtUbsCnKSJyIQhbFCA2FJxhdAcDgHDuPMTgHgNHVxP2mDV7UqdIpbtoG9/QIUhBxihFBydEmuh2gUxXD5Sp90LukNGoUt1AmUBa1/zBXeNdCQbVMH9eRguheli59/jghRxHXmBo84ZOG68fI8u7Hj3t49RSvnqLcQqeGr38Utx+UWHZLG6ERZTJ7gZPtgj/jIYtiMfsNSCgMoOys8vzaqfk/DE2xU1nBTKTToFwHSOTGfgXtv2E8wt0f+L6Hf+9iPMKoh+OEsU6VMa5T7DQKzscpRijpVFE6nYIPSqPG86JMoCzKqaJXR7GGm5/x9Y8KByzPYFJJj0SNqXTp9TMUa34AXQAXhzhqol2Z2H7Ql2DEskvLyTIKnJB5srCxQSkMkAj5vsOp4nUNAJy/py/WhkQ6DVPZ6yuU0Ktj5zG2C9h5jF4dhVLiQu7vsJmbiJQ+FffsFSMAHPdwUcLm9oTgcwoflEaN50WZQFlU3sFtH+MRbvtiiPJEGF16tIXxKJw6JGpMmWLNj63r4U19vHsLrxZTuRm3PF9yMvsfznhkiHJPZs3C3m9QCgMgXv5BRpYf8H5gt/3E9yOWmhMBjRgRhSyKEXqLhSe4aWO/DAD7Zdy0Ey8oARg0AeD6J+yVk7kX55VHnGKEsuTNHI576FQnFjeUKZUSF3qjcedFnyDO//0K2uVkfcmryDAynzO6lC/iQ99QLw9Nb4zuhwd4U5ByCwAebWHYxbCb8oJrFF9RotRoiWsNwcSHPvLFMNccnqMlAgubNyixFxWIS7n3LXacuEzJihI0J6LEiShkUYzQW9yroPcPX0Un+jkR9x/R2EDuK1Qfrss27mm8EgqJKkZoSvaGh4sSjs6Rd9QplRIXRqNGcQu9LIegeOFNbY/O1Q5oXIpe9Ywu7X2L0VU4AsU5ozkL0QZEpA2jzyYd93BeBIBqX8xuU68U4ivKZHGtIddudIW9bxO7SqbIuuk3vCzgu95itOZXq6HITEnUGZqOWcv2i+L+Dhcl1Phq9CwJuqhwwQ9Yq5gZ71rYKS5mYCCksaFeVDRydD4Tee3VpVNLMF0jM2K51pSy0NjAzmOdEichM6V8qVhUtCHvhGECCMDWWArWaGxY9HrOwh0gi2W/wocyyfqwVmtKhBBCpgLHBkIIISIcGwixhUILllCAYQ1YzNjQqfnvs6zK4xnRl3fmZkJpK7UDU/Q8XVHzfH1pRrYyCi3gYXQR0gTxSoXotkIEJAowkHmygL3obh3Ow2/sdoBuHYcZImfMmdltOHMre8mZitBCuwynOhHr0IMCDGTZWMC84aYVxtLJO7hpAfER8y2Dxc9CUEEpIZAign8AZRhkUsswyLmUxKkIKDUS5BMaZSpCCz+McFDXORxAAQayYJRxvWet36D8Ghcx3zJY/NQFFZQSAiki+AdQhkHpVRYZhrj6Gv1XGlWqFwRkF1qIS0MBBjJ/llS/QUlcxHybYPEzElTQz4gtI/gHUIZBJp0MQyKRA9mruOx69YLsQgtxUICBLCFL9O5bXMR85fRc6NZzFlRIl4UyDDLpZBiyiBxosic6oRl9UEIBBrI8LGBs8EIQy1/jIubbbLXNX1AhHZRhsDFqPJsZRQ7SZZ+u0EIcFGAgS8IC1pT2Krh+eDDp+nQi1rQyYr5NsPjGbAQV9BICcVkwGcE/CmUYbIzGnU2jq0pkcY5E2QOyCy3E0aAAA1k+FjBvODjx328AwodZPeSI+ZbB4mchqGCUENBkifsBU4bBxqhR8yBO5ECTUumVMXuU7EILNk5G/aQAA1kg66bfEGWxnq9uu5E4KLRgCQUYlp/gAiVc8AOW6DmlNaCRNoI/WQkotGAJBRjWgCV6TmkNSB3Bn6wEFFqwhK20Bqzz2DD/JR1G8CeErAdcUyKEECLCsYEQQogIxwZCCCEiHBsIIYSIWO1F851GQgj5ojCPDXyBixBCvjS4pkQIIUREN2/gUhIhhHyZcN5ACCFEhGMDIYQQEUUcVkIIIV84nDcQQggR4dhACCFEhGMDIYQQEY4NhBBCRP4P+X8sKFlLbbUAAAAASUVORK5CYII=</image>
+            </graphics_frame>
+            <button x="224" y="237" width="276" height="23" uid="28" appearance="opaque" background="blue" color="white" style="rounded" label="CLICK FOR MONTHLY EXPENSE SLIDERS" font-family="Arial" font-size="12" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="648" />
+            </button>
+            <button x="252" y="1142" width="276" height="23" uid="29" appearance="opaque" background="blue" color="white" style="rounded" label="BACK TO INCOME" font-family="Arial" font-size="12" text-align="center" font-weight="bold">
+                <link target="interface" x="0" y="0" />
+            </button>
+            <button x="483" y="191" width="52" height="30" uid="30" appearance="opaque" background="red" color="white" style="rounded" label="Run" font-family="Arial" font-size="12" text-align="center" font-weight="bold">
+                <menu_action>run</menu_action>
+            </button>
+            <button x="483" y="152" width="51" height="32" uid="31" appearance="opaque" background="red" color="white" style="rounded" label="Clear" font-family="Arial" font-size="12" text-align="center" font-weight="bold">
+                <menu_action>restore_graphs_tables</menu_action>
+            </button>
+            <button x="445" y="770" width="52" height="31" uid="32" appearance="opaque" background="red" color="white" style="rounded" label="Run" font-family="Arial" font-size="12" text-align="center" font-weight="bold">
+                <menu_action>run</menu_action>
+            </button>
+            <button x="385" y="770" width="51" height="32" uid="33" appearance="opaque" background="red" color="white" style="rounded" label="Clear" font-family="Arial" font-size="12" text-align="center" font-weight="bold">
+                <menu_action>restore_graphs_tables</menu_action>
+            </button>
+            <slider x="140" y="30" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="10" max="16">
+                <entity name="Years_of_Education" />
+            </slider>
+            <slider x="140" y="90" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="10000" max="14000">
+                <entity name="Type_1_Starting_Salary" />
+            </slider>
+            <slider x="140" y="151" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="10000" max="18000">
+                <entity name="Type_2_Starting_Salary" />
+            </slider>
+            <slider x="140" y="211" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="14000" max="36000">
+                <entity name="Type_3_Starting_Salary" />
+            </slider>
+            <slider x="143" y="758" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="0" max="1000">
+                <entity name="Car_Payment" />
+            </slider>
+            <slider x="142" y="818" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="0" max="1000">
+                <entity name="Mortgage_or_Rent" />
+            </slider>
+            <slider x="142" y="879" label_side="bottom" isee:navigate_to="true" color="red" width="197" height="43" min="0" max="10000">
+                <entity name="Living_Expenses" />
+            </slider>
+            <text_box x="156" y="1342" uid="34" color="#7F00FF" font-family="Arial" font-size="12" font-weight="bold" text-align="center" padding="5" border-style="solid" border-width="thin" width="165" height="26">Sector Flow Diagram</text_box>
+            <style font-family="Arial" font-size="9" />
+        </interface>
+        <style font-family="Arial" font-size="9" />
+    </model>
+</xmile>
