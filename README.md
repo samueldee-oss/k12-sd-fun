@@ -21,10 +21,13 @@ This project builds a **multi-level game experience** where each level introduce
 k12-sd-fun/
 ├── README.md                 # This file
 ├── LESSONS.md                # Student narrative + teacher lesson plans
+├── CLAUDE.md                 # Notes for Claude Code (studio routine)
+├── studio/                   # Shared desk for Claude Desktop + Claude Code: status, roadmap, tester feedback, inbox/outbox
 ├── .gitignore
 ├── bank_game.py              # Flagship game (Levels 2–4)
 ├── bank_game_assessment.py   # Stock-flow failure assessment (100% mastery gate)
 ├── pong/                     # Level 1 warm-up (browser-native)
+├── whisker-dash/             # Pixel cat platformer (browser-native, 1–2 players)
 ├── experiments/              # Side projects, not part of the curriculum
 │   └── snake-blender-mode/
 ├── K12 sd/                   # System dynamics models (.stmx)
