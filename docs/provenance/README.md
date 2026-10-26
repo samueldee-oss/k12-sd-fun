@@ -20,6 +20,7 @@ recorded as the author's statement.)
 | 2026-06-26 | Codex (same thread as 02) | Browser dashboard with a card per game version, note boxes, and Pygbag web builds. First description of the multi-level systems-thinking idea. Browser builds were still showing a gray box when the transcript ends. | transcript 02 |
 | 2026-08-19 | GitHub Copilot Chat | A Snake game with a "Blender Mode" menu. Not part of the systems-thinking project; kept in [`experiments/`](../../experiments/snake-blender-mode/). | [transcript](../../experiments/snake-blender-mode/transcript.md) |
 | 2026-10-01 | Cline (free OpenRouter and Gemini models), then Codex | Level structure and documentation plan; first README and LESSONS outline; a partial `bank_game_assessment.py`. The Cline session stopped when its free daily request limit ran out. | [transcript 04](transcripts/04_cline_2026-10_repo-and-assessment-scaffold.md), plus the Codex thread above |
+| 2026-10-23 18:18 to 2026-10-25 15:43 | Claude on claude.ai (the session reports `claude-opus-5-5`) | Whisker Dash, a pixel cat platformer, built from scratch over 24 rounds of requests: 49 worlds, 240 levels, 79 skins, a Hotel Lobby hub with talking characters, rides and mini-games, 2 players, touch. Published as a claude.ai artifact (versions 1–49). The first part of the session was compacted, so early requests survive only as a summary. | [transcript 05](transcripts/05_claude_2026-10_whisker-dash.md), [`whisker-dash/PLAN.md`](../../whisker-dash/PLAN.md), [`whisker-dash/GAME-FILE.md`](../../whisker-dash/GAME-FILE.md) |
 
 ## Where each part of the repo came from
 
@@ -31,6 +32,7 @@ recorded as the author's statement.)
 | `dashboard/`, `tools/`, `web_sources/` | Codex, 2026-06-26 |
 | `README.md`, `LESSONS.md` (first draft) | Cline, 2026-10-01 (free-tier model); revised in the archive pass below |
 | `bank_game_assessment.py` | Cline, 2026-10-01; **unfinished** (draft questions only) |
+| `whisker-dash/` | Claude on claude.ai, 2026-10-23 to 10-25. Not yet tied to the systems-thinking lessons. Design plan in `PLAN.md`, file guide in `GAME-FILE.md`, tests in `tests/`. |
 | `K12 sd/transfers/*.stmx` | Pre-existing system dynamics models (446 files). `Mammoth Game.stmx` was modified by Codex on 2026-06-09. **Origin and redistribution rights still to be confirmed** (see below). |
 
 ## Folder contents
