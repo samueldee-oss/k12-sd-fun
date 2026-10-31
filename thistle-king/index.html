@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Thistle King</title><style>[hidden]{display:none!important}</style></head><body>
+<title>Thistle King</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&family=Silkscreen&display=swap">
+<style>
+/* Layout: one dusk-garden screen; canvas arena centered, HUD strip above, controls note below */
+:root{
+  --soil:#140f1c; --dusk:#231a33; --leaf:#5fd08a; --petal:#d86bff; --pollen:#ffd447; --ink:#efe6ff; --muted:#a79cbf;
+  --display:"Pixelify Sans", "Courier New", monospace;
+  --ui:"Silkscreen", "Courier New", monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:radial-gradient(ellipse at 50% 0%, var(--dusk), var(--soil) 70%);color:var(--ink);font-family:var(--ui);
+  display:flex;flex-direction:column;align-items:center;gap:10px;padding-block:14px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));box-sizing:border-box;overflow:hidden}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(22px,5vw,34px);margin:0;letter-spacing:.04em;color:var(--pollen);text-wrap:balance;text-shadow:0 3px 0 #6b3a00}
+.hud{width:min(520px,100%);display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:11px;letter-spacing:.08em}
+.bar{display:flex;flex-direction:column;gap:4px;min-width:0}
+.track{height:10px;background:#0006;border:2px solid var(--muted);border-radius:2px;overflow:hidden}
+.fill{height:100%;transition:width .2s}
+#bossFill{background:var(--petal)} #beeFill{background:var(--pollen)}
+.stage{position:relative;width:min(520px,100%);aspect-ratio:1/1;max-width:100%;flex:0 1 auto;max-height:calc(100% - 160px)}
+canvas{width:100%;height:100%;display:block;border-radius:6px;image-rendering:pixelated;background:#0d0a14;touch-action:none;box-shadow:0 0 0 3px #3b2d52, 0 10px 40px #0008}
+.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;background:#0d0a14d9;border-radius:6px;padding:20px}
+.overlay h2{font-family:var(--display);font-size:clamp(22px,6vw,36px);margin:0;color:var(--petal)}
+.overlay p{margin:0;color:var(--muted);font-size:11px;line-height:1.7;max-width:34ch}
+button{font-family:var(--display);font-size:18px;background:var(--pollen);color:#2a1700;border:0;border-bottom:4px solid #b88a00;border-radius:4px;padding:10px 22px;cursor:pointer}
+button:focus-visible{outline:3px solid var(--leaf);outline-offset:3px}
+.note{font-size:10px;color:var(--muted);letter-spacing:.06em;text-align:center}
+#mute{position:absolute;top:8px;right:8px;font-size:11px;padding:4px 8px;border-bottom-width:2px;background:var(--dusk);color:var(--ink);border-color:#000}
+</style>
+
+<h1>THISTLE KING</h1>
+<div class="hud">
+  <div class="bar"><span>THISTLE KING</span><div class="track"><div class="fill" id="bossFill" style="width:100%"></div></div></div>
+  <div class="bar"><span>BUZZ (YOU)</span><div class="track"><div class="fill" id="beeFill" style="width:100%"></div></div></div>
+</div>
+<div class="stage">
+  <canvas id="c" width="480" height="480"></canvas>
+  <button id="mute" hidden>♪ ON</button>
+  <div class="overlay" id="ov">
+    <h2 id="ovT">The Garden Wakes</h2>
+    <p id="ovP">The Thistle King has choked the meadow. Dodge his seeds, thorns and petals. Grab glowing nectar and fly it into his crown to strike.</p>
+    <button id="go">Start fight</button>
+  </div>
+</div>
+<div class="note">Move: arrows / WASD, or drag on the arena · Nectar hits deal damage · Track: "Bramble Waltz" (original)</div>
+
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d'),W=480,H=480;
+const ov=document.getElementById('ov'),ovT=document.getElementById('ovT'),ovP=document.getElementById('ovP'),go=document.getElementById('go'),muteB=document.getElementById('mute');
+const bossFill=document.getElementById('bossFill'),beeFill=document.getElementById('beeFill');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- original chiptune: "Bramble Waltz" ---------- */
+let ac,master,musicOn=true,seqT=null;
+const BPM=152, step=60/BPM/2;
+// A minor-ish melody, semitones from A4 (null = rest)
+const lead=[0,null,3,5, 7,null,5,3, 8,7,5,null, 3,5,2,null, 0,null,3,5, 7,10,12,null, 10,8,7,5, 3,2,0,null,
+            12,null,10,8, 7,null,8,10, 12,15,12,10, 8,7,5,null, 3,5,7,8, 10,8,7,5, 7,null,3,2, 0,null,null,null];
+const bassRoots=[-24,-24,-19,-19,-16,-16,-17,-17, -24,-24,-19,-19,-21,-21,-17,-17];
+let stepI=0,nextT=0;
+function note(f,t,d,type,vol){const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=f;
+  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(master);o.start(t);o.stop(t+d+.02)}
+function hat(t,v){const b=ac.createBuffer(1,ac.sampleRate*.05,ac.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  const s=ac.createBufferSource(),g=ac.createGain(),h=ac.createBiquadFilter();h.type='highpass';h.frequency.value=6000;s.buffer=b;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+.05);s.connect(h);h.connect(g);g.connect(master);s.start(t)}
+const hz=s=>440*Math.pow(2,s/12);
+function sched(){while(nextT<ac.currentTime+.15){const i=stepI%lead.length;
+  if(lead[i]!=null)note(hz(lead[i]),nextT,step*1.6,'square',.06);
+  if(stepI%2===0){const r=bassRoots[Math.floor(stepI/4)%bassRoots.length];note(hz(r),nextT,step*1.8,'triangle',.18)}
+  if(stepI%4===2)note(hz(bassRoots[Math.floor(stepI/4)%bassRoots.length]+7),nextT,step,'triangle',.1);
+  hat(nextT,stepI%4===0?.08:.03);
+  nextT+=step;stepI++}}
+function startMusic(){try{if(!ac){ac=new (window.AudioContext||window.webkitAudioContext)();master=ac.createGain();master.gain.value=.7;master.connect(ac.destination)}
+  ac.resume();nextT=ac.currentTime+.05;clearInterval(seqT);seqT=setInterval(()=>musicOn&&sched(),40)}catch(e){}}
+function sfx(f,d,type='square',v=.12){if(!ac||!musicOn)return;note(f,ac.currentTime,d,type,v)}
+muteB.onclick=()=>{musicOn=!musicOn;master&&(master.gain.value=musicOn?.7:0);muteB.textContent=musicOn?'♪ ON':'♪ OFF'};
+
+/* ---------- game ---------- */
+const keys={};addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=1;if(e.key.startsWith('Arrow'))e.preventDefault()});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=0);
+let drag=null;
+cv.addEventListener('pointerdown',e=>{drag=pt(e);cv.setPointerCapture(e.pointerId)});
+cv.addEventListener('pointermove',e=>{if(drag)drag=pt(e)});
+cv.addEventListener('pointerup',()=>drag=null);
+function pt(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H}}
+
+const boss={x:240,y:110,hp:30,max:30,t:0,phase:0,hurt:0,mood:0};
+let bee,shots,nectar,parts,state='title',time,patT,patI,shake=0,last=0;
+function reset(){bee={x:240,y:380,hp:6,max:6,inv:0,carry:false,wing:0};shots=[];nectar=[];parts=[];boss.hp=boss.max;boss.phase=0;time=0;patT=0;patI=0;updHUD()}
+function updHUD(){bossFill.style.width=(boss.hp/boss.max*100)+'%';beeFill.style.width=(bee.hp/bee.max*100)+'%'}
+
+/* attack patterns — each spawns over time */
+const pats=[
+  {name:'seedburst',dur:3.2,run(t,dt){ if(Math.floor(t*2.2)!==Math.floor((t-dt)*2.2)){const n=10+boss.phase*3,o=Math.random()*6;
+    for(let i=0;i<n;i++){const a=o+i/n*Math.PI*2;shots.push({k:'seed',x:boss.x,y:boss.y+30,vx:Math.cos(a)*110,vy:Math.sin(a)*110,r:5})} sfx(220,.08)}}},
+  {name:'thorns',dur:3.6,run(t,dt){ if(Math.floor(t*1.6)!==Math.floor((t-dt)*1.6)){const fromL=Math.random()<.5,y=200+Math.random()*250;
+    shots.push({k:'thorn',x:fromL?-40:W+40,y,vx:fromL?260+boss.phase*40:-260-boss.phase*40,vy:0,r:9,warn:.55,wy:y});sfx(110,.15,'sawtooth',.08)}}},
+  {name:'spiral',dur:3.4,run(t,dt){ if(Math.floor(t*14)!==Math.floor((t-dt)*14)){const a=t*3.1;for(let k=0;k<2+(boss.phase>1?1:0);k++){const b=a+k*Math.PI*2/(2+(boss.phase>1?1:0));
+    shots.push({k:'petal',x:boss.x,y:boss.y+20,vx:Math.cos(b)*130,vy:Math.sin(b)*130,r:6,rot:b})}}}},
+  {name:'fluff',dur:3.4,run(t,dt){ if(Math.floor(t*6)!==Math.floor((t-dt)*6)){shots.push({k:'fluff',x:Math.random()*W,y:-10,vx:0,vy:70+Math.random()*50+boss.phase*15,r:7,sw:Math.random()*6})}}},
+];
+
+function spawnNectar(){if(nectar.length<1&&!bee.carry)nectar.push({x:60+Math.random()*360,y:260+Math.random()*180,t:0})}
+
+function loop(now){const dt=Math.min(.033,(now-last)/1000||0);last=now;if(state==='play')update(dt);draw();requestAnimationFrame(loop)}
+function update(dt){time+=dt;boss.t+=dt;
+  // bee movement
+  let mx=(keys.arrowright||keys.d?1:0)-(keys.arrowleft||keys.a?1:0),my=(keys.arrowdown||keys.s?1:0)-(keys.arrowup||keys.w?1:0);
+  const sp=190;
+  if(drag){const dx=drag.x-bee.x,dy=drag.y-bee.y,d=Math.hypot(dx,dy);if(d>4){mx=dx/d*Math.min(1,d/30);my=dy/d*Math.min(1,d/30)}}
+  else if(mx&&my){mx*=.707;my*=.707}
+  const topY=bee.carry?40:150;
+  bee.x=Math.max(12,Math.min(W-12,bee.x+mx*sp*dt));bee.y=Math.max(topY,Math.min(H-12,bee.y+my*sp*dt));
+  bee.wing+=dt*30;bee.inv=Math.max(0,bee.inv-dt);boss.hurt=Math.max(0,boss.hurt-dt);
+  // patterns
+  boss.phase=boss.hp>20?0:boss.hp>10?1:2;
+  const p=pats[patI%pats.length];patT+=dt;p.run(patT,dt);
+  if(patT>p.dur+0.6){patT=0;patI++;if(boss.phase===2&&Math.random()<.5)patI++;spawnNectar()}
+  // shots
+  for(const s of shots){
+    if(s.warn>0){s.warn-=dt;continue}
+    if(s.k==='fluff'){s.sw+=dt*3;s.x+=Math.sin(s.sw)*40*dt}
+    s.x+=s.vx*dt;s.y+=s.vy*dt;
+    if(!bee.inv&&Math.hypot(s.x-bee.x,s.y-bee.y)<s.r+6){bee.hp--;bee.inv=1.2;shake=8;s.dead=1;sfx(90,.25,'sawtooth',.15);if(bee.carry){bee.carry=false}updHUD();burst(bee.x,bee.y,'#ffd447',10);if(bee.hp<=0)end(false)}
+    if(s.x<-60||s.x>W+60||s.y<-40||s.y>H+40)s.dead=1}
+  shots=shots.filter(s=>!s.dead);
+  // nectar
+  for(const n of nectar){n.t+=dt;if(Math.hypot(n.x-bee.x,n.y-bee.y)<18){n.dead=1;bee.carry=true;sfx(880,.1,'triangle',.15);sfx(1320,.12,'triangle',.1)}}
+  nectar=nectar.filter(n=>!n.dead);
+  if(bee.carry&&Math.hypot(bee.x-boss.x,bee.y-(boss.y+5))<40){bee.carry=false;boss.hp-=3;boss.hurt=.5;shake=10;burst(boss.x,boss.y,'#d86bff',24);sfx(330,.2,'square',.18);sfx(165,.3,'triangle',.2);updHUD();
+    bee.y=Math.max(bee.y,190);if(boss.hp<=0)end(true)}
+  for(const q of parts){q.x+=q.vx*dt;q.y+=q.vy*dt;q.vy+=200*dt;q.l-=dt}parts=parts.filter(q=>q.l>0);
+  shake=Math.max(0,shake-dt*30);
+}
+function burst(px,py,c,n){if(reduce)n=Math.ceil(n/3);for(let i=0;i<n;i++){const a=Math.random()*6.28,v=60+Math.random()*120;parts.push({x:px,y:py,vx:Math.cos(a)*v,vy:Math.sin(a)*v-60,l:.6+Math.random()*.4,c})}}
+
+function end(win){state='over';ovT.textContent=win?'The Meadow Blooms':'Pricked!';
+  ovP.textContent=win?`You toppled the Thistle King in ${time.toFixed(1)} seconds. The wildflowers are free.`:'The Thistle King keeps his garden… for now. Nectar strikes take 10 hits to win.';
+  go.textContent=win?'Fight again':'Try again';ov.hidden=false}
+
+/* ---------- drawing ---------- */
+function draw(){x.save();if(shake&&!reduce)x.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);
+  // sky & soil
+  const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#2b1d42');g.addColorStop(.55,'#1a1329');g.addColorStop(1,'#0f2016');x.fillStyle=g;x.fillRect(0,0,W,H);
+  x.fillStyle='#ffffff10';for(let i=0;i<30;i++){x.fillRect((i*97)%W,(i*53)%140,2,2)}
+  // ground grass
+  x.fillStyle='#1d3a24';x.fillRect(0,H-30,W,30);x.fillStyle='#2b5a36';for(let i=0;i<W;i+=8){x.fillRect(i,H-30-((i*7)%10),3,10)}
+  drawBoss();
+  // thorn warnings
+  for(const s of shots)if(s.warn>0){x.fillStyle=`rgba(255,80,80,${.15+.15*Math.sin(time*30)})`;x.fillRect(0,s.wy-8,W,16)}
+  for(const s of shots)if(!(s.warn>0))drawShot(s);
+  for(const n of nectar){const b=4*Math.sin(n.t*5);x.fillStyle='#ffd44755';x.beginPath();x.arc(n.x,n.y+b,16,0,7);x.fill();x.fillStyle='#ffd447';x.beginPath();x.arc(n.x,n.y+b,8,0,7);x.fill();x.fillStyle='#fff8';x.fillRect(n.x-3,n.y+b-4,3,3)}
+  drawBee();
+  for(const q of parts){x.globalAlpha=Math.max(0,q.l);x.fillStyle=q.c;x.fillRect(q.x-2,q.y-2,4,4)}x.globalAlpha=1;
+  if(bee&&bee.carry&&state==='play'){x.fillStyle='#ffd447';x.font='12px Silkscreen, monospace';x.textAlign='center';x.fillText('FLY TO THE CROWN!',W/2,H-40)}
+  x.restore()}
+
+function drawBoss(){const bx=boss.x,by=boss.y,t=boss.t,sw=Math.sin(t*1.5)*4;
+  // stalk
+  x.strokeStyle='#3f7a45';x.lineWidth=14;x.beginPath();x.moveTo(bx,H-30);x.quadraticCurveTo(bx+sw*6,300,bx+sw,by+40);x.stroke();
+  // spiky leaves
+  for(const side of[-1,1]){x.fillStyle='#4f9a55';x.beginPath();const ly=300;x.moveTo(bx,ly);
+    for(let i=0;i<=5;i++){x.lineTo(bx+side*(30+i*14),ly-12-i*6+(i%2?14:0))}x.lineTo(bx,ly+14);x.fill()}
+  // thistle bulb (spiky green cup)
+  x.fillStyle='#5aa860';x.beginPath();x.ellipse(bx,by+35,40,30,0,0,7);x.fill();
+  x.strokeStyle='#8fd48f';x.lineWidth=2;for(let i=-3;i<=3;i++){x.beginPath();x.moveTo(bx+i*11,by+48);x.lineTo(bx+i*13,by+22);x.stroke()}
+  x.fillStyle='#8fd48f';for(let i=0;i<9;i++){const a=Math.PI*(.05+i*.1125);x.beginPath();const px=bx+Math.cos(a)*44,py=by+40+Math.sin(a)*-0+10;
+    x.moveTo(px,py);x.lineTo(px+Math.cos(a)*10,py+6);x.lineTo(px+4,py-4);x.fill()}
+  // purple crown of bristles
+  const hurt=boss.hurt>0;
+  for(let i=0;i<26;i++){const a=Math.PI+i/25*Math.PI,len=48+Math.sin(t*4+i)*4+(boss.phase*4);
+    x.strokeStyle=hurt&&Math.floor(t*20)%2?'#ffffff':(i%2?'#d86bff':'#a63fe0');x.lineWidth=5;x.beginPath();x.moveTo(bx,by+12);x.lineTo(bx+Math.cos(a)*len,by+12+Math.sin(a)*len);x.stroke()}
+  // face on bulb: stern eyes
+  x.fillStyle='#14301a';const ey=by+32;
+  x.fillRect(bx-20,ey,10,6);x.fillRect(bx+10,ey,10,6);
+  x.fillStyle='#ff5a5a';if(boss.phase>0){x.fillRect(bx-17,ey+1,4,4);x.fillRect(bx+13,ey+1,4,4)}
+  x.strokeStyle='#14301a';x.lineWidth=3;x.beginPath();x.moveTo(bx-24,ey-6-boss.phase*2);x.lineTo(bx-8,ey-2);x.moveTo(bx+24,ey-6-boss.phase*2);x.lineTo(bx+8,ey-2);x.stroke();
+  x.beginPath();x.moveTo(bx-10,ey+18);x.lineTo(bx-4,ey+15);x.lineTo(bx+2,ey+18);x.lineTo(bx+8,ey+15);x.lineTo(bx+12,ey+18);x.stroke();
+  // crown target ring when carrying
+  if(bee&&bee.carry){x.strokeStyle=`rgba(255,212,71,${.5+.4*Math.sin(t*8)})`;x.lineWidth=3;x.beginPath();x.arc(bx,by+5,40,0,7);x.stroke()}
+}
+function drawShot(s){x.save();x.translate(s.x,s.y);
+  if(s.k==='seed'){x.fillStyle='#e8d6a0';x.rotate(Math.atan2(s.vy,s.vx));x.beginPath();x.ellipse(0,0,7,4,0,0,7);x.fill();x.fillStyle='#6b4a1e';x.fillRect(-1,-1,4,2)}
+  else if(s.k==='thorn'){x.fillStyle='#3f7a45';x.fillRect(-30,-3,60,6);x.fillStyle='#b8f5b0';for(let i=-24;i<=24;i+=12){x.beginPath();x.moveTo(i,-3);x.lineTo(i+4,-11);x.lineTo(i+8,-3);x.moveTo(i,3);x.lineTo(i+4,11);x.lineTo(i+8,3);x.fill()}}
+  else if(s.k==='petal'){x.rotate(s.rot+time*4);x.fillStyle='#d86bff';x.beginPath();x.ellipse(0,0,8,4,0,0,7);x.fill()}
+  else if(s.k==='fluff'){x.strokeStyle='#efe6ff';x.lineWidth=1.5;for(let i=0;i<8;i++){const a=i*.785;x.beginPath();x.moveTo(0,0);x.lineTo(Math.cos(a)*8,Math.sin(a)*8);x.stroke()}x.fillStyle='#fff';x.fillRect(-1,-1,3,3)}
+  x.restore()}
+function drawBee(){if(!bee)return;if(bee.inv&&Math.floor(bee.inv*16)%2)return;const bx=bee.x,by=bee.y;
+  x.fillStyle='#ffffffaa';const wf=Math.sin(bee.wing)*3;x.beginPath();x.ellipse(bx-5,by-7-wf,6,4,-.4,0,7);x.ellipse(bx+5,by-7-wf,6,4,.4,0,7);x.fill();
+  x.fillStyle='#ffd447';x.beginPath();x.ellipse(bx,by,9,7,0,0,7);x.fill();
+  x.fillStyle='#2a1700';x.fillRect(bx-3,by-6,3,12);x.fillRect(bx+3,by-6,2,12);x.fillRect(bx+6,by-2,2,2);
+  if(bee.carry){x.fillStyle='#ffd447';x.beginPath();x.arc(bx,by+12,5,0,7);x.fill()}
+  // hitbox dot
+  x.fillStyle='#fff';x.fillRect(bx-1,by-1,2,2)}
+
+go.onclick=()=>{reset();state='play';ov.hidden=true;muteB.hidden=false;startMusic();cv.focus?.()};
+reset();requestAnimationFrame(loop);
+</script>
+
+</body></html>

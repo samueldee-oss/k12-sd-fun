@@ -1,7 +1,7 @@
 # Whisker Dash
 
-A pixel-art cat platformer in one file: 49 worlds, 240 levels, 79 skins, a Hotel Lobby hub with talking characters,
-rides and mini-games, 1 or 2 players, keyboard or touch. Open `index.html` in a browser, or use the Whisker Dash card on the dashboard.
+A pixel-art cat platformer in one file: 50 worlds, 245 levels, 80 skins, a Hotel Lobby hub with talking characters,
+rides and mini-games, 1 or 2 players, keyboard or touch, 5 save slots. Open `index.html` in a browser, or use the Whisker Dash card on the dashboard.
 
 | File | What it is |
 |---|---|
