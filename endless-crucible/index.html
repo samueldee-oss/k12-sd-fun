@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Endless Crucible</title><style>[hidden]{display:none!important}</style></head><body>
+<title>Endless Crucible</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: a dot-grid workbench (the crucible) beside a tray of everything you've discovered; tray drops to the bottom on phones. */
+:root {
+  --bg: #e6ecee;
+  --board: #f2f5f6;
+  --dot: #c6d0d5;
+  --chip: #ffffff;
+  --ink: #18222c;
+  --muted: #5a6a76;
+  --line: #cbd5da;
+  --accent: #c9531f;
+  --accent-soft: #f6dccd;
+  --good: #2f8a5b;
+  --shadow: 0 1px 0 rgba(24,34,44,.06), 0 2px 6px rgba(24,34,44,.08);
+  --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f141a; --board: #131a21; --dot: #24303a; --chip: #1c252e; --ink: #e4ebf0;
+    --muted: #8c9ba7; --line: #2b3843; --accent: #f08a4b; --accent-soft: #3a2518; --good: #5cc28c;
+    --shadow: 0 1px 0 rgba(0,0,0,.3), 0 2px 8px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f141a; --board: #131a21; --dot: #24303a; --chip: #1c252e; --ink: #e4ebf0;
+  --muted: #8c9ba7; --line: #2b3843; --accent: #f08a4b; --accent-soft: #3a2518; --good: #5cc28c;
+  --shadow: 0 1px 0 rgba(0,0,0,.3), 0 2px 8px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px;
+  display: grid; grid-template-rows: auto 1fr minmax(0, 40%); overflow: hidden;
+  -webkit-user-select: none; user-select: none;
+}
+header {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding-block: 10px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  border-bottom: 1px solid var(--line);
+}
+h1 { margin: 0; font-family: var(--f-display); font-weight: 800; font-size: 1.35rem; letter-spacing: -.02em; line-height: 1; }
+h1 span { color: var(--accent); }
+.status { font-size: .78rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.status i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); display: inline-block; }
+.status.on i { background: var(--good); }
+.spacer { flex: 1; }
+button {
+  font: inherit; font-size: .85rem; color: var(--ink); background: transparent;
+  border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; cursor: pointer;
+}
+button:hover { border-color: var(--muted); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button.warn { color: var(--accent); border-color: var(--accent); }
+
+#board {
+  position: relative; overflow: hidden; background-color: var(--board);
+  background-image: radial-gradient(var(--dot) 1.2px, transparent 1.4px);
+  background-size: 22px 22px; touch-action: none;
+}
+.hint {
+  position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none;
+  text-align: center; color: var(--muted); padding: 24px; font-size: .95rem;
+}
+.hint b { display: block; font-family: var(--f-display); font-size: 1.2rem; color: var(--ink); margin-bottom: 4px; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px 6px 9px;
+  background: var(--chip); border: 1px solid var(--line); border-radius: 9px; box-shadow: var(--shadow);
+  font-weight: 700; font-size: .92rem; white-space: nowrap; cursor: grab; line-height: 1.2;
+}
+.chip .e { font-size: 1.1rem; line-height: 1; }
+.node { position: absolute; left: 0; top: 0; touch-action: none; will-change: transform; z-index: 1; }
+.node.dragging { cursor: grabbing; z-index: 50; box-shadow: 0 8px 22px rgba(0,0,0,.22); }
+.node.target { border-color: var(--accent); background: var(--accent-soft); }
+.node.brewing { color: var(--muted); animation: pulse 1s ease-in-out infinite; }
+.node.pop { animation: pop .35s cubic-bezier(.3,1.6,.5,1); }
+.node.shake { animation: shake .35s; }
+@keyframes pulse { 50% { opacity: .55; } }
+@keyframes pop { from { scale: .6; } to { scale: 1; } }
+@keyframes shake { 25% { translate: -4px 0; } 75% { translate: 4px 0; } }
+
+#tray {
+  border-top: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0;
+  background: var(--bg);
+}
+.tray-head {
+  display: flex; gap: 10px; align-items: center; padding-block: 10px 8px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.tray-head label { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); white-space: nowrap; font-weight: 700; }
+.tray-head label output { color: var(--ink); font-variant-numeric: tabular-nums; }
+#search {
+  flex: 1; min-width: 0; font: inherit; font-size: .9rem; color: var(--ink); background: var(--chip);
+  border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px;
+}
+#inv {
+  flex: 1; overflow-y: auto; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 7px;
+  padding-block: 4px 16px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+#inv .chip { touch-action: pan-y; }
+#inv .chip.fresh { border-color: var(--accent); }
+.empty { color: var(--muted); font-size: .9rem; }
+
+#toast {
+  position: fixed; left: 50%; top: calc(64px + env(safe-area-inset-top, 0px)); translate: -50% 0;
+  background: var(--ink); color: var(--board); padding: 8px 14px; border-radius: 10px;
+  font-weight: 700; font-size: .9rem; z-index: 100; pointer-events: none; opacity: 0; transition: opacity .2s;
+  max-width: calc(100% - 32px); text-align: center;
+}
+#toast.show { opacity: 1; }
+
+@media (min-width: 760px) {
+  body { grid-template-columns: 1fr 320px; grid-template-rows: auto 1fr; }
+  header { grid-column: 1 / -1; }
+  #tray { border-top: 0; border-left: 1px solid var(--line); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .node.pop, .node.shake, .node.brewing { animation: none; }
+}
+</style>
+
+<header>
+  <h1>Endless <span>Crucible</span></h1>
+  <div class="status" id="status"><i></i><span>Connecting…</span></div>
+  <div class="spacer"></div>
+  <button id="soundBtn" type="button" aria-pressed="true">🔊 Sound</button>
+  <button id="clearBtn" type="button">Clear board</button>
+  <button id="resetBtn" type="button">Reset</button>
+</header>
+
+<main id="board" aria-label="Workbench">
+  <div class="hint" id="hint"><div><b>Drag two things together</b>Tap or drag an element from the tray onto the bench, then drop one on another to see what they make.</div></div>
+</main>
+
+<aside id="tray">
+  <div class="tray-head">
+    <label for="search">Found <output id="count">4</output></label>
+    <input id="search" type="search" placeholder="Search elements" autocomplete="off">
+  </div>
+  <div id="inv"></div>
+</aside>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const START = [["Water","💧"],["Fire","🔥"],["Earth","🌍"],["Wind","🌬️"]];
+// Built-in recipe book: "A + B = Result | emoji". Claude invents anything not listed.
+const BOOK_TEXT = `
+Water + Fire = Steam | 💨
+Water + Earth = Plant | 🌱
+Water + Wind = Wave | 🌊
+Fire + Earth = Lava | 🌋
+Fire + Wind = Smoke | 🌫️
+Earth + Wind = Dust | 🟤
+Water + Water = Lake | 🏞️
+Fire + Fire = Sun | ☀️
+Earth + Earth = Mountain | ⛰️
+Wind + Wind = Tornado | 🌪️
+Lake + Water = Ocean | 🌊
+Water + Dust = Mud | 🟫
+Lava + Water = Stone | 🪨
+Stone + Fire = Metal | 🔩
+Plant + Water = Tree | 🌳
+Tree + Tree = Forest | 🌲
+Steam + Wind = Cloud | ☁️
+Cloud + Water = Rain | 🌧️
+Rain + Sun = Rainbow | 🌈
+Cloud + Fire = Lightning | ⚡
+Lightning + Mud = Life | 🧬
+Life + Earth = Human | 🧑
+Life + Water = Fish | 🐟
+Life + Wind = Bird | 🐦
+Life + Tree = Monkey | 🐒
+Life + Forest = Wolf | 🐺
+Wolf + Human = Dog | 🐕
+Life + Ocean = Whale | 🐋
+Human + Metal = Tool | 🔨
+Tool + Tree = Wood | 🪵
+Wood + Human = House | 🏠
+House + House = Village | 🏘️
+Village + Village = City | 🏙️
+Mountain + Water = River | 🏞️
+Wave + Wind = Storm | ⛈️
+Stone + Stone = Wall | 🧱
+Wall + Wall = Castle | 🏰
+Human + Castle = King | 👑
+Stone + Wind = Sand | 🏜️
+Sand + Fire = Glass | 🪟
+Sand + Water = Beach | 🏖️
+Glass + Sand = Hourglass | ⏳
+Steam + Metal = Engine | ⚙️
+Engine + Bird = Airplane | ✈️
+Wood + Water = Boat | ⛵
+Engine + Boat = Ship | 🚢
+Rain + Mountain = Snow | ❄️
+Snow + Human = Snowman | ☃️
+Snow + Water = Ice | 🧊
+Earth + Sun = Planet | 🪐
+Planet + Planet = Galaxy | 🌌
+Sun + Planet = Solar System | 🌞
+Plant + Plant = Garden | 🌷
+Human + Plant = Farmer | 🧑‍🌾
+Fire + Wood = Campfire | 🏕️
+Lightning + Metal = Electricity | 🔌
+Electricity + Glass = Light Bulb | 💡
+Electricity + Human = Robot | 🤖
+Plant + Fire = Ash | ⚫
+Fish + Fire = Grilled Fish | 🍢
+Smoke + Mountain = Volcano | 🌋
+Mountain + Fire = Volcano | 🌋
+Bird + Bird = Flock | 🪶
+Human + Human = Family | 👪
+Mud + Fire = Brick | 🧱
+Brick + Brick = Wall | 🧱
+Ocean + Wind = Hurricane | 🌀
+Tornado + Water = Waterspout | 💦
+Cloud + Cloud = Sky | 🌤️
+Sky + Sun = Day | 🌞
+Stone + Sky = Moon | 🌙
+Moon + Sky = Night | 🌃
+Day + Night = Time | ⏰
+Sun + Moon = Eclipse | 🌘
+Moon + Ocean = Tide | 🌗
+Night + Sun = Star | ⭐
+Star + Star = Constellation | ✨
+Star + Fire = Comet | ☄️
+Star + Time = Black Hole | 🕳️
+Galaxy + Galaxy = Universe | 🌠
+Universe + Fire = Big Bang | 💥
+Planet + Human = Astronaut | 🧑‍🚀
+Engine + Sky = Rocket | 🚀
+Rocket + Human = Astronaut | 🧑‍🚀
+Rocket + Moon = Moon Landing | 🌝
+Rocket + Computer = Satellite | 🛰️
+Planet + Life = Alien | 👽
+Alien + Airplane = UFO | 🛸
+UFO + Cow = Abduction | 🐄
+Glass + Star = Telescope | 🔭
+Snow + Mountain = Avalanche | 🏔️
+Ice + Mountain = Glacier | 🏔️
+Ice + Ocean = Iceberg | 🧊
+Ice + Bird = Penguin | 🐧
+Ice + Fire = Water | 💧
+Sun + Ice = Puddle | 💧
+Rain + Earth = Puddle | 💧
+Lava + Ice = Obsidian | ⬛
+Snow + Wind = Blizzard | 🌨️
+Rain + Rain = Flood | 🌊
+Flood + Boat = Ark | 🛶
+Lightning + Sky = Thunder | 🌩️
+Fire + Sky = Fireworks | 🎆
+Cloud + Earth = Fog | 🌫️
+Sun + Sand = Desert | 🏜️
+Sand + Sand = Desert | 🏜️
+Desert + Water = Oasis | 🌴
+Desert + Life = Camel | 🐫
+Desert + Plant = Cactus | 🌵
+Cactus + Human = Ouch | 😖
+Ocean + Earth = Island | 🏝️
+Volcano + Ocean = Island | 🏝️
+Tree + Beach = Palm Tree | 🌴
+Palm Tree + Fruit = Coconut | 🥥
+Earth + Mountain = Earthquake | 🫨
+Earthquake + Ocean = Tsunami | 🌊
+Mountain + Mountain = Mountain Range | 🏔️
+Mud + Plant = Swamp | 🪷
+Swamp + Life = Alligator | 🐊
+Life + Lake = Frog | 🐸
+Frog + King = Prince | 🤴
+Mud + Stone = Clay | 🏺
+Clay + Fire = Pottery | 🏺
+Clay + Life = Golem | 🗿
+Stone + Human = Statue | 🗿
+Wood + Time = Coal | ⚫
+Coal + Mountain = Diamond | 💎
+Diamond + Human = Ring | 💍
+Metal + Sun = Gold | 🪙
+Gold + Diamond = Crown | 👑
+Gold + Paper = Money | 💵
+Money + Human = Shopping | 🛍️
+Money + Money = Bank | 🏦
+Life + Mountain = Bear | 🐻
+Bear + Snow = Polar Bear | 🐻‍❄️
+Plant + Sun = Flower | 🌻
+Life + Garden = Bee | 🐝
+Bee + Flower = Honey | 🍯
+Bear + Honey = Happy Bear | 🐻
+Flower + Flower = Bouquet | 💐
+Bouquet + Human = Love | ❤️
+Human + Love = Wedding | 💒
+Ring + Love = Wedding | 💒
+Paper + Love = Gift | 🎁
+Family + House = Home | 🏡
+Fire + Forest = Wildfire | 🔥
+Tree + Wind = Leaf | 🍃
+Leaf + Water = Tea | 🍵
+Tea + Ice = Iced Tea | 🧋
+Tree + Flower = Fruit | 🍑
+Fruit + Water = Juice | 🧃
+Fruit + Ice = Smoothie | 🥤
+Fruit + Fire = Jam | 🫙
+Fruit + Time = Wine | 🍷
+Fruit + Earth = Pumpkin | 🎃
+Plant + Farmer = Wheat | 🌾
+Wheat + Stone = Flour | 🥣
+Flour + Water = Dough | 🫓
+Dough + Fire = Bread | 🍞
+Bread + Bread = Sandwich | 🥪
+Plant + Earth = Grass | 🌿
+Grass + Life = Cow | 🐄
+Cow + Human = Milk | 🥛
+Milk + Time = Cheese | 🧀
+Dough + Cheese = Pizza | 🍕
+Milk + Ice = Ice Cream | 🍦
+Cow + Fire = Steak | 🥩
+Steak + Bread = Burger | 🍔
+Bird + Stone = Egg | 🥚
+Egg + Fire = Omelette | 🍳
+Egg + Time = Chicken | 🐔
+Chicken + Egg = Paradox | 🤯
+Chicken + Fire = Fried Chicken | 🍗
+Flour + Honey = Cake | 🍰
+Cake + Fire = Birthday | 🎂
+Dough + Honey = Cookie | 🍪
+Plant + Milk = Chocolate | 🍫
+Plant + Steam = Coffee | ☕
+Coffee + Human = Energy | 💪
+Wheat + Water = Rice | 🍚
+Rice + Fish = Sushi | 🍣
+Dough + Steam = Noodles | 🍜
+Wheat + Sun = Corn | 🌽
+Corn + Fire = Popcorn | 🍿
+Honey + Fire = Candy | 🍬
+Life + Mud = Pig | 🐖
+Pig + Fire = Bacon | 🥓
+Pig + Bird = Flying Pig | 🐷
+Life + Cloud = Sheep | 🐑
+Sheep + Tool = Wool | 🧶
+Wool + Human = Sweater | 🧥
+Night + Human = Sleep | 😴
+Sleep + Human = Dream | 💭
+Dream + Night = Nightmare | 😱
+Life + Cheese = Mouse | 🐭
+Life + House = Cat | 🐈
+Cat + Cat = Kitten | 🐱
+Cat + Dog = Chaos | 😾
+Cat + Fish = Happy Cat | 😸
+Mouse + Cat = Chase | 🏃
+Cat + Sun = Lion | 🦁
+Lion + Bird = Griffin | 🦅
+Life + Sand = Snake | 🐍
+Stone + Life = Turtle | 🐢
+Turtle + Time = Wisdom | 🦉
+Life + Flower = Butterfly | 🦋
+Butterfly + Human = Fairy | 🧚
+Plant + Night = Mushroom | 🍄
+Human + Fish = Mermaid | 🧜
+Fish + Ocean = Shark | 🦈
+Life + Beach = Crab | 🦀
+Stone + Ocean = Coral | 🪸
+Ocean + Spider = Octopus | 🐙
+Fish + Fish = School of Fish | 🐠
+Lava + Life = Dinosaur | 🦖
+Dinosaur + Time = Fossil | 🦴
+Dinosaur + Fire = Dragon | 🐉
+Metal + Tool = Sword | 🗡️
+Human + Sword = Knight | 🛡️
+Knight + Dragon = Legend | 📜
+Dragon + Gold = Hoard | 💰
+Boat + Human = Sailor | ⚓
+Sailor + Sword = Pirate | 🏴‍☠️
+Pirate + Gold = Treasure | 💰
+Treasure + Beach = Buried Treasure | 🗺️
+Human + Star = Wizard | 🧙
+Wizard + Wood = Wand | 🪄
+Wizard + Dragon = Spell | ✨
+Wizard + Castle = School of Magic | 🏫
+Wizard + Night = Witch | 🧹
+Witch + Cat = Black Cat | 🐈‍⬛
+Human + Time = Old Man | 👴
+Old Man + Time = Skeleton | 💀
+Skeleton + Night = Ghost | 👻
+Ghost + House = Haunted House | 🏚️
+Skeleton + Life = Zombie | 🧟
+Pumpkin + Fire = Jack-o'-Lantern | 🎃
+Jack-o'-Lantern + Night = Halloween | 🦇
+Halloween + Human = Trick-or-Treater | 🍬
+Bird + Night = Bat | 🦇
+Bat + Human = Vampire | 🧛
+Life + Dust = Spider | 🕷️
+Spider + Spider = Spider Web | 🕸️
+Wood + Wind = Paper | 📄
+Paper + Paper = Book | 📕
+Book + Human = Scholar | 🎓
+Book + Book = Library | 📚
+Book + Wizard = Spellbook | 📖
+Paper + Wind = Kite | 🪁
+Paper + Airplane = Paper Plane | ✈️
+Bird + Paper = Letter | ✉️
+Letter + Bird = Carrier Pigeon | 🕊️
+Human + Wind = Music | 🎵
+Music + Wood = Guitar | 🎸
+Music + Stone = Rock Music | 🤘
+Music + Human = Singer | 🎤
+Music + Bird = Song | 🎶
+Singer + Singer = Band | 🎷
+Band + City = Concert | 🎫
+Wind + Wood = Flute | 🪈
+Stone + Tool = Wheel | 🛞
+Wheel + Wheel = Bicycle | 🚲
+Bicycle + Engine = Motorcycle | 🏍️
+Engine + Metal = Car | 🚗
+Wheel + Engine = Car | 🚗
+Car + Car = Traffic | 🚦
+Car + Water = Car Wash | 🧽
+Car + Steam = Train | 🚂
+Train + City = Subway | 🚇
+Airplane + City = Airport | 🛫
+Tornado + Engine = Helicopter | 🚁
+City + Engine = Factory | 🏭
+Smoke + City = Smog | 🌫️
+Hourglass + Metal = Clock | 🕰️
+Electricity + Metal = Battery | 🔋
+Electricity + Sun = Solar Panel | 🔆
+Electricity + Tool = Computer | 💻
+Computer + Computer = Internet | 🌐
+Computer + Glass = Phone | 📱
+Phone + Human = Selfie | 🤳
+Computer + Paper = Printer | 🖨️
+Human + Computer = Gamer | 🕹️
+Computer + Dragon = Video Game | 🎮
+Internet + Cat = Meme | 😹
+Mouse + Computer = Computer Mouse | 🖱️
+Robot + Robot = Artificial Intelligence | 🧠
+Artificial Intelligence + Human = Chatbot | 💬
+Robot + Human = Cyborg | 🦾
+Light Bulb + Human = Idea | 💭
+Idea + Human = Inventor | 🧑‍🔬
+Idea + Paper = Plan | 📝
+Idea + Idea = Genius | 🤓
+Sun + Glass = Magnifying Glass | 🔍
+Human + Fire = Cook | 🧑‍🍳
+Human + Water = Swimmer | 🏊
+Human + Mountain = Climber | 🧗
+Human + Ice = Skater | ⛸️
+Human + Wave = Surfer | 🏄
+Cow + Wind = Horse | 🐎
+Horse + Human = Rider | 🏇
+Horse + Rainbow = Unicorn | 🦄
+Horse + Bird = Pegasus | 🪽
+Tree + House = Treehouse | 🛖
+Life + Human = Baby | 👶
+Baby + Time = Kid | 🧒
+Tree + Snow = Christmas Tree | 🎄
+Human + Christmas Tree = Santa | 🎅
+Rainbow + Water = Paint | 🎨
+Paint + Human = Artist | 🧑‍🎨
+Paint + Paper = Painting | 🖼️
+`;
+const BOOK = BOOK_TEXT.trim().split("\n").map(l => {
+  const [lhs, emoji] = l.split("|").map(s => s.trim());
+  const [pair, out] = lhs.split("=").map(s => s.trim());
+  const [a, b] = pair.split("+").map(s => s.trim());
+  return [a, b, out, emoji];
+});
+const key = (a, b) => [a.toLowerCase(), b.toLowerCase()].sort().join("+");
+const book = new Map(BOOK.map(([a, b, n, e]) => [key(a, b), { name: n, emoji: e }]));
+
+// Discoveries persist per viewer.
+const LS = "endless-crucible-v1";
+let state = { found: START.map(([name, emoji]) => ({ name, emoji })), learned: {} };
+try { const s = JSON.parse(localStorage.getItem(LS) || "null"); if (s && Array.isArray(s.found) && s.found.length) state = s; } catch {}
+const save = () => { try { localStorage.setItem(LS, JSON.stringify(state)); } catch {} };
+const emojiOf = n => (state.found.find(f => f.name.toLowerCase() === n.toLowerCase()) || {}).emoji || "✨";
+
+const $ = s => document.querySelector(s);
+const board = $("#board"), inv = $("#inv"), hint = $("#hint");
+let nodes = [], nid = 0, freshName = null;
+
+// ---- Claude reactions (optional) ----
+let sample = null;
+const statusEl = $("#status");
+function setStatus(on, text) { statusEl.classList.toggle("on", on); statusEl.querySelector("span").textContent = text; }
+(async () => {
+  try { sample = (await window.claude?.use?.("sample")) ?? null; } catch { sample = null; }
+  setStatus(!!sample, sample ? "Claude invents new reactions" : "Recipe book only");
+})();
+
+async function react(a, b) {
+  const k = key(a, b);
+  if (book.has(k)) return book.get(k);
+  if (state.learned[k]) return state.learned[k];
+  if (!sample) return null;
+  const prompt =
+`You are the reaction engine of a crafting game. Players start with Water, Fire, Earth and Wind and combine any two things to discover a new thing.
+Combine "${a}" + "${b}".
+Rules: the result is one noun or well-known concept (an object, creature, place, idea, person type, food, invention, etc.), 1 to 3 words, Title Case. Make it logical and a little playful. It should usually be different from both inputs. No sentences.
+Reply with only JSON like {"name": "Steam", "emoji": "💨"} using exactly one emoji.`;
+  const r = await sample.json(prompt, { modelTier: "quick", cache: { gcTime: 86400000 } });
+  let name = String(r?.name ?? "").replace(/[^\p{L}\p{N} '&\-.]/gu, "").trim().slice(0, 32);
+  if (!name) return null;
+  name = name.replace(/\b\p{L}/gu, c => c.toUpperCase());
+  const known = state.found.find(f => f.name.toLowerCase() === name.toLowerCase());
+  const emoji = known ? known.emoji : ([...String(r?.emoji ?? "").trim()].slice(0, 4).join("") || "✨");
+  const res = { name: known ? known.name : name, emoji };
+  state.learned[k] = res; save();
+  return res;
+}
+
+// ---- Inventory ----
+function renderInv() {
+  const q = $("#search").value.trim().toLowerCase();
+  inv.textContent = "";
+  const list = state.found.filter(f => !q || f.name.toLowerCase().includes(q));
+  for (const f of list) {
+    const c = document.createElement("div");
+    c.className = "chip" + (f.name === freshName ? " fresh" : "");
+    c.tabIndex = 0; c.setAttribute("role", "button");
+    c.innerHTML = `<span class="e"></span><span></span>`;
+    c.children[0].textContent = f.emoji; c.children[1].textContent = f.name;
+    c.addEventListener("pointerdown", e => trayDown(e, f));
+    c.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); spawnRandom(f.name); } });
+    inv.append(c);
+  }
+  if (!list.length) { const p = document.createElement("p"); p.className = "empty"; p.textContent = "Nothing matches that yet."; inv.append(p); }
+  $("#count").textContent = state.found.length;
+}
+$("#search").addEventListener("input", renderInv);
+
+function discover(res) {
+  if (state.found.some(f => f.name.toLowerCase() === res.name.toLowerCase())) return false;
+  state.found.push({ name: res.name, emoji: res.emoji }); freshName = res.name; save(); renderInv();
+  return true;
+}
+
+// ---- Board nodes ----
+function makeNode(name, x, y) {
+  const el = document.createElement("div");
+  el.className = "chip node";
+  el.innerHTML = `<span class="e"></span><span></span>`;
+  el.children[0].textContent = emojiOf(name); el.children[1].textContent = name;
+  board.append(el);
+  const n = { id: ++nid, name, x, y, el, busy: false };
+  nodes.push(n); place(n); hint.hidden = true;
+  el.addEventListener("pointerdown", e => nodeDown(e, n));
+  el.addEventListener("dblclick", () => { const c = makeNode(n.name, n.x + 18, n.y + 18); clamp(c); place(c); c.el.classList.add("pop"); });
+  return n;
+}
+function place(n) { n.el.style.transform = `translate(${n.x}px, ${n.y}px)`; }
+function clamp(n) {
+  const W = board.clientWidth, H = board.clientHeight, w = n.el.offsetWidth, h = n.el.offsetHeight;
+  n.x = Math.max(8, Math.min(W - w - 8, n.x)); n.y = Math.max(8, Math.min(H - h - 8, n.y));
+}
+function removeNode(n) { n.el.remove(); nodes = nodes.filter(m => m !== n); hint.hidden = nodes.length > 0; }
+function spawnRandom(name) {
+  const W = board.clientWidth, H = board.clientHeight;
+  const n = makeNode(name, 24 + Math.random() * Math.max(10, W - 180), 24 + Math.random() * Math.max(10, H - 90));
+  clamp(n); place(n); n.el.classList.add("pop"); sfx.pop();
+}
+
+// ---- Dragging ----
+let drag = null;
+function trayDown(e, f) {
+  if (e.button > 0) return;
+  const sx = e.clientX, sy = e.clientY;
+  const move = ev => {
+    if (Math.hypot(ev.clientX - sx, ev.clientY - sy) < 7) return;
+    cleanup();
+    const r = board.getBoundingClientRect();
+    const n = makeNode(f.name, ev.clientX - r.left - 30, ev.clientY - r.top - 18);
+    beginDrag(n, ev, 30, 18);
+  };
+  const up = () => { cleanup(); spawnRandom(f.name); };
+  const cleanup = () => { removeEventListener("pointermove", move); removeEventListener("pointerup", up); removeEventListener("pointercancel", cleanup); };
+  addEventListener("pointermove", move); addEventListener("pointerup", up); addEventListener("pointercancel", cleanup);
+}
+function nodeDown(e, n) {
+  if (n.busy || e.button > 0) return;
+  e.preventDefault();
+  const r = n.el.getBoundingClientRect();
+  beginDrag(n, e, e.clientX - r.left, e.clientY - r.top);
+}
+function beginDrag(n, e, ox, oy) {
+  drag = { n, ox, oy }; sfx.pick();
+  n.el.classList.add("dragging"); n.el.classList.remove("pop", "shake");
+  moveTo(e);
+  addEventListener("pointermove", moveTo); addEventListener("pointerup", endDrag); addEventListener("pointercancel", endDrag);
+}
+function overlapTarget(n) {
+  const a = n.el.getBoundingClientRect(), cx = a.left + a.width / 2, cy = a.top + a.height / 2;
+  let best = null, bd = Infinity;
+  for (const m of nodes) {
+    if (m === n || m.busy) continue;
+    const b = m.el.getBoundingClientRect();
+    if (cx > b.left - 10 && cx < b.right + 10 && cy > b.top - 10 && cy < b.bottom + 10) {
+      const d = Math.hypot(cx - (b.left + b.width / 2), cy - (b.top + b.height / 2));
+      if (d < bd) { bd = d; best = m; }
+    }
+  }
+  return best;
+}
+function overTray(e) { const t = $("#tray").getBoundingClientRect(); return e.clientX >= t.left && e.clientX <= t.right && e.clientY >= t.top && e.clientY <= t.bottom; }
+function moveTo(e) {
+  if (!drag) return;
+  const r = board.getBoundingClientRect(), n = drag.n;
+  n.x = e.clientX - r.left - drag.ox; n.y = e.clientY - r.top - drag.oy; place(n);
+  const t = overlapTarget(n);
+  nodes.forEach(m => m.el.classList.toggle("target", m === t));
+  n.el.style.opacity = overTray(e) ? ".45" : "";
+}
+function endDrag(e) {
+  removeEventListener("pointermove", moveTo); removeEventListener("pointerup", endDrag); removeEventListener("pointercancel", endDrag);
+  if (!drag) return;
+  const n = drag.n; drag = null;
+  n.el.classList.remove("dragging"); n.el.style.opacity = "";
+  nodes.forEach(m => m.el.classList.remove("target"));
+  if (e.type === "pointerup" && overTray(e)) { removeNode(n); sfx.remove(); return; }
+  const t = overlapTarget(n);
+  if (t) combine(n, t); else { clamp(n); place(n); sfx.drop(); }
+}
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function combine(a, b) {
+  a.busy = b.busy = true;
+  const x = (a.x + b.x) / 2, y = (a.y + b.y) / 2;
+  a.el.hidden = b.el.hidden = true;
+  const brew = makeNode("…", x, y); brew.busy = true;
+  brew.el.children[0].textContent = "⚗️"; brew.el.children[1].textContent = "Reacting";
+  brew.el.classList.add("brewing");
+  let res = null, err = null;
+  const known = book.has(key(a.name, b.name)) || state.learned[key(a.name, b.name)];
+  const stopBubbles = known ? () => {} : sfx.bubbles();
+  try { res = await react(a.name, b.name); } catch (e) { err = e; }
+  stopBubbles(); removeNode(brew);
+  if (!res) {
+    a.el.hidden = b.el.hidden = false; a.busy = b.busy = false;
+    sfx.fizzle(); a.x += 14; b.x -= 14; [a, b].forEach(m => { clamp(m); place(m); m.el.classList.add("shake"); });
+    const code = err?.code;
+    toast(code === "rate_limited" ? "Too many reactions at once. Wait a moment and try again."
+        : code === "not_granted" ? "Claude isn't allowed here, so only the recipe book works."
+        : sample ? "That reaction fizzled. Try again or try another pair." : "These two don't react in the recipe book.");
+    if (code === "not_granted" || code === "sampling_disabled") { sample = null; setStatus(false, "Recipe book only"); }
+    return;
+  }
+  removeNode(a); removeNode(b);
+  const isNew = discover(res);
+  const n = makeNode(res.name, x, y); clamp(n); place(n); n.el.classList.add("pop");
+  if (isNew) { sfx.discover(); toast(`New discovery: ${res.emoji} ${res.name}`); } else sfx.combine();
+}
+
+// ---- Sound kit (synthesized, no files) ----
+const sfx = (() => {
+  let ctx = null, master = null, on = true;
+  try { on = localStorage.getItem(LS + "-sound") !== "off"; } catch {}
+  const ensure = () => {
+    if (!on) return null;
+    try {
+      if (!ctx) { ctx = new (window.AudioContext || window.webkitAudioContext)(); master = ctx.createGain(); master.gain.value = 0.5; master.connect(ctx.destination); }
+      if (ctx.state === "suspended") ctx.resume();
+    } catch { return null; }
+    return ctx;
+  };
+  function tone(freq, { at = 0, dur = 0.12, type = "sine", vol = 0.25, to = null, attack = 0.005 } = {}) {
+    const c = ensure(); if (!c) return;
+    const t = c.currentTime + at, o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + attack);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(master); o.start(t); o.stop(t + dur + 0.02);
+  }
+  function noise({ at = 0, dur = 0.25, vol = 0.15, from = 2000, to = 300 } = {}) {
+    const c = ensure(); if (!c) return;
+    const t = c.currentTime + at, len = Math.floor(c.sampleRate * dur), buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    const src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    src.buffer = buf; f.type = "bandpass"; f.Q.value = 1.2;
+    f.frequency.setValueAtTime(from, t); f.frequency.exponentialRampToValueAtTime(to, t + dur);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(f).connect(g).connect(master); src.start(t);
+  }
+  const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5, 1568];
+  return {
+    get on() { return on; },
+    set on(v) { on = v; try { localStorage.setItem(LS + "-sound", v ? "on" : "off"); } catch {} if (v) ensure(); },
+    unlock: ensure,
+    pick() { tone(520, { to: 780, dur: 0.07, type: "triangle", vol: 0.15 }); },
+    drop() { tone(260, { to: 170, dur: 0.09, type: "triangle", vol: 0.18 }); },
+    pop() { tone(700, { to: 1100, dur: 0.08, vol: 0.16 }); },
+    remove() { noise({ dur: 0.22, vol: 0.12, from: 1800, to: 250 }); },
+    combine() { tone(392, { dur: 0.12, type: "triangle", vol: 0.2 }); tone(587.33, { at: 0.08, dur: 0.18, type: "triangle", vol: 0.2 }); noise({ dur: 0.15, vol: 0.05, from: 4000, to: 1500 }); },
+    discover() {
+      notes.forEach((f, i) => tone(f, { at: i * 0.06, dur: 0.35, type: i % 2 ? "sine" : "triangle", vol: 0.16 }));
+      tone(2093, { at: 0.36, dur: 0.6, vol: 0.06 }); tone(2637, { at: 0.42, dur: 0.6, vol: 0.05 });
+    },
+    fizzle() { tone(220, { to: 70, dur: 0.3, type: "sawtooth", vol: 0.08 }); noise({ dur: 0.3, vol: 0.08, from: 900, to: 120 }); },
+    bubbles() {
+      let alive = true;
+      (function blip() {
+        if (!alive) return;
+        tone(300 + Math.random() * 500, { to: 600 + Math.random() * 700, dur: 0.06, vol: 0.07 });
+        setTimeout(blip, 90 + Math.random() * 110);
+      })();
+      return () => { alive = false; };
+    },
+  };
+})();
+const soundBtn = $("#soundBtn");
+const syncSound = () => { soundBtn.textContent = sfx.on ? "🔊 Sound" : "🔇 Muted"; soundBtn.setAttribute("aria-pressed", String(sfx.on)); };
+soundBtn.addEventListener("click", () => { sfx.on = !sfx.on; syncSound(); if (sfx.on) sfx.pop(); });
+syncSound();
+addEventListener("pointerdown", () => sfx.unlock(), { once: true });
+
+let tt;
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("show"), 2200); }
+
+$("#clearBtn").addEventListener("click", () => { if (nodes.length) sfx.remove(); [...nodes].forEach(n => { if (!n.busy) removeNode(n); }); });
+const resetBtn = $("#resetBtn"); let armed;
+resetBtn.addEventListener("click", () => {
+  if (!armed) { resetBtn.textContent = "Erase all?"; resetBtn.classList.add("warn"); armed = setTimeout(() => { armed = null; resetBtn.textContent = "Reset"; resetBtn.classList.remove("warn"); }, 3000); return; }
+  clearTimeout(armed); armed = null; resetBtn.textContent = "Reset"; resetBtn.classList.remove("warn");
+  state = { found: START.map(([name, emoji]) => ({ name, emoji })), learned: {} }; freshName = null; save();
+  [...nodes].forEach(removeNode); renderInv(); seed();
+});
+
+function seed() {
+  const W = board.clientWidth, H = board.clientHeight;
+  START.forEach(([name], i) => {
+    const n = makeNode(name, W * (0.2 + 0.2 * (i % 2)) + (i > 1 ? W * 0.25 : 0), H * (0.3 + 0.25 * (i % 2)));
+    clamp(n); place(n);
+  });
+}
+renderInv();
+requestAnimationFrame(seed);
+</script>
+
+</body></html>
