@@ -13,6 +13,10 @@ When I say "check the studio":
 2. Summarize for me what changed, what is broken, and any decisions I need to make.
 3. Once we have dealt with a message, move it to `archive/`.
 
+When we start a new systems-thinking game, or a new round of work on one with the lead designer (age 11):
+- Start from `prompts/bank-game-kickoff.md`. Keep its "How to work with me" section, and adapt the game name, the stocks, flows and loops it teaches, the device notes and the first steps.
+- Save the new prompt as `prompts/<game>-kickoff.md` and give it to me to paste into Claude Code.
+
 When we agree on work for the code:
 - Write one message per topic in `to-code/`, using `MESSAGE_TEMPLATE.md`, named `YYYY-MM-DD-HHMM-short-topic.md`.
 - Say what is wanted and why, which game it affects, and what "done" looks like.

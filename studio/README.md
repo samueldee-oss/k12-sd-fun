@@ -19,6 +19,7 @@ Everything here is plain Markdown in the Git repo, so it travels with the projec
 - **`to-code/`**: requests and questions for Claude Code (new feature, bug to fix, "is X possible?").
 - **`to-desktop/`**: reports and questions for Claude Desktop (what was built, what needs a decision, results of a test).
 - **`archive/`**: finished messages, moved here so the two boxes only hold open items.
+- **`prompts/`**: kickoff prompts for starting a Claude Code session with the lead designer. [`bank-game-kickoff.md`](prompts/bank-game-kickoff.md) is the template for new systems-thinking games.
 
 ## Writing a message
 
