@@ -28,7 +28,7 @@ k12-sd-fun/
 ├── bank_game_assessment.py   # Stock-flow failure assessment (100% mastery gate)
 ├── pong/                     # Level 1 warm-up (browser-native)
 ├── whisker-dash/             # Pixel cat platformer (browser-native, 1–2 players)
-├── capybara-rumble/ miriams-sky-day/ sprout-siege/ kitty-and-lotl/ endless-crucible/
+├── capybara-rumble/ sky-days/ sprout-siege/ kitty-and-lotl/ endless-crucible/
 │   sensory-overload/ mothwicks-lantern/ prism-sprint/ thistle-king/ rooftop-flow/
 │                             # More browser-native games (one index.html each)
 ├── experiments/              # Side projects, not part of the curriculum
@@ -60,7 +60,7 @@ Links assume GitHub Pages is enabled for this repo (Settings → Pages → deplo
 | Pong | `https://samueldee-oss.github.io/k12-sd-fun/pong/index.html` |
 | Whisker Dash | `https://samueldee-oss.github.io/k12-sd-fun/whisker-dash/index.html` |
 | Capybara Rumble | `https://samueldee-oss.github.io/k12-sd-fun/capybara-rumble/index.html` |
-| Miriam's Sky Day | `https://samueldee-oss.github.io/k12-sd-fun/miriams-sky-day/index.html` |
+| Sky Days | `https://samueldee-oss.github.io/k12-sd-fun/sky-days/index.html` (game files not added yet) |
 | Sprout Siege | `https://samueldee-oss.github.io/k12-sd-fun/sprout-siege/index.html` |
 | Kitty & Lotl | `https://samueldee-oss.github.io/k12-sd-fun/kitty-and-lotl/index.html` |
 | Endless Crucible | `https://samueldee-oss.github.io/k12-sd-fun/endless-crucible/index.html` |
