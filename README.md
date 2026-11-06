@@ -73,6 +73,18 @@ Links assume GitHub Pages is enabled for this repo (Settings → Pages → deplo
 
 The Bank Game is a Pygame program; its web builds are not committed (see `.gitignore`), so it has no public link yet.
 
+### Put a game on the iPad Home Screen
+
+Every browser game above (and the dashboard) can be added to an iPad or iPhone Home Screen as its own app, with its own icon. It opens full screen, without the Safari address bar.
+
+1. Open the game's link in **Safari** (it must be the GitHub Pages link, not a file or `localhost`).
+2. Tap **Share** (the square with an arrow), then **Add to Home Screen**, then **Add**.
+3. Play it once while online. After that it also opens with no Wi-Fi.
+
+Note: a Home Screen app keeps its own saves, separate from Safari, so progress made in Safari does not carry over.
+
+To add a new game (or change an icon), add a line to `GAMES` in `tools/make_home_screen_apps.py` and run it (needs Pillow: `pip install pillow`). It makes each game's `icons/`, `manifest.webmanifest` and `sw.js`, and adds the Home Screen tags to its `index.html`.
+
 ## 🚀 Quick Start (Desktop)
 
 ```bash
