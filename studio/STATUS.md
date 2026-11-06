@@ -1,6 +1,6 @@
 # Status
 
-_Kept by Claude Code. Last updated 2026-10-25._
+_Kept by Claude Code. Last updated 2026-11-06._
 
 ## Games
 
@@ -27,9 +27,12 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 - Bank Game has no touch controls for its keyboard-only actions (S, P, V).
 - Publishing on GitHub Pages would need the builds to load the runtime straight from the CDN (the same `/cdn/` problem), and the builds would need to stop being ignored by Git.
 - Snake is not linked from the dashboard yet.
+- Home Screen apps: all 12 browser games and the dashboard have icons, manifests and offline support (2026-11-06). Not yet tried on a real iPad, and they only install from the GitHub Pages address, which this session could not check is live.
+- Miriam's Sky Day is linked from the README and dashboard but its folder was never committed (held back over the real name). Pip the Watchman song is not in the repo at all. Neither can be made a Home Screen app until its files are added.
 
 ## Recent changes
 
+- 2026-11-06: Browser games and dashboard made installable as iPad Home Screen apps; generator in `tools/make_home_screen_apps.py` (commit `4378585`).
 - 2026-10-25: Whisker Dash expanded to 49 worlds (built with Claude on claude.ai); plan, file guide, tests and provenance transcript added. Not yet committed.
 - 2026-10-21: Set up this studio folder for Claude Desktop and Claude Code to work together.
 - 2026-10-21: Dashboard server fixed so all six Bank Game builds load (commit `871008a`).
