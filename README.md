@@ -60,7 +60,7 @@ Links assume GitHub Pages is enabled for this repo (Settings → Pages → deplo
 | Pong | `https://samueldee-oss.github.io/k12-sd-fun/pong/index.html` |
 | Whisker Dash | `https://samueldee-oss.github.io/k12-sd-fun/whisker-dash/index.html` |
 | Capybara Rumble | `https://samueldee-oss.github.io/k12-sd-fun/capybara-rumble/index.html` |
-| Sky Days | `https://samueldee-oss.github.io/k12-sd-fun/sky-days/index.html` |
+| Sky Days | `https://samueldee-oss.github.io/k12-sd-fun/sky-days/index.html` (game files not added yet) |
 | Sprout Siege | `https://samueldee-oss.github.io/k12-sd-fun/sprout-siege/index.html` |
 | Kitty & Lotl | `https://samueldee-oss.github.io/k12-sd-fun/kitty-and-lotl/index.html` |
 | Endless Crucible | `https://samueldee-oss.github.io/k12-sd-fun/endless-crucible/index.html` |

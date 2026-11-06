@@ -28,7 +28,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 - Publishing on GitHub Pages would need the builds to load the runtime straight from the CDN (the same `/cdn/` problem), and the builds would need to stop being ignored by Git.
 - Snake is not linked from the dashboard yet.
 - Home Screen apps: all 12 browser games and the dashboard have icons, manifests and offline support (2026-11-06). Not yet tried on a real iPad, and they only install from the GitHub Pages address, which this session could not check is live.
-- Sky Days is linked from the README and dashboard but its folder was never committed (held back over the real name). Pip the Watchman song is not in the repo at all. Neither can be made a Home Screen app until its files are added.
+- Sky Days (renamed 2026-11-06 from a title that used a real person's name) is linked from the README and dashboard as `sky-days/`, but its files are not in the repo yet. The real name must be taken out of the game and its spec before they are committed. Pip the Watchman song is not in the repo at all. Neither can be made a Home Screen app until its files are added.
 
 ## Recent changes
 
