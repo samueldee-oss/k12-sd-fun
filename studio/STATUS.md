@@ -31,6 +31,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-07: Blade Mosaic: piano removed from the music; richer ASMR cutting sounds (a scritch on every bite, crackles on nearly-broken blocks, three-layer sanding texture, sandy trickle after each break, debris ticks), also in Zen Tower.
 - 2026-11-07: Blade Mosaic sound made ASMR-style: grain-based crunches panned by block position, wooden knocks, airy blade whoosh and sanding, steam hiss, room echo; lo-fi music with vinyl crackle replaces the drum beat.
 - 2026-11-07: Blade Mosaic sound: generated music (workshop beat for levels, ambient pad for menus and Zen Tower), blade motor and grind, combo-pitched block pops, crash booms, overheat sizzle, coin jingle, star dings; Sound/Music switches.
 - 2026-11-07: Zen Tower layers fall about twice as fast, and several can be in the air at once.

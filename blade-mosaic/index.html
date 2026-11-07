@@ -449,11 +449,26 @@ function crunch(pan, bright){          // crisp, crumbly crunch: a snap and a fe
   const a = audio(); if (!a) return; const now = a.currentTime;
   if (now - lastPop < 0.026) return; lastPop = now;
   const base = 1400 + (bright || 0);
-  grain(now, 4200, 0.018, 0.035, pan, 0.6);
-  for (let k = 0; k < 4; k++){
+  grain(now, 4200, 0.018, 0.04, pan, 0.6);
+  for (let k = 0; k < 7; k++){
     const r = Math.random();
-    grain(now + k*0.011 + r*0.008, base*(0.55 + r*0.9), 0.025 + r*0.045, 0.05*(1 - k*0.17), pan + (r - 0.5)*0.25, 1.4);
+    grain(now + k*0.01 + r*0.009, base*(0.5 + r*1.1), 0.02 + r*0.05, 0.055*(1 - k*0.11), pan + (r - 0.5)*0.3, 1.6);
   }
+  grain(now + 0.03, 2600, 0.28, 0.018, pan, 0.4);   // sandy trickle after the crumble
+}
+let lastBite = 0, lastTick = 0;
+function biteSound(pan, damage){       // tiny scritch on every bite; nearly-broken blocks crackle
+  const a = actx; if (!a || !save.sound) return; const now = a.currentTime;
+  if (now - lastBite < 0.016) return; lastBite = now;
+  const r = Math.random;
+  grain(now, 2600 + r()*3200, 0.012 + r()*0.02, 0.028, pan + (r() - 0.5)*0.2, 2.2);
+  grain(now + 0.006, 1200 + r()*900, 0.02, 0.016, pan, 1.8);
+  if (damage > 0.5) for (let k = 0; k < 2; k++) grain(now + 0.01 + r()*0.03, 5000 + r()*3000, 0.005, 0.03*damage, pan + (r() - 0.5)*0.3, 1, sfxBus, 'highpass');
+}
+function debrisTick(pan){              // little bits ticking on the floor
+  const a = actx; if (!a || !save.sound) return; const now = a.currentTime;
+  if (now - lastTick < 0.035) return; lastTick = now;
+  grain(now, 3000 + Math.random()*3500, 0.012, 0.016, pan, 2);
 }
 function knock(pan){                   // soft wooden knock for tough blocks
   const a = audio(); if (!a) return; const now = a.currentTime;
@@ -502,13 +517,18 @@ function bladeSound(spin, cutting, over){
     const mk = (type, freq, q) => { const n = a.createBufferSource(); n.buffer = noise(a); n.loop = true;
       const f = a.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q;
       const g = a.createGain(); g.gain.value = 0; n.connect(f).connect(g).connect(sfxBus); n.start(Math.random()*0.5); return { f, g }; };
-    motor = { air:mk('bandpass', 500, 0.6), sand:mk('bandpass', 2200, 0.9) };
+    motor = { air:mk('bandpass', 500, 0.6), sand:mk('bandpass', 2200, 0.9), grit:mk('bandpass', 5200, 1.6), scrape:mk('bandpass', 850, 2.2) };
   }
   const t = a.currentTime;
   motor.air.f.frequency.setTargetAtTime(250 + spin*28, t, 0.1);
   motor.air.g.gain.setTargetAtTime(spin ? (cutting ? 0.035 : 0.02) : 0, t, 0.1);
   motor.sand.f.frequency.setTargetAtTime(1800 + Math.random()*900, t, 0.04);
-  motor.sand.g.gain.setTargetAtTime(cutting && !over ? 0.02 + Math.random()*0.025 : 0, t, 0.03);   // flutter = sandpaper texture
+  const c = cutting && !over, r = Math.random;
+  motor.sand.g.gain.setTargetAtTime(c ? 0.03 + r()*0.035 : 0, t, 0.025);   // flutter = sandpaper texture
+  motor.grit.f.frequency.setTargetAtTime(4200 + r()*2400, t, 0.03);
+  motor.grit.g.gain.setTargetAtTime(c ? 0.012 + r()*0.022 : 0, t, 0.02);    // fine grit
+  motor.scrape.f.frequency.setTargetAtTime(700 + r()*400, t, 0.06);
+  motor.scrape.g.gain.setTargetAtTime(c ? (r() < 0.3 ? 0.04 : 0.012) : 0, t, 0.04);   // coarse scrape, in uneven strokes
 }
 
 /* music: slow lo-fi for levels, a calm pad for menus and Zen Tower */
@@ -520,8 +540,13 @@ function pickTrack(){
 }
 const LOFI = [ { root:41, chord:[53,57,60,64] }, { root:40, chord:[52,55,59,62] }, { root:38, chord:[50,53,57,60] }, { root:36, chord:[48,52,55,59] } ];
 const ZEN = [ [48,52,55,59], [45,48,52,55], [41,45,48,52], [43,47,50,52] ];
-function epiano(notes, t, vol, len){
-  for (const m of notes){ tone('sine', midi(m), t, len, vol, musicBus, ['lowpass', 1600], 0.04); tone('triangle', midi(m)*1.002, t, len*0.6, vol*0.3, musicBus, ['lowpass', 1200], 0.04); }
+function softPad(notes, t, len, vol){
+  for (const m of notes){
+    const o = actx.createOscillator(), g = actx.createGain(), f = actx.createBiquadFilter();
+    o.type = 'sine'; o.frequency.value = midi(m); f.type = 'lowpass'; f.frequency.value = 700;
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + len*0.4); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+    o.connect(f).connect(g).connect(musicBus); o.start(t); o.stop(t + len + 0.05);
+  }
 }
 function musicStep(t){
   const s = music.step, M = musicBus;
@@ -532,8 +557,7 @@ function musicStep(t){
     if (i === 4 || i === 12) grain(t, 2400, 0.22, 0.045, 0, 0.5, M);           // brushed snare
     if (i % 4 === 2) grain(t, 6500, 0.04, 0.01, 0.3, 0.8, M);                  // shaker
     if ([0, 7, 10].includes(i)) tone('sine', midi(ch.root + 12), t, 0.5, 0.13, M, ['lowpass', 450], 0.02);
-    if (i === 0) epiano(ch.chord, t + 0.02, 0.03, 2.6);
-    if (i === 8 && bar % 2) epiano(ch.chord.slice(1), t + 0.03, 0.018, 1.6);
+    if (i === 0) softPad(ch.chord.slice(0, 3).map(m => m - 12), t, 4*16*60/72/4*0.25, 0.022);   // warm pad under the beat
     return 60/72/4;
   }
   const i = s % 16, ch = ZEN[Math.floor(s/16) % 4];
@@ -544,7 +568,7 @@ function musicStep(t){
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.04, t + 2.4); g.gain.setValueAtTime(0.04, t + 6); g.gain.exponentialRampToValueAtTime(0.0001, t + 8.8);
     o.connect(f); o2.connect(f); f.connect(g).connect(M); o.start(t); o2.start(t); o.stop(t + 9); o2.stop(t + 9);
   });
-  if (Math.random() < 0.15){ const pent = [72, 74, 76, 79, 81, 84]; tone('sine', midi(pent[Math.floor(Math.random()*pent.length)]), t, 2.6, 0.03, M, null, 0.02); }
+  if (i === 8 && Math.random() < 0.5) grain(t, 900 + Math.random()*600, 1.6, 0.012, (Math.random() - 0.5), 0.5, M);   // soft wind swell
   return 0.5;
 }
 setInterval(() => {
@@ -751,16 +775,18 @@ function update(dt){
   if (g.over && g.heat <= 25){ g.over = false; sfxCooled(); }
 
   const spin = g.over ? 4 : (cutting ? 26 : 16);
-  if (!g.zen) bladeSound(spin, cutting, g.over);
+  bladeSound(g.zen ? spin*0.6 : spin, cutting, g.over);
   g.ang += spin*dt;
   g.tick += dt;
   const period = 1 / B.rate;
   while (g.tick >= period){
     g.tick -= period;
     if (g.over || !cutting) continue;
+    let heard = 0;
     for (const b of touching){
       if (!b.alive) continue;
       b.hp -= B.dmg; b.flash = 1;
+      if (heard++ < 2) biteSound(((b.x + .5)/g.cols*2 - 1)*0.7, 1 - b.hp/b.max);
       sparks(g.ox + (b.x+.5)*cell, g.oy + (b.y + .5 + (b.fall ? b.fall.off : 0))*cell, B, 2);
       if (b.hp <= 0) breakBlock(b);
     }
@@ -781,7 +807,7 @@ function update(dt){
   for (const p of g.parts){
     p.vy += (p.g ?? 900)*dt; p.x += p.vx*dt; p.y += p.vy*dt; p.life -= dt; p.rot += p.vr*dt;
     // shards and sparks bounce on the ground line
-    if ((p.g ?? 900) > 0 && p.y > groundY && p.vy > 0 && p.y - p.vy*dt <= groundY){ p.y = groundY; p.vy *= -0.45; p.vx *= 0.7; p.vr *= 0.6; }
+    if ((p.g ?? 900) > 0 && p.y > groundY && p.vy > 0 && p.y - p.vy*dt <= groundY){ p.y = groundY; p.vy *= -0.45; p.vx *= 0.7; p.vr *= 0.6; if (p.sq) debrisTick(p.x/W*1.4 - 0.7); }
   }
   g.parts = g.parts.filter(p => p.life > 0 && p.y < H + 40);
   for (const f of g.floats){ f.y -= 40*dt; f.life -= dt; }
