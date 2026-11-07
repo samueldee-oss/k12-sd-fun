@@ -31,7 +31,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
-- 2026-11-07: Blade Mosaic physics: falling pieces with crash damage, blade momentum and edge bounce, bouncing debris (commit COMMIT2).
+- 2026-11-07: Blade Mosaic physics: falling pieces with crash damage, blade momentum and edge bounce, bouncing debris (commit `3b35d41`).
 - 2026-11-07: Blade Mosaic added and linked from the dashboard (commit `79a02bc`).
 - 2026-10-25: Whisker Dash expanded to 49 worlds (built with Claude on claude.ai); plan, file guide, tests and provenance transcript added. Not yet committed.
 - 2026-10-21: Set up this studio folder for Claude Desktop and Claude Code to work together.
