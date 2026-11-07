@@ -20,7 +20,7 @@
 [hidden]{display:none!important}
 html,body{height:100%;margin:0;background:var(--floor);color:var(--ink);overflow:hidden;font-family:var(--body);
   touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
-canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block}
+canvas#game,canvas#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
 button{font-family:var(--body);color:inherit}
 button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
@@ -87,6 +87,7 @@ h2{font:400 clamp(28px,7vw,44px)/1 var(--display);margin:0;color:var(--gold)}
 </style>
 </head>
 <body>
+<canvas id="gl" hidden aria-hidden="true"></canvas>
 <canvas id="game" aria-label="Game stage"></canvas>
 
 <div class="hud" id="hud" hidden>
@@ -96,6 +97,7 @@ h2{font:400 clamp(28px,7vw,44px)/1 var(--display);margin:0;color:var(--gold)}
   <span class="chip" title="Blade heat">🔥<span class="meter"><i id="heatFill"></i></span></span>
   <span class="spacer"></span>
   <span class="chip"><span class="coin"></span><span id="hudCoins">0</span></span>
+  <button class="ibtn" id="viewBtn" aria-label="Switch view" title="Switch between 3D and 2D (V)">3D</button>
   <button class="ibtn" id="pauseBtn" aria-label="Pause">II</button>
 </div>
 <div id="combo">x2 COMBO</div>
@@ -161,6 +163,7 @@ h2{font:400 clamp(28px,7vw,44px)/1 var(--display);margin:0;color:var(--gold)}
   </div>
 </section>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 'use strict';
 /* ---------------- Mosaics ----------------
@@ -461,6 +464,7 @@ function resize(){
   cvs.width = Math.round(W*DPR); cvs.height = Math.round(H*DPR);
   ctx.setTransform(DPR,0,0,DPR,0,0);
   if (game) layout();
+  if (R3){ R3.renderer.setSize(W, H, false); if (game) frame3D(); }
 }
 window.addEventListener('resize', resize);
 
@@ -489,6 +493,7 @@ function startLevel(i){
     falling:[], dirty:true };
   layout();
   game.bx = W/2; game.by = Math.min(H - 40, game.oy + game.rows*game.cell + game.cell*2.2);
+  if (use3D) build3D();
   $('hudName').textContent = m.name;
   show('play');
 }
@@ -510,6 +515,7 @@ window.addEventListener('keydown', e => {
   if (['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)) e.preventDefault();
   if ((k === 'escape' || k === 'p') && state === 'play') pause();
   else if ((k === 'escape' || k === 'p') && state === 'pause') resume();
+  if (k === 'v' && (state === 'play' || state === 'pause')) toggleView();
   if (game) game.tx = null; // keyboard takes over from the pointer
 });
 window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
@@ -517,18 +523,19 @@ let touchLast = null;
 cvs.addEventListener('pointerdown', e => {
   audio();
   if (state !== 'play') return;
-  if (e.pointerType === 'mouse'){ game.tx = e.clientX; game.ty = e.clientY; }
+  if (e.pointerType === 'mouse'){ const q = screenToLogic(e.clientX, e.clientY); game.tx = q.x; game.ty = q.y; }
   else { touchLast = { x:e.clientX, y:e.clientY, id:e.pointerId }; game.tx = game.bx; game.ty = game.by; }
   try { cvs.setPointerCapture(e.pointerId); } catch(_) {}
 });
 cvs.addEventListener('pointermove', e => {
   if (state !== 'play') return;
-  if (e.pointerType === 'mouse'){ game.tx = e.clientX; game.ty = e.clientY; return; }
+  if (e.pointerType === 'mouse'){ const q = screenToLogic(e.clientX, e.clientY); game.tx = q.x; game.ty = q.y; return; }
   if (!touchLast || touchLast.id !== e.pointerId) return;
   // Touch: relative drag, so your finger never hides the blade.
-  const k = 1.5;
-  game.tx = clamp((game.tx ?? game.bx) + (e.clientX - touchLast.x)*k, 0, W);
-  game.ty = clamp((game.ty ?? game.by) + (e.clientY - touchLast.y)*k, 60, H);
+  const k = 1.5, a = screenToLogic(touchLast.x, touchLast.y), b = screenToLogic(e.clientX, e.clientY);
+  const bb = bladeBounds(blade().r * game.cell);
+  game.tx = clamp((game.tx ?? game.bx) + (b.x - a.x)*k, bb.minX, bb.maxX);
+  game.ty = clamp((game.ty ?? game.by) + (b.y - a.y)*k, bb.minY, bb.maxY);
   touchLast = { x:e.clientX, y:e.clientY, id:e.pointerId };
 });
 const endTouch = e => { if (touchLast && touchLast.id === e.pointerId) touchLast = null; };
@@ -557,7 +564,7 @@ function update(dt){
   const accel = speed * 6, ddx = wx - g.vx, ddy = wy - g.vy, dl = Math.hypot(ddx, ddy);
   if (dl <= accel*dt){ g.vx = wx; g.vy = wy; } else { g.vx += ddx/dl*accel*dt; g.vy += ddy/dl*accel*dt; }
   g.bx += g.vx*dt; g.by += g.vy*dt;
-  const minX = reach*0.5, maxX = W - reach*0.5, minY = 60, maxY = H - reach*0.5;
+  const { minX, maxX, minY, maxY } = bladeBounds(reach);
   if (g.bx < minX){ g.bx = minX; g.vx = Math.abs(g.vx)*0.6; } if (g.bx > maxX){ g.bx = maxX; g.vx = -Math.abs(g.vx)*0.6; }
   if (g.by < minY){ g.by = minY; g.vy = Math.abs(g.vy)*0.6; } if (g.by > maxY){ g.by = maxY; g.vy = -Math.abs(g.vy)*0.6; }
 
@@ -651,7 +658,7 @@ function trail(B, x, y, r){
   const col = B.trail === 'fire' ? (Math.random()<.5?'#ff9a3d':'#ff4b3e')
             : B.trail === 'ice' ? (Math.random()<.5?'#bff1ff':'#ffffff')
             : B.trail === 'spark' ? (Math.random()<.5?'#c06bff':'#4fd1ff')
-            : `hsl(${Math.random()*360} 95% 65%)`;
+            : `hsl(${Math.round(Math.random()*360)}, 95%, 65%)`;
   g.parts.push({ x:x+Math.cos(a)*d, y:y+Math.sin(a)*d, vx:Math.cos(a)*40, vy:Math.sin(a)*40 - (B.trail==='fire'?60:0), s:2+Math.random()*3, color:col, life:0.4, rot:0, vr:0, g: B.trail==='fire' ? -120 : 0 });
 }
 
@@ -826,6 +833,7 @@ function show(s){
   if (s === 'levels') buildLevels();
   if (s === 'shop') buildShop();
   if (s === 'title' || s === 'levels') game = null;
+  if (typeof syncView === 'function') syncView();
 }
 function pause(){ if (state === 'play') show('pause'); }
 function resume(){ if (state === 'pause'){ show('play'); last = performance.now(); } }
@@ -925,6 +933,7 @@ $('btnShop3').onclick = () => { shopReturn = 'levels'; show('shop'); };
 $('btnShopDone').onclick = () => show(shopReturn);
 $('btnBack1').onclick = () => show('title');
 $('pauseBtn').onclick = pause;
+$('viewBtn').onclick = toggleView;
 $('btnResume').onclick = resume;
 $('btnRestart').onclick = () => startLevel(game.i);
 $('btnQuit').onclick = () => show('levels');
@@ -932,17 +941,221 @@ $('btnNext').onclick = () => startLevel(Math.min(game.i + 1, MOSAICS.length - 1)
 $('btnLevels').onclick = () => show('levels');
 document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
 
+/* ---------------- 3D view ----------------
+   The game rules run in the same flat grid as the 2D view; this only draws them in 3D:
+   lit cubes standing on a floor, a metal blade grinding their faces, tumbling debris.
+   If three.js cannot load (offline) or WebGL is missing, the game stays in 2D. */
+const glCanvas = document.getElementById('gl');
+let use3D = !!window.THREE && save.view !== '2d', R3 = null;
+const wX = px => (px - game.ox)/game.cell - game.cols/2;   // game pixels -> 3D units
+const wY = py => game.rows - (py - game.oy)/game.cell;
+
+function init3D(){
+  if (R3) return true;
+  if (!window.THREE) return false;
+  try {
+    const renderer = new THREE.WebGLRenderer({ canvas: glCanvas, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(W, H, false);
+    renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color('#15171d');
+    const camera = new THREE.PerspectiveCamera(40, W/H, 0.1, 600);
+    scene.add(new THREE.HemisphereLight(0xfff1e0, 0x1a1d26, 0.7));
+    const sun = new THREE.DirectionalLight(0xffffff, 0.9);
+    sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024);
+    scene.add(sun); scene.add(sun.target);
+    const glow = new THREE.PointLight(0xff8a3d, 0, 9, 2); scene.add(glow);
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), new THREE.MeshStandardMaterial({ color:0x1d2029, roughness:1 }));
+    ground.rotation.x = -Math.PI/2; ground.receiveShadow = true; scene.add(ground);
+    const grid = new THREE.GridHelper(600, 600, 0x2c303b, 0x22252f); grid.position.y = 0.003; scene.add(grid);
+    const shardMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1), new THREE.MeshStandardMaterial({ roughness:0.55 }), 500);
+    shardMesh.castShadow = true; shardMesh.frustumCulled = false; shardMesh.setColorAt(0, new THREE.Color(1,1,1)); shardMesh.count = 0;
+    scene.add(shardMesh);
+    const MAXS = 900, sparkGeo = new THREE.BufferGeometry();
+    sparkGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(MAXS*3), 3));
+    sparkGeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(MAXS*3), 3));
+    const sparkPts = new THREE.Points(sparkGeo, new THREE.PointsMaterial({ size:0.18, vertexColors:true, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false }));
+    sparkPts.frustumCulled = false; scene.add(sparkPts);
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.96, 1, 64), new THREE.MeshBasicMaterial({ color:0xffffff, transparent:true, opacity:0.14, depthWrite:false }));
+    scene.add(ring);
+    R3 = { renderer, scene, camera, sun, glow, shardMesh, sparkGeo, MAXS, ring, blocks:null, bladeObj:null, bladeId:null, dist:30, lastT:0,
+      ray:new THREE.Raycaster(), plane:new THREE.Plane(new THREE.Vector3(0,0,1), 0), hit:new THREE.Vector3(),
+      m:new THREE.Matrix4(), q:new THREE.Quaternion(), e:new THREE.Euler(), v:new THREE.Vector3(), s:new THREE.Vector3(),
+      col:new THREE.Color(), black:new THREE.Color(0,0,0), white:new THREE.Color(1,1,1) };
+    return true;
+  } catch(e) { R3 = null; return false; }
+}
+
+function makeBlade3D(b){
+  const grp = new THREE.Group(), mats = [], arms = [];
+  const ext = { depth:0.12, bevelEnabled:true, bevelThickness:0.03, bevelSize:0.025, bevelSegments:1, curveSegments:12 };
+  const metal = c => { const m = new THREE.MeshStandardMaterial({ color:c, metalness:0.5, roughness:0.3 }); mats.push(m); return m; };
+  const add = (geo, mat, rz) => { geo.translate(0, 0, -0.06); const me = new THREE.Mesh(geo, mat); me.rotation.z = rz || 0; me.castShadow = true; grp.add(me); return me; };
+  const hub = () => add(new THREE.CylinderGeometry(0.2, 0.2, 0.26, 24).rotateX(Math.PI/2), metal(b.c2));
+  if (b.kind === 'saw' || b.kind === 'star'){
+    const s = new THREE.Shape(), n = b.teeth, inner = b.kind === 'star' ? 0.38 : 0.8;
+    let first = true; const P = (x, y) => { if (first){ s.moveTo(x, y); first = false; } else s.lineTo(x, y); };
+    for (let i = 0; i < n; i++){
+      const a0 = i*Math.PI*2/n, a1 = (i+.5)*Math.PI*2/n;
+      if (b.kind === 'star'){ P(Math.cos(a0), Math.sin(a0)); P(Math.cos(a1)*inner, Math.sin(a1)*inner); }
+      else { P(Math.cos(a0)*inner, Math.sin(a0)*inner); P(Math.cos(a0+.15), Math.sin(a0+.15)); P(Math.cos(a1+.25)*inner, Math.sin(a1+.25)*inner); }
+    }
+    s.closePath();
+    if (b.kind === 'saw') for (let i = 0; i < 3; i++){ const a = i*Math.PI*2/3, h = new THREE.Path(); h.absarc(Math.cos(a)*.5, Math.sin(a)*.5, .1, 0, Math.PI*2, true); s.holes.push(h); }
+    add(new THREE.ExtrudeGeometry(s, ext), metal(b.c1));
+    hub();
+  } else if (b.kind === 'ring'){
+    const spikes = [];
+    for (let i = 0; i < b.teeth; i++){
+      const a0 = i*Math.PI*2/b.teeth, t = new THREE.Shape();
+      t.moveTo(Math.cos(a0)*.68, Math.sin(a0)*.68); t.lineTo(Math.cos(a0+.18), Math.sin(a0+.18)); t.lineTo(Math.cos(a0+.36)*.68, Math.sin(a0+.36)*.68); t.closePath();
+      spikes.push(t);
+    }
+    add(new THREE.ExtrudeGeometry(spikes, ext), metal(b.c2));
+    const torus = new THREE.Mesh(new THREE.TorusGeometry(0.66, 0.11, 14, 56), new THREE.MeshStandardMaterial({ color:b.c1, emissive:b.c1, emissiveIntensity:0.7, roughness:0.3 }));
+    grp.add(torus);
+  } else { // vortex
+    for (let i = 0; i < b.teeth; i++){
+      const s = new THREE.Shape(); s.moveTo(0, 0); s.quadraticCurveTo(.9, -.2, 1, -.85); s.quadraticCurveTo(.45, -.35, 0, 0);
+      const m = new THREE.MeshStandardMaterial({ color:0xffffff, emissive:0x000000, roughness:0.35, metalness:0.2 });
+      arms.push(add(new THREE.ExtrudeGeometry(s, ext), m, i*Math.PI*2/b.teeth));
+    }
+    add(new THREE.CylinderGeometry(0.3, 0.3, 0.24, 28).rotateX(Math.PI/2), new THREE.MeshStandardMaterial({ color:0x120a2a, roughness:0.4 }));
+    add(new THREE.CylinderGeometry(0.15, 0.15, 0.3, 20).rotateX(Math.PI/2), new THREE.MeshStandardMaterial({ color:0xffffff, emissive:0xffffff, emissiveIntensity:0.6 }));
+  }
+  grp.userData = { mats, arms };
+  return grp;
+}
+function setBlade3D(){
+  const S = R3, B = blade();
+  if (S.bladeObj){ S.scene.remove(S.bladeObj); S.bladeObj.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); }); }
+  S.bladeObj = makeBlade3D(B); S.bladeId = B.id; S.scene.add(S.bladeObj);
+}
+function build3D(){
+  if (!init3D()){ use3D = false; return; }
+  const g = game, S = R3;
+  if (S.blocks){ S.scene.remove(S.blocks); S.blocks.geometry.dispose(); S.blocks.material.dispose(); }
+  const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(0.94, 0.94, 0.94), new THREE.MeshStandardMaterial({ roughness:0.45, metalness:0.05 }), g.blocks.length);
+  mesh.castShadow = true; mesh.receiveShadow = true;
+  g.blocks.forEach((b, i) => { b.idx = i; b.c3 = new THREE.Color(b.color); mesh.setColorAt(i, b.c3); });
+  S.scene.add(mesh); S.blocks = mesh;
+  setBlade3D();
+  const span = Math.max(g.cols, g.rows) + 10, sh = S.sun.shadow.camera;
+  sh.left = -span; sh.right = span; sh.top = span; sh.bottom = -span; sh.near = 1; sh.far = 250; sh.updateProjectionMatrix();
+  S.sun.position.set(-g.cols*0.5 - 6, g.rows*1.4 + 14, g.rows + 16); S.sun.target.position.set(0, g.rows/2, 0);
+  frame3D();
+}
+function frame3D(){
+  const g = game, S = R3, tanH = Math.tan(S.camera.fov*Math.PI/360), aspect = W/H;
+  S.dist = Math.max((g.rows + 6)/2/tanH, (g.cols + 8)/2/(tanH*aspect));
+  S.camera.aspect = aspect; S.camera.updateProjectionMatrix();
+  S.scene.fog = new THREE.Fog(0x15171d, S.dist*1.25, S.dist*2.6);   // floor fades into the dark
+}
+function render3D(now){
+  const g = game, S = R3, B = blade();
+  const dt = Math.min(0.05, (now - (S.lastT || now))/1000); S.lastT = now;
+  const live = state === 'play';
+  if (S.bladeId !== B.id) setBlade3D();
+
+  const mesh = S.blocks;
+  for (const b of g.blocks){
+    if (!b.alive){ S.m.makeScale(0, 0, 0); mesh.setMatrixAt(b.idx, S.m); continue; }
+    const sc = 1 + b.flash*0.07;
+    S.m.makeScale(sc, sc, b.tough ? sc*1.25 : sc);   // tough blocks stick out further
+    S.m.setPosition(b.x - g.cols/2 + 0.5, g.rows - (b.y + (b.fall ? b.fall.off : 0)) - 0.5, 0);
+    mesh.setMatrixAt(b.idx, S.m);
+    S.col.copy(b.c3).lerp(S.black, (1 - b.hp/b.max)*0.5);
+    if (b.flash > 0) S.col.lerp(S.white, b.flash*0.5);
+    mesh.setColorAt(b.idx, S.col);
+  }
+  mesh.instanceMatrix.needsUpdate = true; mesh.instanceColor.needsUpdate = true;
+
+  // blade rides just in front of the block faces
+  const bx = wX(g.bx), by = wY(g.by), o = S.bladeObj, hot = Math.max(0, g.heat/100 - 0.55)/0.45;
+  o.position.set(bx, by, 0.62); o.scale.setScalar(B.r); o.rotation.z = -g.ang;
+  for (const m of o.userData.mats) m.emissive.setRGB(hot*0.9, hot*0.12, hot*0.04);
+  o.userData.arms.forEach((a, i) => a.material.color.setHSL(((now/1000*120 + i*72) % 360)/360, 0.95, 0.6));
+  S.ring.position.set(bx, by, 0.5); S.ring.scale.setScalar(B.r);
+  S.ring.material.color.set(g.over ? 0xff4b3e : 0xffffff); S.ring.material.opacity = g.over ? 0.45 : 0.14;
+  S.glow.position.set(bx, by, 1.6); S.glow.intensity = g.cutting && !g.over ? 2.2 : 0;
+
+  // debris cubes and sparks
+  let si = 0, pi = 0;
+  const pos = S.sparkGeo.attributes.position.array, ca = S.sparkGeo.attributes.color.array;
+  for (const p of g.parts){
+    if (p.pz === undefined){ p.pz = p.sq ? (Math.random()-.5)*0.4 : 0.7; p.vz = (Math.random()-.5)*(p.sq ? 7 : 4) + (p.sq ? 1.5 : 0); }
+    if (live) p.pz += p.vz*dt;
+    const x = wX(p.x), y = wY(p.y);
+    if (p.sq){
+      if (si >= 500) continue;
+      const s = p.s/g.cell * clamp(p.life*1.5, 0, 1);
+      S.e.set(p.rot*0.7, p.rot*0.4, p.rot); S.q.setFromEuler(S.e); S.s.set(s, s, s); S.v.set(x, Math.max(y, s/2), p.pz);
+      S.m.compose(S.v, S.q, S.s); S.shardMesh.setMatrixAt(si, S.m); S.col.set(p.color); S.shardMesh.setColorAt(si, S.col); si++;
+    } else {
+      if (pi >= S.MAXS) continue;
+      const a = clamp(p.life*3, 0, 1); S.col.set(p.color);
+      pos[pi*3] = x; pos[pi*3+1] = y; pos[pi*3+2] = p.pz;
+      ca[pi*3] = S.col.r*a; ca[pi*3+1] = S.col.g*a; ca[pi*3+2] = S.col.b*a; pi++;
+    }
+  }
+  S.shardMesh.count = si; S.shardMesh.instanceMatrix.needsUpdate = true; S.shardMesh.instanceColor.needsUpdate = true;
+  S.sparkGeo.setDrawRange(0, pi); S.sparkGeo.attributes.position.needsUpdate = true; S.sparkGeo.attributes.color.needsUpdate = true;
+
+  // camera: tilted down a little, drifts with the blade for depth, shakes on crashes
+  const sh = g.shake*0.04, cy = g.rows*0.5;
+  S.camera.position.set(bx*0.15 - S.dist*0.12 + (Math.random()-.5)*sh, cy + S.dist*0.3 + (Math.random()-.5)*sh, S.dist);
+  S.camera.lookAt(bx*0.06, cy*0.95, 0);
+  S.renderer.render(S.scene, S.camera);
+}
+function renderOverlay(){
+  ctx.clearRect(0, 0, W, H);
+  const g = game, S = R3;
+  ctx.font = '700 18px Rubik, system-ui, sans-serif'; ctx.textAlign = 'center';
+  for (const f of g.floats){
+    S.v.set(wX(f.x), wY(f.y), 0.7).project(S.camera);
+    ctx.globalAlpha = clamp(f.life*2, 0, 1); ctx.fillStyle = '#ffd23f';
+    ctx.fillText(f.txt, (S.v.x + 1)/2*W, (1 - S.v.y)/2*H);
+  }
+  ctx.globalAlpha = 1;
+}
+// Screen point -> game pixels (in 3D, through the mosaic's plane)
+function screenToLogic(x, y){
+  if (!(use3D && R3 && game)) return { x, y };
+  const S = R3;
+  S.ray.setFromCamera({ x:(x/W)*2 - 1, y:-(y/H)*2 + 1 }, S.camera);
+  if (!S.ray.ray.intersectPlane(S.plane, S.hit)) return { x:game.bx, y:game.by };
+  return { x: game.ox + (S.hit.x + game.cols/2)*game.cell, y: game.oy + (game.rows - S.hit.y)*game.cell };
+}
+function bladeBounds(reach){
+  const g = game;
+  if (use3D && R3) return { minX:g.ox - 4*g.cell, maxX:g.ox + (g.cols + 4)*g.cell, minY:g.oy - 3*g.cell, maxY:g.oy + g.rows*g.cell - reach*0.2 };
+  return { minX:reach*0.5, maxX:W - reach*0.5, minY:60, maxY:H - reach*0.5 };
+}
+function syncView(){
+  glCanvas.hidden = !(use3D && R3 && game);
+  $('viewBtn').textContent = use3D ? '3D' : '2D';
+  $('viewBtn').setAttribute('aria-label', use3D ? 'Switch to 2D view' : 'Switch to 3D view');
+}
+function toggleView(){
+  if (!window.THREE){ return; }
+  use3D = !use3D; save.view = use3D ? '3d' : '2d'; persist();
+  if (use3D && game) build3D();
+  syncView();
+}
+
 /* ---------------- Loop ---------------- */
 let last = performance.now();
 function frame(now){
   const dt = Math.min(0.05, (now - last)/1000); last = now;
   if (state === 'play' && game) update(dt);
-  render(now);
+  if (game && use3D && R3){ render3D(now); renderOverlay(); } else render(now);
   if (state === 'shop') drawShop(now);
   requestAnimationFrame(frame);
 }
 resize();
 show('title');
+if (!window.THREE) $('viewBtn').hidden = true;
 requestAnimationFrame(frame);
 
 // test hook for automated checks
