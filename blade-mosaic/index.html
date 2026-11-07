@@ -110,7 +110,7 @@ h2{font:400 clamp(28px,7vw,44px)/1 var(--display);margin:0;color:var(--gold)}
     <button class="cta" id="btnPlay">PLAY</button>
     <button class="cta alt" id="btnShop1">BLADE SHOP</button>
   </div>
-  <p class="hint">Mouse: point where the blade goes. iPad: drag anywhere on the screen. Keyboard: arrows or WASD.<br>Watch the heat meter: cutting non-stop overheats your blade.</p>
+  <p class="hint">Cut away what holds a piece up and it falls and cracks when it lands.<br>Mouse: point where the blade goes. iPad: drag anywhere on the screen. Keyboard: arrows or WASD.<br>Watch the heat meter: cutting non-stop overheats your blade.</p>
 </section>
 
 <!-- Level select -->
@@ -132,6 +132,7 @@ h2{font:400 clamp(28px,7vw,44px)/1 var(--display);margin:0;color:var(--gold)}
   <div class="loops">
     <b>Systems corner.</b> Two loops run this game.
     <b>Reinforcing loop:</b> more coins buy a better blade, a better blade grinds faster, and grinding faster earns more coins.
+    <b>Structures are systems too:</b> every block is held up by the blocks under it, so one cut in the right place can bring down a whole tower.
     <b>Balancing loop:</b> cutting heats the blade, and a hot blade stops cutting until it cools. Better blades push back on that limit, but never remove it.
   </div>
   <div class="row"><button class="cta" id="btnShopDone">DONE</button></div>
@@ -484,7 +485,8 @@ function startLevel(i){
   game = { i, m, cols, rows, blocks, grid, left:blocks.length, total:blocks.length, totalHp,
     par: Math.round(10 + blocks.length * 0.15), // seconds for 3 stars
     t:0, coins:0, combo:0, comboT:0, heat:0, over:false, tick:0, ang:0, shake:0,
-    bx:0, by:0, tx:null, ty:null, parts:[], floats:[], done:false, doneT:0 };
+    bx:0, by:0, vx:0, vy:0, cutting:false, tx:null, ty:null, parts:[], floats:[], done:false, doneT:0,
+    falling:[], dirty:true };
   layout();
   game.bx = W/2; game.by = Math.min(H - 40, game.oy + game.rows*game.cell + game.cell*2.2);
   $('hudName').textContent = m.name;
@@ -540,19 +542,29 @@ function update(dt){
   const reach = B.r * cell, speed = B.speed * cell;
 
   // movement
+  // Blade physics: it has momentum. It speeds up toward where you steer,
+  // drags while grinding (the blocks push back), and bounces off the edges.
   let mx = 0, my = 0;
   if (keys['arrowleft']||keys['a']) mx -= 1; if (keys['arrowright']||keys['d']) mx += 1;
   if (keys['arrowup']||keys['w']) my -= 1;   if (keys['arrowdown']||keys['s']) my += 1;
-  if (mx || my){ const l = Math.hypot(mx,my); g.bx += mx/l*speed*dt; g.by += my/l*speed*dt; }
+  const maxV = speed * (g.cutting ? 0.6 : 1);
+  let wx = 0, wy = 0;
+  if (mx || my){ const l = Math.hypot(mx,my); wx = mx/l*maxV; wy = my/l*maxV; }
   else if (g.tx != null){
-    const dx = g.tx - g.bx, dy = g.ty - g.by, d = Math.hypot(dx,dy), step = speed*dt;
-    if (d <= step){ g.bx = g.tx; g.by = g.ty; } else { g.bx += dx/d*step; g.by += dy/d*step; }
+    const dx = g.tx - g.bx, dy = g.ty - g.by, d = Math.hypot(dx,dy);
+    if (d > 0.5){ const want = Math.min(maxV, d*5); wx = dx/d*want; wy = dy/d*want; }
   }
-  g.bx = clamp(g.bx, reach*0.5, W - reach*0.5); g.by = clamp(g.by, 60, H - reach*0.5);
+  const accel = speed * 6, ddx = wx - g.vx, ddy = wy - g.vy, dl = Math.hypot(ddx, ddy);
+  if (dl <= accel*dt){ g.vx = wx; g.vy = wy; } else { g.vx += ddx/dl*accel*dt; g.vy += ddy/dl*accel*dt; }
+  g.bx += g.vx*dt; g.by += g.vy*dt;
+  const minX = reach*0.5, maxX = W - reach*0.5, minY = 60, maxY = H - reach*0.5;
+  if (g.bx < minX){ g.bx = minX; g.vx = Math.abs(g.vx)*0.6; } if (g.bx > maxX){ g.bx = maxX; g.vx = -Math.abs(g.vx)*0.6; }
+  if (g.by < minY){ g.by = minY; g.vy = Math.abs(g.vy)*0.6; } if (g.by > maxY){ g.by = maxY; g.vy = -Math.abs(g.vy)*0.6; }
 
   // cutting: one "bite" every 1/rate seconds hits every block the blade overlaps
   const touching = blocksUnder(g.bx, g.by, reach);
   const cutting = touching.length > 0 && !g.done;
+  g.cutting = cutting;
   if (cutting && !g.over) g.heat += B.heat*dt; else g.heat -= B.cool*dt;
   g.heat = clamp(g.heat, 0, 100);
   if (g.heat >= 100) g.over = true;
@@ -568,17 +580,26 @@ function update(dt){
     for (const b of touching){
       if (!b.alive) continue;
       b.hp -= B.dmg; b.flash = 1;
-      sparks(g.ox + (b.x+.5)*cell, g.oy + (b.y+.5)*cell, B, 2);
+      sparks(g.ox + (b.x+.5)*cell, g.oy + (b.y + .5 + (b.fall ? b.fall.off : 0))*cell, B, 2);
       if (b.hp <= 0) breakBlock(b);
     }
   }
+
+  // block physics: loose pieces fall, land and crack
+  if (g.dirty){ g.dirty = false; settle(); }
+  updateFalling(dt);
 
   // combo decay
   if (g.comboT > 0){ g.comboT -= dt; if (g.comboT <= 0) g.combo = 0; }
 
   // fx
   for (const b of g.blocks) if (b.flash > 0) b.flash = Math.max(0, b.flash - dt*6);
-  for (const p of g.parts){ p.vy += (p.g ?? 900)*dt; p.x += p.vx*dt; p.y += p.vy*dt; p.life -= dt; p.rot += p.vr*dt; }
+  const groundY = g.oy + g.rows*cell;
+  for (const p of g.parts){
+    p.vy += (p.g ?? 900)*dt; p.x += p.vx*dt; p.y += p.vy*dt; p.life -= dt; p.rot += p.vr*dt;
+    // shards and sparks bounce on the ground line
+    if ((p.g ?? 900) > 0 && p.y > groundY && p.vy > 0 && p.y - p.vy*dt <= groundY){ p.y = groundY; p.vy *= -0.45; p.vx *= 0.7; p.vr *= 0.6; }
+  }
   g.parts = g.parts.filter(p => p.life > 0 && p.y < H + 40);
   for (const f of g.floats){ f.y -= 40*dt; f.life -= dt; }
   g.floats = g.floats.filter(f => f.life > 0);
@@ -591,24 +612,25 @@ function update(dt){
 function blocksUnder(x, y, r){
   const g = game, c = g.cell, out = [];
   const x0 = Math.floor((x - r - g.ox)/c), x1 = Math.floor((x + r - g.ox)/c);
-  const y0 = Math.floor((y - r - g.oy)/c), y1 = Math.floor((y + r - g.oy)/c);
+  const y0 = Math.floor((y - r - g.oy)/c) - 1, y1 = Math.floor((y + r - g.oy)/c);
   for (let gy = Math.max(0,y0); gy <= Math.min(g.rows-1,y1); gy++)
     for (let gx = Math.max(0,x0); gx <= Math.min(g.cols-1,x1); gx++){
       const b = g.grid[gy*g.cols+gx]; if (!b || !b.alive) continue;
+      const top = g.oy + (gy + (b.fall ? b.fall.off : 0))*c;
       // circle vs square overlap
-      const nx = clamp(x, g.ox+gx*c, g.ox+(gx+1)*c), ny = clamp(y, g.oy+gy*c, g.oy+(gy+1)*c);
+      const nx = clamp(x, g.ox+gx*c, g.ox+(gx+1)*c), ny = clamp(y, top, top + c);
       if ((nx-x)**2 + (ny-y)**2 < r*r) out.push(b);
     }
   return out;
 }
 function breakBlock(b){
   const g = game, c = g.cell;
-  b.alive = false; g.left--;
+  b.alive = false; g.left--; g.grid[b.y*g.cols+b.x] = null; g.dirty = true;
   g.combo++; g.comboT = 0.9;
   const mult = g.combo >= 30 ? 4 : g.combo >= 15 ? 3 : g.combo >= 6 ? 2 : 1;
   const gain = (b.tough ? 3 : 1) * mult;
   g.coins += gain;
-  const cx = g.ox + (b.x+.5)*c, cy = g.oy + (b.y+.5)*c;
+  const cx = g.ox + (b.x+.5)*c, cy = g.oy + (b.y + .5 + (b.fall ? b.fall.off : 0))*c;
   for (let k = 0; k < 4; k++){
     g.parts.push({ x:cx + (k%2-.5)*c*.4, y:cy + ((k>>1)-.5)*c*.4, vx:(Math.random()-.5)*360, vy:-Math.random()*320-60,
       s:c*0.42, color:b.color, life:1.4, rot:0, vr:(Math.random()-.5)*14, sq:true });
@@ -633,6 +655,83 @@ function trail(B, x, y, r){
   g.parts.push({ x:x+Math.cos(a)*d, y:y+Math.sin(a)*d, vx:Math.cos(a)*40, vy:Math.sin(a)*40 - (B.trail==='fire'?60:0), s:2+Math.random()*3, color:col, life:0.4, rot:0, vr:0, g: B.trail==='fire' ? -120 : 0 });
 }
 
+/* ---------------- Block physics ----------------
+   A block stays up only if it connects (through neighbours left, right, up or down)
+   to a block on the ground row. Anything cut loose falls as one rigid piece,
+   speeds up under gravity, and cracks itself and whatever it lands on. */
+const GRAVITY = 32;   // blocks per second, per second
+function settle(){
+  const g = game, seen = new Set();
+  for (const start of g.blocks){
+    if (!start.alive || start.fall || seen.has(start)) continue;
+    const comp = [], stack = [start]; seen.add(start); let grounded = false;
+    while (stack.length){
+      const b = stack.pop(); comp.push(b);
+      if (b.y === g.rows - 1) grounded = true;
+      for (const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+        const nx = b.x+dx, ny = b.y+dy; if (nx < 0 || ny < 0 || nx >= g.cols || ny >= g.rows) continue;
+        const n = g.grid[ny*g.cols+nx];
+        if (n && n.alive && !n.fall && !seen.has(n)){ seen.add(n); stack.push(n); }
+      }
+    }
+    if (!grounded){ const grp = { blocks:comp, vy:0, off:0 }; comp.forEach(b => b.fall = grp); g.falling.push(grp); }
+  }
+}
+function canDrop(grp){
+  const g = game;
+  for (const b of grp.blocks){
+    if (!b.alive) continue;
+    if (b.y + 1 >= g.rows) return false;
+    const n = g.grid[(b.y+1)*g.cols + b.x];
+    if (n && n.fall !== grp) return false;
+  }
+  return true;
+}
+function updateFalling(dt){
+  const g = game;
+  for (const grp of g.falling.slice()){
+    grp.blocks = grp.blocks.filter(b => b.alive);
+    if (!grp.blocks.length){ g.falling.splice(g.falling.indexOf(grp), 1); continue; }
+    if (!canDrop(grp)){ land(grp); continue; }
+    grp.vy = Math.min(grp.vy + GRAVITY*dt, 40);
+    grp.off += grp.vy*dt;
+    while (grp.off >= 1){
+      if (!canDrop(grp)){ grp.off = 0; land(grp); break; }
+      // move every block down one cell, lowest first so nothing overwrites
+      grp.blocks.sort((a,b) => b.y - a.y);
+      for (const b of grp.blocks){ g.grid[b.y*g.cols+b.x] = null; b.y++; g.grid[b.y*g.cols+b.x] = b; }
+      grp.off -= 1;
+    }
+  }
+}
+function land(grp){
+  const g = game, v = grp.vy;
+  const i = g.falling.indexOf(grp); if (i >= 0) g.falling.splice(i, 1);
+  grp.blocks.forEach(b => b.fall = null);
+  grp.off = 0;
+  g.dirty = true;
+  // Impact: faster and heavier pieces hit harder (more momentum).
+  const crash = Math.round(Math.max(0, v - 9) * 0.3 * (1 + Math.log2(grp.blocks.length) / 2));
+  if (crash <= 0) return;
+  g.shake = Math.min(8, g.shake + 1 + crash*0.4);
+  pop(90);
+  const hit = new Set();
+  // only the bottom face of the piece, and whatever it lands on, takes the hit
+  for (const b of grp.blocks){
+    const under = b.y + 1 < g.rows ? g.grid[(b.y+1)*g.cols + b.x] : null;
+    if (under && grp.blocks.includes(under)) continue;
+    hit.add(b);
+    if (under) hit.add(under);
+  }
+  const c = g.cell;
+  for (const b of hit){
+    if (!b.alive) continue;
+    b.hp -= crash; b.flash = 1;
+    for (let k = 0; k < 2; k++) g.parts.push({ x:g.ox+(b.x+Math.random())*c, y:g.oy+(b.y+1)*c, vx:(Math.random()-.5)*200, vy:-Math.random()*200, s:2+Math.random()*3, color:'#d8cfc0', life:0.5, rot:0, vr:0, g:700 });
+    if (b.hp <= 0) breakBlock(b);
+  }
+}
+
 /* ---------------- Render ---------------- */
 function render(now){
   ctx.clearRect(0,0,W,H);
@@ -646,13 +745,18 @@ function render(now){
   ctx.save();
   if (g.shake > 0) ctx.translate((Math.random()-.5)*g.shake, (Math.random()-.5)*g.shake);
 
+  // ground line: everything rests on it
+  const gy = g.oy + g.rows*c;
+  ctx.fillStyle = 'rgba(255,138,61,.18)'; ctx.fillRect(0, gy, W, Math.max(3, c*0.15));
+  ctx.fillStyle = 'rgba(255,255,255,.025)'; ctx.fillRect(0, gy + Math.max(3, c*0.15), W, H - gy);
+
   // ghost outline of the mosaic so you can see your progress
   ctx.fillStyle = 'rgba(255,255,255,.04)';
   for (const b of g.blocks) if (!b.alive) ctx.fillRect(g.ox+b.x*c+1, g.oy+b.y*c+1, c-2, c-2);
 
   for (const b of g.blocks){
     if (!b.alive) continue;
-    const x = g.ox + b.x*c, y = g.oy + b.y*c, gap = Math.max(1, c*0.06);
+    const x = g.ox + b.x*c, y = g.oy + (b.y + (b.fall ? b.fall.off : 0))*c, gap = Math.max(1, c*0.06);
     ctx.fillStyle = b.color; ctx.fillRect(x+gap, y+gap, c-gap*2, c-gap*2);
     // bevel
     ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.fillRect(x+gap, y+gap, c-gap*2, c*0.14);
@@ -842,7 +946,7 @@ show('title');
 requestAnimationFrame(frame);
 
 // test hook for automated checks
-window.__bladeMosaic = { update, finish, MOSAICS, BLADES, get game(){ return game; }, get save(){ return save; }, startLevel, show };
+window.__bladeMosaic = { update, finish, breakBlock, MOSAICS, BLADES, get game(){ return game; }, get save(){ return save; }, startLevel, show };
 </script>
 </body>
 </html>
