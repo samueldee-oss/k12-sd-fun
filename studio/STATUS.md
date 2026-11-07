@@ -28,10 +28,11 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 - Publishing on GitHub Pages would need the builds to load the runtime straight from the CDN (the same `/cdn/` problem), and the builds would need to stop being ignored by Git.
 - Snake is not linked from the dashboard yet.
 - Home Screen apps: all 12 browser games and the dashboard have icons, manifests and offline support (2026-11-06). Not yet tried on a real iPad, and they only install from the GitHub Pages address, which this session could not check is live.
-- Sky Days (renamed 2026-11-06 from a title that used a real person's name) is linked from the README and dashboard as `sky-days/`, but its files are not in the repo yet. The real name must be taken out of the game and its spec before they are committed. Pip the Watchman song is not in the repo at all. Neither can be made a Home Screen app until its files are added.
+- Pip the Watchman song is not in the repo (it seems to live in a separate `come-follow-me-games` project on the PC). Neither can be made a Home Screen app until its files are added.
 
 ## Recent changes
 
+- 2026-11-07: The sky game is a personal gift, not a K12 game: removed from the dashboard, README, game archive notes and Home Screen tool. The family plays it from a private, unlisted link.
 - 2026-11-07: History of `main`, `claude/home-screen-apps-bn7ohx` and `claude/spinning-blade-game-yo9uzv` rewritten to take a real person's name out of every past version (owner's request). Old clones, including the PC copy, must be re-downloaded or reset before pushing.
 - 2026-11-06: Browser games and dashboard made installable as iPad Home Screen apps; generator in `tools/make_home_screen_apps.py` (commit `4378585`).
 - 2026-10-25: Whisker Dash expanded to 49 worlds (built with Claude on claude.ai); plan, file guide, tests and provenance transcript added. Not yet committed.

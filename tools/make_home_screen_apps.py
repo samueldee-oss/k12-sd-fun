@@ -43,8 +43,6 @@ GAMES = [
     ("thistle-king", "Thistle King", "Thistle King", "TK", "#1f1530", "#d58cff", "#ffd400"),
     ("rooftop-flow", "Rooftop Flow", "Rooftop Flow", "RF", "#0e1230", "#ff8a1f", "#f5c24c"),
     ("experiments/snake-blender-mode", "Snake", "Snake", "S", "#0f172a", "#22c55e", "#ef4444"),
-    # Skipped until its folder is added; check the colours against the game then.
-    ("sky-days", "Sky Days", "Sky Days", "SD", "#7cc8f2", "#ffffff", "#4caf50"),
 ]
 
 ICON_SIZES = {"apple-touch-icon.png": 180, "icon-192.png": 192, "icon-512.png": 512}

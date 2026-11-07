@@ -23,7 +23,6 @@ This folder documents the single-file browser games in this repo: what each one 
 | Thistle King | Arena boss fight | Bee dodges patterns, carries nectar to hit the boss | [thistle-king.md](thistle-king.md) |
 | Rooftop Flow | Endless runner | Tricks and combos across dusk rooftops | [rooftop-flow.md](rooftop-flow.md) |
 | Kitty & Lotl | Toddler-friendly catch game | Catch falling treats in a boat; 7 hidden surprises | [kitty-and-lotl.md](kitty-and-lotl.md) |
-| Sky Days | 7-level pixel adventure | Seven different mini-games in one story | spec not added yet (see note) |
 
 ## Why these are fun: patterns across the set
 
@@ -46,7 +45,3 @@ This folder documents the single-file browser games in this repo: what each one 
 ## Reproducing a game
 
 See [REPRODUCING.md](REPRODUCING.md) for the recipe, a re-prompt template, and a checklist to verify a rebuild.
-
-## Note on Sky Days
-
-This game first used a real person's name in its title and for its main character. The owner decided (2026-11-06) to publish it as **Sky Days**, in the folder `sky-days/`. Before the game and its spec are committed, the real name must be replaced in the title, the character and the spec.
