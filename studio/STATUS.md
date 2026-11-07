@@ -12,7 +12,7 @@ _Kept by Claude Code. Last updated 2026-11-07._
 | Bank Game assessment | `bank_game_assessment.py` | Not reviewed yet. | Not checked. |
 | Pong (Level 1 warm-up) | `pong/` | Works. Touch: drag to move, tap to serve; in 2-player mode each half of the court moves its own paddle. | Yes (simulated touch tested; not yet tried on a real iPad). |
 | Whisker Dash | `whisker-dash/` | Works. 49 worlds, 240 levels, 1–2 players. Plan in `whisker-dash/PLAN.md`; automated tests in `whisker-dash/tests/` all pass (2026-10-25). | Touch pad included (not yet tried on a real iPad). |
-| Blade Mosaic | `blade-mosaic/` | New 2026-11-07. You are a spinning blade grinding 11 block mosaics (heart to Eiffel Tower to castle); 8-blade shop; heat meter as a balancing loop; physics (cut-loose pieces fall and crack on landing, blade has momentum); 3D view (three.js) with a 3D/2D button, falls back to 2D offline; Zen Tower endless relaxing mode; generated music and full sound effects with Sound/Music switches (M mutes). Balance tuned with a bot, not yet with students. | Yes: drag anywhere moves the blade (simulated touch tested; not yet tried on a real iPad). |
+| Blade Mosaic | `blade-mosaic/` | New 2026-11-07. You are a spinning blade grinding 11 block mosaics (heart to Eiffel Tower to castle); 8-blade shop; heat meter as a balancing loop; physics (cut-loose pieces fall and crack on landing, blade has momentum); 3D view (three.js) with a 3D/2D button, falls back to 2D offline; Zen Tower endless relaxing mode; soft ASMR-style generated sound and lo-fi music with Sound/Music switches (M mutes). Balance tuned with a bot, not yet with students. | Yes: drag anywhere moves the blade (simulated touch tested; not yet tried on a real iPad). |
 | Snake (side project) | `experiments/snake-blender-mode/` | Works. Fixed 2026-10-20: body was invisible and the game "auto-ended" around 60-70 points. Swipe to steer. | Yes (simulated touch tested; not yet tried on a real iPad). |
 
 A comparison of the Bank Game versions (features, fun, systems lessons) is in `to-desktop/2026-10-21-1600-bank-game-version-comparison.md`.
@@ -31,6 +31,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-07: Blade Mosaic sound made ASMR-style: grain-based crunches panned by block position, wooden knocks, airy blade whoosh and sanding, steam hiss, room echo; lo-fi music with vinyl crackle replaces the drum beat.
 - 2026-11-07: Blade Mosaic sound: generated music (workshop beat for levels, ambient pad for menus and Zen Tower), blade motor and grind, combo-pitched block pops, crash booms, overheat sizzle, coin jingle, star dings; Sound/Music switches.
 - 2026-11-07: Zen Tower layers fall about twice as fast, and several can be in the air at once.
 - 2026-11-07: Blade Mosaic Zen Tower: endless pastel tower, soft ASMR sounds, no timer or heat (commit `b4f98ac`).
