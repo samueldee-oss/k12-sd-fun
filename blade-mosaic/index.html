@@ -707,7 +707,7 @@ function updateFalling(dt){
     grp.blocks = grp.blocks.filter(b => b.alive);
     if (!grp.blocks.length){ g.falling.splice(g.falling.indexOf(grp), 1); continue; }
     if (!canDrop(grp)){ land(grp); continue; }
-    grp.vy = Math.min(grp.vy + GRAVITY*dt, 40);
+    grp.vy = game.zen ? Math.min(grp.vy + GRAVITY*2.5*dt, 70) : Math.min(grp.vy + GRAVITY*dt, 40);   // Zen Tower drops faster
     grp.off += grp.vy*dt;
     while (grp.off >= 1){
       if (!canDrop(grp)){ grp.off = 0; land(grp); break; }
@@ -995,12 +995,13 @@ function startZen(){
 }
 function zenTick(){
   const g = game;
-  if (g.falling.some(f => f.spawn)) return;                 // one layer in the air at a time
+  // several layers can be in the air at once; stop when the tower plus incoming layers is full
+  const inAir = g.falling.filter(f => f.spawn).length;
   let top = g.rows;
   for (const b of g.blocks) if (b.alive && !b.fall && b.y < top) top = b.y;
-  if (top < ZEN_SKY) return;
+  if (top - inAir < ZEN_SKY) return;
   for (let x = 0; x < g.cols; x++) if (g.grid[x]) return;   // top row must be clear
-  const grp = { blocks:[], vy:0, off:0, spawn:true };
+  const grp = { blocks:[], vy:10, off:0, spawn:true };   // starts with a push
   for (let x = 0; x < g.cols; x++){ const b = zenBlock(g.layer, x, 0); b.fall = grp; grp.blocks.push(b); }
   g.layer++;
   g.falling.push(grp);
