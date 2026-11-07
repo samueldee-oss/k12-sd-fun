@@ -32,6 +32,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-07: History of `main`, `claude/home-screen-apps-bn7ohx` and `claude/spinning-blade-game-yo9uzv` rewritten to take a real person's name out of every past version (owner's request). Old clones, including the PC copy, must be re-downloaded or reset before pushing.
 - 2026-11-06: Browser games and dashboard made installable as iPad Home Screen apps; generator in `tools/make_home_screen_apps.py` (commit `4378585`).
 - 2026-10-25: Whisker Dash expanded to 49 worlds (built with Claude on claude.ai); plan, file guide, tests and provenance transcript added. Not yet committed.
 - 2026-10-21: Set up this studio folder for Claude Desktop and Claude Code to work together.
