@@ -31,7 +31,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
-- 2026-11-07: Blade Mosaic 3D view: lit cubes with shadows, 3D blades and debris; V or the HUD button switches to 2D (commit COMMIT3).
+- 2026-11-07: Blade Mosaic 3D view: lit cubes with shadows, 3D blades and debris; V or the HUD button switches to 2D (commit `03eb2e9`).
 - 2026-11-07: Blade Mosaic physics: falling pieces with crash damage, blade momentum and edge bounce, bouncing debris (commit `3b35d41`).
 - 2026-11-07: Blade Mosaic added and linked from the dashboard (commit `79a02bc`).
 - 2026-10-25: Whisker Dash expanded to 49 worlds (built with Claude on claude.ai); plan, file guide, tests and provenance transcript added. Not yet committed.
