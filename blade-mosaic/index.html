@@ -92,9 +92,9 @@ h2{font:400 clamp(28px,7vw,44px)/1 var(--display);margin:0;color:var(--gold)}
 
 <div class="hud" id="hud" hidden>
   <span class="name" id="hudName">Heart</span>
-  <span class="chip" title="Mosaic demolished"><span class="meter"><i id="progFill"></i></span><span id="progTxt">0%</span></span>
+  <span class="chip" id="chipProg" title="Mosaic demolished"><span class="meter"><i id="progFill"></i></span><span id="progTxt">0%</span></span>
   <span class="chip" title="Time" id="timeTxt">0.0s</span>
-  <span class="chip" title="Blade heat">🔥<span class="meter"><i id="heatFill"></i></span></span>
+  <span class="chip" id="chipHeat" title="Blade heat">🔥<span class="meter"><i id="heatFill"></i></span></span>
   <span class="spacer"></span>
   <span class="chip"><span class="coin"></span><span id="hudCoins">0</span></span>
   <button class="ibtn" id="viewBtn" aria-label="Switch view" title="Switch between 3D and 2D (V)">3D</button>
@@ -110,9 +110,10 @@ h2{font:400 clamp(28px,7vw,44px)/1 var(--display);margin:0;color:var(--gold)}
   <div class="wallet"><span class="coin"></span><span class="coinsNow">0</span> coins</div>
   <div class="row">
     <button class="cta" id="btnPlay">PLAY</button>
+    <button class="cta alt" id="btnZen1">ZEN TOWER</button>
     <button class="cta alt" id="btnShop1">BLADE SHOP</button>
   </div>
-  <p class="hint">Cut away what holds a piece up and it falls and cracks when it lands.<br>Mouse: point where the blade goes. iPad: drag anywhere on the screen. Keyboard: arrows or WASD.<br>Watch the heat meter: cutting non-stop overheats your blade.</p>
+  <p class="hint">Cut away what holds a piece up and it falls and cracks when it lands.<br>Mouse: point where the blade goes. iPad: drag anywhere on the screen. Keyboard: arrows or WASD.<br>Watch the heat meter: cutting non-stop overheats your blade.<br>Zen Tower: an endless tower with soft sounds and no timer. Just grind and relax.</p>
 </section>
 
 <!-- Level select -->
@@ -121,6 +122,7 @@ h2{font:400 clamp(28px,7vw,44px)/1 var(--display);margin:0;color:var(--gold)}
   <div class="wallet"><span class="coin"></span><span class="coinsNow">0</span> coins</div>
   <div class="levels" id="levelGrid"></div>
   <div class="row">
+    <button class="cta alt" id="btnZen2">ZEN TOWER</button>
     <button class="cta alt" id="btnShop2">BLADE SHOP</button>
     <button class="cta alt" id="btnBack1">BACK</button>
   </div>
@@ -574,6 +576,7 @@ function update(dt){
   g.cutting = cutting;
   if (cutting && !g.over) g.heat += B.heat*dt; else g.heat -= B.cool*dt;
   g.heat = clamp(g.heat, 0, 100);
+  if (g.zen){ g.heat = 0; g.over = false; setGrind(cutting); }
   if (g.heat >= 100) g.over = true;
   if (g.over && g.heat <= 25) g.over = false;
 
@@ -595,6 +598,8 @@ function update(dt){
   // block physics: loose pieces fall, land and crack
   if (g.dirty){ g.dirty = false; settle(); }
   updateFalling(dt);
+
+  if (g.zen) zenTick();
 
   // combo decay
   if (g.comboT > 0){ g.comboT -= dt; if (g.comboT <= 0) g.combo = 0; }
@@ -633,7 +638,8 @@ function blocksUnder(x, y, r){
 function breakBlock(b){
   const g = game, c = g.cell;
   b.alive = false; g.left--; g.grid[b.y*g.cols+b.x] = null; g.dirty = true;
-  g.combo++; g.comboT = 0.9;
+  if (g.zen){ g.slots.push(b.idx); g.broken++; if (g.broken % 10 === 0){ softChime(); save.coins += g.coins; g.coins = 0; persist(); } }
+  else { g.combo++; g.comboT = 0.9; }
   const mult = g.combo >= 30 ? 4 : g.combo >= 15 ? 3 : g.combo >= 6 ? 2 : 1;
   const gain = (b.tough ? 3 : 1) * mult;
   g.coins += gain;
@@ -642,6 +648,7 @@ function breakBlock(b){
     g.parts.push({ x:cx + (k%2-.5)*c*.4, y:cy + ((k>>1)-.5)*c*.4, vx:(Math.random()-.5)*360, vy:-Math.random()*320-60,
       s:c*0.42, color:b.color, life:1.4, rot:0, vr:(Math.random()-.5)*14, sq:true });
   }
+  if (g.zen){ crunch(); return; }
   if (mult > 1 || b.tough) g.floats.push({ x:cx, y:cy, txt:'+'+gain, life:0.7 });
   g.shake = Math.min(4, g.shake + (b.tough ? 2 : 0.6));
   pop(b.tough ? 180 : 320 + Math.random()*240);
@@ -717,6 +724,7 @@ function land(grp){
   grp.blocks.forEach(b => b.fall = null);
   grp.off = 0;
   g.dirty = true;
+  if (g.zen){ if (v > 5) thud(); return; }   // Zen Tower: soft landings, no crash damage
   // Impact: faster and heavier pieces hit harder (more momentum).
   const crash = Math.round(Math.max(0, v - 9) * 0.3 * (1 + Math.log2(grp.blocks.length) / 2));
   if (crash <= 0) return;
@@ -759,7 +767,7 @@ function render(now){
 
   // ghost outline of the mosaic so you can see your progress
   ctx.fillStyle = 'rgba(255,255,255,.04)';
-  for (const b of g.blocks) if (!b.alive) ctx.fillRect(g.ox+b.x*c+1, g.oy+b.y*c+1, c-2, c-2);
+  if (!g.zen) for (const b of g.blocks) if (!b.alive) ctx.fillRect(g.ox+b.x*c+1, g.oy+b.y*c+1, c-2, c-2);
 
   for (const b of g.blocks){
     if (!b.alive) continue;
@@ -808,6 +816,12 @@ function titleBlade(now){
 let lastCombo = 0;
 function hud(){
   const g = game;
+  if (g.zen){
+    $('timeTxt').textContent = g.broken + ' blocks';
+    $('hudCoins').textContent = save.coins + g.coins;
+    $('hot').hidden = true; $('combo').style.opacity = 0;
+    return;
+  }
   const pct = Math.round((1 - g.left/g.total)*100);
   $('progFill').style.width = pct + '%'; $('progTxt').textContent = pct + '%';
   $('timeTxt').textContent = g.t.toFixed(1) + 's';
@@ -828,10 +842,12 @@ function show(s){
   state = s;
   for (const [k,id] of Object.entries(SCREENS)) $(id).hidden = k !== s;
   $('hud').hidden = !(s === 'play' || s === 'pause');
-  if (s !== 'play'){ $('combo').style.opacity = 0; $('hot').hidden = true; }
+  if (s !== 'play'){ $('combo').style.opacity = 0; $('hot').hidden = true; if (typeof setGrind === 'function') setGrind(false); }
+  $('chipProg').hidden = $('chipHeat').hidden = !!(game && game.zen);
   document.querySelectorAll('.coinsNow').forEach(el => el.textContent = save.coins);
   if (s === 'levels') buildLevels();
   if (s === 'shop') buildShop();
+  if ((s === 'title' || s === 'levels') && game && game.zen && game.coins){ save.coins += game.coins; game.coins = 0; persist(); }
   if (s === 'title' || s === 'levels') game = null;
   if (typeof syncView === 'function') syncView();
 }
@@ -935,11 +951,104 @@ $('btnBack1').onclick = () => show('title');
 $('pauseBtn').onclick = pause;
 $('viewBtn').onclick = toggleView;
 $('btnResume').onclick = resume;
-$('btnRestart').onclick = () => startLevel(game.i);
+$('btnRestart').onclick = () => game.zen ? startZen() : startLevel(game.i);
+$('btnZen1').onclick = () => { audio(); startZen(); };
+$('btnZen2').onclick = () => { audio(); startZen(); };
 $('btnQuit').onclick = () => show('levels');
 $('btnNext').onclick = () => startLevel(Math.min(game.i + 1, MOSAICS.length - 1));
 $('btnLevels').onclick = () => show('levels');
 document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+
+/* ---------------- Zen Tower (endless, for relaxing) ----------------
+   No timer, no heat, no stars. A tower of soft pastel layers; new layers drop
+   gently onto the top as you grind, so it never runs out. */
+const ZEN_COLS = 10, ZEN_ROWS = 20, ZEN_SKY = 6;  // keep 6 empty rows above the tower
+function zenColor(L, x){
+  const h = (200 + L*9) % 360, style = Math.floor(L/4) % 4;
+  let l = 74;
+  if (style === 0) l = 70 + x;                              // soft gradient
+  else if (style === 1) l = (L % 2) ? 80 : 70;              // banded layers
+  else if (style === 2) l = ((x + L) % 2) ? 79 : 69;        // checker
+  else l = (x > 2 && x < 7) ? 81 : 71;                      // light centre stripe
+  return `hsl(${h}, 62%, ${l}%)`;
+}
+function zenBlock(L, x, y){
+  const g = game, hp = blade().dmg * 2;                     // always two bites, whatever the blade
+  const b = { x, y, color:zenColor(L, x), hp, max:hp, tough:false, flash:0, alive:true, idx:g.slots.pop() };
+  g.blocks.push(b); g.grid[y*g.cols + x] = b;
+  return b;
+}
+function startZen(){
+  const cols = ZEN_COLS, rows = ZEN_ROWS;
+  game = { zen:true, m:{ name:'Zen Tower' }, cols, rows, blocks:[], grid:new Array(cols*rows).fill(null),
+    left:Infinity, total:Infinity, par:0, layer:0, broken:0,
+    slots:Array.from({ length:cols*rows }, (_, i) => cols*rows - 1 - i),
+    t:0, coins:0, combo:0, comboT:0, heat:0, over:false, tick:0, ang:0, shake:0,
+    bx:0, by:0, vx:0, vy:0, cutting:false, tx:null, ty:null, parts:[], floats:[], done:false, doneT:0,
+    falling:[], dirty:true };
+  for (let y = rows - 1; y >= ZEN_SKY; y--){ for (let x = 0; x < cols; x++) zenBlock(game.layer, x, y); game.layer++; }
+  layout();
+  game.bx = W/2; game.by = game.oy + game.cell*3;
+  if (use3D) build3D();
+  $('hudName').textContent = 'Zen Tower';
+  show('play');
+}
+function zenTick(){
+  const g = game;
+  if (g.falling.some(f => f.spawn)) return;                 // one layer in the air at a time
+  let top = g.rows;
+  for (const b of g.blocks) if (b.alive && !b.fall && b.y < top) top = b.y;
+  if (top < ZEN_SKY) return;
+  for (let x = 0; x < g.cols; x++) if (g.grid[x]) return;   // top row must be clear
+  const grp = { blocks:[], vy:0, off:0, spawn:true };
+  for (let x = 0; x < g.cols; x++){ const b = zenBlock(g.layer, x, 0); b.fall = grp; grp.blocks.push(b); }
+  g.layer++;
+  g.falling.push(grp);
+  if (g.blocks.length > g.cols*g.rows*2) g.blocks = g.blocks.filter(b => b.alive);
+}
+
+/* Soft sounds: crumbly crunch, low grinding hum, gentle thud, pentatonic chime */
+let noiseBuf = null, grind = null, lastCrunch = 0, chimeStep = 0;
+function noise(a){
+  if (!noiseBuf){ noiseBuf = a.createBuffer(1, a.sampleRate, a.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random()*2 - 1; }
+  return noiseBuf;
+}
+function crunch(){
+  const a = audio(); if (!a) return; const now = a.currentTime;
+  if (now - lastCrunch < 0.03) return; lastCrunch = now;
+  const src = a.createBufferSource(); src.buffer = noise(a);
+  const f = a.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 700 + Math.random()*1800; f.Q.value = 0.8;
+  const g = a.createGain(), len = 0.08 + Math.random()*0.08;
+  g.gain.setValueAtTime(0.0001, now); g.gain.exponentialRampToValueAtTime(0.11, now + 0.006); g.gain.exponentialRampToValueAtTime(0.0001, now + len);
+  src.connect(f).connect(g).connect(a.destination); src.start(now, Math.random()*0.8); src.stop(now + len + 0.02);
+}
+function thud(){
+  const a = audio(); if (!a) return; const now = a.currentTime;
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = 'sine'; o.frequency.setValueAtTime(95, now); o.frequency.exponentialRampToValueAtTime(48, now + 0.25);
+  g.gain.setValueAtTime(0.0001, now); g.gain.exponentialRampToValueAtTime(0.12, now + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+  o.connect(g).connect(a.destination); o.start(now); o.stop(now + 0.4);
+}
+function softChime(){
+  const a = audio(); if (!a) return; const now = a.currentTime;
+  const scale = [392, 440, 523.25, 587.33, 659.25, 783.99, 659.25, 587.33, 523.25, 440];
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = 'sine'; o.frequency.value = scale[chimeStep++ % scale.length];
+  g.gain.setValueAtTime(0.0001, now); g.gain.exponentialRampToValueAtTime(0.045, now + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
+  o.connect(g).connect(a.destination); o.start(now); o.stop(now + 1.9);
+}
+function setGrind(on){
+  const a = on ? audio() : actx; if (!a) return;
+  if (!grind){
+    if (!on) return;
+    const src = a.createBufferSource(); src.buffer = noise(a); src.loop = true;
+    const f = a.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 420;
+    const g = a.createGain(); g.gain.value = 0;
+    src.connect(f).connect(g).connect(a.destination); src.start();
+    grind = { g };
+  }
+  grind.g.gain.setTargetAtTime(on ? 0.05 : 0, a.currentTime, 0.12);
+}
 
 /* ---------------- 3D view ----------------
    The game rules run in the same flat grid as the 2D view; this only draws them in 3D:
@@ -1036,9 +1145,10 @@ function build3D(){
   if (!init3D()){ use3D = false; return; }
   const g = game, S = R3;
   if (S.blocks){ S.scene.remove(S.blocks); S.blocks.geometry.dispose(); S.blocks.material.dispose(); }
-  const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(0.94, 0.94, 0.94), new THREE.MeshStandardMaterial({ roughness:0.45, metalness:0.05 }), g.blocks.length);
+  const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(0.94, 0.94, 0.94), new THREE.MeshStandardMaterial({ roughness:0.45, metalness:0.05 }), g.zen ? g.cols*g.rows : g.blocks.length);
   mesh.castShadow = true; mesh.receiveShadow = true;
-  g.blocks.forEach((b, i) => { b.idx = i; b.c3 = new THREE.Color(b.color); mesh.setColorAt(i, b.c3); });
+  g.blocks.forEach((b, i) => { if (!g.zen) b.idx = i; if (!b.alive) return; b.c3 = new THREE.Color(b.color); mesh.setColorAt(b.idx, b.c3); });
+  if (!mesh.instanceColor) mesh.setColorAt(0, new THREE.Color(0, 0, 0));
   S.scene.add(mesh); S.blocks = mesh;
   setBlade3D();
   const span = Math.max(g.cols, g.rows) + 10, sh = S.sun.shadow.camera;
@@ -1059,8 +1169,11 @@ function render3D(now){
   if (S.bladeId !== B.id) setBlade3D();
 
   const mesh = S.blocks;
+  S.m.makeScale(0, 0, 0);
+  for (let i = 0; i < mesh.count; i++) mesh.setMatrixAt(i, S.m);   // hide every slot, then show live blocks
   for (const b of g.blocks){
-    if (!b.alive){ S.m.makeScale(0, 0, 0); mesh.setMatrixAt(b.idx, S.m); continue; }
+    if (!b.alive) continue;
+    if (!b.c3) b.c3 = new THREE.Color(b.color);
     const sc = 1 + b.flash*0.07;
     S.m.makeScale(sc, sc, b.tough ? sc*1.25 : sc);   // tough blocks stick out further
     S.m.setPosition(b.x - g.cols/2 + 0.5, g.rows - (b.y + (b.fall ? b.fall.off : 0)) - 0.5, 0);
@@ -1159,7 +1272,7 @@ if (!window.THREE) $('viewBtn').hidden = true;
 requestAnimationFrame(frame);
 
 // test hook for automated checks
-window.__bladeMosaic = { update, finish, breakBlock, MOSAICS, BLADES, get game(){ return game; }, get save(){ return save; }, startLevel, show };
+window.__bladeMosaic = { update, finish, breakBlock, startZen, MOSAICS, BLADES, get game(){ return game; }, get save(){ return save; }, startLevel, show };
 </script>
 </body>
 </html>
