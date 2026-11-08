@@ -107,6 +107,12 @@ body.full:has(#ov:not([hidden])) .pad{display:none}
 .lchip.on{outline:2px solid #8a3b12;background:#fff4d8}
 .lchip.new{background:#ffd27a}
 .lchip:disabled{opacity:.5}
+/* No text selection or long-press copy menu: a press-and-hold on a button or label should not highlight it */
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+/* Phone held upright: menus grow down over the touch pad instead of scrolling inside the short game window */
+@media (orientation:portrait) and (max-width:700px){body:not(.full) .overlay{bottom:auto;min-height:100%;overflow:visible;box-sizing:border-box}}
+/* Full screen: menus use the whole screen, not just the game picture */
+body.full .overlay{position:fixed;top:var(--hudB,0px);left:0;right:0;bottom:0;z-index:6;border-radius:0;box-sizing:border-box;padding:12px max(12px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
 </style>
 
 <h1>WHISKER DASH</h1>
@@ -2882,5 +2888,5 @@ window.claude?.hot?.snapshot?.(()=>({run:runOn&&mode==='story'&&state!=='title'?
 function boot(d){applyHand();if(restoreAll&&d&&d.run){d.run.skinSet=[...new Set([...(d.run.skinSet||[]),...restoreAll])];d.run.powers=[...new Set([...(d.run.powers||[]),'double'])];d.run.picked=true}if(takeBack&&d&&d.run){d.run.skinSet=(d.run.skinSet||[]).filter(k=>!NOTYET.includes(k));d.run.skins=(d.run.skins||[]).map(k=>NOTYET.includes(k)?'orange':k)}renderPowers();if(d&&d.run)resumeRun(d.run);else showTitle();requestAnimationFrame(loop)}
 window.claude?.hot?.ready?window.claude.hot.ready(boot):boot(window.claude?.hot?.data??{});
 </script>
-
+<script id="hud-edge">(function(){var h=document.querySelector('.hud');if(!h)return;function f(){document.documentElement.style.setProperty('--hudB',Math.ceil(h.getBoundingClientRect().bottom)+'px')}if(window.ResizeObserver){var o=new ResizeObserver(f);o.observe(h);o.observe(document.body)}new MutationObserver(function(){requestAnimationFrame(f)}).observe(document.body,{attributes:true,attributeFilter:['class']});addEventListener('resize',f);addEventListener('orientationchange',function(){setTimeout(f,300)});f()})();</script>
 </body></html>
