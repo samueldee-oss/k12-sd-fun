@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><!-- home-screen-app -->
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><!-- home-screen-app -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -117,6 +117,8 @@ body.full:has(#ov:not([hidden])) .pad{display:none}
 .lchip.on{outline:2px solid #8a3b12;background:#fff4d8}
 .lchip.new{background:#ffd27a}
 .lchip:disabled{opacity:.5}
+/* No pinch zoom: the page can still scroll up and down */
+html{touch-action:pan-x pan-y}
 /* No text selection or long-press copy menu: a press-and-hold on a button or label should not highlight it */
 body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 /* Phone held upright: menus grow down over the touch pad instead of scrolling inside the short game window */
@@ -2898,5 +2900,6 @@ window.claude?.hot?.snapshot?.(()=>({run:runOn&&mode==='story'&&state!=='title'?
 function boot(d){applyHand();if(restoreAll&&d&&d.run){d.run.skinSet=[...new Set([...(d.run.skinSet||[]),...restoreAll])];d.run.powers=[...new Set([...(d.run.powers||[]),'double'])];d.run.picked=true}if(takeBack&&d&&d.run){d.run.skinSet=(d.run.skinSet||[]).filter(k=>!NOTYET.includes(k));d.run.skins=(d.run.skins||[]).map(k=>NOTYET.includes(k)?'orange':k)}renderPowers();if(d&&d.run)resumeRun(d.run);else showTitle();requestAnimationFrame(loop)}
 window.claude?.hot?.ready?window.claude.hot.ready(boot):boot(window.claude?.hot?.data??{});
 </script>
+<script id="no-zoom">/* iPhone Safari ignores user-scalable=no, so block its pinch gesture directly */['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault()},{passive:false})});document.addEventListener('touchmove',function(e){if(e.touches.length>1)e.preventDefault()},{passive:false});</script>
 <script id="hud-edge">(function(){var h=document.querySelector('.hud');if(!h)return;function f(){document.documentElement.style.setProperty('--hudB',Math.ceil(h.getBoundingClientRect().bottom)+'px')}if(window.ResizeObserver){var o=new ResizeObserver(f);o.observe(h);o.observe(document.body)}new MutationObserver(function(){requestAnimationFrame(f)}).observe(document.body,{attributes:true,attributeFilter:['class']});addEventListener('resize',f);addEventListener('orientationchange',function(){setTimeout(f,300)});f()})();</script>
 </body></html>
