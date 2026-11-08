@@ -12,7 +12,7 @@ A new session should be able to read this file plus [`GAME-FILE.md`](GAME-FILE.m
 ## 1. The game in one paragraph
 
 You are a cat (or a chicken, puppy, sheep, penguin, frog, platypus, capybara, puffin, deer…) running through
-**49 worlds and 240 levels** to reach the fish at the end of each level. Every world has its own look, music,
+**61 worlds and 296 levels** to reach the fish at the end of each level. Every world has its own look, music,
 physics quirk, hint and a "story" transition screen ("WHOOSH! A giant wave swept the cat into… THE OCEAN").
 Between levels you pick upgrades (powers and skins). Each world gives you a wearable accessory. In the middle of
 the game is the **Hotel Lobby**, a hub with talking friends, a fair with rides, a chicken party, a pool, a bounce
@@ -70,6 +70,8 @@ Play order is `WORDER` in the code. World id 32 (Tower of London) was added late
 | 26 | 26 | THE DIGITAL WORLD | Boot Up; Glitch Gap (gaps); Pixel Bridge (movers); Firewall (spikes); The TV Exit (finale) | glitch | glitchy blocks blink on and off! | 3D Glasses |
 | 27 | 27 | HOTEL LOBBY | Hotel Lobby (lobby) | lobby | take a break! walk up to friends and press jump to chat | Party Hat |
 | 28 | 28 | ANTARCTICA | Penguin Point; Ice Shelf Slide (gaps); Floe Hop (movers); Penguin Rafts (rafts); Iceberg Climb (climb); South Pole (finale) | slide | hold ↓ to belly-slide like a penguin! | Earmuffs |
+| 29 | Better secret lobby (11-06) | The secret lobby no longer unlocks skins; it became a VIP lobby (concierge, lounge, Hall of Secrets, floor piano, fountain). Lobby 2 floor made 40 tiles longer so the ball pit and Gelato stand never end up past the end wall when many friends are unlocked. Other sessions also added a Lore Book (📖). |
+| 30 | Phone full screen (11-07) | ⛶ FULL now sizes the game to fit the phone screen exactly (zooms out, same 5:3 shape, no scrolling) and remembers the choice, so the Home Screen app opens full screen. |
 | 29 | 29 | THE SCOTTISH CASTLE | Gatehouse; Drawbridge (bridge); Great Hall (cave); Tower Stairs (climb); The Battlements (finale) | guard | sneak! hold ↓ to tiptoe. Noise alerts the guard! | Highland Bonnet |
 | 30 | 30 | BUCKINGHAM PALACE | Palace Gates; Garden Hedges (spikes); Corgi Parade (movers); The Throne Room (cave); Royal Grounds Chase | guard | sneak! hold ↓ to tiptoe. Noise alerts the royal guard! | Royal Crown |
 | 31 | 32 | TOWER OF LONDON | Traitors' Gate; The Moat (gaps); Laser Corridor (spikes); Jewel House (bridge); The White Tower (finale) | lasers | security test! red lasers blink on and off: wait for them to switch off |  |
@@ -95,11 +97,28 @@ Play order is `WORDER` in the code. World id 32 (Tower of London) was added late
 Story moments: the Captain (Alien Planet), Pharaoh's treasure (Egypt), the shrink ray into the PC (world 25), the TV exit
 (world 26), Queen Purrcilla makes you **Royal Mouser** (end of The Throne Room), the mouse chase, the Tower of London
 security test, the **knighting scene** and Beefeater Hat (The White Tower), the second shrink ray into Yarn World (end of
-Mad Scientist Lab II). Iceland is the last world; finishing it shows the final screen.
+Mad Scientist Lab II). After Iceland come worlds 50–61 (below); Hotel Lobby 2 is the last world, and finishing the run shows the final screen.
+
+| Play # | World # | World | Levels (style) | Quirk (`PHYS`) | Hint |
+|---|---|---|---|---|---|
+| 50 | 50 | THE CRYSTAL CAVERNS | Cave Mouth; Bat Roost (spikes); Glow Worm Grotto (gaps); Underground River (movers); finale | dark, bats, crystals | dark; glowing crystals light the way; watch for bats |
+| 51 | 51 | THE VOLCANO | Ash Fields; Lava Lake (gaps); Obsidian Steps (climb); Fire Bridges (bridge); The Crater (finale) | lava | jump the lava pits, watch for fireballs. Beating The Crater unlocks **Tiny Mode**. |
+| 52 | 52 | VENICE | Grand Canal; Gondola Hop (movers); Rialto Bridge (bridge); Pigeon Square (gaps); finale | canal | ride the gondolas across the canals |
+| 53 | 53 | THE DENTIST OFFICE | Waiting Room; Toothbrush Alley (spikes); Floss Bridges (bridge); The Big Chair (bounce); Open Wide! (finale) | cannon, tramp | dodge flying toothpaste; bounce on dentist chairs |
+| 54 | 54 | SLIME OCEAN | Goo Lagoon; Bubble Reef (gaps); Slime Buddy Drift (movers); Slime Trench (cave); The Gooey Deep (finale) | floaty | bounce on slime buddies; goo drips from above |
+| 55 | 55 | THE PORTS | Fishing Pier; Container Stacks (climb); Crane Lift (movers); Rope Bridges (bridge); The Big Ship (finale) | wind 30 | sea wind; ride the cargo crates |
+| 56 | 56 | THE SUBWAY | Turnstiles; Platform 9 (spikes); Express Track; Dark Tunnel (cave); Last Train (finale) | traffic (trains) | jump over trains or bounce on their roofs |
+| 57 | 57 | THE MALL | Food Court; Escalator Run (gaps); Fountain Plaza (bounce); Toy Store (spikes); Grand Opening (finale) | escal | ride escalators over the gaps |
+| 58 | 58 | CAPITOL HILL | The Big Lawn; Marble Steps (climb); Security Check (spikes); The Rotunda (cave); The Dome (finale) | lasers | security lasers blink on and off |
+| 59 | 59 | THE COLOSSEUM | Arena Gates; Lion Tunnels (cave); Chariot Track (movers); Column Climb (climb); Grand Champion (finale) | walljump | jump off the columns |
+| 60 | 60 | THE LUSH CAVES | Moss Entrance; Glow Berry Grotto (cave); Dripleaf Pond (bridge); Azalea Garden (gaps); The Mossy Heart (finale) | crumble, dark, crystals | glow berries; big leaves tip over |
+| 61 | 61 | HOTEL LOBBY 2 | Hotel Lobby 2 (lobby) | lobby, foam | the NEW wing (see section 5) |
+
+Worlds 50–61 were added in other Claude sessions (2026-10-26 to 11-02); this table was read back from the game file.
 
 ## 4. Characters and unlocks
 
-- **Skins (79):** 34 cat coats, 8 chickens, 9 dogs, 7 sheep (incl. Icelandic Sheep), 6 penguins, 5 frogs, 3 capybaras, 3 deer, 2 puffins, 2 platypuses.
+- **Skins (355 in total, 2026-11-04):** the 79 below, plus 55 secret cat skins hidden one per world (each also comes as a chicken, sheep, puppy and penguin), Lucky Cat, and others added in later sessions. The original 79: 34 cat coats, 8 chickens, 9 dogs, 7 sheep (incl. Icelandic Sheep), 6 penguins, 5 frogs, 3 capybaras, 3 deer, 2 puffins, 2 platypuses.
 - **Unlocked by playing:** Penguin (arrive in Antarctica), Capybara (end of Canopy Crown), Puffin (end of The Battlements), Frog (end of Lily Pad Hop),
   Platypus (end of Mangrove Maze), Deer (end of Grand Prismatic), Icelandic Sheep (arrive in Iceland). Chicken, Puppy and Sheep are rare upgrade cards from level 10; their breeds then appear as cards.
 - **Copyright rule (keep):** no character from TV, films or games. The platypus is light green with a blue frog "Pip" on its head and wears no hat;
@@ -122,6 +141,20 @@ Undertale style. Lines in (parentheses) are acted out by the character with the 
 (exact same skin: "long-lost twin"). Some answers start games: fetch (Black Lab), hide-and-seek (Snowball), the stands.
 The Castle Guard's line depends on how often you maxed the noise bar in the Scottish Castle.
 Once you have visited the lobby in a run, most later levels have a floating **LOBBY portal** before the fish; jumping into it finishes the level and takes you back.
+
+### Hotel Lobby 2 (world 61)
+The same hub rebuilt as the "new wing": the Bellhop, Librarian, guards and Queen get new lines (`bellhop2`, `librarian2`, …, via `L2K`),
+friends get `linesFor2()` lines, and past the fair there is a **ball pit** (foam tiles `O` at `BALLC`) and a **Gelato Cat** stand.
+Entering it unlocks **Hand-Drawn mode** (toggle on the title screen or pause menu). The Bellhop hints that "some walls are not as solid as they look".
+
+### 🤫 Spoiler: the secret lobby (developer notes; the designer asked not to be told where it is)
+Lobby 2's far-right end wall is fake (tile `W`: drawn like `#`, not solid). Walking into it leads to a hidden **VIP secret lobby**
+(`buildSRoom()`, 78 columns). It does **not** unlock skins (changed 2026-11-06 at the designer's request). Left to right:
+Velvet the concierge (gold cat with a desk, offers a VIP tour), the **VIP Lounge** (velvet sofas; up to 6 secret cats you have
+already found relax there and say which world you found them in), the **Hall of Secrets** (a framed portrait for every secret cat:
+found ones in color, the rest "?", with a found/total counter), a **grand piano** whose keys are on the floor (walk across to play;
+Maestro the tuxedo cat), and the **Golden Fountain** with two bounce pads (Goldie the calico). Chandeliers, carpet and signs.
+The camera is clamped (`srCam`) so the room can't be seen from outside. The old "Rat King" secret skin is now **Bubble Bath**.
 
 ## 6. Special mechanics (by world)
 
@@ -172,10 +205,13 @@ Each row is one round of requests from the designer and what the plan became. Ex
 | 22 | Flow | LOBBY portal near the end of levels; no spoiler hints; accessories by body spot; dancing at the party; guards appear after their world; rafts can't be skipped; Castle Guard remembers your noise. |
 | 23 | Harder tower | Laser Corridor: 10 lasers, 5 fog machines; lasers do 2 damage; knighting animation. |
 | 24 | 17 new worlds | Jungle Canopy → Iceland (order as requested); ladders, foam, taxis, darkness; Deer and Icelandic Sheep; skin previews in the picker; accessories granted for worlds you already reached; the game keeps running if an error happens. |
-| 25 | Save fix | Replaying a level from level select no longer resets where "Continue run" goes; it always resumes at the furthest level reached. |
+| 25 | Save fix | Replaying a level from level select no longer resets where "Continue run" goes; it always resumes at the furthest level reached. "Restore best run" and a power/skin picker. |
+| 26 | Other sessions (10-26 to 11-02) | Worlds 50–61 (Crystal Caverns → Hotel Lobby 2), secret skins and accessories hidden in each world (5 animal versions each), 5 save slots with names, Tiny Mode, Hand-Drawn mode, Lucky Cat, a one-time owner progress restore. Detail is in the game file, not recorded round by round here. |
+| 27 | Restore request (11-02) | A one-time "Restore my run · Antarctica 4" button was built and tested but **not published** (the designer stopped it). |
+| 28 | Secret lobby (11-04) | A hidden secret lobby in Lobby 2 holding every secret skin; Rat King renamed Bubble Bath. Release copy without Google fonts sent for the class. |
 
 ## 8. Ideas not built yet
 
-- An ending for Iceland bigger than the final screen.
+- A bigger ending after the last world.
 - Accessories for worlds 32–49.
 - Bumper cars or a log flume at the fair.

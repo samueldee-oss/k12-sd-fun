@@ -4,7 +4,8 @@ Everything is in one file, [`index.html`](index.html) (HTML, CSS and JavaScript;
 The only outside resource is two Google Fonts (Press Start 2P and VT323); without internet it falls back to a monospace font.
 This guide explains how the file is organized, how it changed over time, and how to check or rebuild it.
 
-**Current file:** 2,289 lines, 336,691 bytes, SHA-256 starts `c9a72e38186f8c40`. Published as claude.ai artifact version 52 on 2026-10-25.
+**Current file:** about 2,880 lines, published as claude.ai artifact version 1794113580-e234 (publish #105) on 2026-11-07.
+Line numbers in the map below are from version 53 and have shifted; search for the names instead.
 The artifact page and this repo copy contain the same game; the repo copy adds a small `<!doctype html>` wrapper around it.
 
 ## 1. How to recreate the exact game
@@ -77,6 +78,12 @@ The rounds match the plan iterations in [`PLAN.md`](PLAN.md#7-plan-iterations).
 | 50 | 2026-10-25 | 25 | Save fix: replaying a level from level select no longer moves "Continue run" back to that level; Continue always resumes at the run's furthest level (this also repairs saves already affected). |
 | 51 | 2026-10-25 | 25 | "Restore best run" button on the title screen: rebuilds a run at the furthest level ever beaten (from `save.beaten`), for when a run was replaced by a new one. |
 | 52 | 2026-10-25 | 25 | Restore now opens a picker: animals earned by playing come back automatically, and you choose your powers (up to 10) and skins. Runs restored by version 51 get the button once more. |
+| 53 | 2026-10-25 | 25 | "Continue + pick powers & skins" on the title screen and "Pick powers & skins" in the pause menu, once per run, for any saved run that never picked (new runs count as picked). |
+| 54–100 | 2026-10-26 to 11-02 | 26 | Made in other Claude sessions: worlds 50–61, save slots (`whiskerdash`, `whiskerdash2`…5, chosen slot in `whiskerdash_slot`), secret skins/accessories per world (`sx`, `sxc`, `sxs`, `sxd`, `sxp` + `sa`), Tiny Mode, Hand-Drawn mode, Lucky Cat, owner restore (`OWNER_RESTORE`). Per-version detail not recorded here. |
+| 101 | 2026-11-04 | 28 | Secret lobby in Lobby 2 (`buildSRoom`, `srCam`, `updSRoom`, `drawSRoom`, fake-wall tile `W`); Rat King → Bubble Bath. Checked: all 296 levels load with no errors; the room was walked into, skins collected and saved. |
+| 102 | 2026-11-05 | – | Another session: Lore Book (📖 button, `LORE`, `save.lore`). |
+| 103 | 2026-11-06 | 29 | VIP secret lobby (no skin unlocks); Lobby 2 floor +40 tiles (gelato/ball-pit fix). All levels load with no errors. |
+| 105 | 2026-11-07 | 30 | `fitFull()`: in full-screen mode the stage width is computed from the real visible height (minus HUD, safe areas) so the whole game fits a landscape phone; choice saved in `whiskerdash_full`. |
 
 ## 5. How it was tested
 
@@ -85,9 +92,16 @@ and by Playwright screenshots in a real Chromium. The reusable versions are in [
 all 240 levels load with no errors, a random-input bot plays every level in a real browser with no errors, and all
 15 mechanic checks pass.
 
+## 5b. Making the class (release) copy and the Home Screen app
+
+1. Start from the published (development) file and change `const OWNER_RESTORE=1;` to `const OWNER_RESTORE=0;`.
+2. `python whisker-dash/release/build_release.py <that file> whisker-dash/WhiskerDash.html` swaps the Google Fonts link for the two fonts embedded in the file (SIL OFL, in `release/fonts/`) and checks no outside links remain. Copy the result to `whisker-dash/site/index.html` too.
+3. `whisker-dash/index.html` (what GitHub Pages and the Home Screen app open) is `WhiskerDash.html` plus the `<!-- home-screen-app -->` … `<!-- /home-screen-app -->` block (manifest, icons, service worker) made by `tools/make_home_screen_apps.py`. Re-run that tool, or carry the block over by hand right after the first `</style>`.
+4. Send `WhiskerDash.html` to the designer for the class.
+
 ## 6. Known limits
 
 - Saves live in one browser only (`localStorage`); clearing site data loses progress.
-- The two Google Fonts need internet; without them the text uses a fallback font.
+- The two Google Fonts need internet (the release copy has none); without them the text uses a fallback font.
 - Replaying levels from level select does not change the story run's position (fixed in version 50).
 - Old saves keep level numbers, so adding levels in the middle shifts where an old run resumes (noted when world 32 was added).

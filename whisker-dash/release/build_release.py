@@ -24,6 +24,7 @@ if not link.search(html):
     sys.exit("Google Fonts link not found; nothing replaced")
 html = link.sub(fonts, html, count=1)
 left = re.findall(r'https?://[^"\'\s)]+', html)
+left = [u for u in left if not u.startswith('http://www.w3.org/')]  # XML namespace names, not downloads
 if left:
     sys.exit(f"outside links still in the file: {left}")
 out.write_text(html, encoding="utf-8")

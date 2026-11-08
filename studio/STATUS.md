@@ -11,7 +11,7 @@ _Kept by Claude Code. Last updated 2026-11-06._
 | Bank Game, Copy and Copy 2 | `bank_game copy.py`, `bank_game copy 2.py` | Work. **Identical code**; one could be dropped from the dashboard. | Keyboard needed. |
 | Bank Game assessment | `bank_game_assessment.py` | Not reviewed yet. | Not checked. |
 | Pong (Level 1 warm-up) | `pong/` | Works. Touch: drag to move, tap to serve; in 2-player mode each half of the court moves its own paddle. | Yes (simulated touch tested; not yet tried on a real iPad). |
-| Whisker Dash | `whisker-dash/` | Works. 49 worlds, 240 levels, 1–2 players. Plan in `whisker-dash/PLAN.md`; automated tests in `whisker-dash/tests/` all pass (2026-10-25). | Touch pad included (not yet tried on a real iPad). |
+| Whisker Dash | `whisker-dash/` | Works. 61 worlds, 296 levels, 1–2 players, Home Screen app with a full-screen fit for phones. Plan in `whisker-dash/PLAN.md`; automated tests in `whisker-dash/tests/` all pass (2026-10-25). | Touch pad included (not yet tried on a real iPad). |
 | Snake (side project) | `experiments/snake-blender-mode/` | Works. Fixed 2026-10-20: body was invisible and the game "auto-ended" around 60-70 points. Swipe to steer. | Yes (simulated touch tested; not yet tried on a real iPad). |
 
 A comparison of the Bank Game versions (features, fun, systems lessons) is in `to-desktop/2026-10-21-1600-bank-game-version-comparison.md`.
@@ -32,6 +32,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-07: Whisker Dash updated to the latest claude.ai version (61 worlds, VIP lobby, Lore Book) and the ⛶ FULL button now fits a landscape phone screen.
 - 2026-11-07: The sky game is a personal gift, not a K12 game: removed from the dashboard, README, game archive notes and Home Screen tool. The family plays it from a private, unlisted link.
 - 2026-11-07: History of `main`, `claude/home-screen-apps-bn7ohx` and `claude/spinning-blade-game-yo9uzv` rewritten to take a real person's name out of every past version (owner's request). Old clones, including the PC copy, must be re-downloaded or reset before pushing.
 - 2026-11-06: Browser games and dashboard made installable as iPad Home Screen apps; generator in `tools/make_home_screen_apps.py` (commit `4378585`).
