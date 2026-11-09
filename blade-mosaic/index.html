@@ -401,14 +401,20 @@ function audio(){
       for (let c = 0; c < 2; c++){ const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random()*2 - 1) * Math.pow(1 - i/len, 3.5); }
       room.buffer = ir; room.connect(master);
       sfxBus = a.createGain(); sfxBus.connect(master);
-      // music runs through an "old record" filter: no deep lows, rounded highs, a touch of saturation
+      // music runs through a worn-out tape/record chain:
+      // thin lows, tape saturation with a little bit-crush, wow and flutter, then a dark low-pass
       musicBus = a.createGain();
-      const lo = a.createBiquadFilter(); lo.type = 'highpass'; lo.frequency.value = 90;
-      const hi = a.createBiquadFilter(); hi.type = 'lowpass'; hi.frequency.value = 4200;
-      const sat = a.createWaveShaper(), curve = new Float32Array(1024);
-      for (let i = 0; i < 1024; i++){ const v = i/511.5 - 1; curve[i] = Math.tanh(v*1.6)/Math.tanh(1.6); }
+      const lo = a.createBiquadFilter(); lo.type = 'highpass'; lo.frequency.value = 110;
+      const sat = a.createWaveShaper(), curve = new Float32Array(2048);
+      for (let i = 0; i < 2048; i++){ const v = i/1023.5 - 1, y = Math.tanh(v*2.4)/Math.tanh(2.4); curve[i] = Math.round(y*40)/40; }
       sat.curve = curve;
-      musicBus.connect(lo).connect(hi).connect(sat).connect(master);
+      const tape = a.createDelay(0.05); tape.delayTime.value = 0.015;
+      const wow = a.createOscillator(), wowAmt = a.createGain(); wow.frequency.value = 0.55; wowAmt.gain.value = 0.0022;
+      const flut = a.createOscillator(), flutAmt = a.createGain(); flut.frequency.value = 6.5; flutAmt.gain.value = 0.00011;
+      wow.connect(wowAmt).connect(tape.delayTime); flut.connect(flutAmt).connect(tape.delayTime); wow.start(); flut.start();
+      const hi = a.createBiquadFilter(); hi.type = 'lowpass'; hi.frequency.value = 2600; hi.Q.value = 0.6;
+      const mid = a.createBiquadFilter(); mid.type = 'peaking'; mid.frequency.value = 900; mid.Q.value = 0.8; mid.gain.value = 3;   // boxy little-speaker bump
+      musicBus.connect(lo).connect(sat).connect(tape).connect(mid).connect(hi).connect(master);
       const s1 = a.createGain(); s1.gain.value = 0.18; sfxBus.connect(s1).connect(room);
       const s2 = a.createGain(); s2.gain.value = 0.35; musicBus.connect(s2).connect(room);
       actx = a; applyVolumes(); pickTrack();
@@ -574,7 +580,7 @@ function acoustic(m, t, vol, dur, pan){
   const a = actx, src = a.createBufferSource(), body = a.createBiquadFilter(), f = a.createBiquadFilter(), g = a.createGain();
   src.buffer = ksBuffer(m, 0.998);
   body.type = 'peaking'; body.frequency.value = 210; body.Q.value = 1.2; body.gain.value = 5;   // wooden body warmth
-  f.type = 'lowpass'; f.frequency.value = 3400;
+  f.type = 'lowpass'; f.frequency.value = 2300;
   g.gain.setValueAtTime(vol, t); g.gain.setValueAtTime(vol, t + dur*0.75); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   panned(src.connect(body).connect(f).connect(g), pan).connect(music.guitarBus); src.start(t); src.stop(t + dur + 0.05);
 }
@@ -597,15 +603,15 @@ function carPass(t){                    // a far-off car sliding from one side t
   if (a.createStereoPanner){ const p = a.createStereoPanner(), dir = Math.random() < 0.5 ? 1 : -1; p.pan.setValueAtTime(-0.8*dir, t); p.pan.linearRampToValueAtTime(0.8*dir, t + len); node = node.connect(p); }
   node.connect(musicBus); n.start(t); n.stop(t + len + 0.05);
 }
-function duck(t){ const g = music.guitarBus.gain; g.cancelScheduledValues(t); g.setValueAtTime(0.6, t); g.linearRampToValueAtTime(1, t + 0.3); }
+function duck(t){ const g = music.guitarBus.gain; g.cancelScheduledValues(t); g.setValueAtTime(0.42, t); g.linearRampToValueAtTime(1, t + 0.38); }
 function musicStep(t){
   const s = music.step, M = musicBus, i = s % 16, bar = Math.floor(s/16) % 4, ch = LOFI[bar];
   const tt = t + (i % 2 ? STEP*SWING : 0);   // a light swing on the off-beats
   if (!music.guitarBus){ music.guitarBus = actx.createGain(); music.guitarBus.connect(M); }
   if (!music.amb){ startAmbience(); music.nextCar = t + 6; }
   // ambience: vinyl crackle, the odd record pop, rain droplets, and now and then a passing car
-  if (Math.random() < 0.5) grain(t + Math.random()*STEP, 2500 + Math.random()*4000, 0.004, 0.01 + Math.random()*0.012, (Math.random() - 0.5)*1.4, 1.5, M);
-  if (Math.random() < 0.03) grain(t + Math.random()*STEP, 1200, 0.012, 0.04, (Math.random() - 0.5), 0.7, M);
+  for (let k = 0; k < 2; k++) if (Math.random() < 0.6) grain(t + Math.random()*STEP, 2000 + Math.random()*3500, 0.004, 0.012 + Math.random()*0.016, (Math.random() - 0.5)*1.4, 1.5, M);
+  if (Math.random() < 0.06) grain(t + Math.random()*STEP, 1200, 0.012, 0.04, (Math.random() - 0.5), 0.7, M);
   for (let k = 0; k < 3; k++) if (Math.random() < 0.7) grain(t + Math.random()*STEP, 2200 + Math.random()*4500, 0.005, 0.003 + Math.random()*0.008, (Math.random() - 0.5)*1.8, 2, M);
   if (t > music.nextCar){ carPass(t); music.nextCar = t + 18 + Math.random()*20; }
   // fingerpicked acoustic guitar
@@ -616,10 +622,10 @@ function musicStep(t){
   if (i === 0) tone('sine', midi(ch.root + 12), tt, 1.9, 0.15, M, ['lowpass', 320], 0.04);
   if (i === 12) tone('sine', midi(ch.root + 19), tt, 0.7, 0.09, M, ['lowpass', 320], 0.04);
   // steady head-nod beat (Zen Tower too): kick on 1 and the "and" of 3, snare on 2 and 4, steady hats
-  if (i === 0 || i === 10){ tone('sine', [110, 45], tt, 0.36, 0.3, M, ['lowpass', 300]); grain(tt, 2800, 0.012, 0.015, 0, 1, M); duck(tt); }
-  if (i === 4 || i === 12){ grain(tt, 1800, 0.18, 0.06, 0, 0.6, M); tone('sine', [200, 160], tt, 0.1, 0.06, M); grain(tt, 4200, 0.05, 0.02, 0, 0.7, M); }
-  if (i % 2 === 0) grain(tt, 7500, 0.03, i % 4 === 2 ? 0.022 : 0.014, 0.25, 0.8, M);
-  if (i === 15) grain(tt, 7500, 0.02, 0.008, 0.25, 0.8, M);
+  if (i === 0 || i === 10){ tone('sine', [100, 42], tt, 0.38, 0.27, M, ['lowpass', 240]); grain(tt, 1800, 0.012, 0.01, 0, 1, M); duck(tt); }
+  if (i === 4 || i === 12){ grain(tt, 1400, 0.2, 0.05, 0, 0.6, M); tone('sine', [180, 140], tt, 0.1, 0.05, M); grain(tt, 3000, 0.05, 0.012, 0, 0.7, M); }
+  if (i % 2 === 0) grain(tt, 6000, 0.03, i % 4 === 2 ? 0.016 : 0.01, 0.25, 0.8, M);
+  if (i === 15) grain(tt, 6000, 0.02, 0.008, 0.25, 0.8, M);
   return STEP;
 }
 setInterval(() => {
