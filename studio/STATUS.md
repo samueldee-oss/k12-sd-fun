@@ -11,7 +11,7 @@ _Kept by Claude Code. Last updated 2026-11-09._
 | Bank Game, Copy and Copy 2 | `bank_game copy.py`, `bank_game copy 2.py` | Work. **Identical code**; one could be dropped from the dashboard. | Keyboard needed. |
 | Bank Game assessment | `bank_game_assessment.py` | Not reviewed yet. | Not checked. |
 | Pong (Level 1 warm-up) | `pong/` | Works. Touch: drag to move, tap to serve; in 2-player mode each half of the court moves its own paddle. | Yes (simulated touch tested; not yet tried on a real iPad). |
-| Whisker Dash | `whisker-dash/` | Works. 61 worlds, 296 levels, 1–2 players, Home Screen app with a full-screen fit for phones. Plan in `whisker-dash/PLAN.md`; automated tests in `whisker-dash/tests/` all pass (2026-10-25). | Touch pad included (not yet tried on a real iPad). |
+| Whisker Dash | `whisker-dash/` | Works. 70 worlds, 341 levels, 1–2 players, a secret and a hint animal in every world, Home Screen app (cat-face icon) with a full-screen fit for phones. Plan in `whisker-dash/PLAN.md`; automated tests in `whisker-dash/tests/` all pass (2026-11-09). | Touch pad included (not yet tried on a real iPad). |
 | Snake (side project) | `experiments/snake-blender-mode/` | Works. Fixed 2026-10-20: body was invisible and the game "auto-ended" around 60-70 points. Swipe to steer. | Yes (simulated touch tested; not yet tried on a real iPad). |
 
 A comparison of the Bank Game versions (features, fun, systems lessons) is in `to-desktop/2026-10-21-1600-bank-game-version-comparison.md`.
@@ -33,6 +33,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 ## Recent changes
 
 - 2026-11-09: Whisker Dash: on touch screens (1 player), tapping the right 30% of the screen jumps (hold for higher), commit `4aa590e`. Repo copy only.
+- 2026-11-09: Whisker Dash: a secret family and a hint animal in every world (ask it and it tells you exactly where), worlds 62–70 moved after Hotel Lobby 2, VIP Lounge renamed Secret Lounge, cat-face Home Screen icon; the wide view and auto-run from `c4f45c6` are now in the claude.ai page too (artifact publish #110). Commit `0e90ce5`.
 - 2026-11-09: Whisker Dash: full screen and the Home Screen app widen the view to the screen (climbing levels stay 480), new AUTO run button (hold down/tiptoe to stop), NOISE/WIND/GRAV meters moved to the top-right clear of touch buttons (commit `c4f45c6`). All tests pass, plus a wide-view sweep of all 296 levels. Repo copy only; not yet in the claude.ai artifact.
 - 2026-11-08: Whisker Dash: luggage carts, hay wagon and mine cart sprites replace wrong shopping carts; secret cats moved into the secret lobby, each with its own lines; game updated to 70 worlds (918339f).
 - 2026-11-08: Whisker Dash on phones: no text highlight on press-and-hold, menus fit upright phones (Resume visible), full-screen menus keep EXIT/music/sound reachable, pinch zoom off (commits `0cd0f46`, `37b551b`). Node test harness updated for the new version. These fixes are in the repo copy only, not yet in the claude.ai artifact.
