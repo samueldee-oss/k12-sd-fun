@@ -12,11 +12,11 @@ A new session should be able to read this file plus [`GAME-FILE.md`](GAME-FILE.m
 ## 1. The game in one paragraph
 
 You are a cat (or a chicken, puppy, sheep, penguin, frog, platypus, capybara, puffin, deer…) running through
-**61 worlds and 296 levels** to reach the fish at the end of each level. Every world has its own look, music,
+**70 worlds and 341 levels** to reach the fish at the end of each level. Every world has its own look, music,
 physics quirk, hint and a "story" transition screen ("WHOOSH! A giant wave swept the cat into… THE OCEAN").
 Between levels you pick upgrades (powers and skins). Each world gives you a wearable accessory. In the middle of
 the game is the **Hotel Lobby**, a hub with talking friends, a fair with rides, a chicken party, a pool, a bounce
-house and food stands. The game supports 1 player, 2-player co-op and 2-player speed battle, keyboard and touch.
+house and food stands. A **Lore Book** (📖) tells the story of the Explorer of Worlds, one page per world. The game supports 1 player, 2-player co-op and 2-player speed battle, keyboard and touch.
 
 ## 2. Core rules
 
@@ -70,8 +70,6 @@ Play order is `WORDER` in the code. World id 32 (Tower of London) was added late
 | 26 | 26 | THE DIGITAL WORLD | Boot Up; Glitch Gap (gaps); Pixel Bridge (movers); Firewall (spikes); The TV Exit (finale) | glitch | glitchy blocks blink on and off! | 3D Glasses |
 | 27 | 27 | HOTEL LOBBY | Hotel Lobby (lobby) | lobby | take a break! walk up to friends and press jump to chat | Party Hat |
 | 28 | 28 | ANTARCTICA | Penguin Point; Ice Shelf Slide (gaps); Floe Hop (movers); Penguin Rafts (rafts); Iceberg Climb (climb); South Pole (finale) | slide | hold ↓ to belly-slide like a penguin! | Earmuffs |
-| 29 | Better secret lobby (11-06) | The secret lobby no longer unlocks skins; it became a VIP lobby (concierge, lounge, Hall of Secrets, floor piano, fountain). Lobby 2 floor made 40 tiles longer so the ball pit and Gelato stand never end up past the end wall when many friends are unlocked. Other sessions also added a Lore Book (📖). |
-| 30 | Phone full screen (11-07) | ⛶ FULL now sizes the game to fit the phone screen exactly (zooms out, same 5:3 shape, no scrolling) and remembers the choice, so the Home Screen app opens full screen. |
 | 29 | 29 | THE SCOTTISH CASTLE | Gatehouse; Drawbridge (bridge); Great Hall (cave); Tower Stairs (climb); The Battlements (finale) | guard | sneak! hold ↓ to tiptoe. Noise alerts the guard! | Highland Bonnet |
 | 30 | 30 | BUCKINGHAM PALACE | Palace Gates; Garden Hedges (spikes); Corgi Parade (movers); The Throne Room (cave); Royal Grounds Chase | guard | sneak! hold ↓ to tiptoe. Noise alerts the royal guard! | Royal Crown |
 | 31 | 32 | TOWER OF LONDON | Traitors' Gate; The Moat (gaps); Laser Corridor (spikes); Jewel House (bridge); The White Tower (finale) | lasers | security test! red lasers blink on and off: wait for them to switch off |  |
@@ -97,7 +95,7 @@ Play order is `WORDER` in the code. World id 32 (Tower of London) was added late
 Story moments: the Captain (Alien Planet), Pharaoh's treasure (Egypt), the shrink ray into the PC (world 25), the TV exit
 (world 26), Queen Purrcilla makes you **Royal Mouser** (end of The Throne Room), the mouse chase, the Tower of London
 security test, the **knighting scene** and Beefeater Hat (The White Tower), the second shrink ray into Yarn World (end of
-Mad Scientist Lab II). After Iceland come worlds 50–61 (below); Hotel Lobby 2 is the last world, and finishing the run shows the final screen.
+Mad Scientist Lab II). After Iceland come worlds 50–70 (below). Hotel Lobby 2 (world 61) comes after The Lush Caves, then worlds 62–70; The Riverside (70) is the last world, and finishing the run shows the final screen.
 
 | Play # | World # | World | Levels (style) | Quirk (`PHYS`) | Hint |
 |---|---|---|---|---|---|
@@ -113,12 +111,23 @@ Mad Scientist Lab II). After Iceland come worlds 50–61 (below); Hotel Lobby 2 
 | 59 | 59 | THE COLOSSEUM | Arena Gates; Lion Tunnels (cave); Chariot Track (movers); Column Climb (climb); Grand Champion (finale) | walljump | jump off the columns |
 | 60 | 60 | THE LUSH CAVES | Moss Entrance; Glow Berry Grotto (cave); Dripleaf Pond (bridge); Azalea Garden (gaps); The Mossy Heart (finale) | crumble, dark, crystals | glow berries; big leaves tip over |
 | 61 | 61 | HOTEL LOBBY 2 | Hotel Lobby 2 (lobby) | lobby, foam | the NEW wing (see section 5) |
+| 62 | 62 | CÂMPENI | Town Square; Haystack Hop (bounce); Forest Railway (movers); Wooden Church (climb); Apuseni Peaks (finale) | - | welcome to the mountains of Romania! hop on the haystacks |
+| 63 | 63 | THE COPPER MINE | The Pit Rim; Haul Road; Blue-Green Lake; Blast Benches; Climb Out! (all `pit`) | - | a giant open-pit mine! walk DOWN the giant steps, then climb back UP |
+| 64 | 64 | HOOVER DAM | Canyon Road; Intake Towers (climb); The Spillway (gaps); Power Plant (cave); Top of the Dam (finale) | wind 30 | canyon wind blows across the top of the giant dam |
+| 65 | 65 | ARCHES NATIONAL PARK | Red Rock Trail; Balanced Rocks (movers); Sandstone Fins (spikes); Natural Bridges (bridge); The Big Arch (finale) | jump 540 | hot desert air: you jump higher! |
+| 66 | 66 | THE OLD PINE MOUNTAINS | Trailhead; White Blaze Trail (spikes); Misty Hollow (gaps, fog); Fire Tower (climb); Ridge Top (finale) | - | the oldest, mistiest mountains around. follow the white trail marks! |
+| 67 | 67 | THE BLACK SAND BEACH | Dark Shore; Basalt Steps (climb); Sea Stacks (gaps); Sneaky Waves (movers); Basalt Cave (finale) | wind 25 | black sand, basalt pillars and a strong sea wind |
+| 68 | 68 | THE MOUNTAIN FLEA MARKET | Parking Field; Tent Tops (bounce); Junk Piles (spikes); Crate Towers (climb); Last Bargain (finale) | tramp | bounce on the tent roofs! everything is for sale |
+| 69 | 69 | THE GOLD MINE | Mine Entrance (cave); Lantern Galleries (4 floors); Minecart Galleries (5 floors); Deep Galleries (6 floors); The Mother Lode (finale) | ladders | the mine has floors! hold jump on a ladder to climb up through the galleries |
+| 70 | 70 | THE RIVERSIDE | Willow Bank; Stepping Stones (gaps); Log Rides (movers); Old Water Mill (climb); The Waterfall (finale) | - | hop across the river on stones and floating logs |
 
-Worlds 50–61 were added in other Claude sessions (2026-10-26 to 11-02); this table was read back from the game file.
+Worlds 50–61 were added in other Claude sessions (2026-10-26 to 11-02); this table was read back from the game file. Worlds 62–70 were added on 2026-11-08 (plan round 31). Since 2026-11-09 (round 33) they are played after Hotel Lobby 2.
+
+**Worlds 62–70 in detail.** Backgrounds: Câmpeni has wooden houses, a wooden church spire, fir trees and haystacks; the Copper Mine is a terraced open pit with ore trucks and a turquoise lake at the bottom; Hoover Dam has the curved concrete dam, intake towers, canyon walls and power pylons; Arches has red rock arches, a balanced rock and mesas; the Old Pine Mountains (inspired by the Appalachians, never named) have layered misty blue ridges and pines; the Black Sand Beach has mossy green mountains far back, a band of hexagonal basalt pillars in front of them, and waves; the Flea Market has snowy peaks, striped tents with goods and string lights; the Gold Mine has timber supports, lanterns and gold veins; the Riverside has willows, a turning water-mill wheel and a flowing river. Each world has a secret skin (Haystack, Copper, Hydro, Red Rock, Pine Cone, Basalt, Bargain Hunter, Gold Nugget, Willow), music, a lore page and an end-of-world scene (mountain train, ore truck, balloon, road-trip van, kite, ferry, trapdoor, mine train, warp portal).
 
 ## 4. Characters and unlocks
 
-- **Skins (355 in total, 2026-11-04):** the 79 below, plus 55 secret cat skins hidden one per world (each also comes as a chicken, sheep, puppy and penguin), Lucky Cat, and others added in later sessions. The original 79: 34 cat coats, 8 chickens, 9 dogs, 7 sheep (incl. Icelandic Sheep), 6 penguins, 5 frogs, 3 capybaras, 3 deer, 2 puffins, 2 platypuses.
+- **Skins (430 in total, 2026-11-09):** the 79 below, plus 70 secret cat skins hidden one per world (each also comes as a chicken, sheep, puppy and penguin), Lucky Cat, and others added in later sessions. The original 79: 34 cat coats, 8 chickens, 9 dogs, 7 sheep (incl. Icelandic Sheep), 6 penguins, 5 frogs, 3 capybaras, 3 deer, 2 puffins, 2 platypuses.
 - **Unlocked by playing:** Penguin (arrive in Antarctica), Capybara (end of Canopy Crown), Puffin (end of The Battlements), Frog (end of Lily Pad Hop),
   Platypus (end of Mangrove Maze), Deer (end of Grand Prismatic), Icelandic Sheep (arrive in Iceland). Chicken, Puppy and Sheep are rare upgrade cards from level 10; their breeds then appear as cards.
 - **Copyright rule (keep):** no character from TV, films or games. The platypus is light green with a blue frog "Pip" on its head and wears no hat;
@@ -148,9 +157,9 @@ friends get `linesFor2()` lines, and past the fair there is a **ball pit** (foam
 Entering it unlocks **Hand-Drawn mode** (toggle on the title screen or pause menu). The Bellhop hints that "some walls are not as solid as they look".
 
 ### 🤫 Spoiler: the secret lobby (developer notes; the designer asked not to be told where it is)
-Lobby 2's far-right end wall is fake (tile `W`: drawn like `#`, not solid). Walking into it leads to a hidden **VIP secret lobby**
+Lobby 2's far-right end wall is fake (tile `W`: drawn like `#`, not solid). Walking into it leads to a hidden **secret lobby**
 (`buildSRoom()`, 78 columns). It does **not** unlock skins (changed 2026-11-06 at the designer's request). Left to right:
-Velvet the concierge (gold cat with a desk, offers a VIP tour), the **VIP Lounge** (velvet sofas; every secret cat you have
+Velvet the concierge (gold cat with a desk, offers a secret tour), the **Secret Lounge** (called the VIP Lounge until 11-09; velvet sofas; every secret cat you have
 found relaxes there (the lounge grows to fit) and each has its own lines (`SRL`); secret cats never appear with the regular lobby friends), the **Hall of Secrets** (a framed portrait for every secret cat:
 found ones in color, the rest "?", with a found/total counter), a **grand piano** whose keys are on the floor (walk across to play;
 Maestro the tuxedo cat), and the **Golden Fountain** with two bounce pads (Goldie the calico). Chandeliers, carpet and signs.
@@ -171,6 +180,9 @@ The camera is clamped (`srCam`) so the room can't be seen from outside. The old 
 | Taxis | New York City | Taxis drive back and forth; jump over them or bounce on the roof. Rain and fog on later levels. |
 | Darkness | Castle Dungeons, Movie Theater | You only see a circle around your cat. |
 | Geysers | Lab, Yellowstone, Lab II, Iceland | Erupt on a timer. |
+| Open-pit terraces (`pit` style) | Copper Mine | `pitSegs()`: climb onto the rim, walk DOWN terrace after terrace to the lake at the bottom, then climb terraces back UP to the fish on the far rim. Spikes always leave two safe tiles each side; gaps never sit next to a spiked terrace. |
+| Mine galleries | Gold Mine (levels 2–4) | `galleryGrid(floors)`: a vertical level of stacked tunnel floors (4, 5, 6). Start at the bottom, cross each floor past spikes, rocks and holes (a hole drops you one floor), and climb a ladder at the far end to the next floor; the fish is at the surface. Checkpoint every second floor. |
+| Secrets and hint animals | Every world | Each world's secret family (cat, chicken, sheep, puppy, penguin, `sx`…`sxp` + a secret hat `sa`) hides in a pocket behind a fake wall, up high, under a fake floor, or under the steps past the fish of its last ordinary level (`SECRETLV`, `SECRETKIND`). Worlds made only of climbs (Inside a PC, Eiffel Tower) hide it in the left wall at the start of the last level; Hotel Lobby in the bottom of the tall wall at the far right; Hotel Lobby 2 in the floor just right of the NEXT LEVEL portal. On the first level of every world, one of the family (cat, chicken or puppy, by world) stands near the start with a "?" bubble: press jump next to it to talk. It names the level and gives a hint, then asks "Want me to tell you EXACTLY where?" (Yes gives full directions). |
 | Snowball quest | Antarctica → lobby | Grab the glowing snowball, carry it on your head, give it to the Snow Leopard. |
 
 ## 7. Plan iterations
@@ -209,7 +221,13 @@ Each row is one round of requests from the designer and what the plan became. Ex
 | 26 | Other sessions (10-26 to 11-02) | Worlds 50–61 (Crystal Caverns → Hotel Lobby 2), secret skins and accessories hidden in each world (5 animal versions each), 5 save slots with names, Tiny Mode, Hand-Drawn mode, Lucky Cat, a one-time owner progress restore. Detail is in the game file, not recorded round by round here. |
 | 27 | Restore request (11-02) | A one-time "Restore my run · Antarctica 4" button was built and tested but **not published** (the designer stopped it). |
 | 28 | Secret lobby (11-04) | A hidden secret lobby in Lobby 2 holding every secret skin; Rat King renamed Bubble Bath. Release copy without Google fonts sent for the class. |
-| 29 | Sprites and secret cats (11-08) | Moving platforms get the right look: luggage carts in the hotel lobbies, a hay wagon in Câmpeni, an ore mine cart in the Copper Mine (shopping carts stay in The Store only). Secret cats no longer hang out with regular lobby friends: every secret cat you have found lives in the secret lobby's VIP Lounge (it grows to fit all 64), each with its own lines (`SRL`). Phone fixes from the repo (no pinch zoom, no long-press select, menus fit) carried into the claude.ai version. |
+| 28b | Lore (11-05) | A Lore Book (📖 on the title, pause and level-clear screens, or B): an intro page (you were chosen as the Explorer of Worlds) plus one page per world, written when you first reach it (`LORE`, `save.lore`). |
+| 29 | Better secret lobby (11-06) | The secret lobby no longer unlocks skins; it became a VIP lobby (concierge, lounge, Hall of Secrets, floor piano, fountain). Lobby 2 floor made 40 tiles longer so the ball pit and Gelato stand never end up past the end wall when many friends are unlocked. Other sessions also added a Lore Book (📖). |
+| 30 | Phone full screen (11-07) | ⛶ FULL now sizes the game to fit the phone screen exactly (zooms out, same 5:3 shape, no scrolling) and remembers the choice, so the Home Screen app opens full screen. |
+| 31 | Nine new worlds (11-08) | "Skip repeats" list: Câmpeni (Romania), an open copper mine that goes down then up, Hoover Dam, Arches National Park, pine mountains (Appalachian-inspired, not named), a black sand beach (mossy mountains behind, basalt pillars in front), a mountain flea market, a gold mine with several floors (galleries), and a riverside. Added as worlds 62–70 before Hotel Lobby 2, with new `pit` and gallery level types, lore pages and secret skins. Ladder fix so a column can have several ladders. Older saves' Hotel Lobby 2 progress moves to its new level number (`save.lv70`). |
+| 32 | Home Screen icon (11-08) | The Home Screen icon changed from letters to a simple pixel face of the game's orange cat (ears, stripes, cream eyes, pink nose, smile, whiskers) on the game's dark purple (`tools/whisker_dash_icon.py`). |
+| 31b | Sprites and secret cats (11-08) | Moving platforms get the right look: luggage carts in the hotel lobbies, a hay wagon in Câmpeni, an ore mine cart in the Copper Mine (shopping carts stay in The Store only). Secret cats no longer hang out with regular lobby friends: every secret cat you have found lives in the secret lobby's VIP Lounge (it grows to fit all 64), each with its own lines (`SRL`). Phone fixes from the repo (no pinch zoom, no long-press select, menus fit) carried into the claude.ai version. |
+| 33 | Secrets everywhere (11-09) | The VIP Lounge became the **Secret Lounge** (and Velvet's tour, signs and lines say "secret" instead of VIP). Worlds 62–70 moved to after Hotel Lobby 2, so The Riverside is the last world (`LASTW` 70); a one-time save fix (`save.lv70b`) moves Nov 8 saves to the new numbers. Every world now has a secret (six new families: Drizzle, Circuit, Room Service, Croissant, Torchlight, Confetti), and every world has a hint animal from its secret family that tells you where it is. |
 
 ## 8. Ideas not built yet
 

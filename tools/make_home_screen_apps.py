@@ -153,7 +153,11 @@ def build(folder: str, name: str, short: str, letters: str, bg: str, fg: str, ac
     icons = game_dir / "icons"
     icons.mkdir(exist_ok=True)
     for filename, size in ICON_SIZES.items():
-        draw_icon(letters, bg, fg, accent, size).save(icons / filename, optimize=True)
+        if folder == "whisker-dash":  # pixel cat face from the game instead of letters (tools/whisker_dash_icon.py)
+            from whisker_dash_icon import draw_cat_icon
+            draw_cat_icon(size).save(icons / filename, optimize=True)
+        else:
+            draw_icon(letters, bg, fg, accent, size).save(icons / filename, optimize=True)
 
     manifest = {
         "name": name,

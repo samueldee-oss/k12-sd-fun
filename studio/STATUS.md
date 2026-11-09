@@ -11,7 +11,7 @@ _Kept by Claude Code. Last updated 2026-11-09._
 | Bank Game, Copy and Copy 2 | `bank_game copy.py`, `bank_game copy 2.py` | Work. **Identical code**; one could be dropped from the dashboard. | Keyboard needed. |
 | Bank Game assessment | `bank_game_assessment.py` | Not reviewed yet. | Not checked. |
 | Pong (Level 1 warm-up) | `pong/` | Works. Touch: drag to move, tap to serve; in 2-player mode each half of the court moves its own paddle. | Yes (simulated touch tested; not yet tried on a real iPad). |
-| Whisker Dash | `whisker-dash/` | Works. 61 worlds, 296 levels, 1–2 players, Home Screen app with a full-screen fit for phones. Plan in `whisker-dash/PLAN.md`; automated tests in `whisker-dash/tests/` all pass (2026-10-25). | Touch pad included (not yet tried on a real iPad). |
+| Whisker Dash | `whisker-dash/` | Works. 70 worlds, 341 levels, 1–2 players, a secret and a hint animal in every world, Home Screen app (cat-face icon) with a full-screen fit for phones. Plan in `whisker-dash/PLAN.md`; automated tests in `whisker-dash/tests/` all pass (2026-11-09). | Touch pad included (not yet tried on a real iPad). |
 | Snake (side project) | `experiments/snake-blender-mode/` | Works. Fixed 2026-10-20: body was invisible and the game "auto-ended" around 60-70 points. Swipe to steer. | Yes (simulated touch tested; not yet tried on a real iPad). |
 
 A comparison of the Bank Game versions (features, fun, systems lessons) is in `to-desktop/2026-10-21-1600-bank-game-version-comparison.md`.
