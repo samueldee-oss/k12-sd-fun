@@ -42,6 +42,7 @@ GAMES = [
     ("prism-sprint", "Prism Sprint", "Prism Sprint", "PS", "#1c0b3a", "#ffd23f", "#ff3cac"),
     ("thistle-king", "Thistle King", "Thistle King", "TK", "#1f1530", "#d58cff", "#ffd400"),
     ("rooftop-flow", "Rooftop Flow", "Rooftop Flow", "RF", "#0e1230", "#ff8a1f", "#f5c24c"),
+    ("ionuts-climb", "Ionuț's Climb", "Ionuț's Climb", "IC", "#161616", "#f4f0e4", "#b3261e"),
     ("experiments/snake-blender-mode", "Snake", "Snake", "S", "#0f172a", "#22c55e", "#ef4444"),
 ]
 
