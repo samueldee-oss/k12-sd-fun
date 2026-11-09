@@ -538,80 +538,89 @@ function bladeSound(spin, cutting, over){
   motor.scrape.g.gain.setTargetAtTime(c ? (r() < 0.3 ? 0.04 : 0.012) : 0, t, 0.04);   // coarse scrape, in uneven strokes
 }
 
-/* music: vintage lo-fi / chillhop everywhere (no piano). Same lazy swung drums at 74 bpm;
-   on top, plucked jazz-guitar chords (9th voicings) and a muted guitar lead, a quiet
-   tape pad, and the whole music bus filtered like a dusty old sample. Chords duck a
-   little on every kick for that pumping feel. Zen Tower plays it without drums. */
-const music = { track:null, next:0, step:0, hiss:null, phrase:[], chordBus:null };
+/* music: vintage chillhop, 70 bpm (no piano). A steady head-nodding beat, a warm
+   fingerpicked acoustic-guitar loop with a short original melody, a slow mellow
+   bassline, and the whole thing filtered like an old record. Ambience underneath:
+   vinyl crackle and pops, cozy hiss, gentle rain and distant city noise.
+   Zen Tower plays the same track without drums. */
+const music = { track:null, next:0, step:0, amb:false, guitarBus:null, nextCar:0 };
 function pickTrack(){
   const want = game && game.zen && (state === 'play' || state === 'pause') ? 'lofi-zen' : 'lofi';
   if (music.track !== want){ const keep = music.track && music.track.startsWith('lofi'); music.track = want; if (!keep){ music.step = 0; music.next = actx ? actx.currentTime + 0.15 : 0; } }
   applyVolumes();
 }
-// Fmaj9, Em9, Dm9, Cmaj9 (roots and jazzy upper voicings)
-const LOFI = [ { root:41, chord:[57,60,64,67] }, { root:40, chord:[55,59,62,66] }, { root:38, chord:[53,57,60,64] }, { root:36, chord:[52,55,59,62] } ];
-const STEP = 60/74/4, SWING = 0.34;
+// Fmaj7, Em7, Dm7, Cmaj7: root (bass) and guitar voicing
+const LOFI = [ { root:41, chord:[53,57,60,64] }, { root:40, chord:[52,55,59,62] }, { root:38, chord:[50,53,57,60] }, { root:36, chord:[48,52,55,59] } ];
+// the guitar melody loop: [16th-step within 4 bars, note, length in steps]
+const MELODY = [ [2,72,3],[6,69,2],[8,67,4],[14,69,2],
+                 [18,71,3],[22,67,2],[24,64,6],[30,62,2],
+                 [34,69,3],[38,65,2],[40,64,4],[44,62,2],[46,60,2],
+                 [50,64,6],[58,62,2],[60,60,4] ];
+const PICK = [ [0,0],[3,2],[6,3],[8,1],[11,2],[14,3] ];   // fingerpicking: [step, voice] (0 = bass string)
+const STEP = 60/70/4, SWING = 0.18;
 // plucked string (Karplus-Strong), rendered once per note and cached
 const ksCache = {};
 function ksBuffer(m, damp){
   const key = m + '_' + damp; if (ksCache[key]) return ksCache[key];
-  const sr = actx.sampleRate, len = Math.floor(sr*2), buf = actx.createBuffer(1, len, sr), d = buf.getChannelData(0);
+  const sr = actx.sampleRate, len = Math.floor(sr*2.4), buf = actx.createBuffer(1, len, sr), d = buf.getChannelData(0);
   const N = Math.max(2, Math.round(sr / midi(m))), ring = new Float32Array(N);
   for (let i = 0; i < N; i++) ring[i] = Math.random()*2 - 1;
-  for (let k = 0; k < 2; k++) for (let i = 0; i < N; i++) ring[i] = (ring[i] + ring[(i+1) % N]) * 0.5;   // softer pick
+  for (let i = 0; i < N; i++) ring[i] = (ring[i] + ring[(i+1) % N]) * 0.5;   // fingertip, not a pick
   let p = 0;
   for (let i = 0; i < len; i++){ const nx = (p + 1) % N, v = ring[p]; d[i] = v; ring[p] = damp*0.5*(v + ring[nx]); p = nx; }
   return (ksCache[key] = buf);
 }
-function pluck(m, t, vol, dur, damp, tone2, pan){
-  const a = actx, src = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
-  src.buffer = ksBuffer(m, damp || 0.997); f.type = 'lowpass'; f.frequency.value = tone2 || 2600;
-  g.gain.setValueAtTime(vol, t); g.gain.setValueAtTime(vol, t + dur*0.7); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  panned(src.connect(f).connect(g), pan).connect(music.chordBus); src.start(t); src.stop(t + dur + 0.05);
+function acoustic(m, t, vol, dur, pan){
+  const a = actx, src = a.createBufferSource(), body = a.createBiquadFilter(), f = a.createBiquadFilter(), g = a.createGain();
+  src.buffer = ksBuffer(m, 0.998);
+  body.type = 'peaking'; body.frequency.value = 210; body.Q.value = 1.2; body.gain.value = 5;   // wooden body warmth
+  f.type = 'lowpass'; f.frequency.value = 3400;
+  g.gain.setValueAtTime(vol, t); g.gain.setValueAtTime(vol, t + dur*0.75); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  panned(src.connect(body).connect(f).connect(g), pan).connect(music.guitarBus); src.start(t); src.stop(t + dur + 0.05);
 }
-function strum(notes, t, vol, dur, down){
-  const order = down ? notes : notes.slice().reverse();
-  order.forEach((m, k) => pluck(m, t + k*0.018, vol*(1 - k*0.08), dur, 0.997, 2400, (k - 1.5)*0.15));
+function startAmbience(){
+  const a = actx, M = musicBus;
+  const bed = (type, freq, q, vol) => { const n = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
+    n.buffer = noise(a); n.loop = true; f.type = type; f.frequency.value = freq; f.Q.value = q; g.gain.value = vol;
+    n.connect(f).connect(g).connect(M); n.start(Math.random()*0.5); };
+  bed('highpass', 5200, 0.7, 0.009);    // cozy tape hiss
+  bed('highpass', 2600, 0.5, 0.010);    // rain, the fine top
+  bed('bandpass', 900, 0.4, 0.008);     // rain, the soft body
+  bed('lowpass', 150, 0.7, 0.030);      // distant city rumble
+  music.amb = true;
 }
-function tapePad(notes, t, len, vol){   // quiet warm bed with tape wow
-  const a = actx, f = a.createBiquadFilter(), g = a.createGain(), wob = a.createOscillator(), wg = a.createGain();
-  f.type = 'lowpass'; f.frequency.value = 600;
-  wob.frequency.value = 0.4; wg.gain.value = 8;
-  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.6); g.gain.setValueAtTime(vol, t + len - 0.6); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
-  wob.connect(wg); f.connect(g).connect(music.chordBus);
-  for (const m of notes){ const o = a.createOscillator(); o.type = 'triangle'; o.frequency.value = midi(m); wg.connect(o.detune); o.connect(f); o.start(t); o.stop(t + len + 0.05); }
-  wob.start(t); wob.stop(t + len + 0.05);
+function carPass(t){                    // a far-off car sliding from one side to the other
+  const a = actx, n = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain(), len = 5 + Math.random()*3;
+  n.buffer = noise(a); n.loop = true; f.type = 'bandpass'; f.frequency.value = 380 + Math.random()*200; f.Q.value = 0.8;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.022, t + len*0.5); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+  let node = n.connect(f).connect(g);
+  if (a.createStereoPanner){ const p = a.createStereoPanner(), dir = Math.random() < 0.5 ? 1 : -1; p.pan.setValueAtTime(-0.8*dir, t); p.pan.linearRampToValueAtTime(0.8*dir, t + len); node = node.connect(p); }
+  node.connect(musicBus); n.start(t); n.stop(t + len + 0.05);
 }
-function newPhrase(chord){             // a short, sparse guitar line from chord tones and the pentatonic scale
-  const pool = [chord[0]+12, chord[1]+12, chord[2]+12, chord[3]+12, 69, 72, 74, 76], out = [];
-  let i = 2;
-  while (i < 32){ if (Math.random() < 0.45){ const len = [1, 2, 2, 3, 4][Math.floor(Math.random()*5)]; out.push({ at:i, m:pool[Math.floor(Math.random()*pool.length)], len }); i += len + 1; } else i += 2; }
-  return out;
-}
-function duck(t){ const g = music.chordBus.gain; g.cancelScheduledValues(t); g.setValueAtTime(0.45, t); g.linearRampToValueAtTime(1, t + 0.32); }
+function duck(t){ const g = music.guitarBus.gain; g.cancelScheduledValues(t); g.setValueAtTime(0.6, t); g.linearRampToValueAtTime(1, t + 0.3); }
 function musicStep(t){
   const s = music.step, M = musicBus, i = s % 16, bar = Math.floor(s/16) % 4, ch = LOFI[bar], zen = music.track === 'lofi-zen';
-  const tt = t + (i % 2 ? STEP*SWING : 0);   // swing the off-beats
-  if (!music.chordBus){ music.chordBus = actx.createGain(); music.chordBus.connect(M); }
-  if (!music.hiss){                          // tape hiss bed
-    const n = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain();
-    n.buffer = noise(actx); n.loop = true; f.type = 'highpass'; f.frequency.value = 5000; g.gain.value = 0.007;
-    n.connect(f).connect(g).connect(M); n.start(); music.hiss = n;
-  }
-  if (Math.random() < 0.45) grain(t + Math.random()*STEP, 2500 + Math.random()*4000, 0.004, 0.012 + Math.random()*0.014, (Math.random() - 0.5)*1.4, 1.5, M);   // vinyl dust
-  // guitar comping: a strum on 1, a lighter upstroke on the "and" of 2, a ghost stab late in the bar
-  if (i === 0){ strum(ch.chord, tt, 0.11, 2.2, true); tapePad(ch.chord.map(m => m - 12), t, 16*STEP + 0.4, 0.012); }
-  if (i === 6) strum(ch.chord.slice(1), tt, 0.06, 1.2, false);
-  if (i === 11 && bar % 2) strum(ch.chord.slice(0, 3), tt, 0.045, 0.35, true);
-  if (i === 0 || i === 7 || i === 10) tone('sine', midi(ch.root + 12), tt, i === 7 ? 0.3 : 0.6, 0.13, M, ['lowpass', 380], 0.02);
-  if (s % 32 === 0) music.phrase = newPhrase(ch.chord);
-  const note = music.phrase.find(n => n.at === s % 32);
-  if (note) pluck(note.m, tt, 0.08, note.len*STEP*2, 0.994, 1900, 0.2);   // muted lead guitar
+  const tt = t + (i % 2 ? STEP*SWING : 0);   // a light swing on the off-beats
+  if (!music.guitarBus){ music.guitarBus = actx.createGain(); music.guitarBus.connect(M); }
+  if (!music.amb){ startAmbience(); music.nextCar = t + 6; }
+  // ambience: vinyl crackle, the odd record pop, rain droplets, and now and then a passing car
+  if (Math.random() < 0.5) grain(t + Math.random()*STEP, 2500 + Math.random()*4000, 0.004, 0.01 + Math.random()*0.012, (Math.random() - 0.5)*1.4, 1.5, M);
+  if (Math.random() < 0.03) grain(t + Math.random()*STEP, 1200, 0.012, 0.04, (Math.random() - 0.5), 0.7, M);
+  for (let k = 0; k < 3; k++) if (Math.random() < 0.7) grain(t + Math.random()*STEP, 2200 + Math.random()*4500, 0.005, 0.003 + Math.random()*0.008, (Math.random() - 0.5)*1.8, 2, M);
+  if (t > music.nextCar){ carPass(t); music.nextCar = t + 18 + Math.random()*20; }
+  // fingerpicked acoustic guitar
+  for (const [at, v] of PICK) if (at === i) acoustic(v === 0 ? ch.chord[0] : ch.chord[v], tt, v === 0 ? 0.11 : 0.075, 1.6, v === 0 ? -0.1 : 0.15*v - 0.2);
+  // melody loop (rests every fourth time round)
+  if (Math.floor(s/64) % 4 !== 3) for (const [at, m, len] of MELODY) if (at === s % 64) acoustic(m, tt, 0.11, Math.max(0.6, len*STEP*2), 0.25);
+  // slow mellow bass: long notes, a gentle step up into the next bar
+  if (i === 0) tone('sine', midi(ch.root + 12), tt, 1.9, 0.15, M, ['lowpass', 320], 0.04);
+  if (i === 12) tone('sine', midi(ch.root + 19), tt, 0.7, 0.09, M, ['lowpass', 320], 0.04);
   if (zen) return STEP;
-  if (i === 0 || i === 10 || (i === 7 && bar === 3)){ tone('sine', [100, 44], tt, 0.32, 0.26, M, ['lowpass', 320]); duck(tt); }   // soft kick
-  if (i === 4 || i === 12){ grain(tt, 2100, 0.2, 0.045, 0, 0.5, M); tone('sine', [190, 150], tt, 0.08, 0.04, M); }   // brushed snare
-  if (i % 2 === 0) grain(tt, 7500, 0.03, i % 4 === 2 ? 0.02 : 0.012, 0.25, 0.8, M);   // soft hats
-  if (i === 14 && Math.random() < 0.4) grain(tt, 7000, 0.12, 0.012, -0.25, 0.8, M);   // open hat
+  // steady head-nod beat: kick on 1 and the "and" of 3, snare on 2 and 4, steady hats
+  if (i === 0 || i === 10){ tone('sine', [110, 45], tt, 0.36, 0.3, M, ['lowpass', 300]); grain(tt, 2800, 0.012, 0.015, 0, 1, M); duck(tt); }
+  if (i === 4 || i === 12){ grain(tt, 1800, 0.18, 0.06, 0, 0.6, M); tone('sine', [200, 160], tt, 0.1, 0.06, M); grain(tt, 4200, 0.05, 0.02, 0, 0.7, M); }
+  if (i % 2 === 0) grain(tt, 7500, 0.03, i % 4 === 2 ? 0.022 : 0.014, 0.25, 0.8, M);
+  if (i === 15) grain(tt, 7500, 0.02, 0.008, 0.25, 0.8, M);
   return STEP;
 }
 setInterval(() => {
