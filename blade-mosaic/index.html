@@ -401,7 +401,14 @@ function audio(){
       for (let c = 0; c < 2; c++){ const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random()*2 - 1) * Math.pow(1 - i/len, 3.5); }
       room.buffer = ir; room.connect(master);
       sfxBus = a.createGain(); sfxBus.connect(master);
-      musicBus = a.createGain(); musicBus.connect(master);
+      // music runs through an "old record" filter: no deep lows, rounded highs, a touch of saturation
+      musicBus = a.createGain();
+      const lo = a.createBiquadFilter(); lo.type = 'highpass'; lo.frequency.value = 90;
+      const hi = a.createBiquadFilter(); hi.type = 'lowpass'; hi.frequency.value = 4200;
+      const sat = a.createWaveShaper(), curve = new Float32Array(1024);
+      for (let i = 0; i < 1024; i++){ const v = i/511.5 - 1; curve[i] = Math.tanh(v*1.6)/Math.tanh(1.6); }
+      sat.curve = curve;
+      musicBus.connect(lo).connect(hi).connect(sat).connect(master);
       const s1 = a.createGain(); s1.gain.value = 0.18; sfxBus.connect(s1).connect(room);
       const s2 = a.createGain(); s2.gain.value = 0.35; musicBus.connect(s2).connect(room);
       actx = a; applyVolumes(); pickTrack();
@@ -531,60 +538,77 @@ function bladeSound(spin, cutting, over){
   motor.scrape.g.gain.setTargetAtTime(c ? (r() < 0.3 ? 0.04 : 0.012) : 0, t, 0.04);   // coarse scrape, in uneven strokes
 }
 
-/* music: lo-fi everywhere (no piano). Swung 16ths at 74 bpm: lazy drums, warm wobbly
-   tape chords, a breathy flute line, round bass, vinyl crackle and tape hiss.
-   Zen Tower plays the same track without drums. */
-const music = { track:null, next:0, step:0, hiss:null, phrase:[] };
+/* music: vintage lo-fi / chillhop everywhere (no piano). Same lazy swung drums at 74 bpm;
+   on top, plucked jazz-guitar chords (9th voicings) and a muted guitar lead, a quiet
+   tape pad, and the whole music bus filtered like a dusty old sample. Chords duck a
+   little on every kick for that pumping feel. Zen Tower plays it without drums. */
+const music = { track:null, next:0, step:0, hiss:null, phrase:[], chordBus:null };
 function pickTrack(){
   const want = game && game.zen && (state === 'play' || state === 'pause') ? 'lofi-zen' : 'lofi';
   if (music.track !== want){ const keep = music.track && music.track.startsWith('lofi'); music.track = want; if (!keep){ music.step = 0; music.next = actx ? actx.currentTime + 0.15 : 0; } }
   applyVolumes();
 }
-const LOFI = [ { root:41, chord:[53,57,60,64] }, { root:40, chord:[52,55,59,62] }, { root:38, chord:[50,53,57,60] }, { root:36, chord:[48,52,55,59] } ];
+// Fmaj9, Em9, Dm9, Cmaj9 (roots and jazzy upper voicings)
+const LOFI = [ { root:41, chord:[57,60,64,67] }, { root:40, chord:[55,59,62,66] }, { root:38, chord:[53,57,60,64] }, { root:36, chord:[52,55,59,62] } ];
 const STEP = 60/74/4, SWING = 0.34;
-function tapeChord(notes, t, len, vol){   // two detuned saws, low-passed, with a slow tape wobble
+// plucked string (Karplus-Strong), rendered once per note and cached
+const ksCache = {};
+function ksBuffer(m, damp){
+  const key = m + '_' + damp; if (ksCache[key]) return ksCache[key];
+  const sr = actx.sampleRate, len = Math.floor(sr*2), buf = actx.createBuffer(1, len, sr), d = buf.getChannelData(0);
+  const N = Math.max(2, Math.round(sr / midi(m))), ring = new Float32Array(N);
+  for (let i = 0; i < N; i++) ring[i] = Math.random()*2 - 1;
+  for (let k = 0; k < 2; k++) for (let i = 0; i < N; i++) ring[i] = (ring[i] + ring[(i+1) % N]) * 0.5;   // softer pick
+  let p = 0;
+  for (let i = 0; i < len; i++){ const nx = (p + 1) % N, v = ring[p]; d[i] = v; ring[p] = damp*0.5*(v + ring[nx]); p = nx; }
+  return (ksCache[key] = buf);
+}
+function pluck(m, t, vol, dur, damp, tone2, pan){
+  const a = actx, src = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
+  src.buffer = ksBuffer(m, damp || 0.997); f.type = 'lowpass'; f.frequency.value = tone2 || 2600;
+  g.gain.setValueAtTime(vol, t); g.gain.setValueAtTime(vol, t + dur*0.7); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  panned(src.connect(f).connect(g), pan).connect(music.chordBus); src.start(t); src.stop(t + dur + 0.05);
+}
+function strum(notes, t, vol, dur, down){
+  const order = down ? notes : notes.slice().reverse();
+  order.forEach((m, k) => pluck(m, t + k*0.018, vol*(1 - k*0.08), dur, 0.997, 2400, (k - 1.5)*0.15));
+}
+function tapePad(notes, t, len, vol){   // quiet warm bed with tape wow
   const a = actx, f = a.createBiquadFilter(), g = a.createGain(), wob = a.createOscillator(), wg = a.createGain();
-  f.type = 'lowpass'; f.frequency.value = 850; f.Q.value = 0.4;
-  wob.frequency.value = 0.45; wg.gain.value = 7;  // cents of wow
-  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.35); g.gain.setValueAtTime(vol, t + len - 0.6); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
-  wob.connect(wg); f.connect(g).connect(musicBus);
-  for (const m of notes) for (const d of [-6, 6]){
-    const o = a.createOscillator(); o.type = 'sawtooth'; o.frequency.value = midi(m); o.detune.value = d;
-    wg.connect(o.detune); o.connect(f); o.start(t); o.stop(t + len + 0.05);
-  }
+  f.type = 'lowpass'; f.frequency.value = 600;
+  wob.frequency.value = 0.4; wg.gain.value = 8;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.6); g.gain.setValueAtTime(vol, t + len - 0.6); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+  wob.connect(wg); f.connect(g).connect(music.chordBus);
+  for (const m of notes){ const o = a.createOscillator(); o.type = 'triangle'; o.frequency.value = midi(m); wg.connect(o.detune); o.connect(f); o.start(t); o.stop(t + len + 0.05); }
   wob.start(t); wob.stop(t + len + 0.05);
 }
-function flute(m, t, len, vol){           // breathy sine with a little vibrato and air
-  const a = actx, o = a.createOscillator(), g = a.createGain(), vib = a.createOscillator(), vg = a.createGain(), f = a.createBiquadFilter();
-  o.type = 'sine'; o.frequency.value = midi(m); vib.frequency.value = 5; vg.gain.value = 9;
-  vib.connect(vg).connect(o.detune);
-  f.type = 'lowpass'; f.frequency.value = 2200;
-  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.12); g.gain.setValueAtTime(vol*0.85, t + len*0.6); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
-  o.connect(f).connect(g).connect(musicBus); o.start(t); vib.start(t); o.stop(t + len + 0.05); vib.stop(t + len + 0.05);
-  grain(t, midi(m)*3, Math.min(0.25, len), vol*0.25, 0, 3, musicBus);   // breath
-}
-function newPhrase(chord){                // a short melody from chord tones and the pentatonic scale
-  const pool = [chord[1]+12, chord[2]+12, chord[3]+12, 72, 74, 76, 79, 81], out = [];
-  let i = 0;
-  while (i < 32){ if (Math.random() < 0.55){ const len = [2, 3, 4, 6][Math.floor(Math.random()*4)]; out.push({ at:i, m:pool[Math.floor(Math.random()*pool.length)], len }); i += len; } else i += 2; }
+function newPhrase(chord){             // a short, sparse guitar line from chord tones and the pentatonic scale
+  const pool = [chord[0]+12, chord[1]+12, chord[2]+12, chord[3]+12, 69, 72, 74, 76], out = [];
+  let i = 2;
+  while (i < 32){ if (Math.random() < 0.45){ const len = [1, 2, 2, 3, 4][Math.floor(Math.random()*5)]; out.push({ at:i, m:pool[Math.floor(Math.random()*pool.length)], len }); i += len + 1; } else i += 2; }
   return out;
 }
+function duck(t){ const g = music.chordBus.gain; g.cancelScheduledValues(t); g.setValueAtTime(0.45, t); g.linearRampToValueAtTime(1, t + 0.32); }
 function musicStep(t){
   const s = music.step, M = musicBus, i = s % 16, bar = Math.floor(s/16) % 4, ch = LOFI[bar], zen = music.track === 'lofi-zen';
   const tt = t + (i % 2 ? STEP*SWING : 0);   // swing the off-beats
+  if (!music.chordBus){ music.chordBus = actx.createGain(); music.chordBus.connect(M); }
   if (!music.hiss){                          // tape hiss bed
     const n = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain();
-    n.buffer = noise(actx); n.loop = true; f.type = 'highpass'; f.frequency.value = 5000; g.gain.value = 0.006;
+    n.buffer = noise(actx); n.loop = true; f.type = 'highpass'; f.frequency.value = 5000; g.gain.value = 0.007;
     n.connect(f).connect(g).connect(M); n.start(); music.hiss = n;
   }
-  if (Math.random() < 0.35) grain(t + Math.random()*STEP, 3000 + Math.random()*4000, 0.004, 0.01 + Math.random()*0.012, (Math.random() - 0.5)*1.4, 1.5, M);   // vinyl crackle
-  if (i === 0) tapeChord(ch.chord, t, 16*STEP + 0.3, zen ? 0.016 : 0.014);
-  if (i === 0 || i === 7 || i === 10) tone('sine', midi(ch.root + 12), tt, i === 7 ? 0.3 : 0.6, 0.12, M, ['lowpass', 400], 0.02);
+  if (Math.random() < 0.45) grain(t + Math.random()*STEP, 2500 + Math.random()*4000, 0.004, 0.012 + Math.random()*0.014, (Math.random() - 0.5)*1.4, 1.5, M);   // vinyl dust
+  // guitar comping: a strum on 1, a lighter upstroke on the "and" of 2, a ghost stab late in the bar
+  if (i === 0){ strum(ch.chord, tt, 0.11, 2.2, true); tapePad(ch.chord.map(m => m - 12), t, 16*STEP + 0.4, 0.012); }
+  if (i === 6) strum(ch.chord.slice(1), tt, 0.06, 1.2, false);
+  if (i === 11 && bar % 2) strum(ch.chord.slice(0, 3), tt, 0.045, 0.35, true);
+  if (i === 0 || i === 7 || i === 10) tone('sine', midi(ch.root + 12), tt, i === 7 ? 0.3 : 0.6, 0.13, M, ['lowpass', 380], 0.02);
   if (s % 32 === 0) music.phrase = newPhrase(ch.chord);
   const note = music.phrase.find(n => n.at === s % 32);
-  if (note) flute(note.m, tt, note.len*STEP*1.1, zen ? 0.022 : 0.026);
+  if (note) pluck(note.m, tt, 0.08, note.len*STEP*2, 0.994, 1900, 0.2);   // muted lead guitar
   if (zen) return STEP;
-  if (i === 0 || i === 10 || (i === 7 && bar === 3)) tone('sine', [100, 44], tt, 0.32, 0.26, M, ['lowpass', 320]);   // soft kick
+  if (i === 0 || i === 10 || (i === 7 && bar === 3)){ tone('sine', [100, 44], tt, 0.32, 0.26, M, ['lowpass', 320]); duck(tt); }   // soft kick
   if (i === 4 || i === 12){ grain(tt, 2100, 0.2, 0.045, 0, 0.5, M); tone('sine', [190, 150], tt, 0.08, 0.04, M); }   // brushed snare
   if (i % 2 === 0) grain(tt, 7500, 0.03, i % 4 === 2 ? 0.02 : 0.012, 0.25, 0.8, M);   // soft hats
   if (i === 14 && Math.random() < 0.4) grain(tt, 7000, 0.12, 0.012, -0.25, 0.8, M);   // open hat

@@ -31,6 +31,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-09: Blade Mosaic music: vintage chillhop style (plucked jazz-guitar chords, muted guitar lead, old-record filter, chords ducking on the kick); drums unchanged. Not yet on the play link; waiting for the user's go-ahead.
 - 2026-11-09: Blade Mosaic: falling whoosh that swells with speed; lo-fi music everywhere (swung drums, tape-wobble chords, flute melody, vinyl crackle, tape hiss; no piano), drumless in Zen Tower.
 - 2026-11-07: Blade Mosaic: piano removed from the music; richer ASMR cutting sounds (a scritch on every bite, crackles on nearly-broken blocks, three-layer sanding texture, sandy trickle after each break, debris ticks), also in Zen Tower.
 - 2026-11-07: Blade Mosaic sound made ASMR-style: grain-based crunches panned by block position, wooden knocks, airy blade whoosh and sanding, steam hiss, room echo; lo-fi music with vinyl crackle replaces the drum beat.
