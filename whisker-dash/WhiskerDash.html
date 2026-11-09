@@ -181,7 +181,7 @@ function build(segs){const cols=[];
   const g=[];for(let r=0;r<ROWS;r++)g.push(cols.map(c=>c[r]));return g}
 
 const WORLDS={1:'ROOFTOPS',2:'THE OCEAN',3:'THE SEWERS',4:'HIGH MOUNTAINS',5:'THE JUNGLE',6:'THE STREETS',7:'LONDON',8:'THE AIRPORT',9:'TOKYO',10:'THE BEACH',11:'THE LAUNCHPAD',12:'SPACE',13:'ALIEN PLANET',14:'EGYPT',15:'HIGHLANDS',16:'PARIS',17:'THE GLACIER',18:'PIRATE COVE',19:'MAYAN TEMPLES',20:'ANCIENT ROME',21:'THE SUBURBS',22:'THE STORE',23:'THE LIBRARY',24:'MAD SCIENTIST LAB',25:'INSIDE A PC',26:'THE DIGITAL WORLD',27:'HOTEL LOBBY',28:'ANTARCTICA',29:'THE SCOTTISH CASTLE',30:'BUCKINGHAM PALACE',31:'MANGROVE SWAMP',32:'TOWER OF LONDON',33:"THE JUNGLE CANOPY",34:"THE EIFFEL TOWER",35:"THE CASTLE DUNGEONS",36:"THE BOUNCY CASTLE",37:"THE ICE CAVES",38:"YELLOWSTONE",39:"CLOUD WORLD",40:"THE REDWOOD FOREST",41:"MACHU PICCHU",42:"MILLIONAIRES' ROW",43:"THE MOVIE THEATER",44:"MAD SCIENTIST LAB II",45:"YARN WORLD",46:"THE FOAM PIT",47:"THE STATUE OF LIBERTY",48:"NEW YORK CITY",49:"ICELAND",50:"THE CRYSTAL CAVERNS",51:"THE VOLCANO",52:"VENICE",53:"THE DENTIST OFFICE",54:"SLIME OCEAN",55:"THE PORTS",56:"THE SUBWAY",57:"THE MALL",58:"CAPITOL HILL",59:"THE COLOSSEUM",60:"THE LUSH CAVES",61:"HOTEL LOBBY 2"};
-const LASTW=61,WORDER=[...Array(30)].map((_,i)=>i+1).concat([32,31],[...Array(29)].map((_,i)=>33+i));
+const LASTW=61,WORDER=[...Array(30)].map((_,i)=>i+1).concat([32,31],[...Array(28)].map((_,i)=>33+i),[62,63,64,65,66,67,68,69,70,61]);
 const LEVELS=[
  {w:1,name:'Alley Stroll',segs:[['f',6],['s',1],['f',6],['s',1],['f',5],['s',2],['f',6],['c'],['f',6],['s',2],['f',5],['s',1],['f',3],['s',1],['f',6],['s',3],['f',6],['F'],['f',8]]},
  {w:1,name:'Rooftop Gaps',segs:[['f',6],['s',2],['f',6],['p',2],['f',6],['p',3],['f',5],['c'],['f',5],['st',3,1],['f',2],['s',2],['f',3],['st',3,2],['p',2],['st',3,2],['f',4],['s',3],['f',6],['F'],['f',8]]},
@@ -266,13 +266,38 @@ const PHYS={1:B1,
  59:{...B1,walljump:1},
  60:{...B1,crumble:1,dark:1,crystals:1},
  61:{...B1,lobby:1,foam:1}};
+// ---------- worlds 62–70 (added 2026-11-08), played between The Lush Caves and Hotel Lobby 2 ----------
+Object.assign(WORLDS,{62:'CÂMPENI',63:'THE COPPER MINE',64:'HOOVER DAM',65:'ARCHES NATIONAL PARK',66:'THE OLD PINE MOUNTAINS',67:'THE BLACK SAND BEACH',68:'THE MOUNTAIN FLEA MARKET',69:'THE GOLD MINE',70:'THE RIVERSIDE'});
+Object.assign(PHYS,{62:{...B1},63:{...B1},64:{...B1,wind:30},65:{...B1,jump:540},66:{...B1},67:{...B1,wind:25},68:{...B1,tramp:1},69:{...B1,ladders:1},70:{...B1}});
+// open-pit mine: up onto the rim, DOWN the terraces to the lake at the bottom, then back UP to the fish on the far rim
+function pitSegs(w,li){const r=rng(w*577+li*61+5),ri=(a,b)=>a+Math.floor(r()*(b-a+1)),segs=[['f',5],['st',2,2],['st',2,4],['st',5,6]];
+  let gapNext=false;for(let h=5;h>=1;h--){const n=ri(3,5),sp=!gapNext&&li>=1&&n>=5&&r()<.3+li*.1;segs.push(['st',n,h,sp?1:0]);gapNext=!sp&&li>=3&&h>1&&r()<.35;if(gapNext)segs.push(['p',ri(1,2)])}
+  segs.push(['f',3],['c'],['f',2]);const m=2+li;for(let i=0;i<m;i++){if(r()<.55)segs.push(['p',ri(2,li>=2?3:2)]);else segs.push(['s',ri(1,li>=2?2:1)]);segs.push(['f',ri(4,5)])}
+  segs.push(['c'],['f',2]);let h=0;gapNext=false;while(h<6){const up=!gapNext&&h<=4&&r()<.4?2:1;h=Math.min(6,h+up);const n=ri(2,li>=2?5:4),sp=!gapNext&&li>=2&&n>=5&&r()<.35;segs.push(['st',n,h,sp?1:0]);gapNext=!sp&&li>=2&&h<6&&r()<.3;if(gapNext)segs.push(['p',1])}
+  segs.push(['st',2,6],['Ft',3,6],['st',3,6],['st',2,4],['st',2,2],['f',8]);return segs}
+// gold mine galleries: stacked tunnel floors joined by ladders. Start at the bottom, climb floor by floor up to the fish at the surface
+function galleryGrid(n,seed){const r=rng(seed),ri=(a,b)=>a+Math.floor(r()*(b-a+1)),W=20,GH=5,H=n*GH+8,g=Array.from({length:H},()=>Array(W).fill('.'));
+  for(let y=0;y<H;y++)g[y][0]=g[y][W-1]='#';for(let c=0;c<W;c++)g[H-1][c]=g[H-2][c]='#';
+  let side=1,entry=2;
+  for(let k=1;k<=n;k++){const s=H-2-GH*k,lc=side?W-3:2,fl=s+GH,stand=fl-1;for(let c=1;c<W-1;c++)g[s][c]='#';
+    const lo=Math.min(entry,lc)+3,hi=Math.max(entry,lc)-3;let c=lo;const busy=new Set();
+    while(c<=hi){const kind=r(),diff=k/n;
+      if(kind<.4){const w=diff>.5&&r()<.5?2:1;for(let q=0;q<w&&c+q<=hi;q++){g[stand][c+q]='^';busy.add(c+q)}c+=w+ri(4,5)}
+      else if(kind<.7){let w=1;g[stand][c]='#';if(diff>.4&&r()<.5)g[stand-1][c]='#';else if(c+1<=hi&&r()<.4){g[stand][c+1]='#';w=2}c+=w+ri(4,5)}
+      else if(k>1&&c+1<=hi){g[fl][c]=g[fl][c+1]='.';busy.add(c);busy.add(c+1);c+=2+ri(4,5)}
+      else{g[stand][c]='#';c+=1+ri(4,5)}}
+    for(let y=s;y<fl;y++)g[y][lc]='H';
+    if(k%2===0){const cc=lc===2?4:W-5;if(g[s-1]&&g[s-1][cc]==='.')g[s-1][cc]='C'}
+    entry=lc;side^=1}
+  const top=H-2-GH*n,fc=entry===2?W-4:3;g[top-1][fc]='F';return g}
+
 const HINT={33:"swing through the treetops on vines",34:"wall-jump up the iron tower!",35:"it's dark down here… and some floors crumble",36:"the whole floor is a bounce house! hold jump to bounce higher",37:"slippery ice and falling icicles!",38:"geysers erupt on a timer: wait for them to stop",39:"bounce from cloud to cloud! the big cloud below is too soft: you sink right through",40:"hold ↑ on a ladder to climb up to the branches!",41:"thin mountain air: you jump higher",42:"polished sidewalks: fast and fancy",43:"the lights are off! you can only see near you",44:"geysers AND lasers this time!",45:"everything is soft and bouncy",46:"walk on the foam, or hold ↓ to dive in and swim!",47:"a strong harbor wind is blowing",48:"watch out for taxis! jump over them, or bounce on their roofs",49:"windy, slippery and full of geysers",54:"floaty slime ocean! bounce on the friendly slime buddies, and watch out for goo dripping from above",55:"a strong sea wind blows across the docks. ride the cargo crates!",56:"jump over the subway trains, or bounce on their roofs!",57:"ride the escalators up and over the gaps! try not to go shopping!",58:"security lasers blink on and off: wait for them to switch off",59:"tall columns: jump off the walls like a gladiator!",60:"glowing berries light up the mossy cave. careful: the big leaves tip over when you stand on them!",61:"welcome to the NEW wing! walk up to friends and press jump to chat",52:"canals everywhere! hop on the gondolas to cross the water",53:"dodge the flying toothpaste, and bounce on the dentist chairs!",51:"the ground is HOT! jump the lava pits and watch out for fireballs leaping out of the lava",50:"it's dark down here! glowing crystals light the way. watch out for bats",32:'security test! red lasers blink on and off: wait for them to switch off',2:'lower gravity down here!',3:'watch the dripping pipes!',4:'the ground is icy!',5:'thick mud: you run slower',6:'scooter speed: fast but slidey',7:'thick fog! hold jump while falling to float with your umbrella',8:'moving walkways push you forward',9:'everything runs in turbo time',10:'the sea breeze pushes you around',11:'heavy gravity on the launchpad',12:'super floaty space gravity',13:'gravity goes up and down',14:'hot desert air: you jump higher',15:'misty moors: everything in slow motion',16:'café energy: a free double jump',17:'slippery ice and falling icicles!',18:'watch out for cannonballs!',19:'old stone slabs crumble under your paws',20:'tall columns: everyone can jump off walls!',21:'trampolines in every backyard!',22:'look out for runaway shopping carts!',23:'shh! hold ↓ to tiptoe. Too much noise wakes the librarian!',24:'watch out for the green geysers!',25:'climb to the exit at the TOP! you can wall-jump here',26:'glitchy blocks blink on and off!',27:'take a break! walk up to friends and press jump to chat',28:'hold ↓ to belly-slide like a penguin!',29:'sneak! hold ↓ to tiptoe. Noise alerts the guard!',30:'sneak! hold ↓ to tiptoe. Noise alerts the royal guard!',31:'watch out for snapping gators in the water!'};
 
 /* ---------- generated levels for worlds 5-14 (tuned to each world's jump reach) ---------- */
 function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let q=Math.imul(s^s>>>15,1|s);q=q+Math.imul(q^q>>>7,61|q)^q;return((q^q>>>14)>>>0)/4294967296}}
 const STYLE_W={walk:{},spikes:{s:3,combo:3},gaps:{p:3,sp:3},bridge:{pl:3,pp:3},bounce:{bp:4,stairs:2},cave:{cs:4},movers:{vn:5},hazard:{dr:3,k:3,gy:3,gt:3},finale:{}};
 function raftSegs(){const segs=[['f',6]];for(let k=0;k<5;k++){const n=3;for(let i=0;i<n;i++)segs.push(['vn',6]);if(k<4)segs.push(['f',2],['c'],['f',2])}segs.push(['f',4],['F'],['f',8]);return segs}
-function genSegs(w,li,st='walk'){if(st==='rafts')return raftSegs();if(st==='vert')return [];if(st==='lobby')return [['f',2],['P'],['f',56],['st',2,6]];if(st==='climb')return climbSegs(w,li);if(st==='allmovers')return allMoverSegs();
+function genSegs(w,li,st='walk'){if(st==='pit')return pitSegs(w,li);if(st==='rafts')return raftSegs();if(st==='vert')return [];if(st==='lobby')return [['f',2],['P'],['f',56],['st',2,6]];if(st==='climb')return climbSegs(w,li);if(st==='allmovers')return allMoverSegs();
   const r=rng(w*1009+li*131+7),ph=PHYS[w],gM=ph.g,sp=ph.speed-(ph.wind||0),R=sp*2*ph.jump/gM,H=ph.jump*ph.jump/(2*gM),Hb=ph.bounce*ph.bounce/(2*gM);
   const cl=(v,a,b)=>Math.max(a,Math.min(b,v)),ri=(a,b)=>a+Math.floor(r()*(b-a+1));
   const maxS=cl(Math.floor((.85*R-8)/24),1,5),maxP=cl(Math.floor((.75*R+17)/24),2,5),maxH=cl(Math.floor((.8*H-2)/24),1,3),maxB=cl(Math.floor(.72*Hb/24),3,7);
@@ -361,6 +386,15 @@ const NAMES={
  58:[["The Big Lawn", "walk"], ["Marble Steps", "climb"], ["Security Check", "spikes"], ["The Rotunda", "cave"], ["The Dome", "finale"]],
  59:[["Arena Gates", "walk"], ["Lion Tunnels", "cave"], ["Chariot Track", "movers"], ["Column Climb", "climb"], ["Grand Champion", "finale"]],
  60:[["Moss Entrance", "walk"], ["Glow Berry Grotto", "cave"], ["Dripleaf Pond", "bridge"], ["Azalea Garden", "gaps"], ["The Mossy Heart", "finale"]],
+ 62:[["Town Square", "walk"], ["Haystack Hop", "bounce"], ["Forest Railway", "movers"], ["Wooden Church", "climb"], ["Apuseni Peaks", "finale"]],
+ 63:[["The Pit Rim", "pit"], ["Haul Road", "pit"], ["Blue-Green Lake", "pit"], ["Blast Benches", "pit"], ["Climb Out!", "pit"]],
+ 64:[["Canyon Road", "walk"], ["Intake Towers", "climb"], ["The Spillway", "gaps"], ["Power Plant", "cave"], ["Top of the Dam", "finale"]],
+ 65:[["Red Rock Trail", "walk"], ["Balanced Rocks", "movers"], ["Sandstone Fins", "spikes"], ["Natural Bridges", "bridge"], ["The Big Arch", "finale"]],
+ 66:[["Trailhead", "walk"], ["White Blaze Trail", "spikes"], ["Misty Hollow", "gaps", {"fog": 1}], ["Fire Tower", "climb"], ["Ridge Top", "finale"]],
+ 67:[["Dark Shore", "walk"], ["Basalt Steps", "climb"], ["Sea Stacks", "gaps"], ["Sneaky Waves", "movers"], ["Basalt Cave", "finale"]],
+ 68:[["Parking Field", "walk"], ["Tent Tops", "bounce"], ["Junk Piles", "spikes"], ["Crate Towers", "climb"], ["Last Bargain", "finale"]],
+ 69:[["Mine Entrance", "cave"], ["Lantern Galleries", "vert", {"gal": 4}], ["Minecart Galleries", "vert", {"gal": 5}], ["Deep Galleries", "vert", {"gal": 6}], ["The Mother Lode", "finale"]],
+ 70:[["Willow Bank", "walk"], ["Stepping Stones", "gaps"], ["Log Rides", "movers"], ["Old Water Mill", "climb"], ["The Waterfall", "finale"]],
  61:[["Hotel Lobby 2", "lobby", {"spawnCol": 5}]],
  52:[["Grand Canal", "walk"], ["Gondola Hop", "movers", {"hint": "ride the gondolas across the canals!"}], ["Rialto Bridge", "bridge"], ["Pigeon Square", "gaps"], ["St. Mark's Tower", "climb", {"hint": "climb to the top of the bell tower!"}]],
  53:[["Waiting Room", "walk"], ["Toothbrush Alley", "spikes"], ["Floss Bridges", "bridge"], ["The Big Chair", "bounce"], ["Open Wide!", "finale", {"hint": "the dentist is ready for you… open wide!"}]],
@@ -370,7 +404,7 @@ const NAMES={
  32:[['Traitors\' Gate','walk'],['The Moat','gaps',{hint:'mind the gaps in the old moat!'}],['Laser Corridor','spikes',{hint:'wait for the lasers to switch off!'}],['Jewel House','bridge',{hint:'fog machines! keep your eyes open'}],['The White Tower','finale',{deco:'knight',hint:'Queen Purrcilla is waiting at the end…'}]],
  31:[['Muddy Banks','walk'],['Root Bridges','bridge'],['Lily Pad Hop','movers',{deco:'frog',hint:'someone is waiting on a lily pad…'}],['Gator Gulch','hazard'],['Mangrove Maze','finale',{deco:'platy',hint:'a new friend waits at the end…'}]]};
 for(const w of WORDER.filter(w=>w>=5))NAMES[w].forEach(([name,st,ex],i)=>LEVELS.push({w,name,st,...(ex||{}),segs:genSegs(w,i,st)}));
-{let vi=0;LEVELS.forEach(L=>{if(L.st==='vert')L.vg=L.seed?vertGrid(L.vli??2,L.seed):vertGrid(vi++)})}
+{let vi=0;LEVELS.forEach(L=>{if(L.st==='vert')L.vg=L.gal?galleryGrid(L.gal,L.w*101+L.gal*7):L.seed?vertGrid(L.vli??2,L.seed):vertGrid(vi++)})}
 // tune the hand-built worlds to match their names
 [[4,{st:'cave'}],[9,{st:'cave'}],[12,{st:'cave'}],[19,{st:'climb',hint:'climb to the summit!'}]].forEach(([i,o])=>Object.assign(LEVELS[i],o));
 LEVELS[19].segs=climbSegs(4,4);
@@ -429,7 +463,16 @@ const WARP={2:['WHOOSH!','A giant wave swept the cat into…','THE OCEAN','#1d7f
  58:["BEEP BEEP!", "A tour bus parked at the mall drove the cat to…", "CAPITOL HILL", "#2a3a6a", "#ffffff"],
  59:["ZAP!", "A time portal under the big dome zapped the cat back to…", "THE COLOSSEUM", "#8a5a2a", "#ffd447"],
  60:["CRACK!", "The arena floor cracked open and the cat tumbled all the way down into…", "THE LUSH CAVES", "#1a3a1a", "#9be36b"],
- 61:["WHOOSH!", "A warp portal in the ice zapped the cat to the brand new…", "HOTEL LOBBY 2", "#7a4a2a", "#ffd447"],
+ 62:["ZAP!", "A glowing portal in the moss zapped the cat all the way to Romania…", "CÂMPENI", "#2a4a2a", "#ffd447"],
+ 63:["CHOO CHOO!", "A little mountain train stopped at the edge of a GIANT hole…", "THE COPPER MINE", "#6a3418", "#5ad8b0"],
+ 64:["VROOM!", "A huge ore truck drove the cat to a canyon with an ENORMOUS wall…", "HOOVER DAM", "#3a3a44", "#6fd3ff"],
+ 65:["FLOAT!", "A balloon floated the cat over the hot desert to…", "ARCHES NATIONAL PARK", "#7a2a10", "#ffb07a"],
+ 66:["ROAD TRIP!", "A long road trip east took the cat into the misty, piney…", "THE OLD PINE MOUNTAINS", "#1a3a3a", "#9be36b"],
+ 67:["WHOOSH!", "A big gust pulled the cat's kite all the way across the ocean to…", "THE BLACK SAND BEACH", "#1b1b22", "#c8ccd4"],
+ 68:["TOOT!", "A ferry dropped the cat in a village where it's ALL for sale…", "THE MOUNTAIN FLEA MARKET", "#3a5a2a", "#ff7fa8"],
+ 69:["WHOOPS!", "A trapdoor under a dusty old stall dropped the cat down into…", "THE GOLD MINE", "#2a1a0a", "#ffd447"],
+ 70:["RUMBLE!", "A mine train zoomed out of the mountain and stopped by a sparkly…", "THE RIVERSIDE", "#1a3a3a", "#6fd3ff"],
+ 61:["WHOOSH!", "A warp portal in the river zapped the cat to the brand new…", "HOTEL LOBBY 2", "#7a4a2a", "#ffd447"],
  52:["FLOAT!", "A hot air balloon carried the cat far away from the volcano, all the way to…", "VENICE", "#3a6a9a", "#ffd0a0"],
  53:["OUCH!", "Too much gelato in Venice gave the cat a toothache! Time to visit…", "THE DENTIST OFFICE", "#5ab8c8", "#ffffff"],
  51:["WHOOSH!", "A blast of steam shot the cat up out of the caverns, right next to…", "THE VOLCANO", "#2a0a06", "#ff8a3a"],
@@ -661,6 +704,15 @@ const SKINS={
  sx58:{n:'Senator',o:'#1a2a5a',d:'#c8323c',e:'#ffffff',p:'#ff9fb8',w:'#ffffff',secret:58},
  sx59:{n:'Gladiator',o:'#c8a050',d:'#8a1f27',e:'#1b1530',p:'#ff9fb8',w:'#ffffff',secret:59},
  sx60:{n:'Azalea',o:'#5fae4a',d:'#ff9fd0',e:'#1b1530',p:'#ffb347',w:'#ffffff',secret:60},
+ sx62:{n:'Haystack',o:'#e8c25a',d:'#b8902a',e:'#1b1530',p:'#ff9fb8',w:'#fff4e0',secret:62},
+ sx63:{n:'Copper',o:'#c87533',d:'#5ad8b0',e:'#1b1530',p:'#ff9fb8',w:'#ffe0c0',secret:63},
+ sx64:{n:'Hydro',o:'#d8d4c8',d:'#3a7ab8',e:'#1b1530',p:'#ff9fb8',w:'#ffffff',secret:64},
+ sx65:{n:'Red Rock',o:'#c8582a',d:'#ffb07a',e:'#1b1530',p:'#ff9fb8',w:'#ffe8d0',secret:65},
+ sx66:{n:'Pine Cone',o:'#7a5a3a',d:'#3f7a3a',e:'#1b1530',p:'#ff9fb8',w:'#e8f4e0',secret:66},
+ sx67:{n:'Basalt',o:'#2a2a30',d:'#6f9a5a',e:'#9be36b',p:'#ff9fb8',w:'#c8ccd4',secret:67},
+ sx68:{n:'Bargain Hunter',o:'#ff7fa8',d:'#6fd3ff',e:'#1b1530',p:'#ffd447',w:'#ffffff',secret:68},
+ sx69:{n:'Gold Nugget',o:'#ffd447',d:'#c8a030',e:'#1b1530',p:'#ff9fb8',w:'#fff3b0',secret:69},
+ sx70:{n:'Willow',o:'#8acc5a',d:'#3a8ad0',e:'#1b1530',p:'#ff9fb8',w:'#ffffff',secret:70},
  sx51:{n:'Obsidian',o:'#1b1420',d:'#ff6a1a',e:'#ffd447',p:'#ff6a1a',w:'#ff6a1a',secret:51},
  luckycat:{n:'Lucky Cat',spr:'luckycat',o:'#fbfbff',d:'#ff9e3d',e:'#1b1530',p:'#ff7fa8',w:'#ffffff',r:'#e8403a',g:'#ffd447'},
  orange:{n:'Orange',o:'#ff9e3d',d:'#c4621c',e:'#1b1530',p:'#ff7fa8',w:'#fff4e0'},
@@ -679,6 +731,8 @@ const NSLOTS=5;let SAVESLOT=1;try{SAVESLOT=Math.min(NSLOTS,Math.max(1,+localStor
 const slotKey=n=>n===1?'whiskerdash':'whiskerdash'+n,SAVEKEY=slotKey(SAVESLOT);
 let save={beaten:[],skins:[],powers:[],best:{},skin:'orange'};
 try{const s=JSON.parse(localStorage.getItem(SAVEKEY)||'null');if(s)save={...save,...s}}catch(e){}
+// worlds 62–70 were inserted before Hotel Lobby 2 (Nov 8): move older saves' Hotel Lobby 2 progress (level 295 and up) to its new number. The run itself continues into the new worlds.
+if(!save.lv70){const sh=j=>j>=295?j+45:j;save.beaten=(save.beaten||[]).map(sh);if(save.run&&save.run.runBeaten)save.run.runBeaten=save.run.runBeaten.map(sh);if(save.best){const b={};for(const k of Object.keys(save.best))b[/^\d+$/.test(k)?sh(+k):k]=save.best[k];save.best=b}save.lv70=1;try{localStorage.setItem(SAVEKEY,JSON.stringify(save))}catch(e){}}
 // one-time fix (Oct 25): bring back the skins and Double Jump that went missing from this save
 // not earned yet: the deer family, the Icelandic sheep, and every frog except the first one
 const NOTYET=['deer','reindeer','fawn','icesheep','treefrog','dartfrog','goldenfrog','purplefrog'];
@@ -940,7 +994,7 @@ function loadLevel(i){lvl=i;grantAcc();loreUnlock(LEVELS[i].w);if(LEVELS[i].w===
   if(PHYS[LEVELS[i].w].jelly){for(let c=0;c<cols;c++){for(let r=0;r<grid.length;r++){if(grid[r][c]==='v')grid[r][c]='.'}for(let r=1;r<grid.length;r++){if(grid[r][c]==='#'){if(grid[r-1][c]==='.')grid[r-1][c]='J';break}}}}
   {const sc=LEVELS[i].spawnCol||2,fr=LEVELS[i].vg?grid.length-2:10;startSpawn={x:sc*T+4,y:fr*T-16}}cpCol=-1;cpRow=9;camY=0;talk=null;banner=2.2;lvlTime=0;parts=[];drops=[];balls=[];crumble={};amb=[];cam=0;lastCam=0;shake=0;
   players=[];for(let p=0;p<numP;p++){const pl={id:p,cp:-1,dead:0,bell:false,safe:[],safeT:0,frozen:0};placeCat(pl,{x:startSpawn.x+p*22,y:startSpawn.y});players.push(pl)}
-  luckyItem=null;npcs=[];SROOM=null;if(PHYS[LEVELS[i].w].lobby){const have=['orange','grey',...Object.keys(SKINS).filter(k=>skinSet.has(k))].filter(k=>!skins.slice(0,numP).includes(k));
+  luckyItem=null;npcs=[];SROOM=null;if(PHYS[LEVELS[i].w].lobby){const have=['orange','grey',...Object.keys(SKINS).filter(k=>skinSet.has(k))].filter(k=>!skins.slice(0,numP).includes(k)&&!/^sx[a-z]?\d+$/.test(k));
     const inside=have.slice(0,8),outside=have.slice(8);grid=build([['f',2],['P'],['f',Math.max(150,NPCC+outside.length*3+6+CHICKPARTY.length*2+8+60+(LEVELS[i].w===61?40:0))-6],['bp'],['f',2],['st',2,6],['f',7],['st',1,10]]);cols=grid[0].length;for(let k=0;k<LEX;k++)grid.unshift(Array(cols).fill('.'));LOFF=LEX*T;startSpawn.y+=LOFF;for(const pl of players)pl.cat.y+=LOFF;{const c0=TOWER.c;for(let i=0;i<10;i++){const r=LEX+8-i*2,a=[0,4,8,4][i%4],n=3;for(let c=c0+a;c<c0+a+n;c++)grid[r][c]='='}grid[LEX+8-18-1][c0+5]='b'}COASTER=buildCoaster();
     luckyItem=skinSet.has('luckycat')?null:{x:(cols-6)*T};
     npcs.push({sk:'grey',name:'Bellhop',hat:1,x:9*T+12,face:-1,lines:LINES.bellhop,key:'bellhop',pitch:520},{sk:'grey',name:'Librarian',lib:1,pal:LIBPAL,x:11*T+12,face:1,lines:LINES.librarian,key:'librarian',pitch:330},...(beatW(29)?[{sk:'orange',name:'Castle Guard',guard:'castle',pal:GUARDPAL.castle,x:13*T+12,face:-1,lines:castleWakes===0?LINES.castlequiet0:castleWakes===1?LINES.castlequiet1:LINES.castleguard,key:'castleguard',pitch:300}]:[]),...(beatW(30)?[{sk:'black',name:'Palace Guard',guard:'palace',pal:GUARDPAL.palace,x:15*T+12,face:-1,lines:LINES.palaceguard,key:'palaceguard',pitch:260}]:[]),...(beatW(30)?[{sk:'snowball',name:'Queen Purrcilla',queen:1,x:17*T+12,face:-1,lines:beatW(32)?LINES.queenknight:LINES.queen,key:'queen',pitch:620}]:[]));
@@ -961,7 +1015,7 @@ function loadLevel(i){lvl=i;grantAcc();loreUnlock(LEVELS[i].w);if(LEVELS[i].w===
       for(let j=0;j<n;j++)vines.push({k:'esc',skin:'escstep',x0,y0,len,rise,sp:55/len,u0:j/n,grp,lead:j===0,hw:15,x:x0,y:242,dx:0,dy:0,ph:0})}a=-1}}}
   document.body.style.background=PAGEBG[world()];setTrack(world());if(mode==='story'&&runOn)persist();
   $('hWorld').textContent=WORLDS[world()];$('hLvl').textContent=LEVELS[i].n+1;$('hLvlOf').textContent=WSIZE[LEVELS[i].w];$('hName').textContent=LEVELS[i].name}
-const MOVK={33:['swing','vine'],34:['lift','elevator'],35:['swing','chandelier'],36:['lift','balloon'],37:['slide','floe'],38:['slide','log'],39:['bob','balloon'],40:['swing','rope'],41:['slide','carpet'],42:['slide','carpet'],43:['lift','chair'],44:['lift','beaker'],45:['swing','rope'],46:['bob','surf'],47:['slide','basket'],48:['slide','bus'],49:['bob','floe'],50:['slide','raft'],51:['bob','rock'],52:['bob','gondola'],53:['lift','toothbrush'],54:['bob','slimebud'],55:['lift','crate'],56:['slide','bus'],57:['lift','elevator'],58:['lift','window'],59:['slide','chariot'],60:['swing','vine'],61:['slide','cart'],32:['swing','chandelier'],1:['slide','basket'],2:['bob','jelly'],3:['slide','duck'],4:['slide','chair'],5:['swing','vine'],6:['lift','window'],7:['slide','bus'],8:['slide','suitcase'],9:['swing','lantern'],10:['bob','surf'],11:['lift','elevator'],12:['orbit','rock'],13:['orbit','ufo'],14:['slide','carpet'],15:['swing','rope'],16:['lift','balloon'],17:['bob','floe'],18:['bob','barrel'],19:['swing','stone'],20:['slide','chariot'],21:['swing','tire'],22:['slide','cart'],23:['slide','ladder'],24:['lift','beaker'],25:['slide','pixel'],26:['slide','pixel'],27:['slide','cart'],28:['bob','floe'],29:['swing','chandelier'],30:['slide','corgi'],31:['bob','lily']};
+const MOVK={33:['swing','vine'],34:['lift','elevator'],35:['swing','chandelier'],36:['lift','balloon'],37:['slide','floe'],38:['slide','log'],39:['bob','balloon'],40:['swing','rope'],41:['slide','carpet'],42:['slide','carpet'],43:['lift','chair'],44:['lift','beaker'],45:['swing','rope'],46:['bob','surf'],47:['slide','basket'],48:['slide','bus'],49:['bob','floe'],50:['slide','raft'],51:['bob','rock'],52:['bob','gondola'],53:['lift','toothbrush'],54:['bob','slimebud'],55:['lift','crate'],56:['slide','bus'],57:['lift','elevator'],58:['lift','window'],59:['slide','chariot'],60:['swing','vine'],61:['slide','luggage'],32:['swing','chandelier'],1:['slide','basket'],2:['bob','jelly'],3:['slide','duck'],4:['slide','chair'],5:['swing','vine'],6:['lift','window'],7:['slide','bus'],8:['slide','suitcase'],9:['swing','lantern'],10:['bob','surf'],11:['lift','elevator'],12:['orbit','rock'],13:['orbit','ufo'],14:['slide','carpet'],15:['swing','rope'],16:['lift','balloon'],17:['bob','floe'],18:['bob','barrel'],19:['swing','stone'],20:['slide','chariot'],21:['swing','tire'],22:['slide','cart'],23:['slide','ladder'],24:['lift','beaker'],25:['slide','pixel'],26:['slide','pixel'],27:['slide','luggage'],28:['bob','floe'],29:['swing','chandelier'],30:['slide','corgi'],31:['bob','lily']};
 function updVines(dt){vt+=dt;updCoaster(dt);const G=LOFF+240;for(const v of vines){let nx,ny;const ph=v.ph;
   if(v.k==='swing'){const a=v.amp*Math.sin(vt*v.sp+ph);nx=v.ax+Math.sin(a)*v.len;ny=v.ay+Math.cos(a)*v.len}
   else if(v.k==='slide'){nx=v.cx+Math.sin(vt*1.1+ph)*50;ny=242}
@@ -1033,6 +1087,13 @@ function drawMover(v){const X=v.x,Y=v.y-4,rope=(col,w=2)=>{x.strokeStyle=col;x.l
     x.fillStyle=col;x.beginPath();x.moveTo(X-22,Y-20);x.lineTo(X,Y-28);x.lineTo(X+22,Y-20);x.fill();x.fillRect(X-20,Y-20,3,20);x.fillRect(X+17,Y-20,3,20);x.fillRect(X-20,Y-6,40,6);
     x.fillStyle='#ffffff55';x.fillRect(X-17,Y-18,34,10);x.fillStyle='#fff4e0';x.fillRect(X-20,Y,40,3);break}
   case 'log':x.fillStyle='#7a4a24';x.fillRect(X-20,Y+1,40,10);x.fillStyle='#5a3418';for(let i=0;i<4;i++)x.fillRect(X-16+i*10,Y+3,6,1);x.fillRect(X-12+5,Y+7,8,1);x.fillStyle='#c8945a';x.beginPath();x.ellipse(X+20,Y+6,3,5,0,0,7);x.fill();x.fillStyle='#8a5a32';x.beginPath();x.ellipse(X+20,Y+6,1.5,2.5,0,0,7);x.fill();x.fillStyle='#3f8a3a';x.fillRect(X-6,Y-2,4,3);x.fillRect(X-4,Y-4,2,2);break;
+  case 'luggage':x.fillStyle='#d8a832';x.fillRect(X-20,Y,40,3);x.fillRect(X-20,Y+10,40,3);x.fillRect(X-20,Y-12,3,25);x.fillRect(X+17,Y-12,3,25);x.fillRect(X-20,Y-14,40,2);
+    x.fillStyle='#8a1f27';x.fillRect(X-16,Y+3,14,7);x.fillStyle='#3a6fd0';x.fillRect(X,Y+3,15,7);x.fillStyle='#ffd447';x.fillRect(X-10,Y+5,2,3);x.fillRect(X+7,Y+5,2,3);
+    x.fillStyle='#2a2a30';x.beginPath();x.arc(X-14,Y+16,3,0,7);x.arc(X+14,Y+16,3,0,7);x.fill();x.fillStyle='#ffd447';x.fillRect(X-1,Y-18,2,4);break;
+  case 'wagon':x.fillStyle='#5a3418';x.fillRect(X-22,Y+12,44,2);x.fillStyle='#8a5a32';x.fillRect(X-20,Y,40,11);x.fillStyle='#6a4224';for(let i=0;i<4;i++)x.fillRect(X-18+i*10,Y+1,1,9);x.fillStyle='#c8945a';x.fillRect(X-20,Y,40,2);
+    x.fillStyle='#4a6a3a';x.fillRect(X-14,Y-4,12,4);x.fillRect(X+2,Y-3,12,3);x.fillStyle='#2a2a30';x.beginPath();x.arc(X-12,Y+15,4,0,7);x.arc(X+12,Y+15,4,0,7);x.fill();x.fillStyle='#9aa4ae';x.fillRect(X-13,Y+14,2,2);x.fillRect(X+11,Y+14,2,2);break;
+  case 'minecart':x.fillStyle='#8a4a24';x.beginPath();x.moveTo(X-20,Y);x.lineTo(X+20,Y);x.lineTo(X+16,Y+13);x.lineTo(X-16,Y+13);x.fill();x.fillStyle='#5a2e14';x.fillRect(X-18,Y+5,36,2);x.fillStyle='#b8682e';x.fillRect(X-20,Y,40,2);
+    x.fillStyle='#5ad8b0';x.fillRect(X-12,Y-3,5,3);x.fillRect(X+4,Y-3,6,3);x.fillStyle='#d8783a';x.fillRect(X-5,Y-4,6,4);x.fillStyle='#2a2a30';x.beginPath();x.arc(X-10,Y+15,3,0,7);x.arc(X+10,Y+15,3,0,7);x.fill();break;
   case 'cart':x.strokeStyle='#9aa4ae';x.lineWidth=1.5;x.strokeRect(X-19,Y,38,14);for(let i=1;i<5;i++){x.beginPath();x.moveTo(X-19+i*8,Y);x.lineTo(X-19+i*8,Y+14);x.stroke()}x.beginPath();x.moveTo(X+19,Y);x.lineTo(X+24,Y-6);x.stroke();
     x.fillStyle='#e8403a';x.fillRect(X-19,Y,38,2);x.fillStyle='#2a2a30';x.beginPath();x.arc(X-12,Y+18,3,0,7);x.arc(X+12,Y+18,3,0,7);x.fill();break;
   case 'window':x.strokeStyle='#cfd6e0';x.lineWidth=1;x.beginPath();x.moveTo(X-18,0);x.lineTo(X-18,Y);x.moveTo(X+18,0);x.lineTo(X+18,Y);x.stroke();
@@ -1145,7 +1206,7 @@ function stepCat(p,dt,rdt,w,ph){const K=PK[p.id];cat=p.cat;
   const canWall=(has('wall')||ph.walljump||LEVELS[lvl].walljump)&&!cat.ground&&cat.wallT>0;
   if(ph.ladders){const lc=Math.floor((cat.x+cat.w/2)/T),onL=tile(lc,Math.floor((cat.y+cat.h*.5)/T))==='H'||tile(lc,Math.floor((cat.y+cat.h+1)/T))==='H';
     if(onL&&(K.jump||K.down)&&!(K.down&&cat.ground&&tile(lc,Math.floor((cat.y+cat.h+1)/T))!=='H'))cat.climb=true;if(!onL)cat.climb=false;
-    if(cat.climb){let top=0;while(top<ROWS&&tile(lc,top)!=='H')top++;cat.ladTop=top*T;if(K.jp&&cat.y+cat.h<=cat.ladTop+2){cat.climb=false;cat.coyote=.1}else K.jp=0;cat.air=Math.max(cat.air,0);cat.vx*=.6;if(Math.abs(cat.x+cat.w/2-(lc*T+12))>1&&!(K.left||K.right))cat.x+=(lc*T+12-cat.w/2-cat.x)*.3}}
+    if(cat.climb){let top=Math.floor((cat.y+cat.h*.5)/T);if(tile(lc,top)!=='H')top=Math.floor((cat.y+cat.h+1)/T);while(top>0&&tile(lc,top-1)==='H')top--;cat.ladTop=top*T;if((K.left||K.right)&&cat.y+cat.h<=cat.ladTop+2&&cat.y+cat.h>cat.ladTop)cat.y=cat.ladTop-cat.h;if(K.jp&&cat.y+cat.h<=cat.ladTop+2){cat.climb=false;cat.coyote=.1}else K.jp=0;cat.air=Math.max(cat.air,0);cat.vx*=.6;if(Math.abs(cat.x+cat.w/2-(lc*T+12))>1&&!(K.left||K.right))cat.x+=(lc*T+12-cat.w/2-cat.x)*.3}}
   const inCloud=ph.cloud&&cat.y+cat.h>CLOUDY;if(inCloud&&K.jp&&p.frozen<=0&&cat.y+cat.h<CLOUDY+12){cat.vy=-jv*.85;K.jp=0;sfx.jump();puff(cat.x+cat.w/2,cat.y+cat.h,'#ffffff',8)}
   if(K.jp&&p.frozen<=0){
     if(cat.coyote>0){cat.vy=-jv;cat.coyote=0;K.jp=0;sfx.jump();makeNoise(.08);puff(cat.x+cat.w/2,cat.y+cat.h,DUST[w],5)}
@@ -1931,20 +1992,22 @@ function bgLibrary(){x.fillStyle='#3a2418';x.fillRect(0,0,VW,VH);const bc=['#c83
 
 
 /* ---------- hidden room behind the far wall of Hotel Lobby 2: the VIP secret lobby ---------- */
-const SR_LOUNGE=8,SR_HALL=26,SR_PIANO=50,SR_FOUNT=67,SR_W=78,SR_NOTES=[262,294,330,392,440,523,587,659,784,880,1047,1175,1319,1568,1760,2093,2349,2637,3136,3520];
+const SR_LOUNGE=8;let SR_LW=18,SR_HALL=26,SR_PIANO=52,SR_FOUNT=69,SR_W=81;const SRL={"sx1": ["* *cough cough* Sorry, still a bit sooty.", "* I swept every chimney on the rooftops. Then I swept this one. It's a fake chimney. Fancy!"], "sx2": ["* I swim in the hot tub when nobody is looking.", "* My tail is too sparkly for regular baths. Only VIP water for me."], "sx3": ["* Bubbles! Bubbles everywhere!", "* I used to live down in the sewers. Now I only take bubble baths. Much better smell."], "sx4": ["* Brrr! Is the heat on? I miss the snow.", "* Fun fact: yetis are just big fluffy cats who forgot to stop growing."], "sx5": ["* I'm the fastest cat in the jungle. Wanna race? ...Actually I'm resting. Later.", "* My spots are real. I counted them. There are 57."], "sx6": ["* See that wall? It needs art. Big, colorful, spray-paint art.", "* Velvet says no. Velvet is no fun."], "sx8": ["* Captain speaking! We are now cruising at… couch level.", "* Please keep your paws inside the lounge at all times."], "sx9": ["* I glow in the dark! Turn off the chandeliers and see!", "* Never mind, Velvet said no. Again."], "sx10": ["* Careful! Don't step on me, I'm a little crumbly.", "* The tide almost got me once. Now I live indoors. Very dry. Very safe."], "sx11": ["* VROOOOM! Sorry. I get excited.", "* I'm full of rocket fuel. That's why I can't sit still on the sofa."], "sx12": ["* Make a wish! ...Okay, I can't actually grant it.", "* But I twinkle. That's almost as good."], "sx13": ["* Greetings, Earth cat. Take me to your fish.", "* On Mars we sleep 25 hours a day. It's even better than Earth."], "sx14": ["* Answer my riddle: what has four paws, naps all day, and is the best?", "* A cat. It's always a cat."], "sx15": ["* Och, a fine lobby this is!", "* My coat is made of plaid. Every single hair. It took ages."], "sx16": ["* Do I smell like strawberry? Pistachio? Lemon?", "* Correct! I smell like ALL of them. I am a macaron."], "sx17": ["* Shiver… Don't touch my nose, it's frozen.", "* I like my milk with ice cubes. Lots of ice cubes."], "sx18": ["* Arr, I be the treasure! X marks the cat!", "* Don't tell the pirates where I am. They still be digging."], "sx19": ["* I'm carved from jade. Very rare, very calm.", "* Breathe in… breathe out… now nap. That's my whole plan."], "sx20": ["* I stood still in a museum for 300 years.", "* Then I moved my tail and everyone screamed. Best day ever."], "sx21": ["* Hello! I guard gardens. This lounge has no garden.", "* So I'm guarding that potted plant. With my life."], "sx22": ["* Beep! I scan things. You are… one (1) cat. Price: priceless.", "* Please don't put me in a shopping cart."], "sx23": ["* Oops, I spilled. Again.", "* Every time I sit down, I leave a little paw print. Velvet sighs a lot."], "sx24": ["* Don't worry, I only glow a little bit.", "* The lab said I was \"an accident.\" I prefer \"a surprise.\""], "sx26": ["* 01101101 01100101 01101111 01110111.", "* That means \"meow.\" Obviously."], "sx28": ["* Did you see the sky in Antarctica? That's me. I'm the sky.", "* The penguins say I'm the prettiest lights they've ever seen."], "sx29": ["* Ouch, careful, I'm a bit prickly.", "* But under the prickles I'm soft. Like a thistle. With purrs."], "sx30": ["* Velvet and I are cousins. I'm the royal one.", "* Bow if you like. A small bow is fine. A tiny one."], "sx31": ["* Squish squish. Sorry, still damp from the swamp.", "* The frogs threw me a goodbye party. It was very loud."], "sx32": ["* I was locked in a glass case at the tower. Now I'm free!", "* The guards still think I'm in there. Shhh."], "sx33": ["* Ribbit! …I mean, meow. I mix them up.", "* I can stick to walls. Not this one, it's too fancy."], "sx35": ["* …", "* (You can't see me, but I'm right here. I'm Shadow.)"], "sx36": ["* Hi hi hi! Every color! All at once!", "* My favorite color is yes."], "sx37": ["* Look but don't lick. I'm made of ice.", "* The hot tub is my enemy."], "sx38": ["* When light hits me, I make rainbows on the ceiling!", "* Rainbow and I are best friends. We argue about who is more colorful."], "sx39": ["* Floaaating… I'm a cloud cat. Very light, very fluffy.", "* If I sneeze, it rains. Sorry in advance."], "sx40": ["* I'm taller than I look. In my heart.", "* The redwood forest taught me patience. And climbing."], "sx41": ["* Hmm? Oh, I'm not an alpaca. I'm a cat dressed as an alpaca.", "* Or an alpaca dressed as a cat. I forget."], "sx42": ["* Shine bright! That's my motto.", "* Diamonds are forever. So are naps."], "sx43": ["* It was a dark and stormy night in the lounge…", "* Everything is black and white for me. Even the gelato."], "sx44": ["* MWAHAHA! Oh hello. Want to see my experiment?", "* It's a sandwich. I invented it. Don't tell the lab."], "sx45": ["* I was knitted by a very nice sheep.", "* If you pull my string, I unravel. Please don't."], "sx46": ["* Boing! I'm soft on every side.", "* Jump on me! …Gently. Velvet is watching."], "sx48": ["* Where to? The fountain? Hop in!", "* Meter's running. Just kidding, VIP rides are free."], "sx49": ["* Whoosh! Green, then pink, then purple…", "* Iceland is my home. The puffins say hi."], "sx50": ["* The caverns sparkled, but I sparkle more.", "* I'm a purple crystal. Purple is the most royal color. Sorry, Royal Velvet."], "sx51": ["* Ssssss! Still a little hot from the volcano.", "* I'm cooling off here. Very slowly. Very volcanically."], "sx52": ["* O sole mio~! Sorry, I sing when I paddle.", "* There are no canals here. I paddle the carpet instead."], "sx53": ["* Ahh, smell my breath! Minty fresh!", "* Remember to brush your teeth. The dentist told me to tell you."], "sx54": ["* Splorp. Hi. I'm made of goo.", "* Don't sit on my sofa cushion. It's me. I'm the cushion."], "sx55": ["* Heave-ho! Need anything lifted?", "* I loaded a whole ship by myself. Okay, the crane helped."], "sx56": ["* Mind the gap! Mind the gap!", "* Next stop: the Hall of Secrets. Doors closing."], "sx57": ["* I bought three hats, two scarves and a gelato on the way in.", "* The gift shop doesn't know about the secret lobby. Yet."], "sx58": ["* I'd like to make a speech. Ahem. Fish for everyone!", "* All in favor, say meow."], "sx59": ["* ARE YOU NOT ENTERTAINED?!", "* Sorry. Lounge voice. Are you not entertained?"], "sx60": ["* The lush caves are cozy, but this lounge is cozier.", "* I brought a glow berry. Want half? It's a bit squished."], "sx62": ["* I'm stuffed with hay. Very comfy, slightly itchy.", "* The forest train in Câmpeni dropped me off. Choo choo!"], "sx63": ["* I'm shiny now, but one day I'll turn green. Copper does that.", "* The mine was deep. This sofa is deep too. In a good way."], "sx64": ["* The dam makes electricity. I make purrs.", "* Both are very important."], "sx65": ["* I'm as old as the arches. Okay, not really. But close.", "* Red rock, red cat. I match."], "sx66": ["* Plip! A pine cone fell on my head. Now I AM a pine cone.", "* Trail tip: always bring snacks."], "sx67": ["* The black sand beach was my home. Watch out for sneaky waves!", "* I'm made of cooled-down lava. Very chill."], "sx68": ["* Psst, want a deal? This sofa, only one fish!", "* It's not my sofa. But it's a great deal."], "sx69": ["* EUREKA! You found me! I'm made of real gold!", "* Okay, golden fur. The gold mine ran out of gold."], "sx70": ["* The river sings, and I sing along. Badly.", "* Willow trees are the best for naps. So are sofas."]},SR_NOTES=[262,294,330,392,440,523,587,659,784,880,1047,1175,1319,1568,1760,2093,2349,2637,3136,3520];
 function srLines(){if(LINES.s_velvet)return;LINES.s_velvet=["* Oh! A visitor! Welcome to the SECRET LOBBY.","* Only the cleverest cats ever find that wall.","* I'm Velvet, your VIP concierge. Make yourself at home."];
 ASK.s_velvet=["* Would you like the VIP tour?",["Yes please!",["* First, the VIP Lounge. Secret cats you've found come here to relax.","* Then the Hall of Secrets. Every secret cat has a frame. Can you fill them all?","* Next, the grand piano. Just walk across the keys!","* And last, the Golden Fountain. Boing!"]],["No thanks",["* Of course. Enjoy your stay, VIP."]]];
 LINES.s_pianist=["* (plays a fancy little tune)","* The piano keys are on the floor. Walk on them to play!","* Run fast for a speedy song. Tiptoe for a slow one."];
 LINES.s_fountain=["* Shh, I'm guarding the Golden Fountain.","* Legend says the very first golden fish swam in this water.","* Jump on the golden pad if you want to see the chandeliers up close."];}
 const srSecretWorld=k=>{for(const[w,n] of Object.entries(WORLDS))if(SKINS[k]&&SKINS[k].secret==w)return n;return 'a faraway world'};
-function buildSRoom(){srLines();const E=cols,RW=SR_W,G=LEX+10,H=grid.length;
+function buildSRoom(){srLines();const fnd=Object.keys(SKINS).filter(k=>/^sx\d+$/.test(k)&&((save.secrets||[]).includes(k)||skinSet.has(k)));
+  SR_LW=Math.max(18,fnd.length*3+4);SR_HALL=SR_LOUNGE+SR_LW;SR_PIANO=SR_HALL+26;SR_FOUNT=SR_PIANO+17;SR_W=SR_FOUNT+12;
+  const E=cols,RW=SR_W,G=LEX+10,H=grid.length;
   for(let r=0;r<H;r++)for(let c=0;c<RW;c++)grid[r].push(r>=G||r===LEX||r===LEX+1||c===RW-1?'#':'.');cols=grid[0].length;
   for(let r=LEX;r<G;r++)if(grid[r][E-1]==='#')grid[r][E-1]='W';
   for(const c of [SR_FOUNT-3,SR_FOUNT+4])grid[G-1][E+c]='B';
-  const found=Object.keys(SKINS).filter(k=>/^sx\d+$/.test(k)&&(save.secrets||[]).includes(k));
+  const found=fnd;
   npcs.push({sk:'gold',name:'Velvet',hat:1,key:'s_velvet',x:(E+4)*T+12,face:-1,lines:LINES.s_velvet,pitch:560});
-  found.slice(-6).forEach((k,j)=>npcs.push({sk:k,name:SKINS[k].n,key:'s_'+k,x:(E+SR_LOUNGE+2+j*3)*T+12,face:j%2?1:-1,pitch:[440,520,600,380,700][j%5],
-    lines:["* Psst! You found me back in "+srSecretWorld(k)+"!","* Every secret cat you find gets a spot in the VIP Lounge.","* The cushions here are SO soft."]}));
+  found.forEach((k,j)=>npcs.push({sk:k,name:SKINS[k].n,key:'s_'+k,x:(E+SR_LOUNGE+3+j*3)*T+12,face:j%2?1:-1,pitch:[440,520,600,380,700,480,640][j%7],
+    lines:[...(SRL[k]||["* Psst! You found me back in "+srSecretWorld(k)+"!"])]}));
   npcs.push({sk:'tux',name:'Maestro',key:'s_pianist',x:(E+SR_PIANO+11)*T+12,face:-1,lines:LINES.s_pianist,pitch:480});
   npcs.push({sk:'calico',name:'Goldie',key:'s_fountain',x:(E+SR_FOUNT+6)*T+12,face:-1,lines:LINES.s_fountain,pitch:640});
   
@@ -1968,13 +2031,13 @@ function drawSRoom(){if(!SROOM)return;const E=SROOM.E,RW=SROOM.RW,X=c=>(E+c)*T,x
   // concierge desk
   x.fillStyle='#6b3f1d';x.fillRect(X(2),y1-26,2*T+8,26);x.fillStyle='#ffd447';x.fillRect(X(2),y1-28,2*T+8,3);x.fillStyle='#fff4e0';x.fillRect(X(2)+6,y1-34,8,6);x.fillStyle='#ffd447';x.beginPath();x.arc(X(3)+12,y1-30,3,0,7);x.fill();
   // VIP lounge: velvet sofas and plants
-  sign(X(SR_LOUNGE+9),y0+40,'VIP LOUNGE',96);
-  for(let j=0;j<3;j++){const sx=X(SR_LOUNGE+1+j*6);x.fillStyle='#b0254a';x.fillRect(sx,y1-20,52,20);x.fillRect(sx-4,y1-30,8,30);x.fillRect(sx+48,y1-30,8,30);x.fillStyle='#d8406a';x.fillRect(sx,y1-34,52,14);x.fillStyle='#ffd447';x.fillRect(sx,y1-20,52,2)}
-  for(const c of [SR_LOUNGE,SR_LOUNGE+19]){const px=X(c)+6;x.fillStyle='#c8864a';x.fillRect(px-6,y1-14,14,14);x.fillStyle='#3fae5a';for(const[a,b,r] of[[-4,-20,7],[6,-22,7],[1,-30,8]]){x.beginPath();x.arc(px+a,y1+b,r,0,7);x.fill()}}
-  if(!SROOM.found.length){x.fillStyle='#ffd447aa';x.font='14px VT323, monospace';x.textAlign='center';x.fillText('secret cats you find will relax here',X(SR_LOUNGE+9),y1-48)}
+  sign(X(SR_LOUNGE+SR_LW/2),y0+40,'VIP LOUNGE',96);
+  for(let j=0;j<Math.floor((SR_LW-2)/6);j++){const sx=X(SR_LOUNGE+1+j*6);x.fillStyle='#b0254a';x.fillRect(sx,y1-20,52,20);x.fillRect(sx-4,y1-30,8,30);x.fillRect(sx+48,y1-30,8,30);x.fillStyle='#d8406a';x.fillRect(sx,y1-34,52,14);x.fillStyle='#ffd447';x.fillRect(sx,y1-20,52,2)}
+  for(const c of [SR_LOUNGE,SR_LOUNGE+SR_LW-1]){const px=X(c)+6;x.fillStyle='#c8864a';x.fillRect(px-6,y1-14,14,14);x.fillStyle='#3fae5a';for(const[a,b,r] of[[-4,-20,7],[6,-22,7],[1,-30,8]]){x.beginPath();x.arc(px+a,y1+b,r,0,7);x.fill()}}
+  if(!SROOM.found.length){x.fillStyle='#ffd447aa';x.font='14px VT323, monospace';x.textAlign='center';x.fillText('secret cats you find will relax here',X(SR_LOUNGE+SR_LW/2),y1-48)}
   // Hall of Secrets: one frame for every secret cat
   const ks=Object.keys(SKINS).filter(k=>/^sx\d+$/.test(k)),have=(save.secrets||[]),nf=ks.filter(k=>have.includes(k)).length,per=Math.ceil(ks.length/3),hx=X(SR_HALL);
-  sign(hx+11*T,y0+6,'HALL OF SECRETS  '+nf+'/'+ks.length,190);
+  sign(hx+12*T,y0+6,'HALL OF SECRETS  '+nf+'/'+ks.length,190);
   ks.forEach((k,j)=>{const col=j%per,row=Math.floor(j/per),fx=hx+col*26,fy=y0+30+row*30;x.fillStyle='#ffd447';x.fillRect(fx,fy,24,24);x.fillStyle=have.includes(k)?'#fff4e0':'#1a0d22';x.fillRect(fx+2,fy+2,20,20);
     if(have.includes(k))sprite(CAT.a,SKINS[k],fx,fy+5,2,false);else{x.fillStyle='#ffd44788';x.font='8px "Press Start 2P", monospace';x.textAlign='center';x.fillText('?',fx+12,fy+16)}});
   // grand piano: keys on the floor
@@ -2888,8 +2951,100 @@ if(!save.run&&!save.migrated&&save.beaten.length){const top=Math.max(...save.bea
 save.migrated=1;try{localStorage.setItem(SAVEKEY,JSON.stringify(save))}catch(e){}
 window.claude?.hot?.snapshot?.(()=>({run:runOn&&mode==='story'&&state!=='title'?runData():null}));
 function boot(d){applyHand();if(restoreAll&&d&&d.run){d.run.skinSet=[...new Set([...(d.run.skinSet||[]),...restoreAll])];d.run.powers=[...new Set([...(d.run.powers||[]),'double'])];d.run.picked=true}if(takeBack&&d&&d.run){d.run.skinSet=(d.run.skinSet||[]).filter(k=>!NOTYET.includes(k));d.run.skins=(d.run.skins||[]).map(k=>NOTYET.includes(k)?'orange':k)}renderPowers();if(d&&d.run)resumeRun(d.run);else showTitle();requestAnimationFrame(loop)}
+
+// ---------- worlds 62–70: hints, colors, music, movers, particles, tiles, backgrounds, lore, end-of-world scenes ----------
+Object.assign(HINT,{62:"welcome to the mountains of Romania! hop on the haystacks",63:"a giant open-pit mine! walk DOWN the giant steps, then climb back UP",64:"canyon wind blows across the top of the giant dam",65:"hot desert air: you jump higher!",66:"the oldest, mistiest mountains around. follow the white trail marks!",67:"black sand, basalt pillars and a strong sea wind",68:"bounce on the tent roofs! everything is for sale",69:"the mine has floors! hold jump on a ladder to climb up through the galleries",70:"hop across the river on stones and floating logs"});
+Object.assign(PAGEBG,{62:'#1a2a3a',63:'#2a140a',64:'#1a1a22',65:'#2a1206',66:'#0e1a22',67:'#0e1014',68:'#1a2214',69:'#120c06',70:'#0e1a1a'});
+Object.assign(FISHCOL,{62:'#ffd447',63:'#5ad8b0',64:'#6fd3ff',65:'#ffb07a',66:'#9be36b',67:'#c8ccd4',68:'#ff7fa8',69:'#ffd447',70:'#6fd3ff'});
+Object.assign(DUST,{62:'#8a6a4a',63:'#c87a4a',64:'#c8c4bc',65:'#e8844a',66:'#7a5a3a',67:'#3a3a42',68:'#8a6a4a',69:'#7a5a3a',70:'#8a6a4a'});
+Object.assign(TRACKS,{62:genTrack(621,{bpm:112,root:293.66,scale:[0,1,4,5,7,8,10],lw:'square',bw:'triangle'}),63:genTrack(631,{bpm:96,root:196,scale:[0,2,3,5,7,10],lw:'sawtooth',bw:'triangle'}),64:genTrack(641,{bpm:104,root:220,scale:[0,2,4,7,9],lw:'triangle',bw:'square'}),
+  65:genTrack(651,{bpm:90,root:246.94,scale:[0,3,5,7,10],lw:'triangle',bw:'sine',echo:1}),66:genTrack(661,{bpm:132,root:293.66,scale:[0,2,4,7,9],lw:'square',bw:'triangle'}),67:genTrack(671,{bpm:80,root:220,scale:[0,2,3,7,8],lw:'sine',bw:'triangle',echo:1}),
+  68:genTrack(681,{bpm:118,root:261.63,scale:[0,2,4,5,7,9],lw:'square',bw:'triangle'}),69:genTrack(691,{bpm:92,root:174.61,scale:[0,3,5,6,7,10],lw:'triangle',bw:'sawtooth',echo:1}),70:genTrack(701,{bpm:100,root:329.63,scale:[0,2,4,7,9],lw:'triangle',bw:'sine'})});
+Object.assign(MOVK,{62:['slide','wagon'],63:['slide','minecart'],64:['lift','elevator'],65:['bob','rock'],66:['swing','rope'],67:['bob','surf'],68:['slide','crate'],69:['lift','elevator'],70:['slide','log']});
+Object.assign(AMB,{62:[['leaf',.8],['butterfly',.4]],63:[['sand',2]],64:[['mote',1]],65:[['sand',1.5]],66:[['leaf',1],['firefly',.6]],67:[['gull',.5],['sand',.6]],68:[['petal',.5],['paper',.5]],69:[['mote',2]],70:[['leaf',1],['butterfly',.6],['firefly',.4]]});
+Object.assign(TH,{
+ 62:{body:'#7a5a3a',line:'#5a3e22',top:'#5fae4a',top2:'#9be36b',plank:'#a8743a',plank2:'#7a4a22',spike:'#8a8a92',spike2:'#e8e8e8',pat:'crack',bp:'#e8c25a'},
+ 63:{body:'#b8643a',line:'#8a4422',top:'#d8925a',top2:'#f0b884',plank:'#6a6a72',plank2:'#a8a8b0',spike:'#3fa890',spike2:'#c8fff0',pat:'crack',bp:'#ffd447'},
+ 64:{body:'#c8c4bc',line:'#a8a49c',top:'#e8e4dc',top2:'#ffffff',plank:'#8a8a92',plank2:'#c8c8d0',spike:'#5a5a62',spike2:'#d8dce4',pat:'concrete',bp:'#ffd447'},
+ 65:{body:'#c8582a',line:'#9a3e1a',top:'#e8844a',top2:'#ffb07a',plank:'#b84a22',plank2:'#e8844a',spike:'#7a3a1a',spike2:'#ffd0a0',pat:'crack',bp:'#6fd3ff'},
+ 66:{body:'#5a4a3a',line:'#3a2e22',top:'#3f7a3a',top2:'#6fae5a',plank:'#8a5a32',plank2:'#c8945a',spike:'#6a6a72',spike2:'#d8d8e0',pat:'crack',bp:'#ffd447'},
+ 67:{body:'#26262c',line:'#18181c',top:'#3a3a42',top2:'#5a5a64',plank:'#4a4a54',plank2:'#7a7a88',spike:'#2a2a30',spike2:'#c8ccd4',pat:'crater',bp:'#6fd3ff'},
+ 68:{body:'#7a5a3a',line:'#5a3e22',top:'#5fae4a',top2:'#9be36b',plank:'#c8323c',plank2:'#ffffff',spike:'#8a8a92',spike2:'#e8e8e8',pat:'plank',bp:'#ffd447'},
+ 69:{body:'#4a3a2e',line:'#32261c',top:'#7a5a3a',top2:'#ffd447',plank:'#8a5a32',plank2:'#c8945a',spike:'#8a8a92',spike2:'#ffe88a',pat:'crater',bp:'#ffd447'},
+ 70:{body:'#6a4a2e',line:'#4a321c',top:'#5fae4a',top2:'#9be36b',plank:'#8a5a32',plank2:'#c8945a',spike:'#7a7a82',spike2:'#d8d8e0',pat:'crack',bp:'#6fd3ff'}});
+function pineTree(px,py,h,col){x.fillStyle=col;for(let k=0;k<3;k++){const y0=py-h+k*h*.27,ww=h*(.16+k*.1);x.beginPath();x.moveTo(px,y0);x.lineTo(px-ww,y0+h*.42);x.lineTo(px+ww,y0+h*.42);x.fill()}x.fillRect(px-1,py-h*.12,3,h*.12)}
+function bgCampeni(){grad('#7ab8f0','#e4f2ff');hills('#8aa4c0',140,28,90,.05);hills('#5a8a6a',172,20,70,.12,30);
+  for(let i=0;i<16;i++){const px=wrap(i*37-cam*.2,VW+40)-20;pineTree(px,192+(i*13)%14,24+(i*7)%14,'#2f5a3a')}
+  hills('#7ab85a',205,6,50,.28,10);
+  for(let i=0;i<5;i++){const hx=wrap(i*130+40-cam*.35,VW+170)-85,wd=i%2?'#a8743a':'#f0e4c8';x.fillStyle=wd;x.fillRect(hx,206,40,32);x.fillStyle='#4a3424';x.beginPath();x.moveTo(hx-6,208);x.lineTo(hx+20,172);x.lineTo(hx+46,208);x.fill();
+    x.fillStyle='#4a6a8a';x.fillRect(hx+8,216,8,8);x.fillRect(hx+24,216,8,8);x.fillStyle='#5a3a22';x.fillRect(hx+17,226,7,12);
+    if(i===2){x.fillStyle='#8a5a32';x.fillRect(hx+46,182,16,56);x.fillStyle='#3a2a1a';x.beginPath();x.moveTo(hx+42,184);x.lineTo(hx+54,110);x.lineTo(hx+66,184);x.fill();x.fillStyle='#ffd447';x.fillRect(hx+53,100,2,12);x.fillRect(hx+49,104,10,2)}}
+  for(let i=0;i<6;i++){const sx=wrap(i*90+20-cam*.5,VW+90)-45;x.fillStyle='#6a4a2a';x.fillRect(sx-1,192,2,48);x.fillStyle='#d8b04a';x.beginPath();x.moveTo(sx-15,240);x.quadraticCurveTo(sx-16,210,sx,202);x.quadraticCurveTo(sx+16,210,sx+15,240);x.fill();
+    x.strokeStyle='#b8902a';x.lineWidth=1;for(let k=0;k<3;k++){x.beginPath();x.moveTo(sx-12+k*2,214+k*8);x.lineTo(sx+12-k*2,214+k*8);x.stroke()}}}
+function bgCopperPit(){grad('#9ac8e8','#f4dcb8');hills('#9a5a32',112,8,80,.05);x.fillStyle='#9a5a32';x.fillRect(0,116,VW,VH);
+  const bx=wrap(450-cam*.15,1400)-500,tones=['#d88a5a','#c87a4a','#b8693e','#c87a4a','#a85a32','#b8693e','#9a4e2a','#a85a32','#8a4422'];
+  for(let k=0;k<9;k++){const y=118+k*15,l=bx-470+k*42,rr=bx+470-k*42;x.fillStyle=tones[k];x.fillRect(l,y,rr-l,15);x.fillStyle='#f0b88466';x.fillRect(l,y,rr-l,2);x.fillStyle='#00000022';x.fillRect(l,y+13,rr-l,2);
+    if(k===2||k===5){const tx=l+((t*24+k*130)%Math.max(40,rr-l-20));x.fillStyle='#ffd447';x.fillRect(tx,y-6,14,6);x.fillRect(tx+10,y-9,5,4);x.fillStyle='#2a2a30';x.fillRect(tx+1,y-1,4,3);x.fillRect(tx+9,y-1,4,3)}}
+  x.fillStyle='#3fc8b0';x.fillRect(0,252,VW,VH-252);x.fillStyle='#8af0dc';for(let i=0;i<10;i++){const rx=wrap(i*53+t*12-cam*.6,VW+40)-20;x.fillRect(rx,258+(i*7)%22,12,2)}}
+function bgHoover(){grad('#6aa8e0','#f4d8a8');hills('#b8784a',150,22,60,.05);const dx=wrap(260-cam*.1,VW+520)-260;
+  x.fillStyle='#3a7ab8';x.fillRect(dx-300,78,600,16);
+  x.fillStyle='#8a4a2a';x.beginPath();x.moveTo(dx-420,50);x.lineTo(dx-150,84);x.lineTo(dx-110,240);x.lineTo(dx-420,240);x.fill();x.beginPath();x.moveTo(dx+420,50);x.lineTo(dx+150,84);x.lineTo(dx+110,240);x.lineTo(dx+420,240);x.fill();
+  x.fillStyle='#e0dcd0';x.beginPath();x.moveTo(dx-150,88);x.quadraticCurveTo(dx,104,dx+150,88);x.lineTo(dx+110,240);x.quadraticCurveTo(dx,250,dx-110,240);x.closePath();x.fill();
+  x.fillStyle='#c8c4b888';for(let k=-4;k<=4;k++)x.fillRect(dx+k*28,96+Math.abs(k)*-1,2,140);x.fillStyle='#a8a498';x.fillRect(dx-150,84,300,5);
+  for(const [ox,hh] of [[-128,40],[-84,48],[70,48],[114,40]]){x.fillStyle='#d8d4c8';x.fillRect(dx+ox,86-hh,14,hh);x.fillStyle='#b8b4a8';x.fillRect(dx+ox-2,86-hh,18,5);x.fillStyle='#e8c25a';x.fillRect(dx+ox+5,80-hh,4,6)}
+  x.fillStyle='#2a6ab0';x.fillRect(dx-110,236,220,10);
+  for(let i=0;i<4;i++){const px=wrap(i*170-cam*.45,VW+170)-85;x.strokeStyle='#4a4a52';x.lineWidth=2;x.beginPath();x.moveTo(px-12,238);x.lineTo(px,130);x.lineTo(px+12,238);x.moveTo(px-14,146);x.lineTo(px+14,146);x.moveTo(px-8,190);x.lineTo(px+8,160);x.moveTo(px+8,190);x.lineTo(px-8,160);x.stroke();
+    x.strokeStyle='#2a2a30';x.lineWidth=1;x.beginPath();x.moveTo(px-14,146);x.quadraticCurveTo(px+71,166,px+156,146);x.stroke();x.beginPath();x.moveTo(px+14,146);x.quadraticCurveTo(px+99,170,px+184,146);x.stroke()}}
+function bgArches(){grad('#4a90e0','#ffd8a0');for(let i=0;i<4;i++){const mx=wrap(i*210-cam*.06,VW+240)-120;x.fillStyle='#c8704a88';x.beginPath();x.moveTo(mx-20,240);x.lineTo(mx,130+(i%2)*20);x.lineTo(mx+130,130+(i%2)*20);x.lineTo(mx+150,240);x.fill()}
+  const arch=(cx,base,w,h,th)=>{x.strokeStyle='#b84a22';x.lineWidth=th;x.beginPath();x.ellipse(cx,base-h*.15,w/2,h,0,Math.PI,0);x.stroke();x.fillStyle='#b84a22';x.fillRect(cx-w/2-th/2,base-h*.15,th,h*.15+4);x.fillRect(cx+w/2-th/2,base-h*.15,th,h*.15+4);
+    x.strokeStyle='#e8844a';x.lineWidth=3;x.beginPath();x.ellipse(cx,base-h*.15,w/2+th/2-2,h+th/2-2,0,Math.PI*1.1,Math.PI*1.6);x.stroke()};
+  for(let i=0;i<3;i++){const ax=wrap(i*230+60-cam*.25,VW+300)-150;x.fillStyle='#c8582a';x.fillRect(ax-90,206,180,36);arch(ax,206,[110,70,150][i],[70,52,90][i],[18,14,22][i])}
+  for(let i=0;i<2;i++){const bx=wrap(i*300+180-cam*.4,VW+300)-150;x.fillStyle='#a8481e';x.fillRect(bx-8,160,16,80);x.fillStyle='#c8582a';x.beginPath();x.ellipse(bx,152,22,16,0,0,7);x.fill();x.fillStyle='#e8844a66';x.beginPath();x.ellipse(bx-6,146,10,6,0,0,7);x.fill()}
+  hills('#e8a060',236,4,50,.55)}
+function bgPines(){grad('#a8c0d8','#eef2f6');x.fillStyle='#fff8d8';x.beginPath();x.arc(wrap(360-cam*.02,VW+80)-40,60,18,0,7);x.fill();
+  const cs=['#a0b4cc','#8298b4','#68809c','#4e6884','#36506a'];for(let k=0;k<5;k++){hills(cs[k],108+k*22,16+k*4,60+k*14,.04+k*.08,k*97);x.fillStyle='#ffffff26';x.fillRect(0,118+k*22,VW,10)}
+  for(let i=0;i<28;i++){const px=wrap(i*19-cam*.42,VW+40)-20;pineTree(px,236+(i*7)%6,22+(i*13)%18,'#1e3448')}
+  x.fillStyle='#ffffff30';for(let k=0;k<3;k++){x.beginPath();x.ellipse(wrap(k*190+t*8-cam*.1,VW+260)-130,150+k*28,150,9,0,0,7);x.fill()}}
+function bgBlackSand(){grad('#8a96a4','#d0d6dc');hills('#4f6e4f',118,38,70,.05);hills('#6a944f',142,26,52,.08,40);x.fillStyle='#ffffffb0';const wf=wrap(300-cam*.08,VW+300)-150;x.fillRect(wf,104,3,58);
+  x.fillStyle='#86b85e55';for(let i=0;i<20;i++)x.fillRect(wrap(i*29-cam*.08,VW)-2,130+(i*17)%30,10,3);
+  x.fillStyle='#2a3a4a';x.fillRect(0,214,VW,VH-214);
+  for(let i=0;i<46;i++){const px=wrap(i*14-cam*.32,46*14)-40;if(px>VW+14)continue;const h=18+Math.max(0,Math.sin(i*.33)*92)+((i*37)%4)*7;if(h<22)continue;
+    x.fillStyle='#24242a';x.fillRect(px,236-h,14,h);x.fillStyle='#45454f';x.fillRect(px,236-h,14,4);x.fillStyle='#16161a';x.fillRect(px+13,236-h,1,h);x.fillStyle='#35353d';for(let k=1;k<h/26;k++)x.fillRect(px,236-h+k*26,14,1)}
+  x.fillStyle='#e8eef4';for(let px=0;px<VW;px+=6){const y=226+Math.sin(px/22+t*2)*2.5;x.fillRect(px,y,6,2)}}
+function bgFlea(){grad('#8ac8f8','#eaf6ff');for(let i=0;i<4;i++){const mx=wrap(i*170-cam*.05,VW+200)-100,mh=90+(i*31)%40;x.fillStyle='#6a8aa8';x.beginPath();x.moveTo(mx-110,200);x.lineTo(mx,200-mh*1.4);x.lineTo(mx+110,200);x.fill();x.fillStyle='#ffffff';x.beginPath();x.moveTo(mx-24,200-mh*1.4+34);x.lineTo(mx,200-mh*1.4);x.lineTo(mx+24,200-mh*1.4+34);x.lineTo(mx+8,200-mh*1.4+28);x.lineTo(mx-6,200-mh*1.4+36);x.fill()}
+  hills('#6faa5a',198,8,70,.2);const cs=[['#c8323c','#ffffff'],['#3a6fd0','#ffd447'],['#2f8a4a','#ffffff'],['#ff8a2a','#fff3b0'],['#9a5ad8','#ffffff']];
+  for(let i=0;i<7;i++){const tx=wrap(i*95-cam*.4,VW+95)-48,[c1,c2]=cs[i%5];x.fillStyle='#5a4a3a';x.fillRect(tx,198,2,40);x.fillRect(tx+62,198,2,40);
+    for(let s=0;s<8;s++){x.fillStyle=s%2?c2:c1;x.beginPath();x.moveTo(tx-4+s*9,200);x.lineTo(tx+32,180);x.lineTo(tx+5+s*9,200);x.fill()}
+    x.fillStyle='#8a5a32';x.fillRect(tx+4,220,56,4);const it=['#6fd3ff','#ffd447','#c8323c','#9be36b','#f4f0e6','#b48cff'];for(let k=0;k<4;k++){x.fillStyle=it[(i+k)%6];x.fillRect(tx+8+k*13,210-(k%2)*4,8,10+(k%2)*4)}}
+  for(let i=0;i<7;i++){const tx=wrap(i*95-cam*.4,VW+95)-48+32;for(let k=1;k<10;k++){const px=tx+k*9.5,py=180+Math.sin(k/10*Math.PI)*14;x.fillStyle=['#ffd447','#ff7fa8','#6fd3ff','#9be36b'][(k+i+Math.floor(t*2))%4];x.fillRect(px,py,3,3)}}}
+function bgGoldMine(){x.fillStyle='#1e1610';x.fillRect(0,0,VW,VH);const ox=cam*.5,oy=camY*.6;
+  x.fillStyle='#2a2018';for(let i=0;i<34;i++){const px=wrap(i*67-ox*.7,VW+80)-40,py=wrap(i*113-oy*.7,VH+80)-40;x.beginPath();x.ellipse(px,py,22+(i%3)*8,12+(i%4)*4,0,0,7);x.fill()}
+  for(let i=0;i<20;i++){const vx=wrap(i*71-ox*.8,VW+40)-20,vy=wrap(i*131-oy*.8,VH+40)-20;x.strokeStyle='#c8a030';x.lineWidth=2;x.beginPath();x.moveTo(vx,vy);x.lineTo(vx+8,vy+5);x.lineTo(vx+14,vy+2);x.lineTo(vx+22,vy+8);x.stroke();
+    if((Math.floor(t*2)+i)%5===0){x.fillStyle='#fff3b0';x.fillRect(vx+12,vy,2,2);x.fillRect(vx+11,vy+1,4,0.8)}}
+  for(let i=0;i<4;i++)for(let j=0;j<4;j++){const fx=wrap(i*150-ox,VW+150)-75,fy=wrap(j*110-oy,VH+110)-55;x.fillStyle='#5a3e22';x.fillRect(fx-40,fy,7,96);x.fillRect(fx+33,fy,7,96);x.fillStyle='#7a5432';x.fillRect(fx-46,fy-6,92,8);
+    x.fillStyle='#ffb34722';x.beginPath();x.arc(fx,fy+12,24,0,7);x.fill();x.fillStyle='#3a2a1a';x.fillRect(fx-1,fy+2,2,5);x.fillStyle='#ffd447';x.fillRect(fx-3,fy+7,6,7)}}
+function bgRiverside(){grad('#8ac8f0','#e8f6ff');hills('#7aa88a',160,20,90,.06);hills('#5a9a5a',192,14,60,.15,20);
+  const mx=wrap(380-cam*.35,VW+520)-260;x.fillStyle='#c8b090';x.fillRect(mx,172,64,66);x.fillStyle='#8a3a2a';x.beginPath();x.moveTo(mx-6,174);x.lineTo(mx+32,146);x.lineTo(mx+70,174);x.fill();x.fillStyle='#4a6a8a';x.fillRect(mx+12,190,10,10);x.fillRect(mx+40,190,10,10);
+  x.save();x.translate(mx-14,208);x.rotate(t*.8);x.strokeStyle='#6a4a2a';x.lineWidth=4;x.beginPath();x.arc(0,0,28,0,7);x.stroke();x.lineWidth=3;for(let k=0;k<8;k++){x.beginPath();x.moveTo(0,0);x.lineTo(Math.cos(k*Math.PI/4)*28,Math.sin(k*Math.PI/4)*28);x.stroke()}x.restore();
+  for(let i=0;i<4;i++){const wx=wrap(i*170-cam*.3,VW+170)-85;x.fillStyle='#5a3e22';x.fillRect(wx-4,168,8,72);x.fillStyle='#6fae4a';x.beginPath();x.ellipse(wx,164,42,28,0,0,7);x.fill();
+    x.strokeStyle='#8acc5a';x.lineWidth=2;for(let k=-5;k<=5;k++){const sx=wx+k*7;x.beginPath();x.moveTo(sx,170);x.quadraticCurveTo(sx+Math.sin(t*1.5+k)*4,200,sx+Math.sin(t*1.5+k)*6,226-Math.abs(k)*3);x.stroke()}}
+  x.fillStyle='#3a8ad0';x.fillRect(0,234,VW,VH-234);x.fillStyle='#9fd8ff';for(let i=0;i<14;i++){const rx=wrap(i*41+t*30-cam*.6,VW+40)-20;x.fillRect(rx,240+(i*11)%40,14,2)}}
+BG[62]=bgCampeni;BG[63]=bgCopperPit;BG[64]=bgHoover;BG[65]=bgArches;BG[66]=bgPines;BG[67]=bgBlackSand;BG[68]=bgFlea;BG[69]=bgGoldMine;BG[70]=bgRiverside;
+Object.assign(LORE,{
+62:'Câmpeni is a little town in the Apuseni Mountains of Romania, with wooden houses, tall haystacks and a river running right through it. The village grandmas say a cat with a book came here long ago and asked about two treasures hidden under the mountains: one copper and one gold. They pointed you up the valley.',
+63:'This mine is a giant hole dug in giant steps, so the trucks can drive all the way down and back up again. Rain makes a blue-green lake at the very bottom, colored by the copper in the rocks. On the lowest step you found a shiny copper fish… with a star on its tail.',
+64:'This enormous concrete wall holds back a whole river to make a lake. The water spins giant turbines that make electricity for millions of people. The dam keeper says a cloaked visitor once asked to borrow some electricity… "to light up a door," they said.',
+65:'Wind, rain and ice spent millions of years carving these red rocks into more than two thousand stone arches. Some look like windows and some look like bridges. At sunset, the shadow of the biggest arch on the sand is shaped exactly like a fish.',
+66:'These are some of the oldest mountains on Earth, older than the dinosaurs, worn round and soft by time. Little white paint marks on the trees show a hiking trail that runs for more than two thousand miles. Around the campfire, hikers play an old banjo song about a cat who explores every world.',
+67:'The sand here is black because it is made of tiny bits of cooled lava. The tall basalt pillars formed when lava cooled slowly and cracked into six-sided columns, like a giant\'s pipe organ. Behind them, green moss covers the mountains like a fluffy blanket. Watch out for sneaky waves!',
+68:'On market day, everyone in the mountain village sells their old treasures: lamps, teapots, roller skates and one very old map. The map seller had just a torn corner of it. "Not for sale," she said, "it belongs to the Explorer." Then she gave it to you for free. It\'s the missing piece!',
+69:'Some gold mine tunnels in these mountains were dug almost two thousand years ago, all by hand! Miners built floor after floor of tunnels, called galleries, connected by ladders. On the deepest floor the walls glitter with gold, and someone scratched a fish right next to a keyhole.',
+70:'The river is calm and sparkly, with willow trees dipping their branches in the water and an old mill wheel turning and turning. You held up the map, now finally whole, next to the river\'s reflection. It shows the way back… to the Hotel Lobby.'});
+Object.assign(CUTS,{62:ridePlain(62,vTrain('#2f6b4a','#c8323c'),{seat:[-20,-42]}),63:ridePlain(63,(a,b)=>vVan(a,b,'ORE TRUCK'),{seat:[10,-46]}),64:()=>pickup(64,fBalloon,{hold:[0,-2],exitX:120}),65:ridePlain(65,(a,b)=>vVan(a,b,'ROAD TRIP'),{seat:[10,-46]}),
+  66:()=>pickup(66,fKite,{hold:[0,-4]}),67:ridePlain(67,vFerry,{water:1,seat:[-30,-14]}),68:()=>sceneTrapdoor(68),69:ridePlain(69,vTrain('#5a4a3a','#ffd447'),{seat:[-20,-42]}),70:()=>scenePortal(70)});
 window.claude?.hot?.ready?window.claude.hot.ready(boot):boot(window.claude?.hot?.data??{});
 </script>
+
 <script id="no-zoom">/* iPhone Safari ignores user-scalable=no, so block its pinch gesture directly */['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault()},{passive:false})});document.addEventListener('touchmove',function(e){if(e.touches.length>1)e.preventDefault()},{passive:false});</script>
 <script id="hud-edge">(function(){var h=document.querySelector('.hud');if(!h)return;function f(){document.documentElement.style.setProperty('--hudB',Math.ceil(h.getBoundingClientRect().bottom)+'px')}if(window.ResizeObserver){var o=new ResizeObserver(f);o.observe(h);o.observe(document.body)}new MutationObserver(function(){requestAnimationFrame(f)}).observe(document.body,{attributes:true,attributeFilter:['class']});addEventListener('resize',f);addEventListener('orientationchange',function(){setTimeout(f,300)});f()})();</script>
 </body></html>

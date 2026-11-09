@@ -4,7 +4,7 @@ Everything is in one file, [`index.html`](index.html) (HTML, CSS and JavaScript;
 The only outside resource is two Google Fonts (Press Start 2P and VT323); without internet it falls back to a monospace font.
 This guide explains how the file is organized, how it changed over time, and how to check or rebuild it.
 
-**Current file:** about 2,880 lines, published as claude.ai artifact version 1794113580-e234 (publish #105) on 2026-11-07.
+**Current file:** published as claude.ai artifact version 1794197392-7fa5 (publish #108) on 2026-11-08; 70 worlds, 341 levels.
 Line numbers in the map below are from version 53 and have shifted; search for the names instead.
 The artifact page and this repo copy contain the same game; the repo copy adds a small `<!doctype html>` wrapper around it.
 
@@ -84,6 +84,7 @@ The rounds match the plan iterations in [`PLAN.md`](PLAN.md#7-plan-iterations).
 | 102 | 2026-11-05 | – | Another session: Lore Book (📖 button, `LORE`, `save.lore`). |
 | 103 | 2026-11-06 | 29 | VIP secret lobby (no skin unlocks); Lobby 2 floor +40 tiles (gelato/ball-pit fix). All levels load with no errors. |
 | 105 | 2026-11-07 | 30 | `fitFull()`: in full-screen mode the stage width is computed from the real visible height (minus HUD, safe areas) so the whole game fits a landscape phone; choice saved in `whiskerdash_full`. |
+| 106–108 | 2026-11-08 | 31 | Other session: worlds 62–70. Then: `luggage`, `wagon`, `minecart` mover sprites (`MOVK` 27, 61, 62, 63); secret cats moved into the secret lobby with unique lines (`SRL`, `SR_LW` sizes the lounge); repo phone fixes merged in. Tests: smoke (341 levels, 0 errors) and mechanics all OK. |
 
 ## 5. How it was tested
 

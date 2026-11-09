@@ -150,8 +150,8 @@ Entering it unlocks **Hand-Drawn mode** (toggle on the title screen or pause men
 ### 🤫 Spoiler: the secret lobby (developer notes; the designer asked not to be told where it is)
 Lobby 2's far-right end wall is fake (tile `W`: drawn like `#`, not solid). Walking into it leads to a hidden **VIP secret lobby**
 (`buildSRoom()`, 78 columns). It does **not** unlock skins (changed 2026-11-06 at the designer's request). Left to right:
-Velvet the concierge (gold cat with a desk, offers a VIP tour), the **VIP Lounge** (velvet sofas; up to 6 secret cats you have
-already found relax there and say which world you found them in), the **Hall of Secrets** (a framed portrait for every secret cat:
+Velvet the concierge (gold cat with a desk, offers a VIP tour), the **VIP Lounge** (velvet sofas; every secret cat you have
+found relaxes there (the lounge grows to fit) and each has its own lines (`SRL`); secret cats never appear with the regular lobby friends), the **Hall of Secrets** (a framed portrait for every secret cat:
 found ones in color, the rest "?", with a found/total counter), a **grand piano** whose keys are on the floor (walk across to play;
 Maestro the tuxedo cat), and the **Golden Fountain** with two bounce pads (Goldie the calico). Chandeliers, carpet and signs.
 The camera is clamped (`srCam`) so the room can't be seen from outside. The old "Rat King" secret skin is now **Bubble Bath**.
@@ -209,6 +209,7 @@ Each row is one round of requests from the designer and what the plan became. Ex
 | 26 | Other sessions (10-26 to 11-02) | Worlds 50–61 (Crystal Caverns → Hotel Lobby 2), secret skins and accessories hidden in each world (5 animal versions each), 5 save slots with names, Tiny Mode, Hand-Drawn mode, Lucky Cat, a one-time owner progress restore. Detail is in the game file, not recorded round by round here. |
 | 27 | Restore request (11-02) | A one-time "Restore my run · Antarctica 4" button was built and tested but **not published** (the designer stopped it). |
 | 28 | Secret lobby (11-04) | A hidden secret lobby in Lobby 2 holding every secret skin; Rat King renamed Bubble Bath. Release copy without Google fonts sent for the class. |
+| 29 | Sprites and secret cats (11-08) | Moving platforms get the right look: luggage carts in the hotel lobbies, a hay wagon in Câmpeni, an ore mine cart in the Copper Mine (shopping carts stay in The Store only). Secret cats no longer hang out with regular lobby friends: every secret cat you have found lives in the secret lobby's VIP Lounge (it grows to fit all 64), each with its own lines (`SRL`). Phone fixes from the repo (no pinch zoom, no long-press select, menus fit) carried into the claude.ai version. |
 
 ## 8. Ideas not built yet
 
