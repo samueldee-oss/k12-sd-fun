@@ -2916,6 +2916,8 @@ addEventListener('resize',()=>{fitT=0});
 function goTouch(){if(document.body.classList.contains('touch'))return;document.body.classList.add('touch');$('tip').textContent=numP>1?'P1 uses the left buttons, P2 the right ones. Tap jump lightly for a small hop.':'Use the buttons under the game. Tap jump lightly for a small hop.'}
 addEventListener('touchstart',goTouch,{passive:true});addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||e.pointerType==='pen')goTouch()});
 if(matchMedia('(pointer:coarse)').matches)document.body.classList.add('touch');
+/* Touch, 1 player: a tap anywhere in the right 30% of the screen works like holding JUMP (hold for a higher jump) */
+{const jz=new Set();document.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'||numP!==1||!$('ov').hidden||e.clientX<innerWidth*.7)return;if(e.target.closest&&e.target.closest('button,a,input,textarea,.lore,.overlay'))return;e.preventDefault();jz.add(e.pointerId);press(0,'jump')},{passive:false});const jup=e=>{if(jz.delete(e.pointerId)&&!jz.size)PK[0].jump=0};document.addEventListener('pointerup',jup);document.addEventListener('pointercancel',jup)}
 // fullscreen: real browser fullscreen where allowed, plus a fill-the-screen layout everywhere
 let realFull=false;
 function wideVW(W,H){if(!(W>0&&H>0))return 480;const v=Math.max(480,Math.min(720,Math.round(VH*W/H/2)*2));return grid&&(LEVELS[lvl].vg||cols*T<v)?480:v}
