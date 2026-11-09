@@ -542,7 +542,7 @@ function bladeSound(spin, cutting, over){
    fingerpicked acoustic-guitar loop with a short original melody, a slow mellow
    bassline, and the whole thing filtered like an old record. Ambience underneath:
    vinyl crackle and pops, cozy hiss, gentle rain and distant city noise.
-   Zen Tower plays the same track without drums. */
+   Zen Tower plays the same track, drums included. */
 const music = { track:null, next:0, step:0, amb:false, guitarBus:null, nextCar:0 };
 function pickTrack(){
   const want = game && game.zen && (state === 'play' || state === 'pause') ? 'lofi-zen' : 'lofi';
@@ -599,7 +599,7 @@ function carPass(t){                    // a far-off car sliding from one side t
 }
 function duck(t){ const g = music.guitarBus.gain; g.cancelScheduledValues(t); g.setValueAtTime(0.6, t); g.linearRampToValueAtTime(1, t + 0.3); }
 function musicStep(t){
-  const s = music.step, M = musicBus, i = s % 16, bar = Math.floor(s/16) % 4, ch = LOFI[bar], zen = music.track === 'lofi-zen';
+  const s = music.step, M = musicBus, i = s % 16, bar = Math.floor(s/16) % 4, ch = LOFI[bar];
   const tt = t + (i % 2 ? STEP*SWING : 0);   // a light swing on the off-beats
   if (!music.guitarBus){ music.guitarBus = actx.createGain(); music.guitarBus.connect(M); }
   if (!music.amb){ startAmbience(); music.nextCar = t + 6; }
@@ -615,8 +615,7 @@ function musicStep(t){
   // slow mellow bass: long notes, a gentle step up into the next bar
   if (i === 0) tone('sine', midi(ch.root + 12), tt, 1.9, 0.15, M, ['lowpass', 320], 0.04);
   if (i === 12) tone('sine', midi(ch.root + 19), tt, 0.7, 0.09, M, ['lowpass', 320], 0.04);
-  if (zen) return STEP;
-  // steady head-nod beat: kick on 1 and the "and" of 3, snare on 2 and 4, steady hats
+  // steady head-nod beat (Zen Tower too): kick on 1 and the "and" of 3, snare on 2 and 4, steady hats
   if (i === 0 || i === 10){ tone('sine', [110, 45], tt, 0.36, 0.3, M, ['lowpass', 300]); grain(tt, 2800, 0.012, 0.015, 0, 1, M); duck(tt); }
   if (i === 4 || i === 12){ grain(tt, 1800, 0.18, 0.06, 0, 0.6, M); tone('sine', [200, 160], tt, 0.1, 0.06, M); grain(tt, 4200, 0.05, 0.02, 0, 0.7, M); }
   if (i % 2 === 0) grain(tt, 7500, 0.03, i % 4 === 2 ? 0.022 : 0.014, 0.25, 0.8, M);
