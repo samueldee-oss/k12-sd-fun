@@ -531,51 +531,84 @@ function bladeSound(spin, cutting, over){
   motor.scrape.g.gain.setTargetAtTime(c ? (r() < 0.3 ? 0.04 : 0.012) : 0, t, 0.04);   // coarse scrape, in uneven strokes
 }
 
-/* music: slow lo-fi for levels, a calm pad for menus and Zen Tower */
-const music = { track:null, next:0, step:0 };
+/* music: lo-fi everywhere (no piano). Swung 16ths at 74 bpm: lazy drums, warm wobbly
+   tape chords, a breathy flute line, round bass, vinyl crackle and tape hiss.
+   Zen Tower plays the same track without drums. */
+const music = { track:null, next:0, step:0, hiss:null, phrase:[] };
 function pickTrack(){
-  const want = (state === 'play' || state === 'pause' || state === 'done') && game && !game.zen ? 'lofi' : 'zen';
-  if (music.track !== want){ music.track = want; music.step = 0; music.next = actx ? actx.currentTime + 0.15 : 0; }
+  const want = game && game.zen && (state === 'play' || state === 'pause') ? 'lofi-zen' : 'lofi';
+  if (music.track !== want){ const keep = music.track && music.track.startsWith('lofi'); music.track = want; if (!keep){ music.step = 0; music.next = actx ? actx.currentTime + 0.15 : 0; } }
   applyVolumes();
 }
 const LOFI = [ { root:41, chord:[53,57,60,64] }, { root:40, chord:[52,55,59,62] }, { root:38, chord:[50,53,57,60] }, { root:36, chord:[48,52,55,59] } ];
-const ZEN = [ [48,52,55,59], [45,48,52,55], [41,45,48,52], [43,47,50,52] ];
-function softPad(notes, t, len, vol){
-  for (const m of notes){
-    const o = actx.createOscillator(), g = actx.createGain(), f = actx.createBiquadFilter();
-    o.type = 'sine'; o.frequency.value = midi(m); f.type = 'lowpass'; f.frequency.value = 700;
-    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + len*0.4); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
-    o.connect(f).connect(g).connect(musicBus); o.start(t); o.stop(t + len + 0.05);
+const STEP = 60/74/4, SWING = 0.34;
+function tapeChord(notes, t, len, vol){   // two detuned saws, low-passed, with a slow tape wobble
+  const a = actx, f = a.createBiquadFilter(), g = a.createGain(), wob = a.createOscillator(), wg = a.createGain();
+  f.type = 'lowpass'; f.frequency.value = 850; f.Q.value = 0.4;
+  wob.frequency.value = 0.45; wg.gain.value = 7;  // cents of wow
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.35); g.gain.setValueAtTime(vol, t + len - 0.6); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+  wob.connect(wg); f.connect(g).connect(musicBus);
+  for (const m of notes) for (const d of [-6, 6]){
+    const o = a.createOscillator(); o.type = 'sawtooth'; o.frequency.value = midi(m); o.detune.value = d;
+    wg.connect(o.detune); o.connect(f); o.start(t); o.stop(t + len + 0.05);
   }
+  wob.start(t); wob.stop(t + len + 0.05);
+}
+function flute(m, t, len, vol){           // breathy sine with a little vibrato and air
+  const a = actx, o = a.createOscillator(), g = a.createGain(), vib = a.createOscillator(), vg = a.createGain(), f = a.createBiquadFilter();
+  o.type = 'sine'; o.frequency.value = midi(m); vib.frequency.value = 5; vg.gain.value = 9;
+  vib.connect(vg).connect(o.detune);
+  f.type = 'lowpass'; f.frequency.value = 2200;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.12); g.gain.setValueAtTime(vol*0.85, t + len*0.6); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+  o.connect(f).connect(g).connect(musicBus); o.start(t); vib.start(t); o.stop(t + len + 0.05); vib.stop(t + len + 0.05);
+  grain(t, midi(m)*3, Math.min(0.25, len), vol*0.25, 0, 3, musicBus);   // breath
+}
+function newPhrase(chord){                // a short melody from chord tones and the pentatonic scale
+  const pool = [chord[1]+12, chord[2]+12, chord[3]+12, 72, 74, 76, 79, 81], out = [];
+  let i = 0;
+  while (i < 32){ if (Math.random() < 0.55){ const len = [2, 3, 4, 6][Math.floor(Math.random()*4)]; out.push({ at:i, m:pool[Math.floor(Math.random()*pool.length)], len }); i += len; } else i += 2; }
+  return out;
 }
 function musicStep(t){
-  const s = music.step, M = musicBus;
-  if (Math.random() < 0.3) grain(t + Math.random()*0.2, 3500 + Math.random()*3000, 0.004, 0.012 + Math.random()*0.01, (Math.random() - 0.5)*1.4, 1.5, M);   // vinyl crackle
-  if (music.track === 'lofi'){             // 72 bpm, 16th-note steps
-    const bar = Math.floor(s/16) % 4, i = s % 16, ch = LOFI[bar];
-    if (i === 0 || i === 10) tone('sine', [110, 44], t, 0.35, 0.28, M, ['lowpass', 380]);
-    if (i === 4 || i === 12) grain(t, 2400, 0.22, 0.045, 0, 0.5, M);           // brushed snare
-    if (i % 4 === 2) grain(t, 6500, 0.04, 0.01, 0.3, 0.8, M);                  // shaker
-    if ([0, 7, 10].includes(i)) tone('sine', midi(ch.root + 12), t, 0.5, 0.13, M, ['lowpass', 450], 0.02);
-    if (i === 0) softPad(ch.chord.slice(0, 3).map(m => m - 12), t, 4*16*60/72/4*0.25, 0.022);   // warm pad under the beat
-    return 60/72/4;
+  const s = music.step, M = musicBus, i = s % 16, bar = Math.floor(s/16) % 4, ch = LOFI[bar], zen = music.track === 'lofi-zen';
+  const tt = t + (i % 2 ? STEP*SWING : 0);   // swing the off-beats
+  if (!music.hiss){                          // tape hiss bed
+    const n = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain();
+    n.buffer = noise(actx); n.loop = true; f.type = 'highpass'; f.frequency.value = 5000; g.gain.value = 0.006;
+    n.connect(f).connect(g).connect(M); n.start(); music.hiss = n;
   }
-  const i = s % 16, ch = ZEN[Math.floor(s/16) % 4];
-  if (i === 0) ch.forEach(m => {
-    const o = actx.createOscillator(), o2 = actx.createOscillator(), g = actx.createGain(), f = actx.createBiquadFilter();
-    o.type = 'sine'; o2.type = 'triangle'; o.frequency.value = midi(m); o2.frequency.value = midi(m) * 1.003;
-    f.type = 'lowpass'; f.frequency.value = 1000;
-    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.04, t + 2.4); g.gain.setValueAtTime(0.04, t + 6); g.gain.exponentialRampToValueAtTime(0.0001, t + 8.8);
-    o.connect(f); o2.connect(f); f.connect(g).connect(M); o.start(t); o2.start(t); o.stop(t + 9); o2.stop(t + 9);
-  });
-  if (i === 8 && Math.random() < 0.5) grain(t, 900 + Math.random()*600, 1.6, 0.012, (Math.random() - 0.5), 0.5, M);   // soft wind swell
-  return 0.5;
+  if (Math.random() < 0.35) grain(t + Math.random()*STEP, 3000 + Math.random()*4000, 0.004, 0.01 + Math.random()*0.012, (Math.random() - 0.5)*1.4, 1.5, M);   // vinyl crackle
+  if (i === 0) tapeChord(ch.chord, t, 16*STEP + 0.3, zen ? 0.016 : 0.014);
+  if (i === 0 || i === 7 || i === 10) tone('sine', midi(ch.root + 12), tt, i === 7 ? 0.3 : 0.6, 0.12, M, ['lowpass', 400], 0.02);
+  if (s % 32 === 0) music.phrase = newPhrase(ch.chord);
+  const note = music.phrase.find(n => n.at === s % 32);
+  if (note) flute(note.m, tt, note.len*STEP*1.1, zen ? 0.022 : 0.026);
+  if (zen) return STEP;
+  if (i === 0 || i === 10 || (i === 7 && bar === 3)) tone('sine', [100, 44], tt, 0.32, 0.26, M, ['lowpass', 320]);   // soft kick
+  if (i === 4 || i === 12){ grain(tt, 2100, 0.2, 0.045, 0, 0.5, M); tone('sine', [190, 150], tt, 0.08, 0.04, M); }   // brushed snare
+  if (i % 2 === 0) grain(tt, 7500, 0.03, i % 4 === 2 ? 0.02 : 0.012, 0.25, 0.8, M);   // soft hats
+  if (i === 14 && Math.random() < 0.4) grain(tt, 7000, 0.12, 0.012, -0.25, 0.8, M);   // open hat
+  return STEP;
 }
 setInterval(() => {
   if (!actx || !music.track || actx.state !== 'running') return;
   if (music.next < actx.currentTime) music.next = actx.currentTime + 0.05;
   while (music.next < actx.currentTime + 0.3){ const d = musicStep(music.next); music.next += d; music.step++; }
 }, 80);
+
+/* falling: a soft wind that swells as pieces speed up and stops when they land */
+let fallWindNode = null;
+function fallWind(speed){
+  const a = actx; if (!a) return;
+  if (!fallWindNode){
+    const n = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
+    n.buffer = noise(a); n.loop = true; f.type = 'bandpass'; f.frequency.value = 400; f.Q.value = 0.9; g.gain.value = 0;
+    n.connect(f).connect(g).connect(sfxBus); n.start(); fallWindNode = { f, g };
+  }
+  const t = a.currentTime, k = Math.min(1, speed/40);
+  fallWindNode.f.frequency.setTargetAtTime(300 + k*1300, t, 0.05);
+  fallWindNode.g.gain.setTargetAtTime(speed > 0.5 ? 0.012 + k*0.06 : 0, t, speed > 0.5 ? 0.05 : 0.03);
+}
 
 /* on/off switches */
 function renderToggles(){
@@ -915,6 +948,9 @@ function updateFalling(dt){
       grp.off -= 1;
     }
   }
+  // falling sound follows the fastest piece in the air
+  let fast = 0; for (const grp of g.falling) if (grp.vy > fast) fast = grp.vy;
+  fallWind(fast);
 }
 function land(grp){
   const g = game, v = grp.vy;
@@ -1040,7 +1076,7 @@ function show(s){
   state = s;
   for (const [k,id] of Object.entries(SCREENS)) $(id).hidden = k !== s;
   $('hud').hidden = !(s === 'play' || s === 'pause');
-  if (s !== 'play'){ $('combo').style.opacity = 0; $('hot').hidden = true; if (typeof setGrind === 'function') setGrind(false); bladeSound(0, false, false); }
+  if (s !== 'play'){ $('combo').style.opacity = 0; $('hot').hidden = true; if (typeof setGrind === 'function') setGrind(false); bladeSound(0, false, false); fallWind(0); }
   pickTrack();
   $('chipProg').hidden = $('chipHeat').hidden = !!(game && game.zen);
   document.querySelectorAll('.coinsNow').forEach(el => el.textContent = save.coins);
