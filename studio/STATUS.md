@@ -32,6 +32,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-09: Whisker Dash: on touch screens (1 player), tapping the right 30% of the screen jumps (hold for higher), commit `4aa590e`. Repo copy only.
 - 2026-11-09: Whisker Dash: full screen and the Home Screen app widen the view to the screen (climbing levels stay 480), new AUTO run button (hold down/tiptoe to stop), NOISE/WIND/GRAV meters moved to the top-right clear of touch buttons (commit `c4f45c6`). All tests pass, plus a wide-view sweep of all 296 levels. Repo copy only; not yet in the claude.ai artifact.
 - 2026-11-08: Whisker Dash: luggage carts, hay wagon and mine cart sprites replace wrong shopping carts; secret cats moved into the secret lobby, each with its own lines; game updated to 70 worlds (918339f).
 - 2026-11-08: Whisker Dash on phones: no text highlight on press-and-hold, menus fit upright phones (Resume visible), full-screen menus keep EXIT/music/sound reachable, pinch zoom off (commits `0cd0f46`, `37b551b`). Node test harness updated for the new version. These fixes are in the repo copy only, not yet in the claude.ai artifact.
