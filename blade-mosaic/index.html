@@ -739,21 +739,31 @@ let game = null;   // current level run
 let state = 'title';
 const $ = id => document.getElementById(id);
 
+// Each pixel of the art becomes a MOSAIC_SCALE x MOSAIC_SCALE patch of blocks, so the
+// mosaics are big. The blade, gravity, coins and combos all scale with it, so the game
+// plays the same, just with far more blocks to grind.
+const MOSAIC_SCALE = 3;
+function jitter(hex, amt){   // tiny random shade change so big shapes look like real tiles
+  const n = parseInt(hex.slice(1), 16), f = 1 + (Math.random()*2 - 1)*amt;
+  const c = v => Math.max(0, Math.min(255, Math.round(v*f))).toString(16).padStart(2, '0');
+  return '#' + c(n >> 16) + c((n >> 8) & 255) + c(n & 255);
+}
 function startLevel(i){
-  const m = MOSAICS[i];
-  const cols = Math.max(...m.art.map(r => r.length)), rows = m.art.length;
+  const m = MOSAICS[i], k = MOSAIC_SCALE;
+  const artCols = Math.max(...m.art.map(r => r.length)), artRows = m.art.length;
+  const cols = artCols*k, rows = artRows*k;
   const baseHp = 2 + Math.floor(i * 0.9);
   const blocks = [], grid = new Array(cols*rows).fill(null);
-  m.art.forEach((line, y) => { for (let x = 0; x < cols; x++){
-    const ch = line[x] || '.'; if (ch === '.' || !m.pal[ch]) continue;
+  for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++){
+    const ch = m.art[Math.floor(y/k)][Math.floor(x/k)] || '.'; if (ch === '.' || !m.pal[ch]) continue;
     const tough = m.tough.includes(ch);
     const hp = tough ? Math.round(baseHp*2.5) : baseHp;
-    const b = { x, y, color:m.pal[ch], hp, max:hp, tough, flash:0, alive:true };
+    const b = { x, y, color:jitter(m.pal[ch], 0.06), hp, max:hp, tough, flash:0, alive:true };
     blocks.push(b); grid[y*cols+x] = b;
-  }});
+  }
   const totalHp = blocks.reduce((s,b) => s+b.max, 0);
-  game = { i, m, cols, rows, blocks, grid, left:blocks.length, total:blocks.length, totalHp,
-    par: Math.round(10 + blocks.length * 0.15), // seconds for 3 stars
+  game = { i, m, k, cols, rows, blocks, grid, left:blocks.length, total:blocks.length, totalHp, coinAcc:0,
+    par: Math.round(15 + blocks.length/(k*k) * 0.3), // seconds for 3 stars (big mosaics take longer)
     t:0, coins:0, combo:0, comboT:0, heat:0, over:false, tick:0, ang:0, shake:0,
     bx:0, by:0, vx:0, vy:0, cutting:false, tx:null, ty:null, parts:[], floats:[], done:false, doneT:0,
     falling:[], dirty:true };
@@ -766,7 +776,7 @@ function startLevel(i){
 function layout(){
   const g = game, top = 64, pad = 20;
   const availW = W - pad*2, availH = H - top - pad*2 - 40;
-  const cell = Math.max(10, Math.floor(Math.min(availW / g.cols, availH / g.rows, 46)));
+  const cell = Math.max(4, Math.floor(Math.min(availW / g.cols, availH / g.rows, 46)));
   const oldCell = g.cell || cell, oldOx = g.ox ?? 0, oldOy = g.oy ?? 0;
   g.cell = cell;
   g.ox = Math.round((W - g.cols*cell)/2);
@@ -800,7 +810,7 @@ cvs.addEventListener('pointermove', e => {
   if (!touchLast || touchLast.id !== e.pointerId) return;
   // Touch: relative drag, so your finger never hides the blade.
   const k = 1.5, a = screenToLogic(touchLast.x, touchLast.y), b = screenToLogic(e.clientX, e.clientY);
-  const bb = bladeBounds(blade().r * game.cell);
+  const bb = bladeBounds(blade().r * (game.k || 1) * game.cell);
   game.tx = clamp((game.tx ?? game.bx) + (b.x - a.x)*k, bb.minX, bb.maxX);
   game.ty = clamp((game.ty ?? game.by) + (b.y - a.y)*k, bb.minY, bb.maxY);
   touchLast = { x:e.clientX, y:e.clientY, id:e.pointerId };
@@ -813,7 +823,7 @@ const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
 function update(dt){
   const g = game, B = blade(), cell = g.cell;
   g.t += g.done ? 0 : dt;
-  const reach = B.r * cell, speed = B.speed * cell;
+  const K = g.k || 1, reach = B.r * K * cell, speed = B.speed * K * cell;
 
   // movement
   // Blade physics: it has momentum. It speeds up toward where you steer,
@@ -903,22 +913,24 @@ function blocksUnder(x, y, r){
     }
   return out;
 }
+function comboMult(g){ const c = g.combo/((g.k || 1)**2); return c >= 30 ? 4 : c >= 15 ? 3 : c >= 6 ? 2 : 1; }
 function breakBlock(b){
   const g = game, c = g.cell;
   b.alive = false; g.left--; g.grid[b.y*g.cols+b.x] = null; g.dirty = true;
   if (g.zen){ g.slots.push(b.idx); g.broken++; if (g.broken % 10 === 0){ softChime(); save.coins += g.coins; g.coins = 0; persist(); } }
   else { g.combo++; g.comboT = 0.9; }
-  const mult = g.combo >= 30 ? 4 : g.combo >= 15 ? 3 : g.combo >= 6 ? 2 : 1;
+  const q = (g.k || 1)**2, mult = comboMult(g);
   const gain = (b.tough ? 3 : 1) * mult;
-  g.coins += gain;
+  g.coinAcc = (g.coinAcc || 0) + gain/q;              // big mosaics pay per area, not per tiny block
+  const whole = Math.floor(g.coinAcc); g.coins += whole; g.coinAcc -= whole;
   const cx = g.ox + (b.x+.5)*c, cy = g.oy + (b.y + .5 + (b.fall ? b.fall.off : 0))*c;
-  for (let k = 0; k < 4; k++){
+  for (let k = 0; k < (q > 1 ? 2 : 4); k++){
     g.parts.push({ x:cx + (k%2-.5)*c*.4, y:cy + ((k>>1)-.5)*c*.4, vx:(Math.random()-.5)*360, vy:-Math.random()*320-60,
       s:c*0.42, color:b.color, life:1.4, rot:0, vr:(Math.random()-.5)*14, sq:true });
   }
   const pan = ((b.x + .5)/g.cols*2 - 1)*0.7;
   if (g.zen){ crunch(pan, 0); return; }
-  if (mult > 1 || b.tough) g.floats.push({ x:cx, y:cy, txt:'+'+gain, life:0.7 });
+  if ((mult > 1 || b.tough) && Math.random() < 1/q) g.floats.push({ x:cx, y:cy, txt:'+'+gain, life:0.7 });
   g.shake = Math.min(4, g.shake + (b.tough ? 2 : 0.6));
   blockSound(b.tough, g.combo, pan);
   if (g.left <= 0 && !g.done){ g.done = true; chime(); }
@@ -976,7 +988,7 @@ function updateFalling(dt){
     grp.blocks = grp.blocks.filter(b => b.alive);
     if (!grp.blocks.length){ g.falling.splice(g.falling.indexOf(grp), 1); continue; }
     if (!canDrop(grp)){ land(grp); continue; }
-    grp.vy = game.zen ? Math.min(grp.vy + GRAVITY*2.5*dt, 70) : Math.min(grp.vy + GRAVITY*dt, 40);   // Zen Tower drops faster
+    grp.vy = game.zen ? Math.min(grp.vy + GRAVITY*2.5*dt, 70) : Math.min(grp.vy + GRAVITY*(game.k || 1)*dt, 40*(game.k || 1));   // Zen Tower drops faster; big mosaics fall at the same on-screen speed
     grp.off += grp.vy*dt;
     while (grp.off >= 1){
       if (!canDrop(grp)){ grp.off = 0; land(grp); break; }
@@ -998,7 +1010,8 @@ function land(grp){
   g.dirty = true;
   if (g.zen){ if (v > 5) thud(); return; }   // Zen Tower: soft landings, no crash damage
   // Impact: faster and heavier pieces hit harder (more momentum).
-  const crash = Math.round(Math.max(0, v - 9) * 0.3 * (1 + Math.log2(grp.blocks.length) / 2));
+  const K = g.k || 1;   // speeds and piece sizes measured in art pixels, so big mosaics crash like small ones
+  const crash = Math.round(Math.max(0, v/K - 9) * 0.3 * (1 + Math.log2(Math.max(1, grp.blocks.length/(K*K))) / 2));
   if (crash <= 0) return;
   g.shake = Math.min(8, g.shake + 1 + crash*0.4);
   boom(crash);
@@ -1069,7 +1082,7 @@ function render(now){
   ctx.globalAlpha = 1;
 
   // blade + reach ring
-  const reach = B.r * c;
+  const reach = B.r * (g.k || 1) * c;
   ctx.beginPath(); ctx.arc(g.bx, g.by, reach, 0, Math.PI*2);
   ctx.strokeStyle = g.over ? 'rgba(255,75,62,.5)' : 'rgba(255,255,255,.12)'; ctx.lineWidth = 2; ctx.stroke();
   drawBlade(ctx, B, g.bx, g.by, reach, g.ang, g.heat/100, now/1000);
@@ -1101,7 +1114,7 @@ function hud(){
   $('heatFill').style.background = g.over ? 'var(--hot)' : g.heat > 70 ? 'var(--spark)' : 'var(--cool)';
   $('hudCoins').textContent = save.coins + g.coins;
   $('hot').hidden = !g.over;
-  const mult = g.combo >= 30 ? 4 : g.combo >= 15 ? 3 : g.combo >= 6 ? 2 : 1;
+  const mult = comboMult(g);
   const cb = $('combo');
   if (mult !== lastCombo){ cb.textContent = `x${mult} COMBO`; lastCombo = mult; }
   cb.style.opacity = mult > 1 ? 1 : 0;
@@ -1407,7 +1420,7 @@ function build3D(){
 }
 function frame3D(){
   const g = game, S = R3, tanH = Math.tan(S.camera.fov*Math.PI/360), aspect = W/H;
-  S.dist = Math.max((g.rows + 6)/2/tanH, (g.cols + 8)/2/(tanH*aspect));
+  S.dist = Math.max((g.rows*1.15 + 6)/2/tanH, (g.cols*1.08 + 8)/2/(tanH*aspect));   // room for the top bar
   S.camera.aspect = aspect; S.camera.updateProjectionMatrix();
   S.scene.fog = new THREE.Fog(0x15171d, S.dist*1.25, S.dist*2.6);   // floor fades into the dark
 }
@@ -1435,10 +1448,10 @@ function render3D(now){
 
   // blade rides just in front of the block faces
   const bx = wX(g.bx), by = wY(g.by), o = S.bladeObj, hot = Math.max(0, g.heat/100 - 0.55)/0.45;
-  o.position.set(bx, by, 0.62); o.scale.setScalar(B.r); o.rotation.z = -g.ang;
+  o.position.set(bx, by, 0.62); o.scale.setScalar(B.r * (g.k || 1)); o.rotation.z = -g.ang;
   for (const m of o.userData.mats) m.emissive.setRGB(hot*0.9, hot*0.12, hot*0.04);
   o.userData.arms.forEach((a, i) => a.material.color.setHSL(((now/1000*120 + i*72) % 360)/360, 0.95, 0.6));
-  S.ring.position.set(bx, by, 0.5); S.ring.scale.setScalar(B.r);
+  S.ring.position.set(bx, by, 0.5); S.ring.scale.setScalar(B.r * (g.k || 1));
   S.ring.material.color.set(g.over ? 0xff4b3e : 0xffffff); S.ring.material.opacity = g.over ? 0.45 : 0.14;
   S.glow.position.set(bx, by, 1.6); S.glow.intensity = g.cutting && !g.over ? 2.2 : 0;
 
