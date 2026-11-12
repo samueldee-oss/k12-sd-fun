@@ -13,6 +13,7 @@ _Kept by Claude Code. Last updated 2026-11-12._
 | Pong (Level 1 warm-up) | `pong/` | Works. Touch: drag to move, tap to serve; in 2-player mode each half of the court moves its own paddle. | Yes (simulated touch tested; not yet tried on a real iPad). |
 | Whisker Dash | `whisker-dash/` | Works. 70 worlds, 341 levels, 1–2 players, a secret and a hint animal in every world, Home Screen app (cat-face icon) with a full-screen fit for phones. Plan in `whisker-dash/PLAN.md`; automated tests in `whisker-dash/tests/` all pass (2026-11-09). | Touch pad included (not yet tried on a real iPad). |
 | Rulebound | `rulebound/` | Works. Word-rule puzzle game (Baba Is You-style): 90 levels in 3 worlds plus a Sandbox, 4 heroes, every level checked solvable by a solver. Built on claude.ai and added as-is. | Touch: tap a square to walk there, swipe, or on-screen pad (simulated touch tested; not yet tried on a real iPad). |
+| Slice Flip 3D | `slice-flip-3d/` | Works. 3D knife-flipping slicing game (Slice Master-style) built on claude.ai and added as-is: real mesh slicing, 12 foods with their own cut faces and slice sounds, pink obstacles, gems, ×1–×20 finish, 13-knife shop, music. Needs internet (loads three.js from cdnjs). | Tap to flip; no other controls needed. Not yet tried on a real iPad. |
 | Snake (side project) | `experiments/snake-blender-mode/` | Works. Fixed 2026-10-20: body was invisible and the game "auto-ended" around 60-70 points. Swipe to steer. | Yes (simulated touch tested; not yet tried on a real iPad). |
 
 A comparison of the Bank Game versions (features, fun, systems lessons) is in `to-desktop/2026-10-21-1600-bank-game-version-comparison.md`.
@@ -33,6 +34,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-12: Slice Flip 3D added (`slice-flip-3d/`): 3D knife-flipping slicing game, listed on the dashboard and in the README. Commit `4343bc5` (branch `claude/slice-flip-3d`).
 - 2026-11-12: Rulebound added (`rulebound/`): word-rule puzzle game, 90 levels in 3 worlds plus a Sandbox, listed on the dashboard and in the README. Commit `a550bcf`.
 - 2026-11-09: Whisker Dash: on touch screens (1 player), tapping the right 30% of the screen jumps (hold for higher), commit `4aa590e`. Repo copy only.
 - 2026-11-09: Whisker Dash: a secret family and a hint animal in every world (ask it and it tells you exactly where), worlds 62–70 moved after Hotel Lobby 2, VIP Lounge renamed Secret Lounge, cat-face Home Screen icon; the wide view and auto-run from `c4f45c6` are now in the claude.ai page too (artifact publish #110). Commit `0e90ce5`.
