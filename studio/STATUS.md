@@ -33,6 +33,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-12: Rulebound added (`rulebound/`): word-rule puzzle game, 90 levels in 3 worlds plus a Sandbox, listed on the dashboard and in the README. Commit `a550bcf`.
 - 2026-11-09: Whisker Dash: on touch screens (1 player), tapping the right 30% of the screen jumps (hold for higher), commit `4aa590e`. Repo copy only.
 - 2026-11-09: Whisker Dash: a secret family and a hint animal in every world (ask it and it tells you exactly where), worlds 62–70 moved after Hotel Lobby 2, VIP Lounge renamed Secret Lounge, cat-face Home Screen icon; the wide view and auto-run from `c4f45c6` are now in the claude.ai page too (artifact publish #110). Commit `0e90ce5`.
 - 2026-11-09: Whisker Dash: full screen and the Home Screen app widen the view to the screen (climbing levels stay 480), new AUTO run button (hold down/tiptoe to stop), NOISE/WIND/GRAV meters moved to the top-right clear of touch buttons (commit `c4f45c6`). All tests pass, plus a wide-view sweep of all 296 levels. Repo copy only; not yet in the claude.ai artifact.
