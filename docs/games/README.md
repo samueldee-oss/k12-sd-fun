@@ -23,6 +23,7 @@ This folder documents the single-file browser games in this repo: what each one 
 | Thistle King | Arena boss fight | Bee dodges patterns, carries nectar to hit the boss | [thistle-king.md](thistle-king.md) |
 | Rooftop Flow | Endless runner | Tricks and combos across dusk rooftops | [rooftop-flow.md](rooftop-flow.md) |
 | Kitty & Lotl | Toddler-friendly catch game | Catch falling treats in a boat; 7 hidden surprises | [kitty-and-lotl.md](kitty-and-lotl.md) |
+| Poirot the Pigeon | 3D deduction / whodunit | Search rooms with a magnifying glass, rule out suspects, accuse | [poirot-pigeon.md](poirot-pigeon.md) |
 
 ## Why these are fun: patterns across the set
 
