@@ -28,6 +28,7 @@ k12-sd-fun/
 ├── bank_game_assessment.py   # Stock-flow failure assessment (100% mastery gate)
 ├── pong/                     # Level 1 warm-up (browser-native)
 ├── whisker-dash/             # Pixel cat platformer (browser-native, 1–2 players)
+├── rulebound/                # Word-rule puzzle game: push words to change the rules (browser-native)
 ├── capybara-rumble/ sprout-siege/ kitty-and-lotl/ endless-crucible/
 │   sensory-overload/ mothwicks-lantern/ prism-sprint/ thistle-king/ rooftop-flow/
 │                             # More browser-native games (one index.html each)
@@ -59,6 +60,7 @@ Links assume GitHub Pages is enabled for this repo (Settings → Pages → deplo
 | Dashboard (all games, notes) | `https://samueldee-oss.github.io/k12-sd-fun/dashboard/` |
 | Pong | `https://samueldee-oss.github.io/k12-sd-fun/pong/index.html` |
 | Whisker Dash | `https://samueldee-oss.github.io/k12-sd-fun/whisker-dash/index.html` |
+| Rulebound | `https://samueldee-oss.github.io/k12-sd-fun/rulebound/index.html` |
 | Capybara Rumble | `https://samueldee-oss.github.io/k12-sd-fun/capybara-rumble/index.html` |
 | Sprout Siege | `https://samueldee-oss.github.io/k12-sd-fun/sprout-siege/index.html` |
 | Kitty & Lotl | `https://samueldee-oss.github.io/k12-sd-fun/kitty-and-lotl/index.html` |

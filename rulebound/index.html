@@ -1,0 +1,2089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Rulebound: Biscuit's Word Puzzles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#15131f;--panel:#211d30;--ink:#f3eefc;--dim:#9b93b8;--pink:#ff8fb8;--gold:#ffd34d}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:Fredoka,system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none}
+#app{display:flex;flex-direction:column;height:100%}
+header{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--panel);border-bottom:2px solid #2e2843}
+header h1{font-size:18px;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header h1 small{color:var(--dim);font-weight:500;margin-right:6px}
+button{font-family:inherit;font-weight:700;border:none;border-radius:12px;padding:8px 12px;font-size:14px;cursor:pointer;background:#342d4d;color:var(--ink);box-shadow:0 3px 0 #1a1627}
+button:active{transform:translateY(2px);box-shadow:0 1px 0 #1a1627}
+button.big{background:var(--pink);color:#2a1020;font-size:18px;padding:12px 22px;box-shadow:0 4px 0 #b4527a}
+#stage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;min-height:0}
+canvas{display:block}
+#rules{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:6px 10px;min-height:34px}
+.chip{font-size:12px;font-weight:700;background:#2a2540;border-radius:8px;padding:4px 8px;letter-spacing:.5px}
+#pad{display:none;justify-content:center;gap:6px;padding:4px 0 12px}
+#pad .col{display:flex;flex-direction:column;gap:6px}
+#pad button{width:58px;height:50px;font-size:22px;padding:0}
+body.touch #pad{display:flex}
+.overlay{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(15,12,24,.72);backdrop-filter:blur(3px);z-index:5}
+.overlay.show{display:flex}
+#menu .card{max-height:96%;overflow:auto}
+.card{background:var(--panel);border:2px solid #3a3256;border-radius:22px;padding:24px;text-align:center;max-width:min(560px,92vw);box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.card h2{margin:0 0 6px;font-size:30px}
+.card p{color:#cfc7e6;margin:8px 0 16px;line-height:1.4}
+#levels{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:10px 0 14px}
+#worlds{display:flex;gap:8px;justify-content:center;margin-top:12px}
+#worlds button{font-size:14px;padding:7px 12px;border:3px solid transparent}
+#worlds button.sel{border-color:var(--gold);background:#3f3560}
+#worlds button:disabled{opacity:.4}
+.wname{color:var(--dim);font-size:13px;margin-top:6px}
+#levels button{aspect-ratio:1.4;font-size:17px;padding:0;position:relative}
+#levels button.done{background:#3d5c48}
+#levels button.done::after{content:'★';position:absolute;top:2px;right:5px;font-size:12px;color:var(--gold)}
+#levels button:disabled{opacity:.35;cursor:default}
+#toast{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:#3a2236;color:#ffd0e2;padding:8px 14px;border-radius:12px;font-weight:700;display:none;z-index:4;text-align:center;max-width:90%}
+#hintBox{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:#2b2545;border:2px solid #4a4070;padding:10px 14px;border-radius:14px;max-width:min(520px,92%);display:none;z-index:4;font-size:15px;line-height:1.35}
+.logo{font-size:44px;letter-spacing:2px;margin:0}
+.logo span{display:inline-block;padding:2px 8px;border-radius:8px;margin:2px}
+.pickLbl{font-weight:700;color:var(--dim);font-size:14px;margin-top:4px}
+#heroes{display:flex;gap:12px;justify-content:center;margin:8px 0 4px}
+#heroes{flex-wrap:wrap}
+#heroes button{display:flex;flex-direction:column;align-items:center;padding:6px 8px;border:3px solid transparent;width:112px}
+#heroes button.sel{border-color:var(--gold);background:#3f3560}
+#heroes b{font-size:17px} #heroes small{color:var(--dim);font-weight:500;font-size:12px}
+.keys{color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1 id="title"><small id="lvnum"></small><span id="lvname">Rulebound</span></h1>
+    <button id="bHint" title="Hint">💡</button>
+    <button id="bWait" title="Wait a turn (Space)" style="display:none">⌛ Wait</button>
+    <button id="bUndo" title="Undo (Z)">↶ Undo</button>
+    <button id="bReset" title="Restart (R)">⟲</button>
+    <button id="bSound" title="Sound">🔊</button>
+    <button id="bMenu" title="Levels (Esc)">☰</button>
+  </header>
+  <div id="stage">
+    <canvas id="c"></canvas>
+    <div id="toast"></div>
+    <div id="hintBox"></div>
+    <div class="overlay show" id="menu"><div class="card">
+      <h2 class="logo"><span style="border:3px solid #ff8fb8;color:#ff8fb8">RULE</span> <span style="color:#fff">IS</span> <span style="background:#c49a6c;color:#2a1a08">PUSH</span></h2>
+      <p>Rules are blocks. Push the words to change the world!<br><b>RULEBOUND</b>: ninety puzzles, three worlds, four heroes.</p>
+      <div class="pickLbl">Choose your hero:</div>
+      <div id="heroes"><button data-h="biscuit"><canvas width="72" height="72"></canvas><b>Biscuit</b><small>golden retriever</small></button><button data-h="doggo"><canvas width="72" height="72"></canvas><b>Doggo</b><small>black &amp; white beagle</small></button><button data-h="hen"><canvas width="72" height="72"></canvas><b>Lady Clucksalot</b><small>Australorp hen</small></button><button data-h="cat"><canvas width="72" height="72"></canvas><b>Noodle</b><small id="catLbl">cat · random coat</small></button></div>
+      <div id="worlds"></div><button id="bSandbox" style="margin-top:8px;background:#3d5c48">🧪 Sandbox: play with every block</button><div class="wname" id="wname"></div>
+      <div id="levels"></div>
+      <div class="keys">Arrows / WASD move · tap a square to walk there · Space wait · Z undo · R restart</div>
+    </div></div>
+    <div class="overlay" id="win"><div class="card">
+      <h2>✨ Puzzle solved! ✨</h2>
+      <p id="winText"></p>
+      <button class="big" id="bNext">Next puzzle ▶</button>
+    </div></div>
+  </div>
+  <div id="rules"></div>
+  <div id="pad">
+    <button data-d="3">◀</button>
+    <div class="col"><button data-d="0">▲</button><button data-d="2">▼</button></div>
+    <button data-d="1">▶</button>
+    <button data-d="-1" title="Wait" style="font-size:15px">wait</button>
+  </div>
+</div>
+<script>
+// ===== RULEBOUND ENGINE =====
+const NOUN_CH={P:'PUP',W:'WALL',R:'ROCK',F:'FLAG',A:'WATER',S:'SKULL',K:'KEY',D:'DOOR',L:'LAVA',B:'BOX',O:'RING'};
+const OBJ_CH={p:'PUP',w:'WALL',r:'ROCK',f:'FLAG',a:'WATER',s:'SKULL',k:'KEY',d:'DOOR',l:'LAVA',b:'BOX',o:'RING'};
+const COMBO_CH={X:['LAVA','FLAG'],Y:['SKULL','FLAG'],Z:['LAVA','RING']};
+const PROP_CH={'1':'YOU','2':'WIN','3':'STOP','4':'PUSH','5':'SINK','6':'DEFEAT','7':'HOT','8':'MELT','9':'OPEN','0':'SHUT','!':'WEAK','~':'PULL','^':'MOVE','@':'TELE'};
+const NOUN_WORDS=new Set(Object.values(NOUN_CH));
+const DX=[0,1,0,-1], DY=[-1,0,1,0];
+function wkind(w){ if(NOUN_WORDS.has(w)) return 'noun'; if(w==='IS'||w==='AND') return w; return 'prop'; }
+
+const LEVELS=[
+ {
+  "name": "Hello, Biscuit",
+  "hint": "Rules are made of word blocks. PUP IS YOU, so you are Biscuit! FLAG IS WIN — touch the flag.",
+  "map": [
+   "................",
+   "..P=1...........",
+   "................",
+   "......r.........",
+   "..p...r.....f...",
+   "......r.........",
+   "................",
+   "..R=4.....F=2...",
+   "................"
+  ]
+ },
+ {
+  "name": "Fenced In",
+  "hint": "Word blocks can be pushed. Push a word out of WALL IS STOP and the walls stop stopping you.",
+  "map": [
+   "................",
+   ".P=1......F=2...",
+   "................",
+   ".W=3...wwwww....",
+   ".......w...w....",
+   ".p.....w.f.w....",
+   ".......w...w....",
+   ".......wwwww....",
+   "................"
+  ]
+ },
+ {
+  "name": "So Close",
+  "hint": "Can't reach the flag? What if YOU were the flag? Swap a word in PUP IS YOU.",
+  "map": [
+   "................",
+   "................",
+   ".P=1....wwwww...",
+   "........w...w...",
+   ".F......w.f.w...",
+   "........w...w...",
+   ".p......wwwww...",
+   "................",
+   "..W=3....F=2...."
+  ]
+ },
+ {
+  "name": "Riverside",
+  "hint": "WATER IS SINK: anything that goes in the water sinks, and takes the water with it. Rocks make good bridges.",
+  "map": [
+   "..........a.....",
+   ".P=1......a.....",
+   "..........a.....",
+   "..p..r....a..f..",
+   "..........a.....",
+   "..........a.....",
+   "A.........a.F=2.",
+   "=.........a.....",
+   "5..R=4....a....."
+  ]
+ },
+ {
+  "name": "Ember Row",
+  "hint": "LAVA IS HOT and PUP IS MELT. One of those rules can be broken.",
+  "map": [
+   "L..........l....",
+   "=..P=1.....l....",
+   "7..........l....",
+   "...........l..f.",
+   "..p........l....",
+   "...........l....",
+   "...P.......l....",
+   "...=.......l.F=2",
+   "...8.......l...."
+  ]
+ },
+ {
+  "name": "Bone Yard",
+  "hint": "Rules work top-to-bottom too! What could the skulls turn into instead?",
+  "map": [
+   "...........s....",
+   ".P=1.......s....",
+   "......S....s....",
+   "......=....s....",
+   "....F.6....s..f.",
+   "...........s....",
+   "..p........s....",
+   "...........s....",
+   "...........s.F=2"
+  ]
+ },
+ {
+  "name": "Locked Out",
+  "hint": "AND lets one rule say two things. KEY IS OPEN AND ... something that lets you move it?",
+  "map": [
+   "..........F=2...",
+   ".P=1............",
+   "................",
+   ".K=9&...........",
+   "................",
+   ".....4...wwwwwww",
+   ".........w.W=3.w",
+   "..p..k...d..f..w",
+   ".D=3&0...wwwwwww"
+  ]
+ },
+ {
+  "name": "The Vault",
+  "hint": "The wall rule is locked inside. But who says YOU has to be Biscuit?",
+  "map": [
+   "................",
+   ".P=1............",
+   "................",
+   "........wwwwww..",
+   "........w.W=3w..",
+   "........w..f.w..",
+   "....W...wwwwww..",
+   "..p.............",
+   "..........F=2..."
+  ]
+ },
+ {
+  "name": "Ring of Fire",
+  "hint": "You can't cross HOT lava, and those rules are stuck. But LAVA IS ... could be finished another way.",
+  "map": [
+   "L...............",
+   "=..P=1..........",
+   "7.........lllll.",
+   "..........l...l.",
+   "..p..L=...l.f.l.",
+   "..........l...l.",
+   "P.....R...lllll.",
+   "=...............",
+   "8..R=4.....F=2.."
+  ]
+ },
+ {
+  "name": "Scattered",
+  "hint": "There is no FLAG IS WIN... yet. Gather the words and build it yourself!",
+  "map": [
+   "...........a....",
+   ".P=1..R=4..a....",
+   "...........a....",
+   "...F.......a....",
+   "...........a..f.",
+   ".....=..r..a....",
+   "A..........a..2.",
+   "=..........a....",
+   "5.p........a...."
+  ]
+ },
+ {
+  "name": "Stuck",
+  "hint": "Biscuit is stuck in a box. But the rock is free... What if the ROCK were YOU?",
+  "map": [
+   "..........F=2...",
+   "................",
+   ".wwwwwww........",
+   ".w.....w........",
+   ".w.P=1.w....r...",
+   ".w..R..w........",
+   "Ww.p...w......f.",
+   "=wwwwwww........",
+   "3..............."
+  ]
+ },
+ {
+  "name": "Island",
+  "hint": "Anything sinks in SINK water... even a word block you don't need!",
+  "map": [
+   "................",
+   ".P=1............",
+   ".....&..........",
+   "........aaaaa...",
+   "..p.....a...a...",
+   "........a.f.a...",
+   "........a...a...",
+   "........aaaaa...",
+   "A=5....F=2......"
+  ]
+ },
+ {
+  "name": "Bone Ring",
+  "hint": "The skull rule is stuck, but it ends with AND. Make skulls something you can shove!",
+  "map": [
+   "S...............",
+   "=...........F=2.",
+   "6...............",
+   "&...............",
+   "....4...sss.....",
+   "..p.....sfs.....",
+   "........sss.....",
+   "................",
+   ".P=1............"
+  ]
+ },
+ {
+  "name": "Boulders",
+  "hint": "Rocks would make a great bridge... if only you could push them.",
+  "map": [
+   "..........a.....",
+   ".R=3......a.....",
+   "...4......a.....",
+   "..........a..f..",
+   "..p...rr..a.....",
+   "......r...a.....",
+   "A.........a.F=2.",
+   "=.P=1.....a.....",
+   "5.........a....."
+  ]
+ },
+ {
+  "name": "Skull Wall",
+  "hint": "SINK water destroys whatever it touches. What if you could PUSH the water into a skull?",
+  "map": [
+   "S..........s....",
+   "=..........s....",
+   "6..........s..f.",
+   "...........s....",
+   "..p..a.....s....",
+   "...........s....",
+   "A=5&....4..s....",
+   "...........s....",
+   ".P=1.......sF=2."
+  ]
+ },
+ {
+  "name": "Bone Fence",
+  "hint": "SKULL IS ... what? Finish that sentence with something harmless and pushable.",
+  "map": [
+   "S=6.....s.......",
+   "........s.......",
+   ".P=1....s.......",
+   "........s....f..",
+   "..p.....s.......",
+   ".S=.....s.......",
+   "........s.......",
+   "...RR=4.s.......",
+   "........sF=2...."
+  ]
+ },
+ {
+  "name": "Ring Around",
+  "hint": "AND works at the front of a rule too: something AND ROCK IS PUSH.",
+  "map": [
+   "S=6......F=2....",
+   "................",
+   "....R=4.........",
+   "..........sss...",
+   "..S&......sfs...",
+   "..........sss...",
+   "..p.............",
+   "................",
+   ".P=1............"
+  ]
+ },
+ {
+  "name": "Hot Spring",
+  "hint": "Two steps: change what the lava IS, then deal with what it became.",
+  "map": [
+   "L..A=5..........",
+   "=..P=1..........",
+   "7.........lllll.",
+   ".........rl...l.",
+   "..p..L=...l.f.l.",
+   "..........l...l.",
+   "P......A..lllll.",
+   "=..........R=4..",
+   "8..........F=2.."
+  ]
+ },
+ {
+  "name": "Double Lock",
+  "hint": "Two doors, but only one key. Could something else become a key?",
+  "map": [
+   "D..........wwwww",
+   "=.P=1......w.f.w",
+   "3..........wwdww",
+   "&......F=2.w...w",
+   "0..K=9&4...w...w",
+   "...........wwdww",
+   "W...R=..........",
+   "=.....K...r..k..",
+   "3..p............"
+  ]
+ },
+ {
+  "name": "Summit",
+  "hint": "Make rocks pushable, build a bridge, then bring the key home to the door.",
+  "map": [
+   "D=3&0A=5...F=2..",
+   "......a.........",
+   ".P=1..a...wwwwww",
+   "....r.a...w....w",
+   "..p...a...d..f.w",
+   "...4..a...w....w",
+   ".R=...a...wwwwww",
+   "......a..k......",
+   "K=9&4.a......W=3"
+  ]
+ },
+ {
+  "name": "Gap",
+  "hint": "The flag rule is missing its middle. Slide a pair of words in to finish two rules at once.",
+  "map": [
+   "P=1......wFw....",
+   ".........R...=4.",
+   ".........w2w....",
+   "..........w.....",
+   ".............r..",
+   "..p.........rfr.",
+   ".............r..",
+   "................",
+   "W=3.R=3........."
+  ]
+ },
+ {
+  "name": "Sealed",
+  "hint": "Keys open SHUT things. What if the walls were SHUT too?",
+  "map": [
+   "................",
+   ".P=1....K=9&4...",
+   "..........wwwww.",
+   "..p.k.....w.f.w.",
+   "..........w...w.",
+   "..........wwwww.",
+   "....0...........",
+   "................",
+   "W=3&.F=2........"
+  ]
+ },
+ {
+  "name": "Who's There?",
+  "hint": "Biscuit can't get out. Who else could be YOU? Choose carefully!",
+  "map": [
+   "S=6.K=9.D=3&0...",
+   "wwwwww..........",
+   "w...Sw.......f..",
+   "w.P=1w....s.....",
+   "w....w..wwww....",
+   "wK.R.w..wk.d....",
+   "w.p..w..wwww....",
+   "wwwwww..........",
+   "W=3.F=2.....r..."
+  ]
+ },
+ {
+  "name": "Smolder",
+  "hint": "Skulls could MELT... and lava could be pushed. Finish both rules!",
+  "map": [
+   "S=6.L=7&...s....",
+   "...........s....",
+   "........4..s....",
+   "...........s....",
+   ".S=...l....s..f.",
+   "....8......s....",
+   "..p........s....",
+   "...........s....",
+   ".P=1....F=2s...."
+  ]
+ },
+ {
+  "name": "Flagless",
+  "hint": "There is no flag. PUP IS YOU AND ... ?",
+  "map": [
+   "P=1&.......a....",
+   "...........a....",
+   "...........a....",
+   "..p...r....a.2..",
+   "...........a....",
+   "...........a....",
+   "A..........a....",
+   "=..........a....",
+   "5..R=4.....a...."
+  ]
+ },
+ {
+  "name": "Corridor",
+  "hint": "The key can't be pushed. But it could walk... together with you.",
+  "map": [
+   "K=9.............",
+   "................",
+   "....P=1.........",
+   "................",
+   "...&....wwwwww..",
+   "..K......k.d.fw.",
+   "..p.....wwwwww..",
+   "................",
+   "D=3&0.W=3...F=2."
+  ]
+ },
+ {
+  "name": "Pocket",
+  "hint": "You can't stand on a pushable flag... but something else might be waiting for it.",
+  "map": [
+   "F=2&4...........",
+   "................",
+   "...........www..",
+   "............rw..",
+   "...........www..",
+   "................",
+   "....f...........",
+   "..p.............",
+   "P=1.R=1.W=3....."
+  ]
+ },
+ {
+  "name": "Locked Room",
+  "hint": "FLAG . WIN is missing a word. Is there an IS you could borrow?",
+  "map": [
+   "F.2.............",
+   "................",
+   ".....W....wwwww.",
+   ".....=....w.f.w.",
+   ".....3....w...w.",
+   "..p.......wwwww.",
+   "................",
+   "................",
+   ".P=1............"
+  ]
+ },
+ {
+  "name": "Rolling Hills",
+  "hint": "The rocks move when you move. Where they end up matters!",
+  "map": [
+   "P=1.A=5..a.a....",
+   ".........a.a....",
+   ".........a.a....",
+   ".........a.a..f.",
+   "..p..r.s.a.a....",
+   ".........a.a....",
+   "....r....a.a....",
+   "...wwwww.a.a....",
+   "R=1.S=6..a.a.F=2"
+  ]
+ },
+ {
+  "name": "Lava Fields",
+  "hint": "Rocks don't melt. Biscuit does. Hmm...",
+  "map": [
+   "R=1.L=7.l.......",
+   "........l.......",
+   ".P=1....l.......",
+   "........l...f...",
+   "..p.....l.......",
+   "...P....l.......",
+   "...=....l.......",
+   "....R...l.......",
+   "P=8.....l...F=2."
+  ]
+ },
+ {
+  "name": "Hallway",
+  "hint": "These doors are WEAK. What happens to the key?",
+  "map": [
+   "D=3&0&!.K=9&4...",
+   "........wwwwwww.",
+   "........w..w..w.",
+   "..p.k...d..d..w.",
+   "........w..w.fw.",
+   "........wwwwwww.",
+   "................",
+   "................",
+   "P=1.W=3.F=2....."
+  ]
+ },
+ {
+  "name": "Front Door",
+  "hint": "No key anywhere. What if the door were OPEN and SHUT at the same time?",
+  "map": [
+   "D=3&0.....F=2...",
+   "................",
+   "..........wwwww.",
+   "..p.......w...w.",
+   ".D=.......d.f.w.",
+   "..........w...w.",
+   "......9...wwwww.",
+   "................",
+   "W=3.P=1........."
+  ]
+ },
+ {
+  "name": "Four Walls",
+  "hint": "No flag in here. But something else could be the goal...",
+  "map": [
+   "P=1.............",
+   "..wwwwwwwww.....",
+   "..w.......w.....",
+   "..w.....2.w.....",
+   "..w.W=3...w.....",
+   "..w.......w.....",
+   "..w.......w.....",
+   "..w..p....w.....",
+   "..wwwwwwwww....."
+  ]
+ },
+ {
+  "name": "Two Paths",
+  "hint": "PUP IS OPEN: a pup can open the door, but it won't come back. Better make a friend first.",
+  "map": [
+   "P=9.D=3&0..F=2..",
+   "................",
+   "..........wwwww.",
+   "..r.......w...w.",
+   "..........d.f.w.",
+   ".R=.......w...w.",
+   "....p..P..wwwww.",
+   "................",
+   "P=1.W=3........."
+  ]
+ },
+ {
+  "name": "Bone Bridge",
+  "hint": "You can't step on a skull. But can a word?",
+  "map": [
+   "P=1.S=6.........",
+   "................",
+   ".......s.s......",
+   ".......Fs2......",
+   ".......s.s......",
+   "........=.......",
+   "................",
+   "..p..........f..",
+   "................"
+  ]
+ },
+ {
+  "name": "Deep End",
+  "hint": "That STOP is stuck tight. Is there anywhere it could go away for good?",
+  "map": [
+   "................",
+   "..www.w...wwwww.",
+   "..wW=3w...w...w.",
+   "..www.w...w.f.w.",
+   ".....a....w...w.",
+   "..........wwwww.",
+   "..p.............",
+   "................",
+   "P=1.F=2.A=5....."
+  ]
+ },
+ {
+  "name": "Three Rivers",
+  "hint": "One word can finish a rule that weakens three things at once.",
+  "map": [
+   "A.F=2...a.l.s...",
+   "=.....p.a.l.s...",
+   "5..L....a.l.s...",
+   "L.......a.l.s...",
+   "=.&A&S=!a.l.s.f.",
+   "7.......a.l.s...",
+   "S.......a.l.s...",
+   "=.......a.l.s...",
+   "6.P=8P=1a.l.s..."
+  ]
+ },
+ {
+  "name": "Fortress",
+  "hint": "Read the rules carefully. What is actually STOP here?",
+  "map": [
+   "R=3.F=2.P=1.....",
+   "................",
+   "......rrrrrrrr..",
+   "......r.wwww.r..",
+   "..p...w.w.fw.r..",
+   "......r.wwww.r..",
+   "......rrrrrrrr..",
+   "................",
+   "................"
+  ]
+ },
+ {
+  "name": "Doorway",
+  "hint": "No key... but PUSH beats STOP.",
+  "map": [
+   "D=3&0.....F=2...",
+   "................",
+   "........wwwwww..",
+   "........w....w..",
+   "..p.....d..f.w..",
+   "........w....w..",
+   "........wwwwww..",
+   ".D=......4......",
+   "W=3.P=1........."
+  ]
+ },
+ {
+  "name": "Shut In",
+  "hint": "Biscuit is stuck, but the skulls are free. Make them safe first!",
+  "map": [
+   "................",
+   "wwwwwwww........",
+   "w....P.w........",
+   "w..S.=.w....s...",
+   "w....1.w....s...",
+   "wS=6...w....s.f.",
+   "w....p.w....s...",
+   "wwwwwwww........",
+   "W=3.F=2........."
+  ]
+ },
+ {
+  "name": "Junction",
+  "hint": "Only one IS on the whole map. Can it do two jobs?",
+  "map": [
+   "................",
+   "................",
+   "..F.............",
+   "......P.........",
+   "......=.........",
+   "......1....2....",
+   "..p.............",
+   "...........f....",
+   "W=3............."
+  ]
+ },
+ {
+  "name": "Hot Seat",
+  "hint": "The flag is sitting in lava. Get it out without stepping in yourself.",
+  "map": [
+   "F=2.L=7.........",
+   "................",
+   "................",
+   "........l.......",
+   "..p...r.X.......",
+   "........l.......",
+   ".F=..4..........",
+   "................",
+   "R=4.P=8.P=1....."
+  ]
+ },
+ {
+  "name": "Tunnel",
+  "hint": "The rocks jam against the wall. What if they broke instead?",
+  "map": [
+   "R=4&............",
+   "................",
+   "......wwwwwwwww.",
+   "..p...rrrr....fw",
+   "......wwwwwwwww.",
+   "................",
+   "...!............",
+   "................",
+   "W=3.P=1.F=2....."
+  ]
+ },
+ {
+  "name": "Two Shores",
+  "hint": "Just one spare IS. Use it, then use it again.",
+  "map": [
+   "P=1.A=5....a....",
+   "...........a....",
+   "..R.4......a....",
+   "...........a..F.",
+   "..p...r....a....",
+   ".....=.....a..2.",
+   "...........a....",
+   "...........a..f.",
+   "...........a...."
+  ]
+ },
+ {
+  "name": "Supplies",
+  "hint": "Two keys and a rock. Don't waste the wrong one!",
+  "map": [
+   "K=9&4D=3&0aa....",
+   "..........aa....",
+   "W.........aawwww",
+   "=...k.....aaw..w",
+   "3.p.r.....aad.fw",
+   "....k.....aaw..w",
+   "..........aawwww",
+   "..........aa....",
+   "A=5P=1R=4.aaF=2."
+  ]
+ },
+ {
+  "name": "Jumble",
+  "hint": "The words are all here, just in the wrong order.",
+  "map": [
+   "P=1.............",
+   "....wwwwwww.....",
+   "....w.....w.....",
+   "....w.2=F.w.....",
+   "....w.....w.....",
+   "....wp...fw.....",
+   "....wwwwwww.....",
+   "................",
+   "W=3............."
+  ]
+ },
+ {
+  "name": "Pond",
+  "hint": "The water could do the work for you. Just keep it away from the flag!",
+  "map": [
+   "S=6A=5P=1.s.....",
+   "..........s.....",
+   "..........s.....",
+   "..........s..f..",
+   "..p...a...s.....",
+   ".=1.......s.....",
+   "..........s.....",
+   "...A......s.....",
+   "..........s.F=2."
+  ]
+ },
+ {
+  "name": "Vault Door",
+  "hint": "The word you need is locked away.",
+  "map": [
+   "K=9&4.D=3&0.....",
+   "................",
+   "........wwwww...",
+   "........w...w...",
+   "..p..k..d.2.w...",
+   "........w...w...",
+   "........wwwww...",
+   ".F=............f",
+   "W=3.P=1........."
+  ]
+ },
+ {
+  "name": "High Shelf",
+  "hint": "WIN won't budge from its corner. Bring the other words to it.",
+  "map": [
+   "...............2",
+   "...............w",
+   "................",
+   "................",
+   "..p.............",
+   ".....F..........",
+   "..........=.....",
+   "..f.............",
+   "P=1.W=3........."
+  ]
+ },
+ {
+  "name": "Word Pile",
+  "hint": "Careful: some pushes make rules you really don't want.",
+  "map": [
+   "P=1.............",
+   "................",
+   "................",
+   "....FS=2........",
+   ".....=..........",
+   ".....A..........",
+   "..p.............",
+   ".............f..",
+   "................"
+  ]
+ },
+ {
+  "name": "Snug",
+  "hint": "Every way out breaks something... or does it? Look up!",
+  "map": [
+   "........P.......",
+   "........=.......",
+   "................",
+   "......P=1.......",
+   ".......wpw......",
+   "......F=2.......",
+   "........a.......",
+   "..............f.",
+   "W=3.A=5........."
+  ]
+ },
+ {
+  "name": "Maze",
+  "hint": "Guide the key through without getting it stuck.",
+  "map": [
+   "K=9&4.D=3&0.S=6.",
+   "...........F=2..",
+   "..ssssssss......",
+   "..sp.....s......",
+   "..s.k....s......",
+   "..s..s...s......",
+   "..s..s...d.f....",
+   "..s..s...s......",
+   "..ssssssss.P=1.."
+  ]
+ },
+ {
+  "name": "Gatehouse",
+  "hint": "The door won't open. Maybe it could just... walk away?",
+  "map": [
+   "D=3&0.P=1.F=2...",
+   "D=.....1..p.....",
+   "wwwwwwwwdwwwwwww",
+   "................",
+   "..........f.....",
+   "................",
+   "................",
+   "................",
+   "W=3............."
+  ]
+ },
+ {
+  "name": "Long Hall",
+  "hint": "Here the key is the lock, and the door is the key.",
+  "map": [
+   "K=3&0.D=9&4.....",
+   "................",
+   "......wwwwwwwwww",
+   "..........k...f.",
+   "......wwwwwwwwww",
+   "...d............",
+   "..p.............",
+   "................",
+   "W=3.P=1.F=2....."
+  ]
+ },
+ {
+  "name": "Graveyard",
+  "hint": "A skull is sitting right on the flag.",
+  "map": [
+   "S=6.F=2.P=1.....",
+   "................",
+   "...........sss..",
+   "..p........sYs..",
+   "...........s.s..",
+   ".S=.............",
+   "......!.........",
+   "................",
+   "................"
+  ]
+ },
+ {
+  "name": "Bone Line",
+  "hint": "The skulls won't change. But the rock could.",
+  "map": [
+   "S=6.R=4&...s....",
+   "...........s....",
+   "...........s.f..",
+   "...........s....",
+   "..p....r...s....",
+   "...........s....",
+   ".....5.....s....",
+   "...........s....",
+   "P=1.F=2....s...."
+  ]
+ },
+ {
+  "name": "Far Away",
+  "hint": "You start as a rock! Biscuit is the one who can cross the lava.",
+  "map": [
+   "R=1.L=7.R=8.....",
+   "...........l....",
+   "..W=3......l....",
+   "...........l....",
+   "..r...www..l..f.",
+   "......wpw..l....",
+   "......www..l....",
+   "....P.=1...l....",
+   "F=2........l...."
+  ]
+ },
+ {
+  "name": "Two Locks",
+  "hint": "First find a way into the stone room, then deal with the door.",
+  "map": [
+   "D=3&0.....R=3P=1",
+   "..www.w.p.......",
+   "..wW=3w....rrrrr",
+   "..www.w....r...r",
+   ".....aw....d.f.r",
+   ".wwwww.....r...r",
+   ".w.4.w.....rrrrr",
+   ".wwwww..........",
+   "A=5.F=2.D=......"
+  ]
+ },
+ {
+  "name": "Obstacle Course",
+  "hint": "One rock, one key, one river, one door. Plan the order!",
+  "map": [
+   "A=5.R=4.K=9&4...",
+   "......wwwwwwwwww",
+   "......a....w....",
+   "..r...a....w....",
+   "..p.k.a....d..f.",
+   "......a....w....",
+   "......a....w....",
+   "......wwwwwwwwww",
+   "D=3&0.W=3.P=1F=2"
+  ]
+ },
+ {
+  "name": "Frost Summit",
+  "hint": "Get unstuck, clear the hall, then finish the flag rule.",
+  "map": [
+   "..P.K=3&0.D=9&4.",
+   "..=.........wwww",
+   ".....d......k..f",
+   "P=1.......=.wwww",
+   ".wpw............",
+   "..a......s.s....",
+   ".........Fs2....",
+   ".........s.s....",
+   "W=3.A=5........."
+  ]
+ },
+ {
+  "name": "Corner Store",
+  "hint": "BOX IS PULL: walk away from a box and it follows you.",
+  "map": [
+   "B=~.P=1.F=2.W=3.",
+   "................",
+   "................",
+   ".......wwwwwww..",
+   ".....pb......fw.",
+   ".......wwwwwww..",
+   "................",
+   "................",
+   "................"
+  ]
+ },
+ {
+  "name": "Night Watch",
+  "hint": "MOVE things walk on their own. Press SPACE (or the Wait button) to wait a turn.",
+  "map": [
+   "W=3...www.......",
+   "......w.w.......",
+   "......w.w...F=2.",
+   "......w.w.......",
+   "..p.........f...",
+   "......wsw.......",
+   "......w.w.......",
+   "......w.w.......",
+   "S=6&^.www..P=1.."
+  ],
+  "dirs": [
+   [
+    7,
+    5,
+    2
+   ]
+  ]
+ },
+ {
+  "name": "Lookout",
+  "hint": "You can't reach it... but it can reach you.",
+  "map": [
+   "F=2&^.P=1.W=3...",
+   "..wwwwwwwwwwww..",
+   "..w.f........w..",
+   "..wwwwww.wwwww..",
+   "................",
+   "................",
+   "........p.......",
+   "................",
+   "................"
+  ]
+ },
+ {
+  "name": "Storeroom",
+  "hint": "A box stuck in a corner can't be pushed out... but it can be pulled.",
+  "map": [
+   "B=4&~A=5P=1F=2..",
+   "wwwwwwwwww......",
+   "wb.......w......",
+   "w........w......",
+   "w..p.....a..f...",
+   "w........w......",
+   "w........w......",
+   "wwwwwwwwww......",
+   "W=3............."
+  ]
+ },
+ {
+  "name": "Quarry",
+  "hint": "The rocks can't be pushed. Could they go on their own?",
+  "map": [
+   "A=5R=.P=1.a.....",
+   "....w.w...a.....",
+   "....w^w...a.....",
+   "....w.w...a.....",
+   "..p.......a..f..",
+   "...r......a.....",
+   "..........a.....",
+   "......r...a.....",
+   "F=2.W=3...a....."
+  ]
+ },
+ {
+  "name": "Mudroom",
+  "hint": "The key keeps bumping into the door. What does it need?",
+  "map": [
+   "K=^&.D=3&0.P=1..",
+   "................",
+   "......9.........",
+   "...........wwwww",
+   "...wk......d..fw",
+   "...........wwwww",
+   "................",
+   "..p.............",
+   "W=3.F=2........."
+  ]
+ },
+ {
+  "name": "Ledge",
+  "hint": "You take two steps at a time now. Sometimes waiting is a step too.",
+  "map": [
+   "P=1&^.A=5.F=2...",
+   "................",
+   "................",
+   "..wwwwwwwwww....",
+   "..p......fa.....",
+   "..wwwwwwwwww....",
+   "................",
+   "................",
+   "................"
+  ]
+ },
+ {
+  "name": "Ember Fields",
+  "hint": "Watch the lava, then make your move.",
+  "map": [
+   "L=7&^.P=1.P=8...",
+   "w.......f......w",
+   "w.ll...........w",
+   "w..............w",
+   "w.........lll..w",
+   "w..............w",
+   "w....ll........w",
+   "w..............w",
+   "F=2.....p......."
+  ],
+  "dirs": [
+   [
+    3,
+    4,
+    3
+   ],
+   [
+    11,
+    4,
+    3
+   ],
+   [
+    12,
+    4,
+    3
+   ]
+  ]
+ },
+ {
+  "name": "Ringside",
+  "hint": "RING IS TELE: step into one ring and pop out of the other.",
+  "map": [
+   "O=@.A=5.P=1.F=2.",
+   "..........a.....",
+   "..........a.....",
+   "..........a.....",
+   "..p...o...a..o..",
+   "..........a.....",
+   "..........a..f..",
+   "..........a.....",
+   "..........a....."
+  ]
+ },
+ {
+  "name": "Little Room",
+  "hint": "Words can travel through rings too.",
+  "map": [
+   "O=@.P=1.W=3.....",
+   "................",
+   "........wwwww...",
+   "........wF=ow...",
+   "........wwwww...",
+   "..p..2.o........",
+   "................",
+   "...........f....",
+   "................"
+  ]
+ },
+ {
+  "name": "Bone Wall",
+  "hint": "The box keeps rolling. Point it somewhere useful.",
+  "map": [
+   "B=^&5.S=6...s...",
+   "B=4.........s...",
+   "............s.f.",
+   "......b.....s...",
+   "..p.........s...",
+   "............s...",
+   "............s...",
+   "............s...",
+   "P=1.F=2.....s..."
+  ],
+  "dirs": [
+   [
+    6,
+    3,
+    2
+   ]
+  ]
+ },
+ {
+  "name": "Back Room",
+  "hint": "You can't get in there. The rock can.",
+  "map": [
+   "R=..P=1.W=3.....",
+   "................",
+   ".............F..",
+   "....wwwwwwwww=w.",
+   "...wr.2.......w.",
+   "....wwwwwwwwwww.",
+   "......^.........",
+   "..p.............",
+   "..........f....."
+  ]
+ },
+ {
+  "name": "Fairground",
+  "hint": "Both rings are on the move. Pick your moment!",
+  "map": [
+   "O=@&^.P=1.P=8...",
+   ".......wa.......",
+   ".......wawlllo..",
+   ".......wa.......",
+   ".wp..o.wa.......",
+   "........a.....f.",
+   "........a.......",
+   "........a.......",
+   "F=2.W=3.a......."
+  ]
+ },
+ {
+  "name": "Nook",
+  "hint": "You're boxed in. Maybe the flag will visit.",
+  "map": [
+   "........F.......",
+   "........=.......",
+   "................",
+   "........^.......",
+   ".......wpw......",
+   ".......w.w......",
+   ".......w.w......",
+   ".......wfw......",
+   "W=3.P=1.F=2....."
+  ],
+  "dirs": [
+   [
+    8,
+    7,
+    0
+   ]
+  ]
+ },
+ {
+  "name": "Cliffside",
+  "hint": "Skulls fall in water too.",
+  "map": [
+   "S=6A=5P=1.aW=3..",
+   "..........a.....",
+   "...s......a.....",
+   "..........a.....",
+   "..p.......a..f..",
+   "..........a.....",
+   ".s........a.....",
+   "..........a.....",
+   "S=.....^.wa..F=2"
+  ],
+  "dirs": [
+   [
+    1,
+    6,
+    3
+   ]
+  ]
+ },
+ {
+  "name": "Long Hallway",
+  "hint": "The guard never stops... unless it trips over something.",
+  "map": [
+   "S=^&6&!.R=4.....",
+   "................",
+   "................",
+   "......wwwwwwwww.",
+   "..pr......s...fw",
+   "......wwwwwwwww.",
+   "................",
+   "................",
+   "P=1.F=2.W=3....."
+  ],
+  "dirs": [
+   [
+    10,
+    4,
+    3
+   ]
+  ]
+ },
+ {
+  "name": "Rail Yard",
+  "hint": "The key knows where to go. Something is in its way.",
+  "map": [
+   "K=^&9.D=3&0.B=~.",
+   "............wwww",
+   "............w..w",
+   "............w..w",
+   "..k.....b...d.fw",
+   "............w..w",
+   "......p.....wwww",
+   "................",
+   "P=1.F=2.W=3....."
+  ]
+ },
+ {
+  "name": "Two Rivers",
+  "hint": "The rock can't swim. But it can travel.",
+  "map": [
+   "O.....a....a...P",
+   "=.....a....a...=",
+   "@.....a....a...1",
+   "R.....a....a...F",
+   "=.pr.oa..o.a.f.=",
+   "4.....a....a...2",
+   "A.....a....a....",
+   "=.....a....a....",
+   "5.....a....a...."
+  ]
+ },
+ {
+  "name": "Red Fence",
+  "hint": "The walls are deadly, and they melt. The rock just needs some heat.",
+  "map": [
+   "W=6&8.R=^&.w....",
+   "...........w....",
+   "...........w....",
+   "...........w....",
+   "...r.......w..f.",
+   "...........w....",
+   ".....7.....w....",
+   "..p........w....",
+   "P=1.F=2....w...."
+  ]
+ },
+ {
+  "name": "Guard Post",
+  "hint": "The guard won't let you through. Show it the way out.",
+  "map": [
+   "O=......F=2S=^&6",
+   "............www.",
+   "............wow.",
+   "......wwwwwwwww.",
+   "......s......ofw",
+   "......wwwwwwwww.",
+   "..@..p..........",
+   "................",
+   "W=3.P=1........."
+  ],
+  "dirs": [
+   [
+    6,
+    4,
+    1
+   ]
+  ]
+ },
+ {
+  "name": "Locked Studio",
+  "hint": "Send the key ahead. It can find the door by itself, with a little help.",
+  "map": [
+   "K=9&4&.D=3&0O=@.",
+   "F=2.............",
+   ".........wwwwww.",
+   ".........w...fw.",
+   ".........d.Z..w.",
+   ".........w....w.",
+   "...ok....wwwwww.",
+   "..p.........^...",
+   "W=3P=1....L=7P=8"
+  ]
+ },
+ {
+  "name": "Crossing",
+  "hint": "The rock keeps bumping into the wall. The rings could help it through.",
+  "map": [
+   "R=^.O=..w..a....",
+   "........w..a....",
+   "......@.w..a....",
+   "........w..a....",
+   ".p..r..ow.oa..f.",
+   "........w..a....",
+   "........w..a....",
+   "........w..a....",
+   "W=3.A=5.wP=1.F=2"
+  ]
+ },
+ {
+  "name": "Narrows",
+  "hint": "Two rivers wide. The rock can only fill one gap by itself.",
+  "map": [
+   "R.........aa...A",
+   "=.........aa...=",
+   "^.........aa...5",
+   ".wwwwwwwwwaa...P",
+   ".w......r.aa..f=",
+   ".wwwww.wwwaa...1",
+   "B.....b...aa...F",
+   "=...p.....aa...=",
+   "4.........aa...2"
+  ],
+  "dirs": [
+   [
+    8,
+    4,
+    3
+   ]
+  ]
+ },
+ {
+  "name": "Tunnel Vision",
+  "hint": "The guard only ever goes one way. Follow, don't meet.",
+  "map": [
+   "O=@.S=^&6.P=1...",
+   "...p............",
+   "................",
+   "www.wwwwwwwwwwww",
+   "o....s....f....o",
+   "wwwwwwwwwwwwwwww",
+   "................",
+   "................",
+   "F=2.W=3........."
+  ]
+ },
+ {
+  "name": "Ember Hall",
+  "hint": "The lava can't go where something is STOP.",
+  "map": [
+   "L=^&7.P=1.P=8...",
+   "...p............",
+   "................",
+   "..w.wwwwwwww....",
+   "..w....l...w....",
+   "..wwwwwww.ww....",
+   "........wfw.....",
+   ".........w......",
+   "F=2.P=.....3.W=3"
+  ],
+  "dirs": [
+   [
+    7,
+    4,
+    3
+   ]
+  ]
+ },
+ {
+  "name": "Wide River",
+  "hint": "Water that is PULL is solid... and it follows you.",
+  "map": [
+   "A=5P=1F=2.aa....",
+   "..........aa....",
+   "..........aa....",
+   "..........aa....",
+   "..p.......aa.f..",
+   "..........aa....",
+   "A.........aa....",
+   "=.........aa....",
+   "...~......aa...."
+  ]
+ },
+ {
+  "name": "Watchman",
+  "hint": "The guard can be pushed. Where would you like it to go?",
+  "map": [
+   "S=^&4&6.A=5.P=1.",
+   "..........a.....",
+   "..........a.....",
+   "..........a.....",
+   "..p.....s.a..f..",
+   "..........a.....",
+   "..........a.....",
+   "..........a.....",
+   "F=2.......a....."
+  ],
+  "dirs": [
+   [
+    8,
+    4,
+    2
+   ]
+  ]
+ },
+ {
+  "name": "Islands",
+  "hint": "Rings and boxes both make portals here.",
+  "map": [
+   "O=@.B=@.P=1.F=2.",
+   ".....a.....a....",
+   ".....a.....a....",
+   ".....a.....a....",
+   "..p.oa.o.b.a.b.f",
+   ".....a.....a....",
+   ".....a.....a....",
+   ".....a.....a....",
+   "A=5..a.....a...."
+  ]
+ },
+ {
+  "name": "Canyon Run",
+  "hint": "One thing at a time: the guard, the box, then the ring.",
+  "map": [
+   "S=^&6B=~O=@P=1..",
+   "...www......aa.F",
+   "...wsw......aaf=",
+   "...w.w...wwwaa.2",
+   ".p......b..oaaoW",
+   "...w.w...wwwaa.=",
+   "...w.w......aa.3",
+   "...www......aa..",
+   "A=5www......aa.."
+  ],
+  "dirs": [
+   [
+    4,
+    2,
+    2
+   ]
+  ]
+ },
+ {
+  "name": "Sunset",
+  "hint": "Everything Sunset Canyon taught you, all at once.",
+  "map": [
+   "B=4&~.O=@.R=....",
+   "wwwwwww..a...a..",
+   "wb....w..a...a..",
+   "w.....w..a..^a..",
+   "w..p..a..a.o.a.f",
+   "w.....w..a...a..",
+   "wwwwwww.oa..ra..",
+   ".........a...a..",
+   "A=5.W=3P=1F=2a.."
+  ]
+ }
+];
+
+function loadLevel(lv){
+  const rows=lv.map, H=rows.length, W=Math.max(...rows.map(r=>r.length));
+  const objs=[]; let id=1;
+  for(let y=0;y<H;y++) for(let x=0;x<W;x++){
+    const ch=rows[y][x]||'.'; if(ch==='.') continue;
+    if(COMBO_CH[ch]) COMBO_CH[ch].forEach(t=>objs.push({id:id++,type:t,x,y,dir:1}));
+    else if(OBJ_CH[ch]) objs.push({id:id++,type:OBJ_CH[ch],x,y,dir:1});
+    else {
+      let word=NOUN_CH[ch]||PROP_CH[ch]||(ch==='='?'IS':ch==='&'?'AND':null);
+      if(word) objs.push({id:id++,type:'TEXT',word,x,y,dir:1});
+    }
+  }
+  if(lv.dirs) for(const [x,y,d] of lv.dirs) for(const o of objs) if(o.x===x&&o.y===y&&o.type!=='TEXT') o.dir=d;
+  const s={W,H,objs,nextId:id};
+  applyTransforms(s,computeRules(s));
+  return s;
+}
+
+function computeRules(s){
+  const grid=new Map();
+  for(const o of s.objs) if(o.type==='TEXT'){ const k=o.y*s.W+o.x; if(!grid.has(k)) grid.set(k,[]); grid.get(k).push(o); }
+  const find=(x,y,pred)=>{ if(x<0||y<0||x>=s.W||y>=s.H) return null; const a=grid.get(y*s.W+x); return a?(a.find(pred)||null):null; };
+  const isNoun=o=>wkind(o.word)==='noun', isTgt=o=>{const k=wkind(o.word); return k==='noun'||k==='prop';};
+  const props=new Map(), trans=new Map(), active=new Set(), sentences=new Set();
+  for(const t of s.objs){
+    if(t.type!=='TEXT'||!isNoun(t)) continue;
+    for(const [dx,dy] of [[1,0],[0,1]]){
+      let cx=t.x+dx, cy=t.y+dy; const subj=[t.word], ids=[t.id];
+      while(true){ const a=find(cx,cy,o=>o.word==='AND'); const n=a&&find(cx+dx,cy+dy,isNoun);
+        if(a&&n){ subj.push(n.word); ids.push(a.id,n.id); cx+=2*dx; cy+=2*dy; } else break; }
+      const is=find(cx,cy,o=>o.word==='IS'); if(!is) continue;
+      ids.push(is.id); cx+=dx; cy+=dy;
+      const tg=find(cx,cy,isTgt); if(!tg) continue;
+      const tgts=[tg.word]; ids.push(tg.id); cx+=dx; cy+=dy;
+      while(true){ const a=find(cx,cy,o=>o.word==='AND'); const n=a&&find(cx+dx,cy+dy,isTgt);
+        if(a&&n){ tgts.push(n.word); ids.push(a.id,n.id); cx+=2*dx; cy+=2*dy; } else break; }
+      for(const sb of subj) for(const g of tgts){
+        sentences.add(sb+' IS '+g);
+        if(wkind(g)==='prop'){ if(!props.has(sb)) props.set(sb,new Set()); props.get(sb).add(g); }
+        else { if(!trans.has(sb)) trans.set(sb,[]); if(!trans.get(sb).includes(g)) trans.get(sb).push(g); }
+      }
+      ids.forEach(i=>active.add(i));
+    }
+  }
+  return {props,trans,active,sentences:[...sentences]};
+}
+function has(rules,o,p){ if(o.type==='TEXT') return p==='PUSH'; const s=rules.props.get(o.type); return !!s&&s.has(p); }
+
+function applyTransforms(s,rules){
+  let changed=false; const out=[];
+  for(const o of s.objs){
+    if(o.type!=='TEXT'){ const t=rules.trans.get(o.type);
+      if(t&&!t.includes(o.type)){ changed=true; t.forEach((nt,i)=>out.push({...o,type:nt,id:i===0?o.id:s.nextId++,morph:true})); continue; } }
+    out.push(o);
+  }
+  s.objs=out; return changed;
+}
+
+function cloneState(s){ return {W:s.W,H:s.H,nextId:s.nextId,objs:s.objs.map(o=>{const c={...o}; delete c.morph; return c;})}; }
+
+const MAX_TEXT_PUSH=2;
+function step(state,dir){
+  const s=cloneState(state); let rules=computeRules(s);
+  const res={state:s,moved:false,pushed:false,won:false,lost:false,destroyed:[]};
+  if(!s.objs.some(o=>has(rules,o,'YOU'))){ res.lost=true; return res; }
+  const objsAt=(x,y)=>s.objs.filter(o=>o.x===x&&o.y===y);
+  let moved=new Set(); const everMoved=new Set();
+  function solid(a){ return (has(rules,a,'STOP')||has(rules,a,'PULL'))&&!has(rules,a,'PUSH'); }
+  function tryMove(o,d,txt,fromYou){ txt=txt||0;
+    const dx=DX[d], dy=DY[d], nx=o.x+dx, ny=o.y+dy;
+    if(nx<0||ny<0||nx>=s.W||ny>=s.H) return false;
+    const here=objsAt(nx,ny);
+    for(const a of here){ if(a.id!==o.id&&solid(a)){ const unlock=(has(rules,o,'OPEN')&&has(rules,a,'SHUT'))||(has(rules,o,'SHUT')&&has(rules,a,'OPEN')); if(!unlock) return false; } }
+    for(const a of here){ if(a.id!==o.id&&has(rules,a,'PUSH')){ const nt=txt+(a.type==='TEXT'?1:0); if(fromYou&&nt>MAX_TEXT_PUSH) return false; if(!tryMove(a,d,nt,fromYou)) return false; if(!has(rules,a,'YOU')) res.pushed=true; } }
+    const ox=o.x, oy=o.y; o.x=nx; o.y=ny; if(o.type!=='TEXT') o.dir=d; moved.add(o.id); everMoved.add(o.id);
+    for(const p of objsAt(ox-dx,oy-dy)){ if(p.id!==o.id&&has(rules,p,'PULL')&&!moved.has(p.id)) tryMove(p,d); }
+    return true;
+  }
+  if(dir>=0){
+    const dx=DX[dir], dy=DY[dir];
+    const movers=s.objs.filter(o=>has(rules,o,'YOU'));
+    movers.sort((a,b)=>(b.x*dx+b.y*dy)-(a.x*dx+a.y*dy));
+    for(const m of movers){ m.dir=dir; if(!moved.has(m.id)) tryMove(m,dir,0,true); }
+  }
+  const dead=new Set(); res.destroyed=[];
+  function interact(){
+    const R=computeRules(s); const H=(o,p)=>has(R,o,p); const cells=new Map();
+    for(const o of s.objs){ if(dead.has(o.id)) continue; const k=o.y*s.W+o.x; if(!cells.has(k)) cells.set(k,[]); cells.get(k).push(o); }
+    for(let L of cells.values()){
+      if(L.length>1) L.forEach(o=>{ if(H(o,'WEAK')) dead.add(o.id); });
+      L=L.filter(o=>!dead.has(o.id));
+      if(L.length>1&&L.some(o=>H(o,'SINK'))) L.forEach(o=>dead.add(o.id));
+      L=L.filter(o=>!dead.has(o.id));
+      if(L.some(o=>H(o,'DEFEAT'))) L.forEach(o=>{ if(H(o,'YOU')) dead.add(o.id); });
+      L=L.filter(o=>!dead.has(o.id));
+      if(L.some(o=>H(o,'HOT'))) L.forEach(o=>{ if(H(o,'MELT')) dead.add(o.id); });
+      L=L.filter(o=>!dead.has(o.id));
+      const op=L.filter(o=>H(o,'OPEN')), sh=L.filter(o=>H(o,'SHUT'));
+      if(op.length&&sh.length){ op.forEach(o=>dead.add(o.id)); sh.forEach(o=>dead.add(o.id)); }
+    }
+    res.destroyed.push(...s.objs.filter(o=>dead.has(o.id)));
+    s.objs=s.objs.filter(o=>!dead.has(o.id));
+  }
+  if(s.objs.some(o=>has(rules,o,'MOVE'))||s.objs.some(o=>has(rules,o,'TELE'))) interact();
+  // MOVE phase
+  rules=computeRules(s); moved=new Set();
+  const mv=s.objs.filter(o=>o.type!=='TEXT'&&has(rules,o,'MOVE')).sort((a,b)=>a.id-b.id);
+  for(const o of mv){ if(moved.has(o.id)) continue; const d=o.dir===undefined?1:o.dir; if(!tryMove(o,d)){ const r=(d+2)%4; o.dir=r; tryMove(o,r); } }
+  // TELE phase
+  rules=computeRules(s);
+  const tele=s.objs.filter(o=>o.type!=='TEXT'&&has(rules,o,'TELE'));
+  if(tele.length){ const done=new Set();
+    for(const o of s.objs){ if(!everMoved.has(o.id)||done.has(o.id)) continue;
+      const T=tele.find(t=>t.id!==o.id&&t.x===o.x&&t.y===o.y&&!(o.type===t.type)); if(!T) continue;
+      const other=tele.filter(t=>t.type===T.type&&t.id!==T.id&&t.id!==o.id).sort((a,b)=>a.id-b.id)[0]; if(!other) continue;
+      o.x=other.x; o.y=other.y; done.add(o.id); res.teleported=true; } }
+  res.moved=everMoved.size>0;
+  // resolve
+  rules=computeRules(s);
+  if(applyTransforms(s,rules)) res.transformed=true;
+  interact();
+  rules=computeRules(s);
+  const cells2=new Map();
+  for(const o of s.objs){ const k=o.y*s.W+o.x; if(!cells2.has(k)) cells2.set(k,[]); cells2.get(k).push(o); }
+  for(const L of cells2.values()) if(L.some(o=>has(rules,o,'YOU'))&&L.some(o=>has(rules,o,'WIN'))) res.won=true;
+  res.lost=!res.won&&!s.objs.some(o=>has(rules,o,'YOU'));
+  return res;
+}
+function stateKey(s){ return s.objs.map(o=>(o.word||o.type)+','+o.x+','+o.y+(o.type!=='TEXT'&&o.type!=='PUP'?','+o.dir:'')).sort().join('|'); }
+// ===== END ENGINE =====
+
+
+const COL={PUP:'#f2b45e',WALL:'#8c86a8',ROCK:'#c49a6c',FLAG:'#ffd34d',WATER:'#5fb0ff',SKULL:'#ef6b6b',KEY:'#ffd34d',DOOR:'#d8814a',LAVA:'#ff7a2e',BOX:'#e2a453',RING:'#c98bff',
+ YOU:'#ff8fb8',WIN:'#ffd34d',STOP:'#5fd17a',PUSH:'#c49a6c',SINK:'#5fb0ff',DEFEAT:'#ef6b6b',HOT:'#ff7a2e',MELT:'#8fe0ff',OPEN:'#ffd34d',SHUT:'#ef6b6b',WEAK:'#b7f0e8',PULL:'#9fb4ff',MOVE:'#c4f06a',TELE:'#e08bff',IS:'#ffffff',AND:'#ffffff'};
+const LAYER={WATER:0,LAVA:0,RING:0.5,BOX:2,FLAG:2.5,DOOR:1,WALL:1,KEY:2,ROCK:2,SKULL:2,TEXT:3,PUP:4};
+const cv=document.getElementById('c'); let ctx=cv.getContext('2d');
+const HEROES={biscuit:{name:'Biscuit',word:'PUP',col:'#f2b45e'},doggo:{name:'Doggo',word:'DOGGO',col:'#e9e4f2'},
+  hen:{name:'Lady Clucksalot',word:'CHEEKEN',col:'#6fd39b',brag:'is clucking with pride! 🐔'},cat:{name:'Noodle',word:'CAT',col:'#f0a04b',brag:'is purring with pride! 🐱'}};
+const CAT_COATS=[
+ {name:'orange tabby',base:'#f0a04b',stripe:'#c96f22',belly:'#fde7c8',ear:'#f0a04b',tail:'#f0a04b'},
+ {name:'gray tabby',base:'#9ea3ad',stripe:'#5f6470',belly:'#e9ebef',ear:'#9ea3ad',tail:'#9ea3ad'},
+ {name:'calico',base:'#fbf7f0',patch1:'#e8893a',patch2:'#2b2628',belly:'#ffffff',ear:'#e8893a',tail:'#2b2628'},
+ {name:'tuxedo',base:'#26232a',belly:'#ffffff',ear:'#26232a',tail:'#26232a',muzzle:'#ffffff'},
+ {name:'cream & cocoa',base:'#f3e6cf',points:'#6b4a35',belly:'#fff6e6',ear:'#6b4a35',tail:'#6b4a35'},
+ {name:'lavender',base:'#c7b6e8',stripe:'#9a84c9',belly:'#f1ebfb',ear:'#c7b6e8',tail:'#c7b6e8'}];
+let catCoat=0; try{ catCoat=JSON.parse(localStorage.getItem('rulebound')||'{}').catCoat|0; }catch(e){}
+
+let heroKey='biscuit'; try{ const h=JSON.parse(localStorage.getItem('rulebound')||'{}').hero; if(HEROES[h]) heroKey=h; }catch(e){}
+let HERO=HEROES[heroKey];
+const disp=w=> w==='PUP'?HERO.word:w;
+const heroText=s=> s.replace(/Biscuit/g,HERO.name).replace(/\bPUP\b/g,HERO.word);
+let cur=0, state=null, hist=[], rules=null, won=false, ts=48, ox=0, oy=0;
+const rpos=new Map(), born=new Map(); let parts=[];
+let progress=0, done=new Set();
+try{ const d=JSON.parse(localStorage.getItem('rulebound')||'{}'); done=new Set(d.done||[]); }catch(e){}
+function save(){ try{ localStorage.setItem('rulebound',JSON.stringify({done:[...done],hero:heroKey,catCoat})); }catch(e){} }
+const unlocked=i=> i===0 || done.has(i-1) || done.has(i);
+
+// ---- sound
+let actx=null, muted=false;
+function beep(f,d=.07,type='square',v=.05,slide=0){ if(muted) return; try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+  const o=actx.createOscillator(), g=actx.createGain(); o.type=type; o.frequency.value=f; if(slide) o.frequency.linearRampToValueAtTime(f+slide,actx.currentTime+d);
+  g.gain.setValueAtTime(v,actx.currentTime); g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+d); o.connect(g).connect(actx.destination); o.start(); o.stop(actx.currentTime+d); }catch(e){} }
+
+// ---- worlds
+const WORLD_SIZE=30;
+const WORLDS=[
+ {name:'Doodle Valley',emoji:'✏️',board:'#1c1929',lines:'rgba(140,160,230,.13)',margin:'rgba(255,120,150,.3)',page:'#15131f',intro:''},
+ {name:'Frost Hollow',emoji:'❄️',board:'#13222b',lines:'rgba(150,220,255,.16)',margin:'rgba(120,230,255,.35)',page:'#0f1a21',intro:'Welcome to World 2: Frost Hollow! ❄️ New word: WEAK. WEAK things break when anything steps on them.'},
+ {name:'Sunset Canyon',emoji:'🌵',board:'#24161b',lines:'rgba(255,170,120,.14)',margin:'rgba(255,200,90,.38)',page:'#170f12',intro:'Welcome to World 3: Sunset Canyon! 🌵 New words: BOX, RING, PULL, MOVE and TELE. PULL things follow you when you walk away. MOVE things walk on their own. TELE rings send you to the other ring. Press SPACE (or the Wait button) to wait a turn.'}];
+const worldOf=i=>i<0?0:Math.floor(i/WORLD_SIZE);
+const SANDBOX={name:'Sandbox',hint:'Free play! Every word block in the game is here, plus one of each thing. Build any rules you like. You can push up to 2 words at a time. Tap ⟲ to reset.',map:[
+ "P=1.................",
+ "....................",
+ ".W.R.F.A.S.K.D.L.B.O",
+ "....................",
+ ".=.=.=.=.=.=.&.&.&..",
+ "....................",
+ ".2.3.4.5.6.7.8.9.0.!",
+ "....................",
+ ".~.^.@.P.1..........",
+ "....................",
+ "..p..r..b..k..d..f..",
+ ".o.ww.a..l..s....o.."]};
+const curLevel=()=>cur<0?SANDBOX:LEVELS[cur];
+let menuWorld=0;
+// ---- level flow
+function start(i){
+  stopWalk();
+  cur=i; state=loadLevel(curLevel()); hist=[]; won=false; rpos.clear(); born.clear(); parts=[];
+  for(const o of state.objs) rpos.set(o.id,{x:o.x,y:o.y});
+  rules=computeRules(state);
+  const w=worldOf(i), W=WORLDS[w];
+  document.getElementById('lvnum').textContent=i<0?'🧪 ':W.emoji+' W'+(w+1)+' · Level '+(i+1)+' ·';
+  document.body.style.background=W.page;
+  document.getElementById('bWait').style.display=(w>=2||i<0)?'':'none';
+  document.getElementById('lvname').textContent=heroText(curLevel().name);
+  hide('menu'); hide('win'); hintBox.style.display='none'; toast(''); updateRules(); resize();
+  if(i<0){ hintBox.textContent='🧪 '+heroText(SANDBOX.hint); hintBox.style.display='block'; }
+  else if(i%WORLD_SIZE===0 && W.intro){ hintBox.textContent=W.intro; hintBox.style.display='block'; [392,523,659,784,1047].forEach((f,k)=>setTimeout(()=>beep(f,.14,'triangle',.05),k*90)); }
+}
+function show(id){ document.getElementById(id).classList.add('show'); }
+function hide(id){ document.getElementById(id).classList.remove('show'); }
+const toastEl=document.getElementById('toast'), hintBox=document.getElementById('hintBox');
+function toast(t){ toastEl.textContent=t; toastEl.style.display=t?'block':'none'; }
+
+function move(d){
+  if(!state||won||document.querySelector('.overlay.show')) return;
+  const r=step(state,d);
+  if(stateKey(r.state)===stateKey(state) && !r.won && !r.lost){ beep(110,.05,'triangle',.03);
+    if(d>=0) for(const o of state.objs) if(has(rules,o,'YOU')) o.dir=d; return; }
+  hist.push(state); if(hist.length>2000) hist.shift();
+  const old=new Map(state.objs.map(o=>[o.id,o]));
+  state=r.state; rules=computeRules(state);
+  for(const o of state.objs){ const p=old.get(o.id); if(!p||p.type!==o.type){ born.set(o.id,performance.now()); if(!rpos.has(o.id)) rpos.set(o.id,{x:o.x,y:o.y}); } }
+  for(const o of r.destroyed){ burst(o.x,o.y,COL[o.type==='TEXT'?o.word:o.type]||'#fff',14); }
+  if(r.destroyed.length) beep(180,.18,'sawtooth',.05,-120);
+  else if(r.transformed) beep(500,.2,'sine',.06,400);
+  else if(r.teleported) beep(700,.15,'sine',.05,-500);
+  else if(r.pushed) beep(260,.06,'square',.035);
+  else beep(420,.04,'triangle',.03);
+  updateRules();
+  hintBox.style.display='none';
+  if(r.won) return winLevel();
+  toast(r.lost?'Nothing is YOU! Press Undo (Z) or ⟲':'');
+}
+function undo(){ stopWalk(); if(!hist.length||won) return; state=hist.pop(); rules=computeRules(state); for(const o of state.objs) if(!rpos.has(o.id)) rpos.set(o.id,{x:o.x,y:o.y}); updateRules(); toast(''); beep(330,.05,'triangle',.03,-100); }
+function restart(){ stopWalk(); if(won) return; hist.push(state); const s=loadLevel(curLevel()); state=s; rules=computeRules(state); for(const o of state.objs) rpos.set(o.id,{x:o.x,y:o.y}); updateRules(); toast(''); beep(240,.12,'triangle',.04,-80); }
+function winLevel(){
+  if(cur<0){ [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.16,'square',.05),i*110));
+    for(let i=0;i<80;i++) parts.push({x:Math.random()*cv.clientWidth,y:-20-Math.random()*200,vx:(Math.random()-.5)*2,vy:2+Math.random()*3,c:['#ff8fb8','#ffd34d','#5fd17a','#5fb0ff','#fff'][i%5],life:240,s:4+Math.random()*5,rot:Math.random()*6,conf:true});
+    toast('🎉 You win! Keep experimenting, or tap ⟲ to reset.'); return; }
+  won=true; done.add(cur); save();
+  [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.16,'square',.05),i*110));
+  for(let i=0;i<120;i++) parts.push({x:Math.random()*cv.width,y:-20-Math.random()*200,vx:(Math.random()-.5)*2,vy:2+Math.random()*3,c:['#ff8fb8','#ffd34d','#5fd17a','#5fb0ff','#fff'][i%5],life:240,s:4+Math.random()*5,rot:Math.random()*6,conf:true});
+  const last=cur===LEVELS.length-1;
+  document.getElementById('winText').textContent= last?'You beat every puzzle! '+HERO.name+' '+(HERO.brag||'is wagging with pride! 🐶'):'"'+heroText(LEVELS[cur].name)+'" complete!';
+  const newWorld=!last && worldOf(cur+1)!==worldOf(cur);
+  if(newWorld) document.getElementById('winText').textContent='You finished '+WORLDS[worldOf(cur)].name+'! A new world awaits...';
+  document.getElementById('bNext').textContent= last?'Back to levels':newWorld?'Enter '+WORLDS[worldOf(cur+1)].name+' '+WORLDS[worldOf(cur+1)].emoji:'Next puzzle ▶';
+  setTimeout(()=>show('win'),900);
+}
+document.getElementById('bNext').onclick=()=>{ if(cur<LEVELS.length-1) start(cur+1); else openMenu(); };
+function openMenu(w){
+  stopWalk();
+  if(w===undefined) w=(state&&cur>=0)?worldOf(cur):menuWorld; menuWorld=w;
+  const nW=Math.ceil(LEVELS.length/WORLD_SIZE), WB=document.getElementById('worlds'); WB.innerHTML='';
+  for(let k=0;k<nW;k++){ const b=document.createElement('button'); b.textContent=WORLDS[k].emoji+' World '+(k+1);
+    if(k===w) b.className='sel'; if(!unlocked(k*WORLD_SIZE)) { b.disabled=true; b.textContent+=' 🔒'; } b.onclick=()=>openMenu(k); WB.appendChild(b); }
+  const lo=w*WORLD_SIZE, hi=Math.min(LEVELS.length,lo+WORLD_SIZE), got=[...done].filter(i=>i>=lo&&i<hi).length;
+  document.getElementById('wname').textContent=WORLDS[w].name+' · '+got+'/'+(hi-lo)+' ★'+(hi-lo<WORLD_SIZE?' · more levels coming soon!':'');
+  const L=document.getElementById('levels'); L.innerHTML='';
+  for(let i=lo;i<hi;i++){ const lv=LEVELS[i]; const b=document.createElement('button'); b.textContent=i+1; b.title=heroText(lv.name);
+    if(done.has(i)) b.className='done'; if(!unlocked(i)) b.disabled=true; b.onclick=()=>start(i); L.appendChild(b); }
+  hide('win'); show('menu');
+}
+function updateRules(){
+  const el=document.getElementById('rules'); el.innerHTML='';
+  for(const s of rules.sentences){ const c=document.createElement('span'); c.className='chip';
+    c.innerHTML=s.split(' ').map(w=>`<span style="color:${COL[w]||'#fff'}">${disp(w)}</span>`).join(' '); el.appendChild(c); }
+}
+
+// ---- input
+const KEYS={ArrowUp:0,KeyW:0,ArrowRight:1,KeyD:1,ArrowDown:2,KeyS:2,ArrowLeft:3,KeyA:3};
+let lastKey=0;
+addEventListener('keydown',e=>{
+  if(e.code in KEYS||e.code==='KeyZ'||e.code==='KeyR'||e.code==='Escape') stopWalk();
+  if(e.code in KEYS){ e.preventDefault(); const now=performance.now(); if(e.repeat&&now-lastKey<110) return; lastKey=now; move(KEYS[e.code]); }
+  else if(e.code==='KeyZ'||e.code==='Backspace'){ e.preventDefault(); undo(); }
+  else if(e.code==='KeyR'){ restart(); }
+  else if(e.code==='Escape'){ openMenu(); }
+  else if((e.code==='Enter'||e.code==='Space') && document.getElementById('win').classList.contains('show')) document.getElementById('bNext').click();
+  else if(e.code==='Space'||e.code==='Period'){ e.preventDefault(); move(-1); }
+});
+document.querySelectorAll('#pad button').forEach(b=>{
+  let t=null; const d=+b.dataset.d;
+  const go=e=>{ e.preventDefault(); move(d); clearInterval(t); t=setInterval(()=>move(d),180); };
+  const stop=()=>clearInterval(t);
+  b.addEventListener('pointerdown',go); b.addEventListener('pointerup',stop); b.addEventListener('pointerleave',stop); b.addEventListener('pointercancel',stop);
+});
+let sw=null;
+cv.addEventListener('touchstart',e=>{ document.body.classList.add('touch'); resize(); const t=e.touches[0]; sw={x:t.clientX,y:t.clientY}; },{passive:true});
+cv.addEventListener('touchend',e=>{ if(!sw) return; const t=e.changedTouches[0]; const dx=t.clientX-sw.x, dy=t.clientY-sw.y; sw=null;
+  lastTouch=performance.now();
+  if(Math.max(Math.abs(dx),Math.abs(dy))<24){ const c=cellAt(t.clientX,t.clientY); if(c) tapTo(c); return; }
+  move(Math.abs(dx)>Math.abs(dy)?(dx>0?1:3):(dy>0?2:0)); });
+let lastTouch=0;
+cv.addEventListener('click',e=>{ if(performance.now()-lastTouch<600) return; const c=cellAt(e.clientX,e.clientY); if(c) tapTo(c); });
+// ---- tap a square to walk there (same row or column, nothing in the way)
+let walking=null, tapMark=null;
+function cellAt(px,py){ if(!state) return null; const r=cv.getBoundingClientRect(); const x=Math.floor((px-r.left-ox)/ts), y=Math.floor((py-r.top-oy)/ts);
+  return (x<0||y<0||x>=state.W||y>=state.H)?null:{x,y}; }
+function stopWalk(){ if(walking){ clearInterval(walking); walking=null; } }
+function tapTo(c){
+  if(!state||won||document.querySelector('.overlay.show')) return;
+  stopWalk();
+  const yous=state.objs.filter(o=>has(rules,o,'YOU')); if(!yous.length) return;
+  if(yous.some(o=>o.x===c.x&&o.y===c.y)){ tapMark={...c,t:performance.now(),ok:true}; move(-1); return; }
+  const DXY=[[0,-1],[1,0],[0,1],[-1,0]];
+  const dirOf=(dx,dy)=>dy<0?0:dx>0?1:dy>0?2:3;
+  // a square is "in the way" if it has something solid you can't push, or something that would hurt you
+  const blockedAt=(x,y,me)=>{ if(x<0||y<0||x>=state.W||y>=state.H) return true;
+    for(const o of state.objs){ if(o.x!==x||o.y!==y||o.id===me.id) continue;
+      if(has(rules,o,'PUSH')) continue;
+      if(has(rules,o,'STOP')||has(rules,o,'PULL')||has(rules,o,'DEFEAT')||has(rules,o,'SINK')||(has(rules,o,'HOT')&&has(rules,me,'MELT'))||has(rules,o,'SHUT')||has(rules,o,'OPEN')) return true; }
+    return false; };
+  const seqClear=(me,seq)=>{ let x=me.x,y=me.y; for(const d of seq){ x+=DXY[d][0]; y+=DXY[d][1]; if(blockedAt(x,y,me)) return {ok:false,x,y}; } return {ok:true}; };
+  const plans=[];
+  for(const me of yous){ const ddx=c.x-me.x, ddy=c.y-me.y, ax=Math.abs(ddx), ay=Math.abs(ddy);
+    const h=Array(ax).fill(dirOf(Math.sign(ddx),0)), v=Array(ay).fill(dirOf(0,Math.sign(ddy)));
+    if(ax===0||ay===0) plans.push({me,seq:ax?h:v});
+    else if(ay===1) plans.push({me,seq:[...v,...h]},{me,seq:[...h,...v]});
+    else if(ax===1) plans.push({me,seq:[...h,...v]},{me,seq:[...v,...h]}); }
+  plans.sort((p,q)=>p.seq.length-q.seq.length);
+  if(!plans.length){ tapMark={...c,t:performance.now(),ok:false}; beep(110,.05,'triangle',.03); return; }
+  let plan=null, fail=null;
+  for(const p of plans){ if(p.seq.length===1){ plan=p; break; } const r=seqClear(p.me,p.seq); if(r.ok){ plan=p; break; } if(!fail) fail=r; }
+  if(!plan){ tapMark={x:fail.x,y:fail.y,t:performance.now(),ok:false}; beep(110,.05,'triangle',.03); return; }
+  tapMark={...c,t:performance.now(),ok:true};
+  const id=plan.me.id, seq=plan.seq; let k=0;
+  const stepOnce=()=>{ const b=state.objs.find(o=>o.id===id); if(!b||won||k>=seq.length){ stopWalk(); return; }
+    if(k===seq.length-1&&seq.length>1){ const nx=b.x+DXY[seq[k]][0], ny=b.y+DXY[seq[k]][1];
+      if(state.objs.some(o=>o.x===nx&&o.y===ny&&o.id!==id&&has(rules,o,'PUSH'))){ stopWalk(); return; } }
+    move(seq[k]); k++; const a=state.objs.find(o=>o.id===id);
+    if(won||!a||k>=seq.length||(a.x===b.x&&a.y===b.y)) stopWalk(); };
+  stepOnce(); if(seq.length>1) walking=setInterval(stepOnce,140);
+}
+if(matchMedia('(pointer:coarse)').matches) document.body.classList.add('touch');
+document.getElementById('bUndo').onclick=undo;
+document.getElementById('bSandbox').onclick=()=>start(-1);
+document.getElementById('bWait').onclick=()=>move(-1);
+document.getElementById('bReset').onclick=restart;
+document.getElementById('bMenu').onclick=()=>openMenu();
+document.getElementById('bHint').onclick=()=>{ if(!state) return; hintBox.textContent='💡 '+heroText(curLevel().hint); hintBox.style.display=hintBox.style.display==='block'?'none':'block'; };
+document.getElementById('bSound').onclick=e=>{ muted=!muted; e.currentTarget.textContent=muted?'🔇':'🔊'; };
+
+// ---- layout
+function resize(){
+  const st=document.getElementById('stage'); const w=st.clientWidth, h=st.clientHeight; const dpr=devicePixelRatio||1;
+  cv.width=w*dpr; cv.height=h*dpr; cv.style.width=w+'px'; cv.style.height=h+'px'; ctx.setTransform(dpr,0,0,dpr,0,0);
+  if(state){ ts=Math.floor(Math.min((w-16)/state.W,(h-16)/state.H)); ox=Math.floor((w-ts*state.W)/2); oy=Math.floor((h-ts*state.H)/2); }
+}
+addEventListener('resize',resize);
+
+// ---- drawing
+function rr(x,y,w,h,r){ ctx.beginPath(); ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h); }
+function burst(x,y,c,n){ for(let i=0;i<n;i++){ const a=Math.random()*6.28, s=1+Math.random()*3; parts.push({gx:x,gy:y,x:0,y:0,vx:Math.cos(a)*s,vy:Math.sin(a)*s,c,life:40,s:3+Math.random()*4}); } }
+function drawObj(o,x,y,s,t){
+  const cx=x+s/2, cy=y+s/2;
+  switch(o.type){
+  case 'PUP':{ if(heroKey==='hen'){ drawHen(o,x,y,s,t); break; } if(heroKey==='cat'){ drawCat(o,x,y,s,t); break; }
+    const B=heroKey==='doggo'; const b=Math.sin(t/180+o.id)*.025*s; const f=[0,1,0,-1][o.dir], fy=[-1,0,1,0][o.dir];
+    const fx=f*s*.06, fyy=fy*s*.035, side=f===-1?1:-1, wag=Math.sin(t/90);
+    const body=B?'#fbfaf7':'#f2b45e', belly=B?'#ffffff':'#fde3b8', head=B?'#fbfaf7':'#f2b45e', ear=B?'#1f1b1e':'#9a5a28', muzzle=B?'#ffffff':'#fde3b8', paw=B?'#ffffff':'#e9a24c';
+    ctx.fillStyle='rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(cx,y+s*.88,s*.32,s*.07,0,0,7); ctx.fill();
+    ctx.strokeStyle=B?'#ece8e2':'#c98a3e'; ctx.lineWidth=s*.08; ctx.lineCap='round'; const tx=cx+side*s*.4, ty=cy+s*(-.02+wag*.07);
+    ctx.beginPath(); ctx.moveTo(cx+side*s*.24,cy+s*.2); ctx.quadraticCurveTo(cx+side*s*.42,cy+s*.15,tx,ty); ctx.stroke();
+    if(B){ ctx.fillStyle='#1f1b1e'; ctx.beginPath(); ctx.arc(tx,ty,s*.045,0,7); ctx.fill(); }
+    ctx.fillStyle=body; ctx.beginPath(); ctx.ellipse(cx,cy+s*.17,s*.29,s*.22,0,0,7); ctx.fill();
+    if(B){ ctx.save(); ctx.beginPath(); ctx.ellipse(cx,cy+s*.17,s*.29,s*.22,0,0,7); ctx.clip();
+      ctx.fillStyle='#1f1b1e'; ctx.beginPath(); ctx.ellipse(cx+side*s*.14,cy+s*.06,s*.09,s*.07,.3,0,7); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx-side*s*.08,cy+s*.3,s*.035,0,7); ctx.fill(); ctx.restore(); }
+    ctx.fillStyle=belly; ctx.beginPath(); ctx.ellipse(cx+fx*.5,cy+s*.22,s*.14,s*.12,0,0,7); ctx.fill();
+    ctx.fillStyle=paw; for(const px of [-.13,.13]){ ctx.beginPath(); ctx.ellipse(cx+px*s,y+s*.84,s*.08,s*.05,0,0,7); ctx.fill(); }
+    const hx=cx+fx*.6, hy=cy-s*.06+b;
+    ctx.fillStyle=head; ctx.beginPath(); ctx.arc(hx,hy,s*.25,0,7); ctx.fill();
+    
+    ctx.fillStyle=ear; for(const sd of [-1,1]){ ctx.beginPath(); ctx.ellipse(hx+sd*s*.22,hy+s*(B?.08:.04)+Math.abs(b)*.5,s*(B?.09:.08),s*(B?.19:.15),sd*(B?.2:.35),0,7); ctx.fill(); }
+    ctx.fillStyle=muzzle; ctx.beginPath(); ctx.ellipse(hx+fx,hy+s*.09+fyy,s*.12,s*.085,0,0,7); ctx.fill();
+    ctx.fillStyle='#2a1a10'; ctx.beginPath(); ctx.ellipse(hx+fx*1.2,hy+s*.05+fyy,s*.045,s*.032,0,0,7); ctx.fill();
+    for(const ex of [-.09,.09]){ ctx.beginPath(); ctx.arc(hx+ex*s+fx,hy-s*.04+fyy,s*.035,0,7); ctx.fill(); }
+    ctx.fillStyle='#fff'; for(const ex of [-.09,.09]){ ctx.beginPath(); ctx.arc(hx+ex*s+fx+s*.012,hy-s*.055+fyy,s*.012,0,7); ctx.fill(); }
+    ctx.fillStyle='rgba(255,110,110,.35)'; for(const ex of [-.16,.16]){ ctx.beginPath(); ctx.ellipse(hx+ex*s+fx*.6,hy+s*.06,s*.04,s*.025,0,0,7); ctx.fill(); }
+    break;}
+  case 'WALL':{ ctx.fillStyle='#3b3552'; ctx.fillRect(x,y,s+.5,s+.5); ctx.strokeStyle='#2a253b'; ctx.lineWidth=Math.max(1,s*.05);
+    ctx.beginPath(); ctx.moveTo(x,y+s/2); ctx.lineTo(x+s,y+s/2); ctx.moveTo(x+s/2,y); ctx.lineTo(x+s/2,y+s/2); ctx.moveTo(x+s*.2,y+s/2); ctx.lineTo(x+s*.2,y+s); ctx.moveTo(x+s*.75,y+s/2); ctx.lineTo(x+s*.75,y+s); ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.06)'; ctx.fillRect(x,y,s,s*.08); break;}
+  case 'ROCK':{ ctx.fillStyle='#8a6440'; ctx.beginPath(); ctx.ellipse(cx,cy+s*.06,s*.36,s*.3,0,0,7); ctx.fill();
+    ctx.fillStyle='#c49a6c'; ctx.beginPath(); ctx.ellipse(cx-s*.02,cy+s*.02,s*.33,s*.26,0,0,7); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.25)'; ctx.beginPath(); ctx.ellipse(cx-s*.12,cy-s*.08,s*.09,s*.05,-.4,0,7); ctx.fill(); break;}
+  case 'FLAG':{ const w=Math.sin(t/200)*s*.05; ctx.strokeStyle='#e9e4f5'; ctx.lineWidth=s*.06; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(x+s*.3,y+s*.85); ctx.lineTo(x+s*.3,y+s*.15); ctx.stroke();
+    ctx.fillStyle='#ffd34d'; ctx.beginPath(); ctx.moveTo(x+s*.33,y+s*.17); ctx.quadraticCurveTo(x+s*.55,y+s*.17+w,x+s*.8,y+s*.3+w); ctx.quadraticCurveTo(x+s*.55,y+s*.4-w,x+s*.33,y+s*.48); ctx.fill();
+    ctx.shadowBlur=0; break;}
+  case 'WATER':{ ctx.fillStyle='#2b6fc0'; ctx.fillRect(x,y,s+.5,s+.5); ctx.strokeStyle='rgba(180,220,255,.55)'; ctx.lineWidth=s*.05;
+    for(let k=0;k<2;k++){ ctx.beginPath(); const yy=y+s*(.35+k*.35); for(let i=0;i<=8;i++){ const xx=x+s*i/8; const v=yy+Math.sin(t/300+i*.9+k*2+x*.05)*s*.04; i?ctx.lineTo(xx,v):ctx.moveTo(xx,v);} ctx.stroke(); } break;}
+  case 'LAVA':{ ctx.fillStyle='#c93a12'; ctx.fillRect(x,y,s+.5,s+.5);
+    for(let k=0;k<3;k++){ const p=(t/900+k*.33+(x+y)*.013)%1; ctx.fillStyle=`rgba(255,${150+k*30},40,${.8-p*.6})`; ctx.beginPath(); ctx.arc(x+s*(.2+.3*k),y+s*(.8-p*.5),s*(.08+p*.06),0,7); ctx.fill(); } break;}
+  case 'SKULL':{ ctx.fillStyle='rgba(239,107,107,.25)'; ctx.beginPath(); ctx.arc(cx,cy,s*.42,0,7); ctx.fill();
+    ctx.fillStyle='#f2e8dc'; ctx.beginPath(); ctx.arc(cx,cy-s*.04,s*.27,0,7); ctx.fill(); rr(cx-s*.16,cy+s*.1,s*.32,s*.18,s*.05); ctx.fill();
+    ctx.fillStyle='#3a1520'; for(const ex of [-.1,.1]){ ctx.beginPath(); ctx.arc(cx+ex*s,cy-s*.03,s*.07,0,7); ctx.fill(); }
+    ctx.fillRect(cx-s*.08,cy+s*.17,s*.03,s*.1); ctx.fillRect(cx-s*.015,cy+s*.17,s*.03,s*.1); ctx.fillRect(cx+s*.05,cy+s*.17,s*.03,s*.1); break;}
+  case 'KEY':{ ctx.strokeStyle='#ffd34d'; ctx.fillStyle='#ffd34d'; ctx.lineWidth=s*.09; ctx.beginPath(); ctx.arc(x+s*.32,cy,s*.14,0,7); ctx.stroke();
+    ctx.fillRect(x+s*.45,cy-s*.045,s*.38,s*.09); ctx.fillRect(x+s*.68,cy,s*.07,s*.15); ctx.fillRect(x+s*.78,cy,s*.06,s*.11); break;}
+  case 'BOX':{ ctx.fillStyle='#8a5a28'; rr(x+s*.1,y+s*.1,s*.8,s*.8,s*.08); ctx.fill(); ctx.fillStyle='#d9994f'; rr(x+s*.16,y+s*.16,s*.68,s*.68,s*.05); ctx.fill();
+    ctx.strokeStyle='#8a5a28'; ctx.lineWidth=s*.07; ctx.beginPath(); ctx.moveTo(x+s*.18,y+s*.18); ctx.lineTo(x+s*.82,y+s*.82); ctx.moveTo(x+s*.82,y+s*.18); ctx.lineTo(x+s*.18,y+s*.82); ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.18)'; ctx.fillRect(x+s*.16,y+s*.16,s*.68,s*.06); break;}
+  case 'RING':{ const g=ctx.createRadialGradient(cx,cy,s*.05,cx,cy,s*.42); g.addColorStop(0,'#1b0f2e'); g.addColorStop(.6,'#5a2c8a'); g.addColorStop(1,'rgba(201,139,255,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,s*.42,0,7); ctx.fill();
+    ctx.strokeStyle='#d9a8ff'; ctx.lineWidth=s*.07; ctx.beginPath(); ctx.ellipse(cx,cy,s*.32,s*.32,0,0,7); ctx.stroke();
+    ctx.strokeStyle='rgba(255,220,255,.8)'; ctx.lineWidth=s*.035; for(let k=0;k<3;k++){ const a=t/400+k*2.094; ctx.beginPath(); ctx.arc(cx,cy,s*.18,a,a+1.2); ctx.stroke(); } break;}
+  case 'DOOR':{ ctx.fillStyle='#7a4220'; rr(x+s*.12,y+s*.06,s*.76,s*.9,s*.12); ctx.fill(); ctx.fillStyle='#a85a2c'; rr(x+s*.18,y+s*.12,s*.64,s*.8,s*.08); ctx.fill();
+    ctx.strokeStyle='#7a4220'; ctx.lineWidth=s*.03; ctx.beginPath(); ctx.moveTo(cx,y+s*.12); ctx.lineTo(cx,y+s*.92); ctx.stroke();
+    ctx.fillStyle='#ffd34d'; ctx.beginPath(); ctx.arc(x+s*.68,cy+s*.06,s*.05,0,7); ctx.fill(); break;}
+  case 'TEXT':{ const w=o.word, c=COL[w]||'#fff', k=wkind(w), act=rules.active.has(o.id);
+    const wig=act?Math.sin(t/250+o.id)*s*.015:0;
+    ctx.globalAlpha*=act?1:.45;
+    const p=s*.06;
+    if(k==='prop'){ ctx.fillStyle=c; rr(x+p,y+p+wig,s-2*p,s-2*p,s*.14); ctx.fill(); ctx.fillStyle='#1a1424'; }
+    else { ctx.fillStyle='#1e1a2c'; rr(x+p,y+p+wig,s-2*p,s-2*p,s*.14); ctx.fill(); ctx.strokeStyle=c; ctx.lineWidth=s*.05; ctx.stroke(); ctx.fillStyle=c; }
+    let fs=s*.36; ctx.font=`700 ${fs}px Fredoka, system-ui`; const mw=ctx.measureText(disp(w)).width; if(mw>s*.78){ fs*=s*.78/mw; ctx.font=`700 ${fs}px Fredoka, system-ui`; }
+    ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(disp(w),cx,cy+wig+s*.02); break;}
+  }
+}
+function drawHen(o,x,y,s,t){
+  const cx=x+s/2, cy=y+s/2, f=[0,1,0,-1][o.dir], fy=[-1,0,1,0][o.dir], dir=f===-1?-1:1;
+  const bob=Math.abs(Math.sin(t/160+o.id))*s*.03, peck=Math.sin(t/700+o.id)>.92?s*.04:0;
+  ctx.fillStyle='rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(cx,y+s*.88,s*.28,s*.06,0,0,7); ctx.fill();
+  ctx.strokeStyle='#3a3a46'; ctx.lineWidth=s*.04; ctx.lineCap='round';
+  for(const lx of [-.07,.07]){ ctx.beginPath(); ctx.moveTo(cx+lx*s,cy+s*.22); ctx.lineTo(cx+lx*s,y+s*.85); ctx.moveTo(cx+lx*s-s*.05,y+s*.86); ctx.lineTo(cx+lx*s+s*.06,y+s*.86); ctx.stroke(); }
+  // tail feathers
+  for(let i=0;i<3;i++){ ctx.fillStyle=i===1?'#24402f':'#16151b'; ctx.beginPath(); ctx.ellipse(cx-dir*s*(.24+i*.02),cy-s*(.02+i*.07)-bob,s*.07,s*.18,-dir*(.5+i*.25),0,7); ctx.fill(); }
+  // body
+  ctx.fillStyle='rgba(200,230,255,.13)'; ctx.beginPath(); ctx.arc(cx,cy,s*.44,0,7); ctx.fill();
+  ctx.fillStyle='#1c1b22'; ctx.beginPath(); ctx.ellipse(cx,cy+s*.08-bob,s*.28,s*.22,0,0,7); ctx.fill(); ctx.strokeStyle='rgba(230,240,255,.45)'; ctx.lineWidth=Math.max(1,s*.02); ctx.stroke();
+  ctx.strokeStyle='rgba(90,200,140,.55)'; ctx.lineWidth=s*.03; ctx.beginPath(); ctx.ellipse(cx-dir*s*.03,cy+s*.06-bob,s*.15,s*.1,-dir*.3,dir>0?3.4:-.3,dir>0?5.6:2.0); ctx.stroke();
+  ctx.strokeStyle='rgba(150,110,230,.4)'; ctx.beginPath(); ctx.arc(cx-dir*s*.05,cy+s*.12-bob,s*.1,.3,1.6); ctx.stroke();
+  // head
+  const hx=cx+dir*s*.15+f*s*.02, hy=cy-s*.16-bob+fy*s*.02+peck;
+  ctx.fillStyle='#e23b3b'; for(let i=0;i<3;i++){ ctx.beginPath(); ctx.arc(hx-dir*s*.06+dir*i*s*.055,hy-s*.13-(i===1?s*.02:0),s*.045,0,7); ctx.fill(); }
+  ctx.fillStyle='#1c1b22'; ctx.beginPath(); ctx.arc(hx,hy,s*.14,0,7); ctx.fill(); ctx.strokeStyle='rgba(230,240,255,.45)'; ctx.lineWidth=Math.max(1,s*.02); ctx.stroke();
+  ctx.strokeStyle='rgba(90,200,140,.6)'; ctx.lineWidth=s*.025; ctx.beginPath(); ctx.arc(hx,hy,s*.11,3.6,4.8); ctx.stroke();
+  ctx.fillStyle='#4a3a2a'; ctx.beginPath(); ctx.moveTo(hx+dir*s*.12,hy-s*.02); ctx.lineTo(hx+dir*s*.23,hy+s*.02); ctx.lineTo(hx+dir*s*.12,hy+s*.05); ctx.fill();
+  ctx.fillStyle='#e23b3b'; ctx.beginPath(); ctx.ellipse(hx+dir*s*.1,hy+s*.11,s*.035,s*.055,0,0,7); ctx.fill();
+  ctx.fillStyle='#e23b3b'; ctx.beginPath(); ctx.arc(hx+dir*s*.05,hy-s*.02,s*.05,0,7); ctx.fill();
+  ctx.fillStyle='#2a1a10'; ctx.beginPath(); ctx.arc(hx+dir*s*.055,hy-s*.025,s*.028,0,7); ctx.fill();
+  ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(hx+dir*s*.065,hy-s*.035,s*.01,0,7); ctx.fill();
+}
+function rnd(n){ const v=Math.sin(n*12.9898+78.233)*43758.5453; return v-Math.floor(v); }
+function drawCat(o,x,y,s,t){
+  const C=CAT_COATS[catCoat%CAT_COATS.length];
+  const cx=x+s/2, cy=y+s/2, f=[0,1,0,-1][o.dir], fy=[-1,0,1,0][o.dir], fx=f*s*.06, fyy=fy*s*.035, side=f===-1?1:-1;
+  const b=Math.sin(t/200+o.id)*.02*s, sway=Math.sin(t/400);
+  ctx.fillStyle='rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(cx,y+s*.88,s*.3,s*.06,0,0,7); ctx.fill();
+  ctx.strokeStyle=C.tail; ctx.lineWidth=s*.07; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(cx+side*s*.22,cy+s*.26);
+  ctx.bezierCurveTo(cx+side*s*.45,cy+s*.2,cx+side*s*.42,cy-s*.1,cx+side*s*(.32+sway*.06),cy-s*.18); ctx.stroke();
+  ctx.fillStyle=C.base; ctx.beginPath(); ctx.ellipse(cx,cy+s*.18,s*.26,s*.21,0,0,7); ctx.fill();
+  ctx.save(); ctx.beginPath(); ctx.ellipse(cx,cy+s*.18,s*.26,s*.21,0,0,7); ctx.clip();
+  if(C.stripe){ ctx.strokeStyle=C.stripe; ctx.lineWidth=s*.04; for(const k of [-.12,0,.12]){ ctx.beginPath(); ctx.moveTo(cx+k*s+side*s*.05,cy); ctx.lineTo(cx+k*s+side*s*.1,cy+s*.12); ctx.stroke(); } }
+  if(C.patch1){ ctx.fillStyle=C.patch1; ctx.beginPath(); ctx.ellipse(cx+side*s*.13,cy+s*.08,s*.12,s*.09,0,0,7); ctx.fill(); ctx.fillStyle=C.patch2; ctx.beginPath(); ctx.ellipse(cx-side*s*.14,cy+s*.24,s*.09,s*.07,0,0,7); ctx.fill(); }
+  ctx.restore();
+  ctx.fillStyle=C.belly; ctx.beginPath(); ctx.ellipse(cx+fx*.5,cy+s*.24,s*.12,s*.11,0,0,7); ctx.fill();
+  ctx.fillStyle=C.points||C.belly; for(const px of [-.11,.11]){ ctx.beginPath(); ctx.ellipse(cx+px*s,y+s*.85,s*.07,s*.045,0,0,7); ctx.fill(); }
+  const hx=cx+fx*.6, hy=cy-s*.08+b;
+  for(const sd of [-1,1]){ ctx.fillStyle=C.ear; ctx.beginPath(); ctx.moveTo(hx+sd*s*.2,hy-s*.06); ctx.lineTo(hx+sd*s*.18,hy-s*.3); ctx.lineTo(hx+sd*s*.04,hy-s*.17); ctx.fill();
+    ctx.fillStyle='#f6a7b8'; ctx.beginPath(); ctx.moveTo(hx+sd*s*.17,hy-s*.1); ctx.lineTo(hx+sd*s*.165,hy-s*.24); ctx.lineTo(hx+sd*s*.08,hy-s*.16); ctx.fill(); }
+  ctx.fillStyle=C.base; ctx.beginPath(); ctx.ellipse(hx,hy,s*.23,s*.2,0,0,7); ctx.fill();
+  if(C.patch2){ ctx.save(); ctx.beginPath(); ctx.ellipse(hx,hy,s*.23,s*.2,0,0,7); ctx.clip(); ctx.fillStyle=C.patch2; ctx.beginPath(); ctx.ellipse(hx-s*.15,hy-s*.1,s*.12,s*.11,0,0,7); ctx.fill(); ctx.fillStyle=C.patch1; ctx.beginPath(); ctx.ellipse(hx+s*.16,hy-s*.12,s*.1,s*.09,0,0,7); ctx.fill(); ctx.restore(); }
+  if(C.stripe){ ctx.strokeStyle=C.stripe; ctx.lineWidth=s*.03; for(const k of [-.05,0,.05]){ ctx.beginPath(); ctx.moveTo(hx+k*s,hy-s*.19); ctx.lineTo(hx+k*s*1.2,hy-s*.11); ctx.stroke(); } }
+  if(C.points){ ctx.fillStyle=C.points; ctx.beginPath(); ctx.ellipse(hx+fx,hy+s*.06+fyy,s*.11,s*.08,0,0,7); ctx.fill(); }
+  else { ctx.fillStyle=C.muzzle||C.belly; ctx.beginPath(); ctx.ellipse(hx+fx,hy+s*.07+fyy,s*.1,s*.07,0,0,7); ctx.fill(); }
+  for(const ex of [-.09,.09]){ ctx.fillStyle='#7fd06a'; ctx.beginPath(); ctx.ellipse(hx+ex*s+fx,hy-s*.03+fyy,s*.045,s*.05,0,0,7); ctx.fill();
+    ctx.fillStyle='#1a1424'; ctx.beginPath(); ctx.ellipse(hx+ex*s+fx,hy-s*.03+fyy,s*.015,s*.04,0,0,7); ctx.fill(); }
+  ctx.fillStyle='#f27f9b'; ctx.beginPath(); ctx.moveTo(hx+fx-s*.03,hy+s*.04+fyy); ctx.lineTo(hx+fx+s*.03,hy+s*.04+fyy); ctx.lineTo(hx+fx,hy+s*.075+fyy); ctx.fill();
+  ctx.strokeStyle=C.base==='#26232a'?'rgba(255,255,255,.7)':'rgba(40,30,40,.55)'; ctx.lineWidth=Math.max(1,s*.012);
+  for(const sd of [-1,1]) for(const k of [-.02,.03]){ ctx.beginPath(); ctx.moveTo(hx+fx+sd*s*.08,hy+s*(.07+k)+fyy); ctx.lineTo(hx+fx+sd*s*.24,hy+s*(.05+k*2)+fyy); ctx.stroke(); }
+}
+
+const off=document.createElement('canvas'), octx=off.getContext('2d'), sil=document.createElement('canvas'), sctx=sil.getContext('2d');
+function mkNoise(n,fn){ const c=document.createElement('canvas'); c.width=c.height=n; const g=c.getContext('2d'); const d=g.createImageData(n,n);
+  for(let i=0;i<d.data.length;i+=4){ const [v,a]=fn(); d.data[i]=d.data[i+1]=d.data[i+2]=v; d.data[i+3]=a; } g.putImageData(d,0,0); return c; }
+const HATCH=(()=>{ const n=48,c=document.createElement('canvas'); c.width=c.height=n; const g=c.getContext('2d'); g.strokeStyle='#000'; g.lineCap='round';
+  for(let d=-n;d<n*2;d+=7){ g.lineWidth=3+Math.random()*2; g.beginPath(); g.moveTo(d+Math.random()*2,n); g.lineTo(d+n+Math.random()*2,0); g.stroke(); } return c; })();
+const DOTS=(()=>{ const n=10,c=document.createElement('canvas'); c.width=c.height=n; const g=c.getContext('2d'); g.fillStyle='#000'; g.beginPath(); g.arc(5,5,2.2,0,7); g.fill(); return c; })();
+const tmp=document.createElement('canvas'), tctx=tmp.getContext('2d');
+function masked(pat,alpha){ tmp.width=off.width; tmp.height=off.height; tctx.drawImage(off,0,0); tctx.globalCompositeOperation='destination-in'; tctx.globalAlpha=alpha||1; tctx.fillStyle=tctx.createPattern(pat,'repeat'); tctx.fillRect(0,0,tmp.width,tmp.height); tctx.globalCompositeOperation='source-over'; tctx.globalAlpha=1; return tmp; }
+const GRAIN=mkNoise(180,()=>[150+Math.random()*105,255]), SPECK=mkNoise(160,()=>[0,Math.random()<.28?255:0]);
+function silo(col){ sctx.setTransform(1,0,0,1,0,0); sctx.globalCompositeOperation='source-over'; sctx.clearRect(0,0,sil.width,sil.height); sctx.drawImage(off,0,0); sctx.globalCompositeOperation='source-in'; sctx.fillStyle=col; sctx.fillRect(0,0,sil.width,sil.height); sctx.globalCompositeOperation='source-over'; return sil; }
+function outline(col,r,jit){ const S=silo(col); for(let i=0;i<8;i++){ const a=i/8*6.283; const j=jit?(rnd(i+jit)-.5)*r*.8:0; ctx.drawImage(S,Math.cos(a)*r+j,Math.sin(a)*r+j); } }
+function boardBG(W,H,t){
+  const bx=ox-6,by=oy-6,bw=ts*state.W+12,bh=ts*state.H+12;
+  const TH=WORLDS[worldOf(cur)];
+  ctx.fillStyle=TH.board; ctx.fillRect(bx,by,bw,bh);
+  ctx.strokeStyle=TH.lines; ctx.lineWidth=1; for(let j=1;j<state.H*2;j++){ ctx.beginPath(); ctx.moveTo(bx,oy+j*ts/2); ctx.lineTo(bx+bw,oy+j*ts/2); ctx.stroke(); }
+  ctx.strokeStyle=TH.margin; ctx.beginPath(); ctx.moveTo(ox+ts*.5,by); ctx.lineTo(ox+ts*.5,by+bh); ctx.stroke();
+  if(worldOf(cur)===2){ for(let i=0;i<22;i++){ const sx=bx+((rnd(i)*bw+Math.sin(t/900+i)*12+bw)%bw), sy=by+bh-((rnd(i+7)*bh+t*.02*(.5+rnd(i+9)))%bh), r=1+rnd(i+11)*2;
+      ctx.fillStyle=`rgba(255,${150+rnd(i+3)*80|0},80,${.25+.25*Math.sin(t/300+i)})`; ctx.beginPath(); ctx.arc(sx,sy,r,0,7); ctx.fill(); } }
+  if(worldOf(cur)===1){ ctx.strokeStyle='rgba(220,245,255,.35)'; ctx.lineWidth=1.2; for(let i=0;i<26;i++){ const sx=bx+((rnd(i)*bw+t*.012*(.5+rnd(i+3)))%bw), sy=by+((rnd(i+7)*bh+t*.025*(.6+rnd(i+9)))%bh), r=2+rnd(i+11)*3;
+      for(let a=0;a<3;a++){ const an=a*Math.PI/3+t/2000; ctx.beginPath(); ctx.moveTo(sx-Math.cos(an)*r,sy-Math.sin(an)*r); ctx.lineTo(sx+Math.cos(an)*r,sy+Math.sin(an)*r); ctx.stroke(); } } }
+  ctx.strokeStyle='rgba(235,228,250,.8)'; ctx.lineWidth=2; for(const [y0,s0] of [[by,0],[by+bh,7]]){ ctx.beginPath(); for(let i=0;i<=40;i++){ const px=bx+bw*i/40, py=y0+(rnd(i+s0)-.5)*3; i?ctx.lineTo(px,py):ctx.moveTo(px,py);} ctx.stroke(); }
+}
+function frame(t){
+  requestAnimationFrame(frame);
+  const dpr=devicePixelRatio||1, W=cv.width/dpr, H=cv.height/dpr;
+  ctx.clearRect(0,0,W,H);
+  if(state){
+    boardBG(W,H,t);
+    if(off.width!==cv.width||off.height!==cv.height){ off.width=sil.width=cv.width; off.height=sil.height=cv.height; }
+    octx.setTransform(1,0,0,1,0,0); octx.clearRect(0,0,off.width,off.height); octx.setTransform(dpr,0,0,dpr,0,0);
+    const main=ctx; ctx=octx;
+    const list=[...state.objs].sort((a,b)=>{ const la=a.type==='TEXT'?3:LAYER[a.type]??2, lb=b.type==='TEXT'?3:LAYER[b.type]??2;
+      const ya=has(rules,a,'YOU')?10:0, yb=has(rules,b,'YOU')?10:0; return la+ya-(lb+yb); });
+    for(const o of list){
+      let r=rpos.get(o.id); if(!r){ r={x:o.x,y:o.y}; rpos.set(o.id,r); }
+      r.x+=(o.x-r.x)*.35; r.y+=(o.y-r.y)*.35; if(Math.abs(o.x-r.x)<.01) r.x=o.x; if(Math.abs(o.y-r.y)<.01) r.y=o.y;
+      const bt=born.get(o.id); let sc=1; if(bt!==undefined){ const k=(t-bt)/300; if(k>=1) born.delete(o.id); else sc=.3+.7*(1-Math.pow(1-k,3))+Math.sin(k*Math.PI)*.15; }
+      ctx.save(); const px=ox+r.x*ts, py=oy+r.y*ts;
+      if(sc!==1){ ctx.translate(px+ts/2,py+ts/2); ctx.scale(sc,sc); ctx.translate(-px-ts/2,-py-ts/2); }
+      drawObj(o,px,py,ts,t); ctx.restore();
+    }
+    ctx=main;
+    ctx.save(); ctx.setTransform(1,0,0,1,0,0);
+    const boil=Math.floor(t/150)%4;
+    outline('rgba(235,228,250,.9)',Math.max(1.5,ts*.035*dpr),boil*5+3); ctx.drawImage(silo(WORLDS[worldOf(cur)].board),0,0);
+    ctx.filter='saturate(1.25) brightness(1.1)'; ctx.drawImage(masked(HATCH,1),(rnd(boil)-.5)*2*dpr,(rnd(boil+5)-.5)*2*dpr); ctx.filter='none';
+    ctx.globalAlpha=.5; ctx.drawImage(off,0,0); ctx.globalAlpha=1;
+    ctx.restore();
+  }
+  if(tapMark&&state){ const k=(t-tapMark.t)/450; if(k>=1) tapMark=null; else { ctx.save(); ctx.globalAlpha=1-k; ctx.strokeStyle=tapMark.ok?'#7dffa8':'#ff6b6b'; ctx.lineWidth=3;
+    const px=ox+tapMark.x*ts, py=oy+tapMark.y*ts, g=ts*.08+k*ts*.06; rr(px+g,py+g,ts-2*g,ts-2*g,ts*.18); ctx.stroke();
+    if(!tapMark.ok){ ctx.beginPath(); ctx.moveTo(px+ts*.3,py+ts*.3); ctx.lineTo(px+ts*.7,py+ts*.7); ctx.moveTo(px+ts*.7,py+ts*.3); ctx.lineTo(px+ts*.3,py+ts*.7); ctx.stroke(); }
+    ctx.restore(); } }
+  parts=parts.filter(p=>p.life>0);
+  for(const p of parts){ p.life--; p.x+=p.vx; p.y+=p.vy;
+    if(p.conf){ p.vy+=.02; p.rot+=.1; ctx.save(); ctx.translate(p.x/(devicePixelRatio||1)*(devicePixelRatio||1)/(devicePixelRatio||1)*(devicePixelRatio||1),p.y); ctx.rotate(p.rot); ctx.fillStyle=p.c; ctx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2); ctx.restore(); }
+    else { p.vx*=.92; p.vy*=.92; ctx.globalAlpha=p.life/40; ctx.fillStyle=p.c; ctx.fillRect(ox+(p.gx+.5)*ts+p.x*ts*.1-p.s/2, oy+(p.gy+.5)*ts+p.y*ts*.1-p.s/2, p.s,p.s); ctx.globalAlpha=1; }
+  }
+}
+function setHero(k,reroll){ heroKey=k; HERO=HEROES[k];
+  if(k==='cat'){ if(reroll){ let n; do{ n=Math.floor(Math.random()*CAT_COATS.length); }while(n===catCoat%CAT_COATS.length); catCoat=n; }
+    HERO.col=CAT_COATS[catCoat%CAT_COATS.length].base==='#26232a'?'#d8d4e4':CAT_COATS[catCoat%CAT_COATS.length].base; }
+  document.getElementById('catLbl').textContent='cat · '+CAT_COATS[catCoat%CAT_COATS.length].name+' 🎲';
+  COL.PUP=HERO.col; save();
+  document.querySelectorAll('#heroes button').forEach(b=>b.classList.toggle('sel',b.dataset.h===k));
+  if(state){ document.getElementById('rules').innerHTML=''; updateRules(); } }
+document.querySelectorAll('#heroes button').forEach(b=>b.onclick=()=>{ setHero(b.dataset.h,b.dataset.h==='cat'); beep(660,.08,'square',.04,200); });
+function drawPreviews(t){ const main=ctx; const saved=heroKey;
+  document.querySelectorAll('#heroes button').forEach(b=>{ const c=b.querySelector('canvas'); ctx=c.getContext('2d'); ctx.clearRect(0,0,72,72);
+    heroKey=b.dataset.h; drawObj({type:'PUP',dir:b.dataset.h==='hen'?1:2,id:b.dataset.h.length},4,4,64,t); });
+  heroKey=saved; ctx=main; }
+(function prev(t){ if(document.getElementById('menu').classList.contains('show')) drawPreviews(t||0); requestAnimationFrame(prev); })();
+setHero(heroKey);
+resize(); openMenu(); requestAnimationFrame(frame);
+</script>
+</body>
+</html>
