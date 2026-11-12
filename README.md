@@ -29,6 +29,7 @@ k12-sd-fun/
 ├── pong/                     # Level 1 warm-up (browser-native)
 ├── whisker-dash/             # Pixel cat platformer (browser-native, 1–2 players)
 ├── rulebound/                # Word-rule puzzle game: push words to change the rules (browser-native)
+├── slice-flip-3d/            # 3D knife-flipping slicing game (browser-native, three.js)
 ├── capybara-rumble/ sprout-siege/ kitty-and-lotl/ endless-crucible/
 │   sensory-overload/ mothwicks-lantern/ prism-sprint/ thistle-king/ rooftop-flow/
 │                             # More browser-native games (one index.html each)
@@ -61,6 +62,7 @@ Links assume GitHub Pages is enabled for this repo (Settings → Pages → deplo
 | Pong | `https://samueldee-oss.github.io/k12-sd-fun/pong/index.html` |
 | Whisker Dash | `https://samueldee-oss.github.io/k12-sd-fun/whisker-dash/index.html` |
 | Rulebound | `https://samueldee-oss.github.io/k12-sd-fun/rulebound/index.html` |
+| Slice Flip 3D | `https://samueldee-oss.github.io/k12-sd-fun/slice-flip-3d/index.html` |
 | Capybara Rumble | `https://samueldee-oss.github.io/k12-sd-fun/capybara-rumble/index.html` |
 | Sprout Siege | `https://samueldee-oss.github.io/k12-sd-fun/sprout-siege/index.html` |
 | Kitty & Lotl | `https://samueldee-oss.github.io/k12-sd-fun/kitty-and-lotl/index.html` |
