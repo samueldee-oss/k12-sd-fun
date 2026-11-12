@@ -30,6 +30,7 @@ k12-sd-fun/
 ├── whisker-dash/             # Pixel cat platformer (browser-native, 1–2 players)
 ├── capybara-rumble/ sprout-siege/ kitty-and-lotl/ endless-crucible/
 │   sensory-overload/ mothwicks-lantern/ prism-sprint/ thistle-king/ rooftop-flow/
+│   poirot-pigeon/
 │                             # More browser-native games (one index.html each)
 ├── experiments/              # Side projects, not part of the curriculum
 │   └── snake-blender-mode/
@@ -68,6 +69,7 @@ Links assume GitHub Pages is enabled for this repo (Settings → Pages → deplo
 | Prism Sprint | `https://samueldee-oss.github.io/k12-sd-fun/prism-sprint/index.html` |
 | Thistle King | `https://samueldee-oss.github.io/k12-sd-fun/thistle-king/index.html` |
 | Rooftop Flow | `https://samueldee-oss.github.io/k12-sd-fun/rooftop-flow/index.html` |
+| Poirot the Pigeon | `https://samueldee-oss.github.io/k12-sd-fun/poirot-pigeon/index.html` |
 | Snake (experiment) | `https://samueldee-oss.github.io/k12-sd-fun/experiments/snake-blender-mode/index.html` |
 
 The Bank Game is a Pygame program; its web builds are not committed (see `.gitignore`), so it has no public link yet.
