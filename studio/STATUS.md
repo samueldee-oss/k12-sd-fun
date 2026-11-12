@@ -1,6 +1,6 @@
 # Status
 
-_Kept by Claude Code. Last updated 2026-11-09._
+_Kept by Claude Code. Last updated 2026-11-12._
 
 ## Games
 
@@ -12,6 +12,7 @@ _Kept by Claude Code. Last updated 2026-11-09._
 | Bank Game assessment | `bank_game_assessment.py` | Not reviewed yet. | Not checked. |
 | Pong (Level 1 warm-up) | `pong/` | Works. Touch: drag to move, tap to serve; in 2-player mode each half of the court moves its own paddle. | Yes (simulated touch tested; not yet tried on a real iPad). |
 | Whisker Dash | `whisker-dash/` | Works. 70 worlds, 341 levels, 1–2 players, a secret and a hint animal in every world, Home Screen app (cat-face icon) with a full-screen fit for phones. Plan in `whisker-dash/PLAN.md`; automated tests in `whisker-dash/tests/` all pass (2026-11-09). | Touch pad included (not yet tried on a real iPad). |
+| Poirot the Pigeon | `poirot-pigeon/` | Works. 3D whodunit: 3 themed crime scenes (manor, Orient Express, Nile steamer), room pictures searched with magnifying glasses, Poirot-book tricks, easy/hard, 1–2 players. Every case checked solvable by script. Spec in `docs/games/poirot-pigeon.md`. | Touch joysticks and drag-to-inspect included (not yet tried on a real iPad). Needs WebGL. |
 | Snake (side project) | `experiments/snake-blender-mode/` | Works. Fixed 2026-10-20: body was invisible and the game "auto-ended" around 60-70 points. Swipe to steer. | Yes (simulated touch tested; not yet tried on a real iPad). |
 
 A comparison of the Bank Game versions (features, fun, systems lessons) is in `to-desktop/2026-10-21-1600-bank-game-version-comparison.md`.
@@ -28,10 +29,12 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 - Publishing on GitHub Pages would need the builds to load the runtime straight from the CDN (the same `/cdn/` problem), and the builds would need to stop being ignored by Git.
 - Snake is not linked from the dashboard yet.
 - Home Screen apps: all 12 browser games and the dashboard have icons, manifests and offline support (2026-11-06). Not yet tried on a real iPad, and they only install from the GitHub Pages address, which this session could not check is live.
+- Poirot the Pigeon uses a copied three.js file (`poirot-pigeon/three.min.js`, ~600 KB), unlike the other single-file games; it needs WebGL.
 - Pip the Watchman song is not in the repo (it seems to live in a separate `come-follow-me-games` project on the PC). Neither can be made a Home Screen app until its files are added.
 
 ## Recent changes
 
+- 2026-11-12: New game Poirot the Pigeon added (folder, dashboard card, README link, Home Screen icon, archive spec), commit `9374f45`. Same as the claude.ai artifact except three.js loads from the folder instead of a CDN.
 - 2026-11-09: Whisker Dash: on touch screens (1 player), tapping the right 30% of the screen jumps (hold for higher), commit `4aa590e`. Repo copy only.
 - 2026-11-09: Whisker Dash: a secret family and a hint animal in every world (ask it and it tells you exactly where), worlds 62–70 moved after Hotel Lobby 2, VIP Lounge renamed Secret Lounge, cat-face Home Screen icon; the wide view and auto-run from `c4f45c6` are now in the claude.ai page too (artifact publish #110). Commit `0e90ce5`.
 - 2026-11-09: Whisker Dash: full screen and the Home Screen app widen the view to the screen (climbing levels stay 480), new AUTO run button (hold down/tiptoe to stop), NOISE/WIND/GRAV meters moved to the top-right clear of touch buttons (commit `c4f45c6`). All tests pass, plus a wide-view sweep of all 296 levels. Repo copy only; not yet in the claude.ai artifact.
