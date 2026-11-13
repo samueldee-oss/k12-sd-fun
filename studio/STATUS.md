@@ -1,6 +1,6 @@
 # Status
 
-_Kept by Claude Code. Last updated 2026-11-12._
+_Kept by Claude Code. Last updated 2026-11-13._
 
 ## Games
 
@@ -14,6 +14,7 @@ _Kept by Claude Code. Last updated 2026-11-12._
 | Whisker Dash | `whisker-dash/` | Works. 70 worlds, 341 levels, 1–2 players, a secret and a hint animal in every world, Home Screen app (cat-face icon) with a full-screen fit for phones. Plan in `whisker-dash/PLAN.md`; automated tests in `whisker-dash/tests/` all pass (2026-11-09). | Touch pad included (not yet tried on a real iPad). |
 | Rulebound | `rulebound/` | Works. Word-rule puzzle game (Baba Is You-style): 90 levels in 3 worlds plus a Sandbox, 4 heroes, every level checked solvable by a solver. Built on claude.ai and added as-is. | Touch: tap a square to walk there, swipe, or on-screen pad (simulated touch tested; not yet tried on a real iPad). |
 | Poirot the Pigeon | `poirot-pigeon/` | Works. 3D whodunit: 3 themed crime scenes (manor, Orient Express, Nile steamer), room pictures searched with magnifying glasses, Poirot-book tricks, easy/hard, 1–2 players. Every case checked solvable by script. Spec in `docs/games/poirot-pigeon.md`. | Touch joysticks and drag-to-inspect included (not yet tried on a real iPad). Needs WebGL. |
+| Banana Slug Arena | `banana-slug-arena/` | Works. Brotato-style arena: Banana Slug, Frog or Pigeon vs bugs and swamp critters, 20 waves with hordes and 3 bosses, 46 characters, 24 weapons, pets, hats, Danger 0–5, Endless, achievements, run saves. Built on claude.ai and added as-is. Spec in `docs/games/banana-slug-arena.md`. | Touch joystick included (simulated runs tested; not yet tried on a real iPad). |
 | Snake (side project) | `experiments/snake-blender-mode/` | Works. Fixed 2026-10-20: body was invisible and the game "auto-ended" around 60-70 points. Swipe to steer. | Yes (simulated touch tested; not yet tried on a real iPad). |
 
 A comparison of the Bank Game versions (features, fun, systems lessons) is in `to-desktop/2026-10-21-1600-bank-game-version-comparison.md`.
@@ -35,6 +36,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-13: New game Banana Slug Arena added (folder, dashboard card, README link, Home Screen icon, archive spec), commit `f34ed1a`, on `main`. Same file as the claude.ai artifact.
 - 2026-11-12: Rulebound added (`rulebound/`): word-rule puzzle game, 90 levels in 3 worlds plus a Sandbox, listed on the dashboard and in the README. Commit `a550bcf`.
 - 2026-11-12: New game Poirot the Pigeon added (folder, dashboard card, README link, Home Screen icon, archive spec), commit `8f54c2b`, on `main`. Same as the claude.ai artifact except three.js loads from the folder instead of a CDN.
 - 2026-11-09: Whisker Dash: on touch screens (1 player), tapping the right 30% of the screen jumps (hold for higher), commit `4aa590e`. Repo copy only.
