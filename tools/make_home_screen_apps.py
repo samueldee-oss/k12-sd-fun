@@ -8,8 +8,12 @@ For every game listed in GAMES this script:
   * adds the Home Screen tags to <game>/index.html between
     <!-- home-screen-app --> and <!-- /home-screen-app --> (replaced on every run).
 
-Re-run it safely any time. To add a new game (for example Pip the Watchman), add
-a line to GAMES and run:
+Icons are the cute picture drawings from tools/game_icons.py (the same drawings the
+dashboard shows as animated GIFs). It also writes dashboard/offline-files.json, the list the
+dashboard's "Save for airplane" button downloads.
+
+Re-run it safely any time. To add a new game (for example Pip the Watchman), add a
+drawing to tools/game_icons.py, add a line to GAMES here and run:
 
     python tools/make_home_screen_apps.py
 
@@ -25,7 +29,12 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
+import game_icons
+
 ROOT = Path(__file__).resolve().parent.parent
+
+# folders whose picture in tools/game_icons.py has a different name
+ICON_ID = {"experiments/snake-blender-mode": "snake"}
 
 # folder, full name, short name (under the icon, keep to ~12 letters), icon letters,
 # background colour, letter colour, accent colour (a stripe across the bottom).
@@ -41,6 +50,7 @@ GAMES = [
     ("mothwicks-lantern", "Mothwick's Lantern", "Mothwick", "ML", "#000000", "#ffffff", "#ffd400"),
     ("prism-sprint", "Prism Sprint", "Prism Sprint", "PS", "#1c0b3a", "#ffd23f", "#ff3cac"),
     ("thistle-king", "Thistle King", "Thistle King", "TK", "#1f1530", "#d58cff", "#ffd400"),
+    ("rulebound", "Rulebound", "Rulebound", "RB", "#2a2540", "#ffd34d", "#ff8fb8"),
     ("rooftop-flow", "Rooftop Flow", "Rooftop Flow", "RF", "#0e1230", "#ff8a1f", "#f5c24c"),
     ("poirot-pigeon", "Poirot the Pigeon", "Poirot", "PP", "#1a1830", "#f2c14e", "#8e5bd6"),
     ("banana-slug-arena", "Banana Slug Arena", "Slug Arena", "BS", "#2f5a22", "#f7d63a", "#e98a6a"),
@@ -88,8 +98,11 @@ def draw_icon(letters: str, bg: str, fg: str, accent: str, size: int) -> Image.I
 SW_TEMPLATE = """// Made by tools/make_home_screen_apps.py. Lets this game open offline once it has
 // been played online. Always tries the network first, so updates show up right away.
 const PREFIX = "{prefix}";
-const CACHE = PREFIX + "v1";
+const CACHE = PREFIX + "v2";
 const PRECACHE = {precache};
+// Google Fonts are kept in a shared cache so the games keep their fonts offline.
+const FONT_HOSTS = ["fonts.googleapis.com", "fonts.gstatic.com"];
+const FONT_CACHE = "k12-fonts";
 
 self.addEventListener("install", (event) => {{
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(PRECACHE)).catch(() => {{}}));
@@ -107,7 +120,19 @@ self.addEventListener("activate", (event) => {{
 
 self.addEventListener("fetch", (event) => {{
   const req = event.request;
-  if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin) return;
+  if (req.method !== "GET") return;
+  const url = new URL(req.url);
+  if (FONT_HOSTS.includes(url.hostname)) {{
+    event.respondWith(
+      caches.match(req).then((hit) => hit || fetch(req).then((res) => {{
+        const copy = res.clone();
+        caches.open(FONT_CACHE).then((c) => c.put(req, copy));
+        return res;
+      }}))
+    );
+    return;
+  }}
+  if (url.origin !== self.location.origin) return;
   event.respondWith(
     fetch(req)
       .then((res) => {{
@@ -155,15 +180,18 @@ def build(folder: str, name: str, short: str, letters: str, bg: str, fg: str, ac
 
     icons = game_dir / "icons"
     icons.mkdir(exist_ok=True)
+    icon_id = ICON_ID.get(folder, folder)
     for filename, size in ICON_SIZES.items():
-        if folder == "whisker-dash":  # pixel cat face from the game instead of letters (tools/whisker_dash_icon.py)
-            from whisker_dash_icon import draw_cat_icon
-            draw_cat_icon(size).save(icons / filename, optimize=True)
+        if folder == "dashboard":  # four game pictures in a grid
+            img = game_icons.dashboard_icon(size)
         elif folder == "ships-and-villagers":  # Joseph and John Taylor on a starry sky (tools/ships_and_villagers_icon.py)
             from ships_and_villagers_icon import draw_villagers_icon
-            draw_villagers_icon(size).save(icons / filename, optimize=True)
-        else:
-            draw_icon(letters, bg, fg, accent, size).save(icons / filename, optimize=True)
+            img = draw_villagers_icon(size)
+        elif icon_id in game_icons.ICONS:  # the game's picture (a still frame of its dashboard GIF)
+            img = game_icons.still_icon(icon_id, size)
+        else:  # fallback: letters
+            img = draw_icon(letters, bg, fg, accent, size)
+        img.save(icons / filename, optimize=True)
 
     # A version tag on the icon links, so iPads and browsers fetch a changed icon
     # instead of keeping an old cached one.
@@ -201,6 +229,45 @@ def build(folder: str, name: str, short: str, letters: str, bg: str, fg: str, ac
     print(f"ok   {folder}")
 
 
+def write_offline_list() -> None:
+    """dashboard/offline-files.json: every file the dashboard needs to play all games offline."""
+    import hashlib
+
+    files, fonts = [], set()
+    h = hashlib.sha1()
+    dash = ROOT / "dashboard"
+    for f in ["./", "index.html", "styles.css", "app.js", "manifest.webmanifest", "sw.js", "icons/apple-touch-icon.png"]:
+        files.append(f)
+    for gif in sorted((dash / "app-icons").glob("*.gif")):
+        files.append("app-icons/" + gif.name)
+        h.update(gif.read_bytes())
+    for folder, *_ in GAMES:
+        if folder == "dashboard":
+            continue
+        game_dir = ROOT / folder
+        index = game_dir / "index.html"
+        if not index.exists():
+            continue
+        html = index.read_text(encoding="utf-8")
+        rel = "../" + folder + "/"
+        files += [rel, rel + "index.html"]
+        for r in sorted(set(re.findall(r'(?:src|href)="([^"#?:]+)(?:\?[^"]*)?"', html))):
+            if (game_dir / r).is_file():
+                files.append(rel + r)
+                h.update((game_dir / r).read_bytes())
+        files.append(rel + "sw.js")
+        h.update(html.encode("utf-8"))
+        fonts.update(re.findall(r'href="(https://fonts\.googleapis\.com/css2\?[^"]+)"', html))
+    for f in ("index.html", "styles.css", "app.js"):
+        if (dash / f).exists():
+            h.update((dash / f).read_bytes())
+    data = {"version": h.hexdigest()[:12], "files": list(dict.fromkeys(files)),
+            "fonts": sorted(f.replace("&amp;", "&") for f in fonts)}
+    (dash / "offline-files.json").write_text(json.dumps(data, indent=1) + "\n", encoding="utf-8")
+    print(f"ok   dashboard/offline-files.json ({len(data['files'])} files, {len(data['fonts'])} font sheets)")
+
+
 if __name__ == "__main__":
     for game in GAMES:
         build(*game)
+    write_offline_list()

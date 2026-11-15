@@ -88,7 +88,17 @@ Every browser game above (and the dashboard) can be added to an iPad or iPhone H
 
 Note: a Home Screen app keeps its own saves, separate from Safari, so progress made in Safari does not carry over.
 
-To add a new game (or change an icon), add a line to `GAMES` in `tools/make_home_screen_apps.py` and run it (needs Pillow: `pip install pillow`). It makes each game's `icons/`, `manifest.webmanifest` and `sw.js`, and adds the Home Screen tags to its `index.html`.
+### Play on an airplane (offline)
+
+1. Add the **dashboard** to the Home Screen (steps above) and open it from there.
+2. On Wi-Fi, tap **⬇ Save for airplane**. When it says **✓ Ready for airplane**, every game is saved on the iPad.
+3. With no internet, open the dashboard app and play. Bank Game needs internet; Endless Crucible offline uses its recipe book only.
+
+If a game changes, the button says **Update offline games**; tap it on Wi-Fi.
+
+### Icons and adding a game
+
+Each game has a cute picture icon drawn by `tools/game_icons.py`: animated GIFs for the dashboard grid (`dashboard/app-icons/`), and a still frame of the same picture for the Home Screen icon. To add a game: add a drawing to `tools/game_icons.py`, a line to `GAMES` in `tools/make_home_screen_apps.py`, and a line to `GAMES` in `dashboard/app.js`, then run `python tools/game_icons.py` and `python tools/make_home_screen_apps.py` (needs Pillow: `pip install pillow`). The second script makes each game's `icons/`, `manifest.webmanifest` and `sw.js`, adds the Home Screen tags to its `index.html`, and refreshes `dashboard/offline-files.json` (the list the airplane button downloads).
 
 ## 🚀 Quick Start (Desktop)
 

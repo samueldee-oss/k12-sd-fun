@@ -30,13 +30,14 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 - Bank Game has no touch controls for its keyboard-only actions (S, P, V).
 - Publishing on GitHub Pages would need the builds to load the runtime straight from the CDN (the same `/cdn/` problem), and the builds would need to stop being ignored by Git.
-- Snake is not linked from the dashboard yet.
-- Home Screen apps: all 12 browser games and the dashboard have icons, manifests and offline support (2026-11-06). Not yet tried on a real iPad, and they only install from the GitHub Pages address, which this session could not check is live.
+- Dashboard "Save for airplane" (offline) tested in desktop Chrome with the network switched off; not yet tried on a real iPad. Google Fonts could not be reached from the test machine, so offline font saving is untested (games fall back to a plain font if it fails).
+- Home Screen apps: all 15 browser games and the dashboard have picture icons, manifests and offline support (2026-11-06). Not yet tried on a real iPad, and they only install from the GitHub Pages address, which this session could not check is live.
 - Poirot the Pigeon uses a copied three.js file (`poirot-pigeon/three.min.js`, ~600 KB), unlike the other single-file games; it needs WebGL.
 - Pip the Watchman song is not in the repo (it seems to live in a separate `come-follow-me-games` project on the PC). Neither can be made a Home Screen app until its files are added.
 
 ## Recent changes
 
+- 2026-11-15: Dashboard redesigned as a phone-style grid of animated picture icons (one per game, drawn by `tools/game_icons.py`); the same pictures are now every game's Home Screen icon. Notes and Copy link moved to the ⓘ button; Bank Game versions are one icon with a version menu; Snake and Rulebound added to the dashboard/Home Screen tool. New "⬇ Save for airplane" button saves every game for offline play (root `sw.js`, `dashboard/offline-files.json`); game service workers now keep Google Fonts offline. Commit COMMIT.
 - 2026-11-15: Ships & Villagers sheep pen: the gate won't close while you're inside (Greta tells you to step out), and after the job it opens and closes with E so you can't get trapped; the sheep stay in. Commit `c4dc2c0`.
 - 2026-11-15: Ships & Villagers walking easier on phones: a quick tap walks only a few steps (about 64 px), holding a finger keeps walking toward it, and letting go (or releasing a key) stops within a step thanks to gentle easing. Commit `34500be`.
 - 2026-11-15: Home Screen tool now adds a version tag (`?v=`) to icon links so iPads fetch a changed icon instead of a cached one; applied to Ships & Villagers only (other games pick it up next time the tool is run on the PC). Commit `ddb7a9d`.

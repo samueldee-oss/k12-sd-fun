@@ -1,8 +1,11 @@
 // Made by tools/make_home_screen_apps.py. Lets this game open offline once it has
 // been played online. Always tries the network first, so updates show up right away.
 const PREFIX = "k12-dashboard-";
-const CACHE = PREFIX + "v1";
-const PRECACHE = ["./", "./index.html", "./manifest.webmanifest", "./icons/apple-touch-icon.png", "./styles.css"];
+const CACHE = PREFIX + "v2";
+const PRECACHE = ["./", "./index.html", "./manifest.webmanifest", "./icons/apple-touch-icon.png", "./app.js", "./styles.css"];
+// Google Fonts are kept in a shared cache so the games keep their fonts offline.
+const FONT_HOSTS = ["fonts.googleapis.com", "fonts.gstatic.com"];
+const FONT_CACHE = "k12-fonts";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(PRECACHE)).catch(() => {}));
@@ -20,7 +23,19 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
-  if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin) return;
+  if (req.method !== "GET") return;
+  const url = new URL(req.url);
+  if (FONT_HOSTS.includes(url.hostname)) {
+    event.respondWith(
+      caches.match(req).then((hit) => hit || fetch(req).then((res) => {
+        const copy = res.clone();
+        caches.open(FONT_CACHE).then((c) => c.put(req, copy));
+        return res;
+      }))
+    );
+    return;
+  }
+  if (url.origin !== self.location.origin) return;
   event.respondWith(
     fetch(req)
       .then((res) => {

@@ -2,17 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>K12 Game Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>K12 Games</title>
   <link rel="stylesheet" href="styles.css">
-  <style>
-    .copy-link{margin:4px 0;padding:4px 10px;font:inherit;font-size:.85rem;cursor:pointer;border:1px solid currentColor;border-radius:6px;background:transparent;color:inherit}
-    .copy-link.done{font-weight:700}
-  </style>
 <!-- home-screen-app -->
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=b3993df5">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=b3993df5">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="K12 Games">
@@ -23,288 +19,44 @@
 </head>
 <body>
   <main class="dashboard">
-    <section class="library" aria-label="Game library">
-      <div class="masthead">
-        <p class="eyebrow">K12 SD</p>
-        <h1>Game Dashboard</h1>
-        <p class="subhead">Choose a version, then play it in the browser panel.</p>
-      </div>
-
-      <div class="game-grid">
-        <article class="game-entry">
-          <button class="game-card active" type="button" data-src="../pong/index.html" data-note-id="pong">
-            <span class="tag">HTML</span>
-            <strong>Pong</strong>
-            <span>Already browser-native</span>
-          </button>
-          <button class="copy-link" type="button" data-path="pong/index.html">Copy link</button>
-          <textarea class="game-notes" data-note-id="pong" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="../whisker-dash/index.html" data-note-id="whisker-dash">
-            <span class="tag">HTML</span>
-            <strong>Whisker Dash</strong>
-            <span>Pixel cat platformer, 1–2 players</span>
-          </button>
-          <button class="copy-link" type="button" data-path="whisker-dash/index.html">Copy link</button>
-          <textarea class="game-notes" data-note-id="whisker-dash" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="../rulebound/index.html" data-note-id="rulebound">
-            <span class="tag">HTML</span>
-            <strong>Rulebound</strong>
-            <span>Word-rule puzzles: push words to change the rules (90 levels + sandbox)</span>
-          </button>
-          <button class="copy-link" type="button" data-path="rulebound/index.html">Copy link</button>
-          <textarea class="game-notes" data-note-id="rulebound" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="../capybara-rumble/index.html" data-note-id="capybara-rumble">
-            <span class="tag">HTML</span>
-            <strong>Capybara Rumble</strong>
-            <span>Lane-battle strategy on the riverbank</span>
-          </button>
-          <button class="copy-link" type="button" data-path="capybara-rumble/index.html">Copy link</button>
-          <textarea class="game-notes" data-note-id="capybara-rumble" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="../sprout-siege/index.html" data-note-id="sprout-siege">
-            <span class="tag">HTML</span>
-            <strong>Sprout Siege</strong>
-            <span>Lane-defense strategy: plant seeds, stop the Gloobs</span>
-          </button>
-          <button class="copy-link" type="button" data-path="sprout-siege/index.html">Copy link</button>
-          <textarea class="game-notes" data-note-id="sprout-siege" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="../kitty-and-lotl/index.html" data-note-id="kitty-and-lotl">
-            <span class="tag">HTML</span>
-            <strong>Kitty &amp; Lotl</strong>
-            <span>Cat and axolotl catch treats in a teacup boat</span>
-          </button>
-          <button class="copy-link" type="button" data-path="kitty-and-lotl/index.html">Copy link</button>
-          <textarea class="game-notes" data-note-id="kitty-and-lotl" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="../poirot-pigeon/index.html" data-note-id="poirot-pigeon">
-            <span class="tag">HTML</span>
-            <strong>Poirot the Pigeon</strong>
-            <span>3D whodunit: search rooms with a magnifying glass, 1–2 players</span>
-          </button>
-          <button class="copy-link" type="button" data-path="poirot-pigeon/index.html">Copy link</button>
-          <textarea class="game-notes" data-note-id="poirot-pigeon" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="../banana-slug-arena/index.html" data-note-id="banana-slug-arena">
-            <span class="tag">HTML</span>
-            <strong>Banana Slug Arena</strong>
-            <span>Brotato-style arena: survive 20 waves of derpy bugs and swamp critters</span>
-          </button>
-          <button class="copy-link" type="button" data-path="banana-slug-arena/index.html">Copy link</button>
-          <textarea class="game-notes" data-note-id="banana-slug-arena" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="../ships-and-villagers/index.html" data-note-id="ships-and-villagers">
-            <span class="tag">HTML</span>
-            <strong>Ships &amp; Villagers</strong>
-            <span>World 1: storybook castle village with 5 village jobs</span>
-          </button>
-          <button class="copy-link" type="button" data-path="ships-and-villagers/index.html">Copy link</button>
-          <textarea class="game-notes" data-note-id="ships-and-villagers" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="../endless-crucible/index.html" data-note-id="endless-crucible">
-            <span class="tag">HTML</span>
-            <strong>Endless Crucible</strong>
-            <span>Combine elements to discover new things (recipe-book mode)</span>
-          </button>
-          <button class="copy-link" type="button" data-path="endless-crucible/index.html">Copy link</button>
-          <textarea class="game-notes" data-note-id="endless-crucible" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="../sensory-overload/index.html" data-note-id="sensory-overload">
-            <span class="tag">HTML</span>
-            <strong>Sensory Overload</strong>
-            <span>Incremental clicker about stimulation and touching grass</span>
-          </button>
-          <button class="copy-link" type="button" data-path="sensory-overload/index.html">Copy link</button>
-          <textarea class="game-notes" data-note-id="sensory-overload" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="../mothwicks-lantern/index.html" data-note-id="mothwicks-lantern">
-            <span class="tag">HTML</span>
-            <strong>Mothwick's Lantern</strong>
-            <span>Pixel boss fight with a non-violent ending</span>
-          </button>
-          <button class="copy-link" type="button" data-path="mothwicks-lantern/index.html">Copy link</button>
-          <textarea class="game-notes" data-note-id="mothwicks-lantern" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="../prism-sprint/index.html" data-note-id="prism-sprint">
-            <span class="tag">HTML</span>
-            <strong>Prism Sprint</strong>
-            <span>Neon rhythm runner, 6 levels</span>
-          </button>
-          <button class="copy-link" type="button" data-path="prism-sprint/index.html">Copy link</button>
-          <textarea class="game-notes" data-note-id="prism-sprint" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="../thistle-king/index.html" data-note-id="thistle-king">
-            <span class="tag">HTML</span>
-            <strong>Thistle King</strong>
-            <span>Bee vs. boss garden dodger</span>
-          </button>
-          <button class="copy-link" type="button" data-path="thistle-king/index.html">Copy link</button>
-          <textarea class="game-notes" data-note-id="thistle-king" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="../rooftop-flow/index.html" data-note-id="rooftop-flow">
-            <span class="tag">HTML</span>
-            <strong>Rooftop Flow</strong>
-            <span>Endless rooftop runner with tricks</span>
-          </button>
-          <button class="copy-link" type="button" data-path="rooftop-flow/index.html">Copy link</button>
-          <textarea class="game-notes" data-note-id="rooftop-flow" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="web_builds/bank-game-current/index.html" data-note-id="bank-game-current">
-            <span class="tag">Pygame</span>
-            <strong>Bank Game Current</strong>
-            <span>Latest APY shops version</span>
-          </button>
-          <textarea class="game-notes" data-note-id="bank-game-current" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="web_builds/bank-game-copy-5/index.html" data-note-id="bank-game-copy-5">
-            <span class="tag">Pygame</span>
-            <strong>Bank Game Copy 5</strong>
-            <span>Recent saved version</span>
-          </button>
-          <textarea class="game-notes" data-note-id="bank-game-copy-5" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="web_builds/bank-game-copy-4/index.html" data-note-id="bank-game-copy-4">
-            <span class="tag">Pygame</span>
-            <strong>Bank Game Copy 4</strong>
-            <span>Saved iteration</span>
-          </button>
-          <textarea class="game-notes" data-note-id="bank-game-copy-4" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="web_builds/bank-game-copy-3/index.html" data-note-id="bank-game-copy-3">
-            <span class="tag">Pygame</span>
-            <strong>Bank Game Copy 3</strong>
-            <span>Saved iteration</span>
-          </button>
-          <textarea class="game-notes" data-note-id="bank-game-copy-3" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="web_builds/bank-game-copy-2/index.html" data-note-id="bank-game-copy-2">
-            <span class="tag">Pygame</span>
-            <strong>Bank Game Copy 2</strong>
-            <span>Saved iteration</span>
-          </button>
-          <textarea class="game-notes" data-note-id="bank-game-copy-2" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-
-        <article class="game-entry">
-          <button class="game-card" type="button" data-src="web_builds/bank-game-copy/index.html" data-note-id="bank-game-copy">
-            <span class="tag">Pygame</span>
-            <strong>Bank Game Copy</strong>
-            <span>Earlier saved version</span>
-          </button>
-          <textarea class="game-notes" data-note-id="bank-game-copy" rows="3" placeholder="Notes for improvements, systems idea, or level goal"></textarea>
-        </article>
-      </div>
-
-      <div class="build-note">
-        <strong>Copy link</strong> gives the public GitHub Pages address (needs Pages turned on for the repo).
-        Pygame builds are not committed, so they have no public link yet.
-      </div>
-
-      <div class="build-note">
-        <strong>Pygame builds:</strong>
-        Run <code>.\tools\build_web_games.ps1</code>, then serve this folder with
-        <code>.\tools\serve_dashboard.ps1</code>.
-      </div>
+    <section class="home" aria-label="Game library">
+      <header class="topbar">
+        <h1>K12 Games</h1>
+        <span id="offlinePill" class="pill" hidden>✈ Offline</span>
+        <button id="saveOffline" class="save-btn" type="button">⬇ Save for airplane</button>
+      </header>
+      <div id="saveStatus" class="save-status" hidden></div>
+      <input id="search" class="search" type="search" placeholder="Search games" autocomplete="off" aria-label="Search games">
+      <div id="grid" class="grid" role="list"></div>
+      <p class="foot">
+        <b>Bank Game</b> runs only from the PC server (<code>tools\serve_dashboard.ps1</code>) and needs internet.
+      </p>
     </section>
 
-    <section class="player" aria-label="Selected game">
-      <div class="player-toolbar">
-        <div>
-          <span class="toolbar-label">Now Playing</span>
-          <strong id="gameTitle">Pong</strong>
+    <section id="player" class="player" aria-label="Selected game">
+      <div class="bar">
+        <button id="back" class="icon-btn back" type="button" aria-label="Back to games">‹ Games</button>
+        <img id="barIcon" class="bar-icon" alt="">
+        <div class="bar-title">
+          <strong id="gameTitle">Pick a game</strong>
+          <select id="versionPick" class="version" hidden aria-label="Version"></select>
         </div>
-        <a id="openLink" href="../pong/index.html" target="_blank" rel="noreferrer">Open full page</a>
+        <button id="infoBtn" class="icon-btn" type="button" aria-expanded="false" title="About + notes">ⓘ</button>
+        <button id="fullBtn" class="icon-btn" type="button" title="Full screen">⤢</button>
+        <a id="openLink" class="icon-btn" href="#" target="_blank" rel="noreferrer" title="Open in its own tab">↗</a>
       </div>
-      <iframe id="gameFrame" title="Playable selected game" src="../pong/index.html"></iframe>
+      <div id="info" class="info" hidden>
+        <p id="gameDesc"></p>
+        <button id="copyLink" class="chip" type="button">Copy link</button>
+        <textarea id="notes" rows="3" placeholder="Notes: ideas, bugs, systems idea, level goals"></textarea>
+      </div>
+      <div class="stage">
+        <iframe id="gameFrame" title="Selected game" allow="fullscreen; autoplay"></iframe>
+        <div id="pickHint" class="pick-hint">Tap a game to play</div>
+      </div>
     </section>
   </main>
-
-  <script>
-    const cards = [...document.querySelectorAll(".game-card")];
-    const frame = document.querySelector("#gameFrame");
-    const title = document.querySelector("#gameTitle");
-    const openLink = document.querySelector("#openLink");
-    const notes = [...document.querySelectorAll(".game-notes")];
-
-    cards.forEach((card) => {
-      card.addEventListener("click", () => {
-        cards.forEach((item) => item.classList.remove("active"));
-        card.classList.add("active");
-        const src = card.dataset.src;
-        const name = card.querySelector("strong").textContent;
-        frame.src = src;
-        title.textContent = name;
-        openLink.href = src;
-      });
-    });
-
-    notes.forEach((note) => {
-      const key = `k12-game-note:${note.dataset.noteId}`;
-      note.value = localStorage.getItem(key) || "";
-      note.addEventListener("input", () => {
-        localStorage.setItem(key, note.value);
-      });
-    });
-
-    const PAGES_BASE = "https://samueldee-oss.github.io/k12-sd-fun/";
-    document.querySelectorAll(".copy-link").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const url = PAGES_BASE + btn.dataset.path;
-        try {
-          await navigator.clipboard.writeText(url);
-        } catch (e) {
-          const t = document.createElement("textarea");
-          t.value = url; document.body.appendChild(t); t.select();
-          try { document.execCommand("copy"); } catch (e2) { prompt("Copy this link:", url); }
-          t.remove();
-        }
-        const old = btn.textContent;
-        btn.textContent = "Copied!"; btn.classList.add("done");
-        setTimeout(() => { btn.textContent = old; btn.classList.remove("done"); }, 1500);
-      });
-    });
-  </script>
+  <div id="toast" class="toast" hidden></div>
+  <script src="app.js"></script>
 </body>
 </html>
