@@ -165,6 +165,11 @@ def build(folder: str, name: str, short: str, letters: str, bg: str, fg: str, ac
         else:
             draw_icon(letters, bg, fg, accent, size).save(icons / filename, optimize=True)
 
+    # A version tag on the icon links, so iPads and browsers fetch a changed icon
+    # instead of keeping an old cached one.
+    import hashlib
+    ver = hashlib.md5((icons / "apple-touch-icon.png").read_bytes()).hexdigest()[:8]
+
     manifest = {
         "name": name,
         "short_name": short,
@@ -174,8 +179,8 @@ def build(folder: str, name: str, short: str, letters: str, bg: str, fg: str, ac
         "background_color": bg,
         "theme_color": bg,
         "icons": [
-            {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
-            {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"},
+            {"src": f"icons/icon-192.png?v={ver}", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+            {"src": f"icons/icon-512.png?v={ver}", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"},
         ],
     }
     (game_dir / "manifest.webmanifest").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
@@ -184,7 +189,7 @@ def build(folder: str, name: str, short: str, letters: str, bg: str, fg: str, ac
     html = re.sub(re.escape(START) + r".*?" + re.escape(END) + r"\n?", "", html, flags=re.S)
     if "</head>" not in html:
         raise SystemExit(f"{index}: no </head> to add the tags before")
-    html = html.replace("</head>", head_block(name, short, bg) + "</head>", 1)
+    html = html.replace("</head>", head_block(name, short, bg).replace('.png"', f'.png?v={ver}"') + "</head>", 1)
     index.write_text(html, encoding="utf-8")
 
     precache = ["./", "./index.html", "./manifest.webmanifest", "./icons/apple-touch-icon.png"]
