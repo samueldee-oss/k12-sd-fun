@@ -37,6 +37,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-15: Ships & Villagers: John Taylor's pincushion moved down to sit on his shoulder. Commit `a19c3c0`.
 - 2026-11-15: Ships & Villagers: John Taylor's pincushion made eye-sized with thin pins (game and Home Screen icon). Commit `f4f297e`.
 - 2026-11-15: Ships & Villagers: Home Screen icon is now Joseph and John Taylor on a starry sky (art drawn with the game's own code, `tools/ships_and_villagers_icon.py`); short-hair tuft tidied so it no longer looks like an eye patch. Commit `5ae9917`.
 - 2026-11-15: New game Ships & Villagers (World 1) added (folder, dashboard card, README link, Home Screen icon, archive spec), commit `b64fcb4`, on `main`. Same file as the claude.ai artifact.
