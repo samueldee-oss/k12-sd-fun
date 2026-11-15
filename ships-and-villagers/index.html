@@ -372,10 +372,11 @@ let pointerDown=false;
 cv.addEventListener('pointerdown',e=>{cv.focus();const p=toView(e);
 if(mode==='title'){for(let i=0;i<4;i++){const bx=150+i*170;if(p.x>bx&&p.x<bx+150&&p.y>220&&p.y<430){if(sel===i)startGame();sel=i;return}}if(p.y>450)startGame();return}
 for(let i=0;i<4;i++){const bx=12+i*104;if(p.x>bx&&p.x<bx+98&&p.y>VH-46&&p.y<VH-10){P.hero=i;return}}
-pointerDown=true;P.target={x:p.x+cam.x,y:p.y+cam.y};
+pointerDown=true;downT=performance.now();P.target={x:p.x+cam.x,y:p.y+cam.y};
 const near=findInteract(P.target.x,P.target.y,40);if(near&&Math.hypot(near.x-P.x,near.y-P.y)<60){actPressed=true;P.target=null}});
 cv.addEventListener('pointermove',e=>{if(pointerDown&&mode==='play'){const p=toView(e);P.target={x:p.x+cam.x,y:p.y+cam.y}}});
-addEventListener('pointerup',()=>{pointerDown=false});
+addEventListener('pointerup',()=>{if(pointerDown&&mode==='play'&&P.target){if(performance.now()-downT<300){const tx=P.target.x-P.x,ty=P.target.y-P.y,d=Math.hypot(tx,ty),STEP=64;if(d>STEP)P.target={x:P.x+tx/d*STEP,y:P.y+ty/d*STEP}}else P.target=null}pointerDown=false});
+let downT=0;
 function startGame(){P.hero=sel;mode='play';say(NPCS[1],'Good morning! Come see me at the bakery!',6);}
 
 // ---------- interactions ----------
@@ -422,15 +423,18 @@ if(mode!=='play')return;
 let dx=0,dy=0;
 if(keys.arrowleft||keys.a)dx--;if(keys.arrowright||keys.d)dx++;if(keys.arrowup||keys.w)dy--;if(keys.arrowdown||keys.s)dy++;
 if(dx||dy)P.target=null;
-if(!dx&&!dy&&P.target){const tx=P.target.x-P.x,ty=P.target.y-P.y,d=Math.hypot(tx,ty);if(d<5){P.target=null}else{dx=tx/d;dy=ty/d}}
+let mag=1;if(!dx&&!dy&&P.target){const tx=P.target.x-P.x,ty=P.target.y-P.y,d=Math.hypot(tx,ty);if(d<4){P.target=null}else{dx=tx/d;dy=ty/d;mag=Math.min(1,d/16)}}
 if(P.fishing){dx=dy=0;const f=P.fishing;f.t+=dt;if(f.phase==='wait'&&f.t>f.biteAt){f.phase='bite';f.t=0}else if(f.phase==='bite'&&f.t>0.9){floatText(P.x,P.y-62,'It got away!');f.phase='wait';f.t=0;f.biteAt=1+Math.random()*2.2}}
-const len=Math.hypot(dx,dy);P.moving=len>0;
-if(len){dx/=len;dy/=len;const sp=(P.carry?92:125)*dt;const nx=P.x+dx*sp,ny=P.y+dy*sp;let moved=false;
-if(!hitsBlock(nx,P.y,9)&&!crossFence(P.x,P.y,nx,P.y,6)){P.x=nx;moved=true}
-if(!hitsBlock(P.x,ny,9)&&!crossFence(P.x,P.y,P.x,ny,6)){P.y=ny;moved=true}
-if(dx)P.face=dx>0?1:-1;
-if(!moved){P.stuck+=dt;if(P.stuck>0.35)P.target=null}else P.stuck=0;
-P.boilT+=dt;if(P.boilT>0.12){P.boilT=0;P.boil=(P.boil+1)%3}}
+const len=Math.hypot(dx,dy);if(P.fishing){P.vx=P.vy=0}
+const spd=(P.carry?92:125)*mag;let tvx=0,tvy=0;if(len){tvx=dx/len*spd;tvy=dy/len*spd}
+const kk=1-Math.exp(-dt*(len?10:15));P.vx=(P.vx||0)+(tvx-(P.vx||0))*kk;P.vy=(P.vy||0)+(tvy-(P.vy||0))*kk;
+let v=Math.hypot(P.vx,P.vy);if(!len&&v<6){P.vx=P.vy=0;v=0}P.moving=v>6;
+if(v>0){const nx=P.x+P.vx*dt,ny=P.y+P.vy*dt;let moved=false;
+if(!hitsBlock(nx,P.y,9)&&!crossFence(P.x,P.y,nx,P.y,6)){P.x=nx;moved=true}else P.vx=0;
+if(!hitsBlock(P.x,ny,9)&&!crossFence(P.x,P.y,P.x,ny,6)){P.y=ny;moved=true}else P.vy=0;
+if(len&&dx)P.face=dx>0?1:-1;
+if(len&&!moved){P.stuck+=dt;if(P.stuck>0.35)P.target=null}else P.stuck=0;
+if(P.moving){P.boilT+=dt;if(P.boilT>0.12){P.boilT=0;P.boil=(P.boil+1)%3}}}
 if(actPressed){actPressed=false;interact()}
 // sheep
 sheep.forEach(s=>{const ddx=s.x-P.x,ddy=s.y-P.y,d=Math.hypot(ddx,ddy);let vx=0,vy=0;const ins=insidePen(s);
