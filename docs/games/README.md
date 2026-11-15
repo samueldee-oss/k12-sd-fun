@@ -25,6 +25,7 @@ This folder documents the single-file browser games in this repo: what each one 
 | Kitty & Lotl | Toddler-friendly catch game | Catch falling treats in a boat; 7 hidden surprises | [kitty-and-lotl.md](kitty-and-lotl.md) |
 | Poirot the Pigeon | 3D deduction / whodunit | Search rooms with a magnifying glass, rule out suspects, accuse | [poirot-pigeon.md](poirot-pigeon.md) |
 | Banana Slug Arena | Arena survival roguelite (Brotato-style) | Dodge waves of critters while weapons auto-fire; shop and level up between waves | [banana-slug-arena.md](banana-slug-arena.md) |
+| Ships & Villagers | Cozy village-jobs sim (Stardew-style), World 1 | Walk a storybook castle village and finish 5 jobs for the villagers | [ships-and-villagers.md](ships-and-villagers.md) |
 
 ## Why these are fun: patterns across the set
 

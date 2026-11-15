@@ -44,6 +44,7 @@ GAMES = [
     ("rooftop-flow", "Rooftop Flow", "Rooftop Flow", "RF", "#0e1230", "#ff8a1f", "#f5c24c"),
     ("poirot-pigeon", "Poirot the Pigeon", "Poirot", "PP", "#1a1830", "#f2c14e", "#8e5bd6"),
     ("banana-slug-arena", "Banana Slug Arena", "Slug Arena", "BS", "#2f5a22", "#f7d63a", "#e98a6a"),
+    ("ships-and-villagers", "Ships & Villagers", "Villagers", "S&V", "#f7eedb", "#5a3e2b", "#d9574f"),
     ("experiments/snake-blender-mode", "Snake", "Snake", "S", "#0f172a", "#22c55e", "#ef4444"),
 ]
 

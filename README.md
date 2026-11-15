@@ -31,7 +31,7 @@ k12-sd-fun/
 ├── rulebound/                # Word-rule puzzle game: push words to change the rules (browser-native)
 ├── capybara-rumble/ sprout-siege/ kitty-and-lotl/ endless-crucible/
 │   sensory-overload/ mothwicks-lantern/ prism-sprint/ thistle-king/ rooftop-flow/
-│   poirot-pigeon/ banana-slug-arena/
+│   poirot-pigeon/ banana-slug-arena/ ships-and-villagers/
 │                             # More browser-native games (one index.html each)
 ├── experiments/              # Side projects, not part of the curriculum
 │   └── snake-blender-mode/
@@ -73,6 +73,7 @@ Links assume GitHub Pages is enabled for this repo (Settings → Pages → deplo
 | Rooftop Flow | `https://samueldee-oss.github.io/k12-sd-fun/rooftop-flow/index.html` |
 | Poirot the Pigeon | `https://samueldee-oss.github.io/k12-sd-fun/poirot-pigeon/index.html` |
 | Banana Slug Arena | `https://samueldee-oss.github.io/k12-sd-fun/banana-slug-arena/index.html` |
+| Ships & Villagers | `https://samueldee-oss.github.io/k12-sd-fun/ships-and-villagers/index.html` |
 | Snake (experiment) | `https://samueldee-oss.github.io/k12-sd-fun/experiments/snake-blender-mode/index.html` |
 
 The Bank Game is a Pygame program; its web builds are not committed (see `.gitignore`), so it has no public link yet.
