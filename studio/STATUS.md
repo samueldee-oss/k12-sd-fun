@@ -1,6 +1,6 @@
 # Status
 
-_Kept by Claude Code. Last updated 2026-11-13._
+_Kept by Claude Code. Last updated 2026-11-15._
 
 ## Games
 
@@ -15,6 +15,7 @@ _Kept by Claude Code. Last updated 2026-11-13._
 | Rulebound | `rulebound/` | Works. Word-rule puzzle game (Baba Is You-style): 90 levels in 3 worlds plus a Sandbox, 4 heroes, every level checked solvable by a solver. Built on claude.ai and added as-is. | Touch: tap a square to walk there, swipe, or on-screen pad (simulated touch tested; not yet tried on a real iPad). |
 | Poirot the Pigeon | `poirot-pigeon/` | Works. 3D whodunit: 3 themed crime scenes (manor, Orient Express, Nile steamer), room pictures searched with magnifying glasses, Poirot-book tricks, easy/hard, 1–2 players. Every case checked solvable by script. Spec in `docs/games/poirot-pigeon.md`. | Touch joysticks and drag-to-inspect included (not yet tried on a real iPad). Needs WebGL. |
 | Banana Slug Arena | `banana-slug-arena/` | Works. Brotato-style arena: Banana Slug, Frog or Pigeon vs bugs and swamp critters, 20 waves with hordes and 3 bosses, 46 characters, 24 weapons, pets, hats, Danger 0–5, Endless, achievements, run saves. Built on claude.ai and added as-is. Spec in `docs/games/banana-slug-arena.md`. | Touch joystick included (simulated runs tested; not yet tried on a real iPad). |
+| Ships & Villagers | `ships-and-villagers/` | Works. World 1 of a storybook village sim (Stardew-style): castle village, 4 playable villagers, 5 village jobs, one star each. Built on claude.ai and added as-is. Spec in `docs/games/ships-and-villagers.md`. | Tap to walk and a "Do it" button (simulated runs tested; not yet tried on a real iPad). |
 | Snake (side project) | `experiments/snake-blender-mode/` | Works. Fixed 2026-10-20: body was invisible and the game "auto-ended" around 60-70 points. Swipe to steer. | Yes (simulated touch tested; not yet tried on a real iPad). |
 
 A comparison of the Bank Game versions (features, fun, systems lessons) is in `to-desktop/2026-10-21-1600-bank-game-version-comparison.md`.
@@ -36,6 +37,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-15: New game Ships & Villagers (World 1) added (folder, dashboard card, README link, Home Screen icon, archive spec), commit `b64fcb4`, on `main`. Same file as the claude.ai artifact.
 - 2026-11-13: New game Banana Slug Arena added (folder, dashboard card, README link, Home Screen icon, archive spec), commit `f34ed1a`, on `main`. Same file as the claude.ai artifact.
 - 2026-11-12: Rulebound added (`rulebound/`): word-rule puzzle game, 90 levels in 3 worlds plus a Sandbox, listed on the dashboard and in the README. Commit `a550bcf`.
 - 2026-11-12: New game Poirot the Pigeon added (folder, dashboard card, README link, Home Screen icon, archive spec), commit `8f54c2b`, on `main`. Same as the claude.ai artifact except three.js loads from the folder instead of a CDN.
