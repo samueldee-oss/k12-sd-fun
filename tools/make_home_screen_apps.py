@@ -44,7 +44,7 @@ GAMES = [
     ("rooftop-flow", "Rooftop Flow", "Rooftop Flow", "RF", "#0e1230", "#ff8a1f", "#f5c24c"),
     ("poirot-pigeon", "Poirot the Pigeon", "Poirot", "PP", "#1a1830", "#f2c14e", "#8e5bd6"),
     ("banana-slug-arena", "Banana Slug Arena", "Slug Arena", "BS", "#2f5a22", "#f7d63a", "#e98a6a"),
-    ("ships-and-villagers", "Ships & Villagers", "Villagers", "S&V", "#f7eedb", "#5a3e2b", "#d9574f"),
+    ("ships-and-villagers", "Ships & Villagers", "Villagers", "S&V", "#232552", "#f7eedb", "#d9574f"),
     ("experiments/snake-blender-mode", "Snake", "Snake", "S", "#0f172a", "#22c55e", "#ef4444"),
 ]
 
@@ -159,6 +159,9 @@ def build(folder: str, name: str, short: str, letters: str, bg: str, fg: str, ac
         if folder == "whisker-dash":  # pixel cat face from the game instead of letters (tools/whisker_dash_icon.py)
             from whisker_dash_icon import draw_cat_icon
             draw_cat_icon(size).save(icons / filename, optimize=True)
+        elif folder == "ships-and-villagers":  # Joseph and John Taylor on a starry sky (tools/ships_and_villagers_icon.py)
+            from ships_and_villagers_icon import draw_villagers_icon
+            draw_villagers_icon(size).save(icons / filename, optimize=True)
         else:
             draw_icon(letters, bg, fg, accent, size).save(icons / filename, optimize=True)
 

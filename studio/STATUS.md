@@ -37,6 +37,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-15: Ships & Villagers: Home Screen icon is now Joseph and John Taylor on a starry sky (art drawn with the game's own code, `tools/ships_and_villagers_icon.py`); short-hair tuft tidied so it no longer looks like an eye patch.
 - 2026-11-15: New game Ships & Villagers (World 1) added (folder, dashboard card, README link, Home Screen icon, archive spec), commit `b64fcb4`, on `main`. Same file as the claude.ai artifact.
 - 2026-11-13: New game Banana Slug Arena added (folder, dashboard card, README link, Home Screen icon, archive spec), commit `f34ed1a`, on `main`. Same file as the claude.ai artifact.
 - 2026-11-12: Rulebound added (`rulebound/`): word-rule puzzle game, 90 levels in 3 worlds plus a Sandbox, listed on the dashboard and in the README. Commit `a550bcf`.
