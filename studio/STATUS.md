@@ -37,6 +37,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-15: Ships & Villagers sheep pen: the gate won't close while you're inside (Greta tells you to step out), and after the job it opens and closes with E so you can't get trapped; the sheep stay in. Commit `c4dc2c0`.
 - 2026-11-15: Ships & Villagers walking easier on phones: a quick tap walks only a few steps (about 64 px), holding a finger keeps walking toward it, and letting go (or releasing a key) stops within a step thanks to gentle easing. Commit `34500be`.
 - 2026-11-15: Home Screen tool now adds a version tag (`?v=`) to icon links so iPads fetch a changed icon instead of a cached one; applied to Ships & Villagers only (other games pick it up next time the tool is run on the PC). Commit `ddb7a9d`.
 - 2026-11-15: Ships & Villagers: John Taylor's pincushion moved down to sit on his shoulder. Commit `a19c3c0`.

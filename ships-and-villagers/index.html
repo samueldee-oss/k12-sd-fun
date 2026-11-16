@@ -389,7 +389,7 @@ if(P.bread>0)houses.forEach(h=>{if(!h.bakery&&!h.got)consider({kind:'door',h,x:h
 if(JOBS.fisher.started&&!JOBS.fisher.done)fishSpots.forEach(s=>consider({kind:'fish',s,x:s.x,y:s.y},Math.hypot(s.x-x,s.y-y)));
 if(JOBS.merchant.started&&!JOBS.merchant.done){if(!P.carry&&crates>0)consider({kind:'crate',x:1625,y:722},Math.hypot(1625-x,722-y));
 if(P.carry==='crate')consider({kind:'stall',x:STALL.x+STALL.w/2,y:STALL.y+STALL.d+10},Math.hypot(STALL.x+STALL.w/2-x,STALL.y+STALL.d+10-y)-10)}
-if(JOBS.shepherd.started&&!JOBS.shepherd.done&&!gateClosed)consider({kind:'gate',x:PEN.x2+16,y:(PEN.g1+PEN.g2)/2+10},Math.hypot(PEN.x2+16-x,(PEN.g1+PEN.g2)/2+10-y));
+if((JOBS.shepherd.started&&!JOBS.shepherd.done&&!gateClosed)||JOBS.shepherd.done)consider({kind:'gate',x:PEN.x2+16,y:(PEN.g1+PEN.g2)/2+10},Math.hypot(PEN.x2+16-x,(PEN.g1+PEN.g2)/2+10-y));
 return best}
 function interact(){
 if(P.fishing){const f=P.fishing;if(f.phase==='bite'){JOBS.fisher.prog++;floatText(P.x,P.y-62,'A fish!','#3d6fd1');P.fishing=null;checkJobs()}else{P.fishing=null;floatText(P.x,P.y-62,'Reeled in')}return}
@@ -406,8 +406,11 @@ else if(o.kind==='door'){o.h.got=true;P.bread--;JOBS.baker.prog++;floatText(o.x,
 else if(o.kind==='fish'){P.fishing={s:o.s,t:0,biteAt:1+Math.random()*2.2,phase:'wait'};P.face=o.s.wx>P.x?1:(o.s.wx<P.x?-1:P.face)}
 else if(o.kind==='crate'){P.carry='crate';crates--}
 else if(o.kind==='stall'){P.carry=null;JOBS.merchant.prog++;floatText(o.x,o.y-60,'Delivered!');checkJobs()}
+else if(o.kind==='gate'&&JOBS.shepherd.done){if(gateClosed){gateClosed=false;rebuildFence(false)}else if(playerInPen())say(npc('shepherd'),'Step out first, then close the gate!',3);else{gateClosed=true;rebuildFence(true)}}
+else if(o.kind==='gate'&&playerInPen()){say(npc('shepherd'),'Step out first, then close the gate!',3)}
 else if(o.kind==='gate'){const inside=sheep.filter(s=>insidePen(s)).length;if(inside>=5){gateClosed=true;rebuildFence(true);JOBS.shepherd.prog=5;checkJobs()}else say(npc('shepherd'),'Not yet! '+(5-inside)+' sheep still outside.',3)}}
 const splashes=[];function splash(x,y){for(let i=0;i<10;i++)splashes.push({x:x+(Math.random()-0.5)*40,y:y+(Math.random()-0.5)*20,t:0.6})}
+function playerInPen(){return P.x>PEN.x&&P.x<PEN.x2&&P.y>PEN.y&&P.y<PEN.y2}
 function insidePen(s){return s.x>PEN.x+6&&s.x<PEN.x2-6&&s.y>PEN.y+6&&s.y<PEN.y2-4}
 function openPen(){gateClosed=false;rebuildFence(false);sheep.length=0;const pos=[[560,120],[660,200],[760,110],[820,230],[620,80]];
 pos.forEach(p=>sheep.push({x:p[0],y:p[1],vx:0,vy:0,face:1,wt:0,wx:0,wy:0}));
@@ -516,7 +519,7 @@ if(mode==='play'){
 if(P.bread>0)houses.forEach(h=>{if(!h.bakery&&!h.got&&inView(h.door.x,h.door.y,40)){glow(ctx,h.door.x-cam.x,h.door.y-cam.y-14,26,'rgba(255,220,120,0.6)');drawSp(ctx,breadSp,h.door.x,h.door.y-40)}});
 if(JOBS.farmer.started&&!JOBS.farmer.done)beds.forEach(b=>{if(!b.wet&&inView(b.x,b.y,40))marker(ctx,b.x+b.w/2-cam.x,b.y-14-cam.y+Math.sin(T*3+b.x)*2,'~','#bfe1ee')});
 if(JOBS.merchant.started&&!JOBS.merchant.done&&P.carry==='crate')glow(ctx,STALL.x+STALL.w/2-cam.x,STALL.y+20-cam.y,60,'rgba(255,220,120,0.55)');
-const o=findInteract(P.x,P.y-6,46);if(o&&!P.fishing){const lbl={npc:'Talk',bed:'Water',door:'Give bread',fish:'Fish',crate:'Pick up',stall:'Drop crate',gate:'Close gate'}[o.kind];
+const o=findInteract(P.x,P.y-6,46);if(o&&!P.fishing){const lbl={npc:'Talk',bed:'Water',door:'Give bread',fish:'Fish',crate:'Pick up',stall:'Drop crate',gate:gateClosed?'Open gate':'Close gate'}[o.kind];
 ctx.font='15px "Patrick Hand",cursive';const w=ctx.measureText('E  '+lbl).width+18;const x=P.x-cam.x-w/2,y=P.y-cam.y+10;ctx.fillStyle='rgba(255,250,240,0.92)';ctx.strokeStyle=INK;ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(x,y,w,22,8);ctx.fill();ctx.stroke();ctx.fillStyle=INK;ctx.textAlign='left';ctx.fillText('E  '+lbl,x+9,y+16)}
 bubbles.forEach(b=>{const e=b.ent;if(inView(e.x,e.y,10))drawBubble(ctx,e.x-cam.x,e.y-cam.y-56,b.text)});
 floats.forEach(f=>{ctx.globalAlpha=Math.min(1,f.t);ctx.fillStyle=f.col;ctx.font='18px "Patrick Hand",cursive';ctx.textAlign='center';ctx.fillText(f.text,f.x-cam.x,f.y-cam.y);ctx.globalAlpha=1});
