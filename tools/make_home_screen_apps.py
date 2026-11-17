@@ -42,20 +42,20 @@ GAMES = [
     ("dashboard", "K12 SD Games", "K12 Games", "K12", "#16191f", "#ffffff", "#3ddc97"),
     ("pong", "Pong", "Pong", "P", "#111827", "#ffffff", "#34d399"),
     ("whisker-dash", "Whisker Dash", "Whisker Dash", "WD", "#1b1033", "#7fd4ff", "#ff9f1c"),
-    ("capybara-rumble", "Capybara Rumble", "Capybara", "CR", "#2c4a2a", "#ffcf4a", "#8b5a2b"),
+    ("capybara-rumble", "Capybara Rumble", "Capybara Rumble", "CR", "#2c4a2a", "#ffcf4a", "#8b5a2b"),
     ("sprout-siege", "Sprout Siege", "Sprout Siege", "SS", "#3e2f1c", "#9be15d", "#e0b04a"),
     ("kitty-and-lotl", "Kitty & Lotl", "Kitty & Lotl", "K&L", "#cdeefd", "#e9418a", "#f7a531"),
-    ("endless-crucible", "Endless Crucible", "Crucible", "EC", "#f4f5f7", "#e2552d", "#3b82f6"),
-    ("sensory-overload", "Sensory Overload", "Sensory", "SO", "#fafafa", "#e5442f", "#111111"),
-    ("mothwicks-lantern", "Mothwick's Lantern", "Mothwick", "ML", "#000000", "#ffffff", "#ffd400"),
+    ("endless-crucible", "Endless Crucible", "Endless Crucible", "EC", "#f4f5f7", "#e2552d", "#3b82f6"),
+    ("sensory-overload", "Sensory Overload", "Sensory Overload", "SO", "#fafafa", "#e5442f", "#111111"),
+    ("mothwicks-lantern", "Mothwick's Lantern", "Mothwick's Lantern", "ML", "#000000", "#ffffff", "#ffd400"),
     ("prism-sprint", "Prism Sprint", "Prism Sprint", "PS", "#1c0b3a", "#ffd23f", "#ff3cac"),
     ("thistle-king", "Thistle King", "Thistle King", "TK", "#1f1530", "#d58cff", "#ffd400"),
     ("rulebound", "Rulebound", "Rulebound", "RB", "#2a2540", "#ffd34d", "#ff8fb8"),
     ("rooftop-flow", "Rooftop Flow", "Rooftop Flow", "RF", "#0e1230", "#ff8a1f", "#f5c24c"),
-    ("poirot-pigeon", "Poirot the Pigeon", "Poirot", "PP", "#1a1830", "#f2c14e", "#8e5bd6"),
-    ("banana-slug-arena", "Banana Slug Arena", "Slug Arena", "BS", "#2f5a22", "#f7d63a", "#e98a6a"),
-    ("ships-and-villagers", "Ships & Villagers", "Villagers", "S&V", "#232552", "#f7eedb", "#d9574f"),
-    ("experiments/snake-blender-mode", "Snake", "Snake", "S", "#0f172a", "#22c55e", "#ef4444"),
+    ("poirot-pigeon", "Poirot the Pigeon", "Poirot the Pigeon", "PP", "#1a1830", "#f2c14e", "#8e5bd6"),
+    ("banana-slug-arena", "Banana Slug Arena", "Banana Slug Arena", "BS", "#2f5a22", "#f7d63a", "#e98a6a"),
+    ("ships-and-villagers", "Ships & Villagers", "Ships & Villagers", "S&V", "#232552", "#f7eedb", "#d9574f"),
+    ("experiments/snake-blender-mode", "Blender Mode Snake", "Blender Mode Snake", "S", "#0f172a", "#22c55e", "#ef4444"),
 ]
 
 ICON_SIZES = {"apple-touch-icon.png": 180, "icon-192.png": 192, "icon-512.png": 512}
@@ -184,10 +184,13 @@ def build(folder: str, name: str, short: str, letters: str, bg: str, fg: str, ac
     for filename, size in ICON_SIZES.items():
         if folder == "dashboard":  # four game pictures in a grid
             img = game_icons.dashboard_icon(size)
+        elif (ROOT / "dashboard" / "app-icons" / f"{icon_id}.png").exists():
+            # a still from the recorded first-level gameplay (tools/capture_icons.py)
+            img = Image.open(ROOT / "dashboard" / "app-icons" / f"{icon_id}.png").convert("RGB").resize((size, size), Image.LANCZOS)
         elif folder == "ships-and-villagers":  # Joseph and John Taylor on a starry sky (tools/ships_and_villagers_icon.py)
             from ships_and_villagers_icon import draw_villagers_icon
             img = draw_villagers_icon(size)
-        elif icon_id in game_icons.ICONS:  # the game's picture (a still frame of its dashboard GIF)
+        elif icon_id in game_icons.ICONS:  # drawn picture (a still frame of its dashboard GIF)
             img = game_icons.still_icon(icon_id, size)
         else:  # fallback: letters
             img = draw_icon(letters, bg, fg, accent, size)
@@ -258,7 +261,7 @@ def write_offline_list() -> None:
         files.append(rel + "sw.js")
         h.update(html.encode("utf-8"))
         fonts.update(re.findall(r'href="(https://fonts\.googleapis\.com/css2\?[^"]+)"', html))
-    for f in ("index.html", "styles.css", "app.js"):
+    for f in ("index.html", "styles.css", "styles.css"):
         if (dash / f).exists():
             h.update((dash / f).read_bytes())
     data = {"version": h.hexdigest()[:12], "files": list(dict.fromkeys(files)),

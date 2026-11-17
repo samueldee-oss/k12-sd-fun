@@ -1,6 +1,6 @@
 {
   "name": "Poirot the Pigeon",
-  "short_name": "Poirot",
+  "short_name": "Poirot the Pigeon",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -8,13 +8,13 @@
   "theme_color": "#1a1830",
   "icons": [
     {
-      "src": "icons/icon-192.png?v=9a14eca3",
+      "src": "icons/icon-192.png?v=d208052e",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-512.png?v=9a14eca3",
+      "src": "icons/icon-512.png?v=d208052e",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

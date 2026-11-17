@@ -772,7 +772,9 @@ def dashboard_icon(size: int) -> Image.Image:
     for i, gid in enumerate(("whisker-dash", "capybara-rumble", "poirot-pigeon", "banana-slug-arena")):
         x = gap + (i % 2) * (tile + gap) - 6
         y = gap + (i // 2) * (tile + gap) - 6
-        im.paste(still_icon(gid, tile), (x + 6, y + 6), mask)
+        shot = ROOT / "dashboard" / "app-icons" / f"{gid}.png"  # recorded gameplay still, if there is one
+        pic = Image.open(shot).convert("RGB").resize((tile, tile), Image.LANCZOS) if shot.exists() else still_icon(gid, tile)
+        im.paste(pic, (x + 6, y + 6), mask)
     return im.resize((size, size), Image.LANCZOS)
 
 

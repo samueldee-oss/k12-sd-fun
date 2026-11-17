@@ -1,6 +1,6 @@
 {
   "name": "Endless Crucible",
-  "short_name": "Crucible",
+  "short_name": "Endless Crucible",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

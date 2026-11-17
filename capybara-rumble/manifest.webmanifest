@@ -1,6 +1,6 @@
 {
   "name": "Capybara Rumble",
-  "short_name": "Capybara",
+  "short_name": "Capybara Rumble",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -8,13 +8,13 @@
   "theme_color": "#2c4a2a",
   "icons": [
     {
-      "src": "icons/icon-192.png?v=62970a33",
+      "src": "icons/icon-192.png?v=70a257d2",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-512.png?v=62970a33",
+      "src": "icons/icon-512.png?v=70a257d2",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

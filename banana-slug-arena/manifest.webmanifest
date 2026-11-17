@@ -1,6 +1,6 @@
 {
   "name": "Banana Slug Arena",
-  "short_name": "Slug Arena",
+  "short_name": "Banana Slug Arena",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -8,13 +8,13 @@
   "theme_color": "#2f5a22",
   "icons": [
     {
-      "src": "icons/icon-192.png?v=ae48b90f",
+      "src": "icons/icon-192.png?v=650d6ac6",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-512.png?v=ae48b90f",
+      "src": "icons/icon-512.png?v=650d6ac6",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

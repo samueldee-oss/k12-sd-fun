@@ -4,20 +4,20 @@
 const GAMES = [
   { id: "whisker-dash", name: "Whisker Dash", desc: "Pixel cat platformer, 1–2 players.", src: "../whisker-dash/index.html" },
   { id: "rulebound", name: "Rulebound", desc: "Word-rule puzzles: push words to change the rules (90 levels + sandbox).", src: "../rulebound/index.html" },
-  { id: "poirot-pigeon", name: "Poirot", desc: "Poirot the Pigeon: 3D whodunit, search rooms with a magnifying glass, 1–2 players.", src: "../poirot-pigeon/index.html" },
-  { id: "banana-slug-arena", name: "Slug Arena", desc: "Banana Slug Arena: survive 20 waves of derpy bugs and swamp critters.", src: "../banana-slug-arena/index.html" },
-  { id: "ships-and-villagers", name: "Villagers", desc: "Ships & Villagers, World 1: storybook castle village with 5 village jobs.", src: "../ships-and-villagers/index.html" },
-  { id: "capybara-rumble", name: "Capybara", desc: "Capybara Rumble: lane-battle strategy on the riverbank.", src: "../capybara-rumble/index.html" },
+  { id: "poirot-pigeon", name: "Poirot the Pigeon", desc: "Poirot the Pigeon: 3D whodunit, search rooms with a magnifying glass, 1–2 players.", src: "../poirot-pigeon/index.html" },
+  { id: "banana-slug-arena", name: "Banana Slug Arena", desc: "Banana Slug Arena: survive 20 waves of derpy bugs and swamp critters.", src: "../banana-slug-arena/index.html" },
+  { id: "ships-and-villagers", name: "Ships & Villagers", desc: "Ships & Villagers, World 1: storybook castle village with 5 village jobs.", src: "../ships-and-villagers/index.html" },
+  { id: "capybara-rumble", name: "Capybara Rumble", desc: "Capybara Rumble: lane-battle strategy on the riverbank.", src: "../capybara-rumble/index.html" },
   { id: "sprout-siege", name: "Sprout Siege", desc: "Lane-defense strategy: plant seeds, stop the Gloobs.", src: "../sprout-siege/index.html" },
   { id: "kitty-and-lotl", name: "Kitty & Lotl", desc: "Cat and axolotl catch treats in a teacup boat.", src: "../kitty-and-lotl/index.html" },
-  { id: "endless-crucible", name: "Crucible", desc: "Endless Crucible: combine elements to discover new things. Offline it uses the recipe book only.", src: "../endless-crucible/index.html" },
-  { id: "sensory-overload", name: "Sensory", desc: "Sensory Overload: a clicker about stimulation and touching grass.", src: "../sensory-overload/index.html" },
-  { id: "mothwicks-lantern", name: "Mothwick", desc: "Mothwick's Lantern: pixel boss fight with a kind ending.", src: "../mothwicks-lantern/index.html" },
+  { id: "endless-crucible", name: "Endless Crucible", desc: "Endless Crucible: combine elements to discover new things. Offline it uses the recipe book only.", src: "../endless-crucible/index.html" },
+  { id: "sensory-overload", name: "Sensory Overload", desc: "Sensory Overload: a clicker about stimulation and touching grass.", src: "../sensory-overload/index.html" },
+  { id: "mothwicks-lantern", name: "Mothwick's Lantern", desc: "Mothwick's Lantern: pixel boss fight with a kind ending.", src: "../mothwicks-lantern/index.html" },
   { id: "prism-sprint", name: "Prism Sprint", desc: "Neon rhythm runner, 6 levels.", src: "../prism-sprint/index.html" },
   { id: "thistle-king", name: "Thistle King", desc: "Bee vs. boss garden dodger.", src: "../thistle-king/index.html" },
   { id: "rooftop-flow", name: "Rooftop Flow", desc: "Endless rooftop runner with tricks.", src: "../rooftop-flow/index.html" },
   { id: "pong", name: "Pong", desc: "Classic Pong with touch controls, 1–2 players.", src: "../pong/index.html" },
-  { id: "snake", name: "Snake", desc: "Snake (side project). Swipe to steer.", src: "../experiments/snake-blender-mode/index.html" },
+  { id: "snake", name: "Blender Mode Snake", desc: "Snake (side project). Swipe to steer.", src: "../experiments/snake-blender-mode/index.html" },
   {
     id: "bank-game", name: "Bank Game", desc: "Stocks, flows and interest: save, buy, and watch money grow. Needs the PC server and internet.",
     needsNet: true,
@@ -83,7 +83,7 @@ function open(g, opts = {}) {
   const pick = $("#versionPick");
   pick.hidden = !vs;
   if (vs) pick.innerHTML = vs.map((v) => `<option value="${v.id}"${v === currentVersion ? " selected" : ""}>${v.name}</option>`).join("");
-  $("#gameTitle").textContent = g.versions ? g.name : (GAMES_FULL[g.id] || g.name);
+  $("#gameTitle").textContent = g.name;
   $("#barIcon").src = `app-icons/${g.id}.gif`;
   $("#gameDesc").textContent = g.desc;
   load();
@@ -105,10 +105,6 @@ function load() {
   $("#copyLink").hidden = !!current.versions;
 }
 
-const GAMES_FULL = {
-  "poirot-pigeon": "Poirot the Pigeon", "banana-slug-arena": "Banana Slug Arena", "capybara-rumble": "Capybara Rumble",
-  "endless-crucible": "Endless Crucible", "ships-and-villagers": "Ships & Villagers", "sensory-overload": "Sensory Overload", "mothwicks-lantern": "Mothwick's Lantern",
-};
 
 $("#versionPick").addEventListener("change", (e) => {
   currentVersion = current.versions.find((v) => v.id === e.target.value);
