@@ -72,7 +72,7 @@ GAMES.forEach((g) => {
   b.type = "button";
   b.dataset.id = g.id;
   b.setAttribute("role", "listitem");
-  b.innerHTML = `<span class="app-icon"><img src="app-icons/${g.id}.gif" alt="" loading="lazy"></span><span class="app-name"></span>`;
+  b.innerHTML = `<span class="app-icon"><img src="app-icons/${g.id}.gif?v=3" alt="" loading="lazy"></span><span class="app-name"></span>`;
   b.querySelector(".app-name").textContent = g.name;
   b.addEventListener("click", () => open(g));
   grid.appendChild(b);
@@ -99,7 +99,7 @@ function open(g, opts = {}) {
   pick.hidden = !vs;
   if (vs) pick.innerHTML = vs.map((v) => `<option value="${v.id}"${v === currentVersion ? " selected" : ""}>${v.name}</option>`).join("");
   $("#gameTitle").textContent = g.name;
-  $("#barIcon").src = `app-icons/${g.id}.gif`;
+  $("#barIcon").src = `app-icons/${g.id}.gif?v=3`;
   $("#gameDesc").textContent = g.desc;
   load();
   grid.querySelectorAll(".app").forEach((el) => el.classList.toggle("active", el.dataset.id === g.id));
