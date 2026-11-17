@@ -238,18 +238,60 @@ async def sensory_step(pg, i):
         await pg.click("#btn")
 
 
-# Mothwick's Lantern: FIGHT, hit the bar, then dodge in the box
-async def moth_setup(pg):
+# Mothwick's Lantern: the mercy route. Off camera: Cup the flame twice and Hum once, dodging in between,
+# until MOTHWICK no longer wants to fight. On camera: MERCY -> Spare -> "You spared MOTHWICK."
+MOTH_PATCH = ("let G;", "let G; window.__G = () => G;")
+
+
+async def moth_until_menu(pg, limit=120):
+    arrows = ["ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown"]
+    for n in range(limit):
+        st = await pg.evaluate("__G().state")
+        if st == "menu":
+            for k in arrows:
+                await pg.keyboard.up(k)
+            return
+        await pg.evaluate("(g=>g.hp=Math.max(g.hp,g.maxHp-2))(__G())")  # never lose the run while setting up
+        if st in ("text", "say", "sub", "bubble"):
+            await tap(pg, "z")
+        else:
+            await hold(pg, arrows[(n // 3) % 4], arrows)
+        await pg.wait_for_timeout(250)
+
+
+async def moth_menu(pg, btn, sub):
+    while await pg.evaluate("__G().btn") != btn:
+        await tap(pg, "ArrowRight")
+        await pg.wait_for_timeout(120)
     await tap(pg, "z")
+    await pg.wait_for_timeout(250)
+    while await pg.evaluate("__G().sub") != sub:
+        await tap(pg, "ArrowDown")
+        await pg.wait_for_timeout(120)
+    await tap(pg, "z")
+    await pg.wait_for_timeout(300)
+
+
+async def moth_setup(pg):
+    await tap(pg, "z")  # past the intro line
     await pg.wait_for_timeout(500)
+    await moth_until_menu(pg)
+    for sub in (1, 1, 2):  # Cup the flame, Cup the flame, Hum softly
+        await moth_menu(pg, 1, sub)
+        await moth_until_menu(pg)
+    await pg.wait_for_timeout(1200)  # let "no longer wants to fight" settle
 
 
 async def moth_step(pg, i):
-    if i in (0, 5, 14, 18, 22, 26, 30):
-        await tap(pg, "z")
-    if i >= 32:
-        await hold(pg, ["ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown"][(i // 4) % 4],
-                   ["ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown"])
+    if i < 3:
+        return
+    if i == 3:
+        while await pg.evaluate("__G().btn") != 3:  # over to MERCY
+            await tap(pg, "ArrowRight")
+            await pg.wait_for_timeout(150)
+    elif i in (8, 13) or (i > 16 and i % 6 == 0):
+        if await pg.evaluate("__G().state") not in ("end", "explore"):
+            await tap(pg, "z")  # MERCY, then Spare, then read the lines (stop at YOU WON)
 
 
 # Prism Sprint: Neon Steps, jump the spikes
@@ -395,7 +437,7 @@ RECIPES = {
     "sensory-overload": dict(path="sensory-overload/index.html", setup=nothing, step=sensory_step,
                              crop=(120, 190, 360)),
     "mothwicks-lantern": dict(path="mothwicks-lantern/index.html", setup=moth_setup, step=moth_step,
-                              crop=(280, 58, 400), frames=60, gap_ms=60),
+                              crop=(160, 58, 640, 480), frames=56, gap_ms=60, still=12, trim=(0, 46), load_ms=1500, patch=MOTH_PATCH),
     "prism-sprint": dict(path="prism-sprint/index.html", setup=prism_setup, step=prism_step,
                          crop=(120, 160, 420)),
     "thistle-king": dict(path="thistle-king/index.html", setup=thistle_setup, step=thistle_step,
