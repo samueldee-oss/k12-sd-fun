@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mochi's Star Quest</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Lexend:wght@400;500&family=Press+Start+2P&display=swap" rel="stylesheet"><style id="css">
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:'Fredoka',system-ui,sans-serif;color:#3b3346;background:linear-gradient(180deg,#bfe6ff 0%,#ffe9f3 100%);background-attachment:fixed;min-height:100vh}
+#root{max-width:1000px;margin:0 auto;padding:16px 14px 48px}
+.px{image-rendering:pixelated;image-rendering:crisp-edges;display:inline-block;vertical-align:middle}
+.btn{font-family:inherit;font-weight:700;font-size:20px;border:3px solid #3b3346;border-radius:16px;padding:11px 18px;background:#fff;color:#3b3346;box-shadow:0 5px 0 #3b3346;cursor:pointer;transition:transform .08s,box-shadow .08s;margin:6px}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #3b3346}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.go{background:#7be08a}.btn.pink{background:#ffb3cf}.btn.yel{background:#ffe066}.btn.blue{background:#a9d8ff}
+.btn.big{font-size:27px;padding:15px 28px}.btn.sm{font-size:17px;padding:6px 12px}
+.card{background:#fffdf7;border:3px solid #3b3346;border-radius:22px;box-shadow:0 6px 0 rgba(59,51,70,.25);padding:18px;margin-bottom:16px}
+.center{text-align:center}
+.row{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;margin-top:12px}
+.small{font-size:16px;opacity:.75;font-weight:600}
+.tip{font-size:15px;opacity:.7;margin-top:12px}
+h1,h2{margin:.3em 0}
+.logoRow{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap}
+.logo{font-family:'Press Start 2P',monospace;font-size:clamp(17px,3.6vw,30px);line-height:1.35;color:#6b4bb5;text-shadow:3px 3px 0 #ffd23f}
+.sub{font-size:17px;margin-top:8px}
+.jar{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin-top:14px}
+.slot{width:40px;height:40px;border:3px dashed #b9b0cc;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#f3f0fa}
+.slot.on{border:3px solid #f2b600;background:#fff6c9}
+.jarlbl{text-align:center;font-weight:600;margin-top:6px}
+.win{text-align:center;font-size:20px;background:#fff6c9}
+.world{border:3px solid #3b3346;border-radius:24px;padding:14px 10px 18px;margin:16px 0;box-shadow:0 6px 0 rgba(59,51,70,.2)}
+.wtitle{font-weight:700;font-size:22px;text-align:center;margin-bottom:6px}
+.nodes{display:flex;justify-content:space-around;flex-wrap:wrap;gap:10px;padding-top:44px}
+.node{display:flex;flex-direction:column;align-items:center;width:160px;position:relative}
+.nbtn{width:86px;height:86px;border-radius:50%;border:4px solid #3b3346;background:#ffe066;font:700 34px 'Fredoka',sans-serif;color:#3b3346;box-shadow:0 6px 0 #3b3346;cursor:pointer}
+.nbtn:active{transform:translateY(4px);box-shadow:0 2px 0 #3b3346}
+.node.locked .nbtn{background:#ddd8e6;font-size:28px;cursor:default}
+.node.cur .nbtn{background:#7be08a;animation:pulse 1.2s infinite}
+.here{position:absolute;top:-46px}
+.ntitle{font-weight:600;font-size:16px;text-align:center;margin-top:8px}
+.nstars{color:#e8a400;font-size:22px;letter-spacing:2px;min-height:26px}
+.bottomBar{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:10px}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.bob{animation:bob 1.4s ease-in-out infinite}.bob2{animation:bob 1.1s ease-in-out infinite reverse}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.spin{animation:spin 2.4s ease-in-out infinite}
+@keyframes spin{0%,100%{transform:rotate(-10deg) scale(1)}50%{transform:rotate(10deg) scale(1.12)}}
+.ctitle{font-size:clamp(28px,5vw,44px)}
+.sprites{display:flex;justify-content:center;align-items:flex-end;gap:16px;margin:10px 0}
+.big{font-size:22px}
+.steps{font-size:17px;font-weight:600;background:#fff8;border-radius:12px;display:inline-block;padding:8px 14px}
+.dots{display:flex;justify-content:center;gap:8px;margin:12px}
+.dots span{width:18px;height:18px;border-radius:50%;border:3px solid #3b3346;background:#fff}
+.dots span.on{background:#7be08a}.dots span.cur{background:#ffe066}
+.wcard{font-family:'Lexend',sans-serif;font-size:clamp(46px,10vw,88px);font-weight:500;padding:28px 10px;margin:10px auto;max-width:560px;background:#fff;border:4px solid #3b3346;border-radius:24px;box-shadow:0 7px 0 #3b3346}
+.pop{animation:pop .25s ease-out}
+@keyframes pop{from{transform:scale(.7);opacity:.3}to{transform:scale(1);opacity:1}}
+.readTop{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.readTop .rt{flex:1;font-size:19px}
+.timer{font-family:'Press Start 2P',monospace;font-size:20px;background:#fff;border:3px solid #3b3346;border-radius:12px;padding:8px 12px}
+.raceLbl{text-align:center;font-weight:600;margin-bottom:4px}
+.race{height:62px;border:3px solid #3b3346;border-radius:32px;position:relative;margin:4px 0 12px;background:repeating-linear-gradient(90deg,#e9f7ff 0 40px,#dff0ff 40px 80px);overflow:hidden}
+.ghostRun{position:absolute;top:6px;left:0;opacity:.85}
+.ghostRun.won{opacity:1;filter:drop-shadow(0 0 6px #7d8fd6)}
+.flag{position:absolute;right:10px;top:12px;font-size:30px}
+.passage{font-family:'Lexend',sans-serif;font-size:clamp(23px,3.9vw,36px);line-height:1.8;background:#fffdf7;border:3px solid #3b3346;border-radius:22px;padding:20px 24px;position:relative;box-shadow:0 6px 0 rgba(59,51,70,.25);min-height:220px}
+.w{border-radius:8px;cursor:pointer;padding:0 2px;transition:background .15s}
+.w.miss{background:#ffc9c9;text-decoration:line-through;text-decoration-color:#e03131;text-decoration-thickness:3px}
+.w.glow{background:#fff09a;box-shadow:0 3px 0 #ffd23f}
+.overlay{position:absolute;inset:0;background:rgba(255,253,247,.97);display:flex;align-items:center;justify-content:center;border-radius:20px;z-index:2}
+.countNum{font-family:'Press Start 2P',monospace;font-size:72px;color:#6b4bb5;animation:pop .4s}
+.helper{text-align:center;font-size:16px;opacity:.8;margin-top:10px}
+.stats{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin:12px 0}
+.stat{background:#fff;border:3px solid #3b3346;border-radius:18px;padding:10px 18px;min-width:140px;font-weight:600}
+.num{font-size:40px;font-weight:700;color:#6b4bb5}
+.bigstars{font-size:52px;color:#f2b600;letter-spacing:6px;text-shadow:0 3px 0 #3b334633}
+.bigstars .off{color:#d9d3e6}
+.whys{list-style:none;padding:0;font-size:19px;line-height:1.7}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:8px 0}
+.chip{font-family:'Lexend',sans-serif;background:#ffe3ec;border:2px solid #3b3346;border-radius:12px;padding:4px 12px;font-size:22px}
+.conf{position:fixed;top:-50px;animation:fall 2.7s ease-in forwards;pointer-events:none;z-index:50}
+@keyframes fall{to{transform:translateY(112vh) rotate(560deg)}}
+.pond{background:linear-gradient(#bfefff,#6cc4ef);border:3px solid #3b3346;border-radius:24px;padding:20px 10px;position:relative;overflow:hidden;min-height:300px}
+.fishTop{display:flex;justify-content:space-between;font-size:26px;font-weight:700;margin-bottom:8px}
+.timebar{height:18px;border:3px solid #3b3346;border-radius:10px;background:#fff;overflow:hidden;margin-bottom:12px}
+.timebar div{height:100%;background:#7be08a;width:100%}
+.jump{position:absolute;font-size:44px;animation:jump .7s ease-out forwards;pointer-events:none}
+@keyframes jump{0%{transform:translateY(0) scale(.6);opacity:1}60%{transform:translateY(-140px) scale(1.2)}100%{transform:translate(160px,-40px) scale(.5);opacity:0}}
+.dock{display:flex;align-items:flex-end;justify-content:center;gap:12px}
+.tiers{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.tier{width:230px}
+.tier .e{font-size:44px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.grid4 .stat{text-align:center}
+canvas.chart{width:100%;height:320px;background:#fff;border:3px solid #3b3346;border-radius:16px}
+.legend{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;font-weight:600;margin-top:8px}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:6px;vertical-align:middle}
+table{width:100%;border-collapse:collapse;font-size:16px}
+td,th{padding:6px 8px;border-bottom:2px solid #eee8f5;text-align:left}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.form label{font-weight:600;display:flex;flex-direction:column;gap:4px}
+.form input[type=text],.form input[type=number],.form input[type=date]{font:inherit;font-size:18px;padding:8px 10px;border:3px solid #3b3346;border-radius:12px}
+.check{flex-direction:row!important;align-items:center;gap:10px!important}
+.check input{width:24px;height:24px}
+.guide{font-size:16px;line-height:1.55}
+.guide h3{margin:14px 0 4px}
+.note{background:#fff6c9;border:2px dashed #e8a400;border-radius:14px;padding:10px 14px;font-size:16px}
+.play{position:relative;height:min(58vh,440px);border:3px solid #3b3346;border-radius:24px;overflow:hidden;margin-top:10px;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.crit{position:absolute;left:0;top:0;width:78px;height:78px;font-size:54px;line-height:78px;background:none;border:0;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
+.poof{position:absolute;font-size:44px;pointer-events:none;animation:poof .5s ease-out forwards}
+@keyframes poof{to{transform:scale(2.2);opacity:0}}
+.mochiCorner{position:absolute;bottom:6px;left:10px;pointer-events:none}
+.yay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,253,247,.85)}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#3b3346;color:#fff;padding:10px 18px;border-radius:14px;font-weight:600;z-index:60}
+</style><!-- home-screen-app -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=601bacb0">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=601bacb0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mochi's Star Quest">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#bfe7ff">
+<script id="home-screen-sw">if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
+<!-- /home-screen-app -->
+</head><body><div id="root"></div><script id="state" type="application/json">{"v":1,"updated":0,"settings":{"name":"","startWpm":48,"startAcc":93,"goalWpm":104,"goalAcc":98,"startDate":"2026-11-11","goalDate":"2027-04-30","glow":false,"sound":true},"ch":{},"log":[],"fishBest":{}}</script><script id="app">
+(function(){
+const HEAD='<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mochi\'s Star Quest</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Lexend:wght@400;500&family=Press+Start+2P&display=swap" rel="stylesheet">';
+const $=s=>document.querySelector(s);
+const root=$('#root');
+const KEY='mochiStarQuest_v1';
+
+/* ---------- STORY ---------- */
+const WORLDS=[
+ {n:'Sunny Meadow',e:'🌼',bg:'linear-gradient(135deg,#fff4b8,#c9f2b0)'},
+ {n:'Whisper Woods',e:'🍄',bg:'linear-gradient(135deg,#d8f0d0,#a7d3b0)'},
+ {n:'Sparkle Sea',e:'🐚',bg:'linear-gradient(135deg,#c9f3ff,#8fd3f4)'},
+ {n:'Snowy Sky Peak',e:'❄️',bg:'linear-gradient(135deg,#f4f6ff,#cdd7ff)'}];
+const CH=[
+{w:0,t:'The Falling Star',n:'A bee is buzzing about something shiny in the garden...',x:`Mochi is a little gray cat with big green eyes. One night, she sat on a hill to look at the sky. Then she saw a big flash! A star fell down, down, down. It hit a rock and broke into twelve shiny bits. The bits flew all over the land. "Oh no!" said Mochi. "The sky will be so dark." Just then, something glowed in the grass by her paw. It was one tiny bit of the star! A little bug with a glowing tail flew up. "I am Pip," said the bug. "I will help you find the rest." Mochi smiled. "Let's go!"`},
+{w:0,t:'The Tall Sunflower',n:'Something is glowing at the bottom of the pond...',x:`In the morning, Mochi and Pip ran to the garden. The flowers were red, pink, and gold. A fat bee buzzed past them. "Have you seen a star bit?" asked Mochi. "Yes," said the bee. "It fell into the big sunflower. But it is too heavy for me to carry." Mochi looked up. The sunflower was very, very tall. She dug her claws into the stem and climbed up, up, up. At the top, something was shining in the yellow petals. It was the second star bit! "Two!" yelled Pip. "You did it!"`},
+{w:0,t:'The Frog Joke',n:'The path leads into the dark, whispery woods...',x:`The next star bit was at the bottom of the pond. Mochi did not want to get wet. "Cats and water do not mix," she said. A green frog hopped onto a lily pad. "I will dive for it," said the frog, "if you tell me a funny joke." Mochi thought and thought. "Why did the frog take the bus to work?" she asked. "Why?" said the frog. "Because his car got toad away!" The frog laughed so hard that he fell off his lily pad. Splash! When he came back up, he had the star bit in his mouth. "Here you go," he said. That made three.`},
+{w:1,t:'The Wise Owl',n:'A squirrel who LOVES shiny things lives nearby...',x:`The path went into the deep woods. The trees were tall, and the light was dim. Mochi felt a little scared. "Do not worry," said Pip. "My tail will light the way." Pip's tail glowed bright yellow. They walked past old logs and soft green moss. "Who goes there?" said a voice from a branch. It was a big brown owl. "It is just us," said Mochi. "We are looking for bits of a fallen star." The owl blinked her round eyes. "Something warm and shiny landed in my nest last night," she said. "You may have it." She dropped it down, and Mochi caught it. Four star bits!`},
+{w:1,t:"Nutmeg's Treasure",n:'Uh oh... are those rain clouds?',x:`Inside a hollow tree lived a squirrel named Nutmeg. Nutmeg loved shiny things. She had buttons, bottle caps, and a silver spoon. Right in the middle of her pile was a star bit. "That is mine now," said Nutmeg. "I found it first." Mochi did not get mad. She sat and thought for a moment. "A star bit will stop shining if it is kept away from the sky," she said softly. "But I can give you something just as shiny." She took the little bell off her collar and gave it a shake. Ding, ding, ding! Nutmeg's eyes got wide. "It's a deal!" she said. Now Mochi had five.`},
+{w:1,t:'Mushroom Rain',n:'The path ends at a sparkly, sandy beach...',x:`Plip, plop, plip! Big drops of rain began to fall. Mochi and Pip hid under a giant red mushroom with white spots. "My fur is getting wet," said Mochi with a frown. A slow snail slid up next to them. "I love the rain," said the snail. "It makes the ground nice and soft for my belly." Then the snail stopped and pointed with one eye. "Is that the thing you are looking for?" Under the next mushroom, a light was blinking on and off. Mochi raced across the wet grass, grabbed the star bit, and dashed back. She was soaked from nose to tail, but she was smiling. "That makes six!" cheered Pip. "We are halfway there!"`},
+{w:2,t:'The Sandcastle',n:'Something is sparkling on a faraway island...',x:`After the woods, the path ended at a sandy beach. The waves went swish, swish on the shore. A red crab was building a giant sandcastle. On the very top of the tallest tower sat a star bit, glowing like a tiny lamp. "Please may we have that?" asked Mochi. "Only if you help me finish my castle," said the crab. So Mochi dug a moat with her paws. Pip found pretty shells to put on the walls. The crab made a bridge out of a stick. When the castle was done, it was the best castle on the whole beach. The crab clicked his claws with joy and handed them the star bit. Seven!`},
+{w:2,t:'Turtle Ride',n:'The water is starting to rumble...',x:`Far out in the sea was a small island. "I can see something sparkling over there," said Pip. "But how will we get across?" asked Mochi. "I do not like to swim." Just then, a big sea turtle poked her head out of the water. "Hop on my back," she said kindly. "I am slow, but I am strong." Mochi held on tight as the turtle paddled through the waves. Little fish jumped and played around them. The sun was warm on Mochi's back, and she started to feel brave. On the island, they found the star bit inside a pink shell. "Thank you, turtle!" said Mochi. Now they had eight bits of the star.`},
+{w:2,t:'Grandma Whale',n:'The last bits are up on a snowy mountain. Brrr!',x:`On the way back, the water began to rumble. A huge gray whale rose up next to them. She was bigger than a house! Mochi's fur stood straight up. "Do not be afraid," said the turtle. "That is Grandma Whale. She is very gentle." The whale sang a long, low song. Then she blew a giant spout of water high into the air. Something sparkly shot up with the water and came twirling back down. Mochi stretched out her paws and caught it. It was the ninth star bit! "I kept it safe for you," sang Grandma Whale. "The sea is happy to help the sky." Mochi waved goodbye as the whale swam away.`},
+{w:3,t:'The Snowy Mountain',n:'Two bits are floating way up on a cloud...',x:`The last three bits had landed on top of a snowy mountain. It was a long, cold climb. The wind blew, and snowflakes stuck to Mochi's whiskers. "Brrr," said Mochi. "My paws are freezing." A fluffy white goat came hopping down the rocks. "Follow me," said the goat. "I know the safe path to the top." Mochi and Pip followed the goat around big rocks and over icy bridges. At last, they found a star bit, but it was stuck inside a block of ice. Pip flew close and made his tail glow as bright as he could. Slowly, the ice began to melt. Drip, drip, drip. Soon the star bit popped out into Mochi's paws. Ten!`},
+{w:3,t:'The Cloud Bridge',n:'All twelve bits are found. Time to fix the star!',x:`At the very top of the mountain, the clouds were so low that Mochi could almost touch them. Two bits of the star were floating on a cloud, just out of reach. "How can we get up there?" asked Mochi. A flock of bluebirds landed next to her. "We can help," they chirped. The birds held the ends of a long ribbon in their beaks. They flew up and made a bridge from the mountain to the cloud. Mochi took a deep breath. She stepped onto the ribbon, one paw at a time. She did not look down. When she reached the cloud, she scooped up both star bits. "Eleven and twelve!" yelled Pip. "We found them all!"`},
+{w:3,t:'The Star Comes Home',n:'',x:`Mochi set all twelve star bits in a circle on the snow. They began to hum and glow. Then, one by one, they floated up and clicked together like a puzzle. The star was whole again! It shined so brightly that the whole mountain turned gold. "Thank you, Mochi," the star said in a voice like bells. "Because you never gave up, I can go home." The star rose higher and higher until it was back in the sky. All of Mochi's new friends saw it from far away, and they all cheered. Mochi and Pip sat together and looked up. The night was bright and beautiful. "What should we do next?" asked Pip. Mochi grinned. "Let's find a new adventure."`}
+];
+
+const FISH=[
+ {n:'Little Fish',e:'🐟',w:'a and the see can go up we to it is in my me you he she big run look said come here play red blue yes no not all am at be but did do eat get good have like new now on out ran ride saw say so that they this too want was went what who will with cat dog sun hat'.split(' ')},
+ {n:'Medium Fish',e:'🐠',w:'after again any ask by could every fly from give going had has her him his how just know let live may of old once open over put round some stop take thank them then think walk were when frog jump fish ship stamp brown three green sleep tree'.split(' ')},
+ {n:'Big Fish',e:'🐡',w:"always around because been before best both buy call cold does don't fast first found gave goes made many pull read right sing tell their these those upon very which why wish work would write your about better bring carry clean done draw drink eight fall far full grow hold laugh light long much myself never only own pick seven shall show small start today together try warm".split(' ')}];
+
+/* ---------- PIXEL SPRITES ---------- */
+const MOCHI=["................","..kk........kk..",".kgpk......kpgk.",".kgggkkkkkkgggk.",".kggggggggggggk.",".kgweggggggwegk.",".kgeeggggggeegk.",".kggggkppkggggk.",".kllgggkkgggllk.","..kkggggggggkk..","..kggllllllggk..",".kggllllllllggkk",".kggllllllllggkg",".kgglkllllklggkg","..kkkkkkkkkkkkk.","................"];
+const PIP=["..k..k..","...kk...","..kddk..",".wkddkw.","wwkddkww","..kyyk..","..kyyk..","...kk..."];
+const STAR=["...y...","..yYy..","yyyYyyy",".yYYYy.","..yyy..",".yy.yy.","yy...yy"];
+function mk(rows,pal){const h=rows.length,w=rows[0].length;const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');rows.forEach((r,y)=>[...r].forEach((ch,i)=>{if(pal[ch]){x.fillStyle=pal[ch];x.fillRect(i,y,1,1)}}));return{u:c.toDataURL(),w}}
+const SPR={
+ mochi:mk(MOCHI,{k:'#3b3346',g:'#a9a3bd',l:'#ece8f6',p:'#ff9fbd',w:'#ffffff',e:'#3fbf6a'}),
+ ghost:mk(MOCHI,{k:'#7d8fd6',g:'#cfe0ff',l:'#eef4ff',p:'#b9cdfa',w:'#ffffff',e:'#5d6fc0'}),
+ pip:mk(PIP,{k:'#3b3346',d:'#7a62b0',w:'#d7efff',y:'#ffe14d'}),
+ star:mk(STAR,{y:'#ffcc1f',Y:'#fff6b0'})};
+function im(n,s,cls){const p=SPR[n];return `<img class="px ${cls||''}" alt="" src="${p.u}" style="width:${p.w*s}px">`}
+
+/* ---------- HELPERS ---------- */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const dstr=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const pdate=s=>{const[y,m,d]=String(s).split('-').map(Number);return new Date(y,(m||1)-1,d||1)};
+const fmt=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+pad(s%60)};
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const tokens=x=>x.trim().split(/\s+/);
+const isWord=t=>/[A-Za-z0-9]/.test(t);
+const clean=w=>w.replace(/^[^A-Za-z]+/,'').replace(/[^A-Za-z]+$/,'');
+function starsHtml(n){let h='';for(let i=0;i<3;i++)h+=i<n?'★':'<span class="off">★</span>';return h}
+function toast(m,ms){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),ms||1800)}
+
+/* ---------- STATE ---------- */
+function defaults(){return{v:1,updated:0,settings:{name:'',startWpm:48,startAcc:93,goalWpm:104,goalAcc:98,startDate:'2026-11-11',goalDate:'2027-04-30',glow:false,sound:true},ch:{},log:[],fishBest:{}}}
+function loadState(){
+ let emb=null,loc=null;
+ try{emb=JSON.parse(document.getElementById('state').textContent)}catch(e){}
+ try{loc=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+ const best=[emb,loc].filter(x=>x&&x.v===1).sort((a,b)=>(b.updated||0)-(a.updated||0))[0];
+ const d=defaults();
+ if(best){Object.assign(d.settings,best.settings||{});d.ch=best.ch||{};d.log=best.log||[];d.fishBest=best.fishBest||{};d.updated=best.updated||0}
+ return d}
+let S=loadState();
+function saveLocal(){S.updated=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function buildHTML(){
+ const css=document.getElementById('css').textContent, app=document.getElementById('app').textContent;
+ const json=JSON.stringify(S).replace(/</g,'\\u003c');const SC='</'+'script>';
+ return '<!DOCTYPE html>\n<html lang="en"><head>'+HEAD+'<style id="css">'+css+'</style></head><body><div id="root"></div><script id="state" type="application/json">'+json+SC+'<script id="app">'+app+SC+'</body></html>'}
+async function saveAll(){
+ saveLocal();
+ try{const a=(window.claude&&window.claude.use)?await window.claude.use('artifact'):null;
+  if(!a)return;toast('Saving progress… ⭐',4000);await a.publish(buildHTML())}catch(e){/* not the owner or offline: browser copy is kept */}
+}
+
+/* goal line */
+function goalOn(ds){const s=S.settings;const a=pdate(s.startDate),b=pdate(s.goalDate),t=pdate(ds);let f=(t-a)/(b-a);if(!isFinite(f))f=1;f=Math.max(0,Math.min(1,f));return Math.round(+s.startWpm+(s.goalWpm-s.startWpm)*f)}
+const todayGoal=()=>goalOn(dstr(new Date()));
+function streak(){const days=new Set(S.log.map(l=>l.d));const d=new Date();if(!days.has(dstr(d)))d.setDate(d.getDate()-1);let n=0;while(days.has(dstr(d))){n++;d.setDate(d.getDate()-1)}return n}
+
+/* sound */
+let AC=null;
+function tone(f,dur,type,vol,delay){if(!S.settings.sound)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=type||'square';o.frequency.value=f;const t=AC.currentTime+(delay||0);g.gain.setValueAtTime(vol||.05,t);g.gain.exponentialRampToValueAtTime(.0001,t+(dur||.1));o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+(dur||.1)+.03)}catch(e){}}
+const sfx={tap:()=>tone(560,.05),good:()=>{tone(660,.1);tone(990,.12,'square',.05,.08)},miss:()=>tone(220,.14,'triangle',.08),star:()=>[523,659,784,1046].forEach((f,i)=>tone(f,.16,'square',.05,i*.11)),count:()=>tone(440,.1),go:()=>tone(880,.2)};
+function confetti(){const em=['⭐','✨','💛','🌟','🐾'];for(let i=0;i<40;i++){const s=document.createElement('span');s.className='conf';s.textContent=em[i%em.length];s.style.left=Math.random()*100+'vw';s.style.animationDelay=Math.random()*.7+'s';s.style.fontSize=(18+Math.random()*24)+'px';document.body.appendChild(s);setTimeout(()=>s.remove(),3600)}}
+
+let timers=[],raf=0;
+function stopTimers(){timers.forEach(t=>{clearTimeout(t);clearInterval(t)});timers=[];if(raf)cancelAnimationFrame(raf);raf=0;window.onkeydown=null}
+function show(h){stopTimers();root.innerHTML=h;window.scrollTo(0,0)}
+function on(id,fn){const e=document.getElementById(id);if(e)e.onclick=fn}
+
+/* ---------- MAP ---------- */
+const done=i=>!!(S.ch[i]&&S.ch[i].done);
+function curIdx(){for(let i=0;i<CH.length;i++)if(!done(i))return i;return -1}
+const unlocked=i=>i===0||done(i-1);
+function renderMap(){
+ const cur=curIdx();const found=CH.filter((c,i)=>done(i)).length;
+ let jar='';for(let i=0;i<12;i++)jar+=`<span class="slot ${i<found?'on':''}">${i<found?im('star',4):''}</span>`;
+ let h=`<div class="card"><div class="logoRow">${im('mochi',5,'bob')}<div class="center"><div class="logo">Mochi's<br>Star Quest</div><div class="sub">${S.settings.name?'Reader: <b>'+esc(S.settings.name)+'</b> · ':''}🐾 ${streak()}-day streak · 🎯 Today's goal: <b>${todayGoal()}</b> words a minute</div></div>${im('pip',5,'bob2')}</div><div class="jar">${jar}</div><div class="jarlbl">Star bits found: ${found} / 12</div></div>`;
+ if(cur===-1)h+=`<div class="card win">🌟 You saved the star! Read any chapter again — every re-read makes you faster. Can you get ★★★ on all of them?</div>`;
+ WORLDS.forEach((w,wi)=>{
+  h+=`<div class="world" style="background:${w.bg}"><div class="wtitle">${w.e} World ${wi+1}: ${w.n}</div><div class="nodes">`;
+  CH.forEach((c,i)=>{if(c.w!==wi)return;const st=S.ch[i];const un=unlocked(i);
+   h+=`<div class="node ${i===cur?'cur':''} ${un?'':'locked'}">${i===cur?'<div class="here">'+im('mochi',3,'bob')+'</div>':''}<button class="nbtn" data-i="${i}" ${un?'':'disabled'}>${un?i+1:'🔒'}</button><div class="ntitle">${esc(c.t)}</div><div class="nstars">${st&&st.done?starsHtml(st.stars||1):''}</div></div>`});
+  h+='</div></div>'});
+ h+=`<div class="bottomBar"><button class="btn blue big" id="fish">🐟 Fish Flash</button><button class="btn yel big" id="prog">📈 Progress</button><button class="btn big" id="set">⚙️ Grown-ups</button></div>`;
+ show(h);
+ root.querySelectorAll('.nbtn').forEach(b=>b.onclick=()=>{sfx.tap();startChapter(+b.dataset.i)});
+ on('fish',()=>{sfx.tap();renderFishMenu()});on('prog',()=>{sfx.tap();renderProgress()});on('set',()=>{sfx.tap();renderSettings()});
+}
+
+/* ---------- CHAPTER ---------- */
+let run=null;
+const SKIPWARM=new Set(['mochi','there','their','would','could','about','which','these','those','where','little']);
+function warmWords(x){const seen=new Set(),arr=[];tokens(x).forEach(t=>{const w=clean(t);const lw=w.toLowerCase();if(w.length>=5&&!seen.has(lw)&&!SKIPWARM.has(lw)){seen.add(lw);arr.push(w)}});arr.sort((a,b)=>b.length-a.length);return shuffle(arr.slice(0,5))}
+function startChapter(i){run={i,reads:[],toks:tokens(CH[i].x),warm:warmWords(CH[i].x)};renderIntro()}
+function renderIntro(){
+ const c=CH[run.i],w=WORLDS[c.w];
+ show(`<div class="card center" style="background:${w.bg}"><div class="small">${w.e} ${w.n} · Chapter ${run.i+1}</div><h1 class="ctitle">${esc(c.t)}</h1><div class="sprites">${im('mochi',8,'bob')}${im('pip',6,'bob2')}</div><p class="big">Read one little story and help Mochi find star bit #${run.i+1}!</p><div class="steps">① Warm-up words → 🎈 → ② Read the story → 🎈 → ③ Read it again → 🎈 → ⭐</div><div class="row"><button class="btn" id="back">⬅ Map</button><button class="btn go big" id="start">Let's go! ▶</button></div></div>`);
+ on('back',renderMap);on('start',()=>{sfx.go();renderWarm(0)});
+}
+function renderWarm(k){
+ const ws=run.warm;if(k>=ws.length)return playBreak(renderRead);
+ show(`<div class="card center"><div class="small">Warm-up! Read each word out loud. 🔥</div><div class="dots">${ws.map((_,j)=>`<span class="${j<k?'on':j===k?'cur':''}"></span>`).join('')}</div><div class="wcard pop">${esc(ws[k])}</div><div class="row"><button class="btn" id="skip">Skip warm-up</button><button class="btn go big" id="next">Got it! ➜</button></div><div class="tip">Grown-up: if he gets stuck, sound it out together, then let him read it once more on his own.</div></div>`);
+ on('next',()=>{sfx.good();renderWarm(k+1)});on('skip',()=>playBreak(renderRead));
+ window.onkeydown=e=>{if(e.key==='Enter'||e.key===' '||e.key==='ArrowRight'){e.preventDefault();sfx.good();renderWarm(k+1)}};
+}
+function fastest(){return run.reads.reduce((m,r)=>!m||r.secs<m.secs?r:m,null)}
+function renderRead(){
+ const c=CH[run.i],t=run.toks,att=run.reads.length+1,prev=att>1?fastest():null;
+ const glow=S.settings.glow&&att>1;const glowWpm=prev?Math.max(todayGoal(),prev.wpm+4):todayGoal();
+ let h=`<div class="readTop"><button class="btn sm" id="back">⬅ Map</button><div class="rt"><b>${esc(c.t)}</b> · ${att===1?'Read the story':'Read it again — nice and smooth 🌟'}</div>${im('pip',3,'bob2')}</div>`;
+ h+=`<div class="passage" id="pass">${t.map((w,j)=>`<span class="w" data-j="${j}">${esc(w)}</span>`).join(' ')}<div class="overlay" id="ov"><div class="center">${im('mochi',6,'bob')}<br><button class="btn go big" id="go">Ready? GO! 📖</button><div class="tip">Take your time and read your best!</div></div></div></div>`;
+ h+=`<div class="helper" id="helper">Grown-up: tap any word he misses, skips, or you have to tell him. Tap again to undo. (Fixing it himself counts as right!)</div><div class="row"><button class="btn" id="restart">↺ Start over</button><button class="btn go big" id="done" disabled>I'm done! 🏁</button></div>`;
+ show(h);
+ const miss=new Set();let mode='ready',t0=0,secs=0,lastGlow=null;
+ const wordIdx=[];t.forEach((w,j)=>{if(isWord(w))wordIdx.push(j)});
+ root.querySelectorAll('.w').forEach(s=>s.onclick=()=>{if(mode==='ready')return;const j=+s.dataset.j;if(miss.has(j)){miss.delete(j);s.classList.remove('miss')}else{miss.add(j);s.classList.add('miss')}sfx.tap()});
+ on('back',renderMap);on('restart',renderRead);
+  function loop(){const el=(performance.now()-t0)/1000;
+  if(glow){const k=Math.min(wordIdx.length-1,Math.floor(el*glowWpm/60));const sp=root.querySelector(`.w[data-j="${wordIdx[k]}"]`);if(sp!==lastGlow){if(lastGlow)lastGlow.classList.remove('glow');if(sp)sp.classList.add('glow');lastGlow=sp}}
+  raf=requestAnimationFrame(loop)}
+ on('go',()=>{const ov=$('#ov');let n=3;sfx.count();ov.innerHTML=`<div class="countNum">${n}</div>`;
+  const iv=setInterval(()=>{n--;if(n>0){sfx.count();ov.innerHTML=`<div class="countNum">${n}</div>`}else{clearInterval(iv);sfx.go();ov.remove();mode='run';t0=performance.now();raf=requestAnimationFrame(loop);timers.push(setTimeout(()=>{const d=$('#done');if(d)d.disabled=false},6000))}},800);timers.push(iv)});
+ function finish(){
+  if(mode==='run'){mode='check';secs=(performance.now()-t0)/1000;cancelAnimationFrame(raf);raf=0;if(lastGlow)lastGlow.classList.remove('glow');sfx.good();
+   $('#helper').innerHTML='<b>Grown-up check:</b> make sure every missed word is red, then tap <b>See my score</b>.';
+   const b=$('#done');b.textContent='See my score ⭐';b.className='btn yel big';}
+  else if(mode==='check'){score(miss,secs)}}
+ on('done',finish);
+ window.onkeydown=e=>{if(e.key==='Enter'&&mode!=='ready'){e.preventDefault();finish()}};
+}
+function score(miss,secs){
+ const t=run.toks;const words=t.filter(isWord).length;const errs=[...miss].filter(j=>isWord(t[j])).length;
+ const wpm=Math.round((words-errs)/(secs/60));const acc=Math.round((words-errs)/words*1000)/10;const goal=todayGoal();
+ const stars=1+(acc>=S.settings.goalAcc?1:0)+(wpm>=goal?1:0);
+ const missed=[...new Set([...miss].sort((a,b)=>a-b).map(j=>clean(t[j])).filter(Boolean))];
+ const res={words,errs,secs:Math.round(secs*10)/10,wpm,acc,stars,goal,missed};
+ const prevBest=fastest();
+ const st=S.ch[run.i]||{done:false,stars:0,reads:0,bestWpm:0,bestAcc:0};
+ const cold=run.reads.length===0&&!st.reads;
+ st.reads++;st.bestWpm=Math.max(st.bestWpm,wpm);st.bestAcc=Math.max(st.bestAcc,acc);st.stars=Math.max(st.stars,stars);S.ch[run.i]=st;
+ S.log.push({t:Date.now(),d:dstr(new Date()),c:run.i,k:cold?'cold':'practice',wpm,acc,secs:res.secs,errs,words});
+ run.reads.push(res);saveLocal();
+ renderResult(res,prevBest);
+}
+function renderResult(res,prevBest){
+ const beat=prevBest&&res.wpm>prevBest.wpm;const ga=S.settings.goalAcc;const allow=Math.floor(res.words*(1-ga/100)+1e-9);
+ const name=S.settings.name?', '+esc(S.settings.name):'';
+ const head=beat?'You got even smoother'+name+'! 🚀':pick(['Great reading','Wow, nice job','You did it','Awesome reading','Super reading'])+name+'!';
+ let h=`<div class="card center"><div class="sprites">${im('mochi',7,'bob')}${im('pip',5,'bob2')}</div><h2>${head}</h2>
+ <div class="stats"><div class="stat"><div class="num">${res.wpm}</div>words a minute</div><div class="stat"><div class="num">${res.acc}%</div>careful reading</div></div>
+ <div class="bigstars">${starsHtml(res.stars)}</div>
+ <ul class="whys"><li>⭐ You read the whole story!</li><li>${res.acc>=ga?'⭐ Super careful reader!':'☆ Careful star next time: try for '+(allow>0?'just '+allow+' oops'+(allow>1?'es':''):'no oopses')}</li><li>${res.wpm>=res.goal?'⭐ Speedy star!':'☆ Speedy star next time: '+res.goal+' words a minute'}</li></ul>`;
+ if(res.missed.length)h+=`<div class="small">Tricky words — read them once more:</div><div class="chips">${res.missed.map(w=>`<span class="chip">${esc(w)}</span>`).join('')}</div>`;
+ h+=`<div class="row">${run.reads.length===1?'<button class="btn go big" id="again">🎈 Fun break, then read it again ➜</button><button class="btn" id="fin">Finish chapter ➜</button>':'<button class="btn" id="again">🔁 Read it once more</button><button class="btn go big" id="fin">🎈 Fun break, then get your star bit ➜</button>'}</div></div>`;
+ show(h);
+ if(beat||res.stars===3){sfx.star();confetti()}else sfx.good();
+ on('again',()=>{sfx.tap();playBreak(renderRead)});on('fin',()=>{sfx.tap();playBreak(renderReward)});
+}
+function renderReward(){
+ const i=run.i,st=S.ch[i],first=!st.done;st.done=true;saveLocal();
+ const c=CH[i],next=CH[i+1];
+ show(`<div class="card center" style="background:${WORLDS[c.w].bg}"><div class="spin" style="display:inline-block;margin-top:10px">${im('star',16)}</div><h2>${first?'You found star bit #'+(i+1)+'!':'Chapter complete!'}</h2><div class="bigstars">${starsHtml(st.stars)}</div><p class="big">${next?(first?'🔓 New chapter unlocked: ':'Next up: ')+'<b>'+esc(next.t)+'</b><br>'+esc(c.n):'You saved the star! 🌟<br>The End... for now!'}</p><button class="btn go big" id="map">Back to map 🗺️</button></div>`);
+ sfx.star();confetti();
+ on('map',()=>{renderMap();saveAll()});
+}
+
+/* ---------- FUN BREAKS ---------- */
+const BREAKS=[
+ {t:'Pop the bubbles!',e:['🫧'],bg:'linear-gradient(#d6f6ff,#6cc4ef)',mv:'up'},
+ {t:'Catch the fireflies!',e:['✨','🌟'],bg:'linear-gradient(#2e2560,#6b4bb5)',mv:'wander'},
+ {t:'Catch fish for Mochi!',e:['🐟','🐠'],bg:'linear-gradient(#c9f3ff,#4aa8e0)',mv:'down'},
+ {t:'Catch the butterflies!',e:['🦋','🌸'],bg:'linear-gradient(#fff4b8,#c9f2b0)',mv:'wander'},
+ {t:'Catch the falling stars!',e:['⭐'],bg:'linear-gradient(#1f2a5c,#4b5fb5)',mv:'down'}];
+let lastBreak=-1;
+function playBreak(next){
+ let bi;do{bi=Math.floor(Math.random()*BREAKS.length)}while(bi===lastBreak);lastBreak=bi;
+ const B=BREAKS[bi],GOAL=10;let got=0,crits=[],last=0,finished=false;
+ show(`<div class="card center"><h2>🎈 Fun break! ${B.t}</h2><div class="big">Tap them! <b id="bc">0</b> / ${GOAL}</div><div class="play" id="play" style="background:${B.bg}"><div class="mochiCorner">${im('mochi',5,'bob')}</div></div><div class="row"><button class="btn sm" id="skipb">Skip ➜</button></div></div>`);
+ const play=$('#play');on('skipb',next);
+ function spawn(){const W=play.clientWidth,H=play.clientHeight;const el=document.createElement('button');el.className='crit';el.textContent=pick(B.e);
+  const c={el,x:Math.random()*(W-90)+6,y:0,vx:0,vy:0,ph:Math.random()*6};
+  if(B.mv==='up'){c.y=H;c.vy=-(45+Math.random()*30)}else if(B.mv==='down'){c.y=-80;c.vy=40+Math.random()*30}else{c.y=Math.random()*(H-90);const a=Math.random()*6.28;c.vx=Math.cos(a)*55;c.vy=Math.sin(a)*55}
+  el.onpointerdown=e=>{e.preventDefault();if(finished)return;got++;$('#bc').textContent=got;sfx.good();const pf=document.createElement('span');pf.className='poof';pf.textContent='✨';pf.style.left=c.x+14+'px';pf.style.top=c.y+14+'px';play.appendChild(pf);setTimeout(()=>pf.remove(),550);el.remove();crits=crits.filter(o=>o!==c);if(got>=GOAL)win()};
+  play.appendChild(el);crits.push(c)}
+ function win(){finished=true;sfx.star();confetti();crits.forEach(c=>c.el.remove());crits=[];const y=document.createElement('div');y.className='yay';y.innerHTML=`${im('mochi',7,'bob')}<h2>Yay! You got them all!</h2><button class="btn go big" id="cont">Keep going ➜</button>`;play.appendChild(y);on('cont',()=>{sfx.tap();next()})}
+ function loop(ts){const dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;const W=play.clientWidth,H=play.clientHeight;
+  if(!finished&&crits.length<5&&Math.random()<.05)spawn();
+  crits.forEach(c=>{c.ph+=dt*2;c.x+=(c.vx+(B.mv==='wander'?0:Math.sin(c.ph)*30))*dt;c.y+=c.vy*dt;
+   if(B.mv==='wander'){if(c.x<0||c.x>W-78)c.vx*=-1;if(c.y<0||c.y>H-78)c.vy*=-1;c.x=Math.max(0,Math.min(W-78,c.x));c.y=Math.max(0,Math.min(H-78,c.y))}
+   c.el.style.transform=`translate(${c.x}px,${c.y}px)`});
+  crits=crits.filter(c=>{if(c.y<-100||c.y>H+20){c.el.remove();return false}return true});
+  raf=requestAnimationFrame(loop)}
+ spawn();spawn();raf=requestAnimationFrame(loop);
+}
+
+/* ---------- FISH FLASH ---------- */
+function renderFishMenu(){
+ let h=`<div class="card center"><h1 class="ctitle">🐟 Fish Flash</h1><p class="big">Read words fast! Every word you read right, Mochi catches a fish. You have 45 seconds.</p><div class="tiers">`;
+ FISH.forEach((f,i)=>{h+=`<div class="card tier"><div class="e">${f.e}</div><h2>${f.n}</h2><div class="small">${f.w.slice(0,4).join(', ')}…</div><div class="small">Best: ${S.fishBest[i]||0} fish</div><button class="btn go" data-t="${i}">Play</button></div>`});
+ h+=`</div><div class="tip">Grown-up: tap “Got it!” (or → key) when he reads the word right, “Tricky” (or ← key) when he doesn't. Tricky words come back again.</div><div class="row"><button class="btn" id="back">⬅ Map</button></div></div>`;
+ show(h);root.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{sfx.tap();playFish(+b.dataset.t)});on('back',renderMap);
+}
+function playFish(ti){
+ const F=FISH[ti],DUR=45;let q=shuffle(F.w.slice()),cur=null,caught=0,missed=[],t0=0,running=false;
+ show(`<div class="card"><div class="fishTop"><span>⏱ <span id="ft">${DUR}</span></span><span>🪣 <span id="fc">0</span> fish</span></div><div class="timebar"><div id="tb"></div></div><div class="pond center" id="pond"><div class="wcard" id="wc">Ready?</div><div class="dock">${im('mochi',5,'bob')}<span style="font-size:40px">🪣</span></div></div><div class="row"><button class="btn pink big" id="no" disabled>🔁 Tricky</button><button class="btn go big" id="yes" disabled>Got it! 🐟</button></div><div class="row"><button class="btn sm" id="back">⬅ Stop</button></div></div>`);
+ on('back',renderFishMenu);
+ const wc=$('#wc');
+ function next(){if(!q.length)q=shuffle(F.w.slice());cur=q.shift();wc.textContent=cur;wc.classList.remove('pop');void wc.offsetWidth;wc.classList.add('pop')}
+ function yes(){if(!running)return;caught++;$('#fc').textContent=caught;sfx.good();const f=document.createElement('span');f.className='jump';f.textContent=F.e;f.style.left='46%';f.style.top='62%';$('#pond').appendChild(f);setTimeout(()=>f.remove(),800);next()}
+ function no(){if(!running)return;sfx.miss();if(!missed.includes(cur))missed.push(cur);q.splice(Math.min(3,q.length),0,cur);next()}
+ on('yes',yes);on('no',no);
+ window.onkeydown=e=>{if(e.key==='ArrowRight'||e.key===' '||e.key==='Enter'){e.preventDefault();yes()}else if(e.key==='ArrowLeft'){e.preventDefault();no()}};
+ let n=3;wc.textContent=n;sfx.count();
+ const cd=setInterval(()=>{n--;if(n>0){wc.textContent=n;sfx.count()}else{clearInterval(cd);sfx.go();running=true;$('#yes').disabled=false;$('#no').disabled=false;t0=performance.now();next();
+  const iv=setInterval(()=>{const el=(performance.now()-t0)/1000;const left=Math.max(0,DUR-el);$('#ft').textContent=Math.ceil(left);$('#tb').style.width=(left/DUR*100)+'%';if(left<=0){clearInterval(iv);running=false;endFish()}},100);timers.push(iv)}},800);
+ timers.push(cd);
+ function endFish(){
+  const best=S.fishBest[ti]||0,nb=caught>best;if(nb)S.fishBest[ti]=caught;
+  S.log.push({t:Date.now(),d:dstr(new Date()),c:-1,k:'fish',tier:ti,wpm:Math.round(caught*60/DUR),acc:null,fish:caught});saveLocal();
+  show(`<div class="card center"><div class="sprites">${im('mochi',7,'bob')}<span style="font-size:60px">${F.e}</span></div><h2>You caught ${caught} fish!</h2>${nb?'<p class="big">🏆 New best!</p>':'<p class="big">Best: '+best+' fish</p>'}${missed.length?'<div class="small">Tricky words to practice:</div><div class="chips">'+missed.map(w=>'<span class="chip">'+esc(w)+'</span>').join('')+'</div>':'<p class="big">No tricky words — wow! 🌟</p>'}<div class="row"><button class="btn" id="menu">⬅ Fish menu</button><button class="btn go big" id="again">Play again 🐟</button><button class="btn yel" id="map">🗺️ Map</button></div></div>`);
+  if(nb||!missed.length){sfx.star();confetti()}else sfx.good();
+  on('menu',renderFishMenu);on('again',()=>playFish(ti));on('map',()=>{renderMap();saveAll()});
+ }
+}
+
+/* ---------- PROGRESS ---------- */
+function renderProgress(){
+ const s=S.settings;const reads=S.log.filter(l=>l.k!=='fish');const colds=reads.filter(l=>l.k==='cold');
+ const wk=reads.filter(l=>Date.now()-l.t<7*864e5);const bestWk=wk.length?Math.max(...wk.map(l=>l.wpm)):'–';
+ const lastCold=colds[colds.length-1];const accs=wk.map(l=>l.acc);const avgAcc=accs.length?Math.round(accs.reduce((a,b)=>a+b,0)/accs.length*10)/10+'%':'–';
+ let h=`<div class="card"><div class="row" style="justify-content:space-between;margin:0"><h1 style="margin:0">📈 Progress</h1><button class="btn" id="back">⬅ Map</button></div>
+ <div class="grid4" style="margin-top:12px"><div class="stat"><div class="num">${todayGoal()}</div>today's goal (wpm)</div><div class="stat"><div class="num">${lastCold?lastCold.wpm:'–'}</div>last first-read wpm</div><div class="stat"><div class="num">${bestWk}</div>best wpm this week</div><div class="stat"><div class="num">${avgAcc}</div>accuracy this week</div><div class="stat"><div class="num">🐾 ${streak()}</div>day streak</div></div></div>
+ <div class="card"><canvas class="chart" id="cv"></canvas><div class="legend"><span><i style="background:#ff7a59"></i>First read of a new story (the real score)</span><span><i style="background:#b9a8e6"></i>Practice re-reads</span><span><i style="background:#ff4f8b;border-radius:0;height:4px"></i>Goal path: ${s.startWpm} → ${s.goalWpm} wpm by ${pdate(s.goalDate).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</span></div></div>`;
+ const rec=S.log.slice(-15).reverse();
+ h+=`<div class="card"><h2>Recent reading</h2>${rec.length?'<table><tr><th>Day</th><th>What</th><th>wpm</th><th>Accuracy</th></tr>'+rec.map(l=>`<tr><td>${pdate(l.d).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td>${l.k==='fish'?'🐟 Fish Flash ('+l.fish+' fish)':(l.k==='cold'?'📖 First read: ':'🔁 Re-read: ')+esc(CH[l.c].t)}</td><td>${l.wpm}</td><td>${l.acc==null?'–':l.acc+'%'}</td></tr>`).join('')+'</table>':'<p>No reading yet — go find the first star bit! ⭐</p>'}</div>`;
+ show(h);on('back',renderMap);
+ requestAnimationFrame(()=>drawChart($('#cv')));
+}
+function drawChart(cv){
+ if(!cv)return;const dpr=window.devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;cv.width=W*dpr;cv.height=H*dpr;const x=cv.getContext('2d');x.scale(dpr,dpr);
+ const s=S.settings;const a=pdate(s.startDate).getTime(),b=pdate(s.goalDate).getTime()+864e5;
+ const pts=S.log.filter(l=>l.k!=='fish');const ymax=Math.min(220,Math.max(130,...pts.map(l=>l.wpm+10)));
+ const L=46,R=16,T=16,B=32;const X=t=>L+Math.max(0,Math.min(1,(t-a)/(b-a)))*(W-L-R);const Y=v=>T+(1-Math.min(v,ymax)/ymax)*(H-T-B);
+ x.font='13px Fredoka, sans-serif';x.fillStyle='#3b3346';x.strokeStyle='#eee8f5';x.lineWidth=1;
+ for(let v=0;v<=ymax;v+=20){x.beginPath();x.moveTo(L,Y(v));x.lineTo(W-R,Y(v));x.stroke();x.fillText(v,8,Y(v)+4)}
+ const m=new Date(a);m.setDate(1);m.setMonth(m.getMonth()+1);
+ while(m.getTime()<b){const px=X(m.getTime());x.strokeStyle='#f3eefa';x.beginPath();x.moveTo(px,T);x.lineTo(px,H-B);x.stroke();x.fillText(m.toLocaleDateString(undefined,{month:'short'}),px-12,H-10);m.setMonth(m.getMonth()+1)}
+ x.setLineDash([8,6]);x.strokeStyle='#ff4f8b';x.lineWidth=3;x.beginPath();x.moveTo(X(a),Y(s.startWpm));x.lineTo(X(b),Y(s.goalWpm));x.stroke();x.setLineDash([]);
+ x.fillStyle='#ff4f8b';x.font='bold 14px Fredoka, sans-serif';x.fillText('Goal '+s.goalWpm,X(b)-62,Y(s.goalWpm)-8);
+ const tn=Date.now();x.strokeStyle='#6b4bb5';x.lineWidth=2;x.beginPath();x.moveTo(X(tn),T);x.lineTo(X(tn),H-B);x.stroke();x.fillStyle='#6b4bb5';x.fillText('today',X(tn)+4,T+12);
+ pts.filter(l=>l.k!=='cold').forEach(l=>{x.fillStyle='#b9a8e6';x.beginPath();x.arc(X(l.t),Y(l.wpm),4,0,7);x.fill()});
+ const cs=pts.filter(l=>l.k==='cold');x.strokeStyle='#ff7a59';x.lineWidth=2.5;x.beginPath();cs.forEach((l,i)=>{i?x.lineTo(X(l.t),Y(l.wpm)):x.moveTo(X(l.t),Y(l.wpm))});x.stroke();
+ cs.forEach(l=>{x.fillStyle='#ff7a59';x.beginPath();x.arc(X(l.t),Y(l.wpm),6,0,7);x.fill();x.strokeStyle='#3b3346';x.lineWidth=1.5;x.stroke()});
+}
+
+/* ---------- GROWN-UPS ---------- */
+function renderSettings(){
+ const s=S.settings;
+ show(`<div class="card"><div class="row" style="justify-content:space-between;margin:0"><h1 style="margin:0">⚙️ Grown-ups</h1><button class="btn" id="back">⬅ Map</button></div>
+ <div class="form" style="margin-top:12px">
+ <label>Reader's name (optional)<input type="text" id="f_name" value="${esc(s.name)}"></label>
+ <label>Starting speed (wpm)<input type="number" id="f_sw" value="${s.startWpm}"></label>
+ <label>Goal speed (wpm)<input type="number" id="f_gw" value="${s.goalWpm}"></label>
+ <label>Accuracy goal (%)<input type="number" id="f_ga" value="${s.goalAcc}" step="0.5"></label>
+ <label>Start date<input type="date" id="f_sd" value="${s.startDate}"></label>
+ <label>Goal date<input type="date" id="f_gd" value="${s.goalDate}"></label>
+ <label class="check"><input type="checkbox" id="f_glow" ${s.glow?'checked':''}> Glow guide on re-reads (a yellow highlight moves at goal pace)</label>
+ <label class="check"><input type="checkbox" id="f_snd" ${s.sound?'checked':''}> Sounds</label>
+ </div><div class="row"><button class="btn go big" id="save">Save ✓</button></div></div>
+ <div class="card guide"><h2>How to use it</h2>
+ <h3>Small spurts</h3>One chapter a day is plenty (about 5 minutes): warm-up words → fun break → first read → fun break → re-read → fun break → star bit. The breaks are 10 easy taps with no timer and no way to lose. Fish Flash is a 45-second bonus for days he wants more.
+ <h3>Scoring (you tap, he reads)</h3>Tap a word if he skips it, says a different word, or you have to tell him (wait about 3 seconds first). If he fixes it himself, it counts as right. Words a minute = words read correctly ÷ minutes.
+ <h3>Which number matters</h3>The <b>first read</b> of each new chapter is the honest measure — it's his first time seeing that text. Re-reads are practice; they're supposed to be faster, and that builds fluency.
+ <h3>Accuracy first, then speed</h3>If accuracy dips below the goal, have him slow down. Speed grows on its own once reading is smooth and accurate.
+ <div class="note" style="margin-top:12px">The stories get a little longer and harder as the chapters go on, so his speed may dip a bit on new worlds — that's normal. Scores on school passages can differ, because every passage is different.</div>
+ <h3>Reset</h3><button class="btn pink" id="reset">Erase all progress</button></div>`);
+ on('back',renderMap);
+ on('save',()=>{const g=id=>document.getElementById(id);const num=(id,d)=>{const v=parseFloat(g(id).value);return isFinite(v)&&v>0?v:d};
+  s.name=g('f_name').value.trim().slice(0,30);s.startWpm=num('f_sw',48);s.goalWpm=num('f_gw',104);s.goalAcc=Math.min(100,num('f_ga',98));
+  if(g('f_sd').value)s.startDate=g('f_sd').value;if(g('f_gd').value)s.goalDate=g('f_gd').value;s.glow=g('f_glow').checked;s.sound=g('f_snd').checked;
+  sfx.good();renderMap();saveAll()});
+ let armed=false;on('reset',e=>{const b=e.currentTarget;if(!armed){armed=true;b.textContent='Tap again to erase everything';return}const keep=S.settings;S=defaults();S.settings=keep;renderMap();saveAll()});
+}
+
+renderMap();
+})();
+</script></body></html>

@@ -55,6 +55,21 @@ GAMES = [
     ("poirot-pigeon", "Poirot the Pigeon", "Poirot the Pigeon", "PP", "#1a1830", "#f2c14e", "#8e5bd6"),
     ("banana-slug-arena", "Banana Slug Arena", "Banana Slug Arena", "BS", "#2f5a22", "#f7d63a", "#e98a6a"),
     ("ships-and-villagers", "Ships & Villagers", "Ships & Villagers", "S&V", "#232552", "#f7eedb", "#d9574f"),
+    ("tiny-realms", "Tiny Realms", "Tiny Realms", "TI", "#2f6fd1", "#ffffff", "#ffd34d"),
+    ("bounce-pit", "Bounce Pit: Skyward", "Bounce Pit: Skyward", "BO", "#1c2a1c", "#ffffff", "#ffd34d"),
+    ("blade-mosaic", "Blade Mosaic", "Blade Mosaic", "BL", "#16161c", "#ffffff", "#ffd34d"),
+    ("mochi-star-quest", "Mochi's Star Quest", "Mochi's Star Quest", "MO", "#bfe7ff", "#ffffff", "#ffd34d"),
+    ("slice-flip-3d", "Slice Flip 3D", "Slice Flip 3D", "SL", "#bfe0ff", "#ffffff", "#ffd34d"),
+    ("blips-climb", "Only Up: Blip's Climb Home", "Only Up: Blip's Climb Home", "ON", "#203050", "#ffffff", "#ffd34d"),
+    ("dropper-3d", "Dropper 3D", "Dropper 3D", "DR", "#0c1630", "#ffffff", "#ffd34d"),
+    ("ionuts-climb", "Ionuț's Climb: Through Romania", "Ionuț's Climb: Through Romania", "IO", "#7cc0e8", "#ffffff", "#ffd34d"),
+    ("spark-burst", "Spark Burst", "Spark Burst", "SP", "#0e0a24", "#ffffff", "#ffd34d"),
+    ("supernova-run", "Supernova Run", "Supernova Run", "SU", "#c43cc8", "#ffffff", "#ffd34d"),
+    ("underglow", "Underglow: A Fungal Network Game", "Underglow: A Fungal Network Game", "UN", "#06060c", "#ffffff", "#ffd34d"),
+    ("pal-island", "Pal Island 3D", "Pal Island 3D", "PA", "#7fd0ff", "#ffffff", "#ffd34d"),
+    ("hypernova-3d", "Hypernova 3D", "Hypernova 3D", "HY", "#140c2c", "#ffffff", "#ffd34d"),
+    ("wanderleaf", "Wanderleaf", "Wanderleaf", "WA", "#ece7d4", "#ffffff", "#ffd34d"),
+    ("chameleon-hide-seek", "Chameleon Hide & Seek", "Chameleon Hide & Seek", "CH", "#2e5b2a", "#ffffff", "#ffd34d"),
     ("experiments/snake-blender-mode", "Blender Mode Snake", "Blender Mode Snake", "S", "#0f172a", "#22c55e", "#ef4444"),
 ]
 
@@ -258,6 +273,8 @@ def write_offline_list() -> None:
             if (game_dir / r).is_file():
                 files.append(rel + r)
                 h.update((game_dir / r).read_bytes())
+        for extra in sorted(game_dir.glob("*.js")):  # scripts loaded by import maps / modules too
+            files.append(rel + extra.name)
         files.append(rel + "sw.js")
         h.update(html.encode("utf-8"))
         fonts.update(re.findall(r'href="(https://fonts\.googleapis\.com/css2\?[^"]+)"', html))

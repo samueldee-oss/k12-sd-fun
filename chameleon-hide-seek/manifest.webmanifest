@@ -1,0 +1,23 @@
+{
+  "name": "Chameleon Hide & Seek",
+  "short_name": "Chameleon Hide & Seek",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#2e5b2a",
+  "theme_color": "#2e5b2a",
+  "icons": [
+    {
+      "src": "icons/icon-192.png?v=ad560162",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png?v=ad560162",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

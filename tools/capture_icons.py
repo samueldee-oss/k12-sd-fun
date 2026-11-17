@@ -20,6 +20,7 @@ import asyncio
 import functools
 import http.server
 import json
+import math
 import os
 import shutil
 import sys
@@ -451,6 +452,198 @@ RECIPES = {
 }
 
 
+
+# ---------- games added 2026-11-16 (from John's claude.ai artifacts)
+
+async def js_click(pg, text=None, selector=None):
+    """Click without waiting for the element to hold still (start buttons often bounce)."""
+    if selector:
+        return await pg.evaluate("s=>{const e=document.querySelector(s);if(e){e.click();return true}return false}", selector)
+    return await pg.evaluate("""t=>{const els=[...document.querySelectorAll('button,a,[role=button],div,span')]
+      .filter(e=>e.offsetParent&&e.textContent.trim().startsWith(t));
+      const e=els.sort((a,b)=>a.textContent.length-b.textContent.length)[0];if(e){e.click();return true}return false}""", text)
+
+
+async def click_first(pg, *selectors):
+    for sel in selectors:
+        loc = pg.locator(sel)
+        if await loc.count() and await loc.first.is_visible():
+            await loc.first.click()
+            return True
+    return False
+
+
+async def tiny_setup(pg):
+    await pg.click("#bNew")
+    await pg.wait_for_timeout(800)
+    for _ in range(4):  # accept the default tribe / map choices
+        if not await click_first(pg, "button:has-text('Start')", "button:has-text('Play')", "button:has-text('Begin')"):
+            break
+        await pg.wait_for_timeout(600)
+
+
+async def tiny_step(pg, i):
+    if i % 6 == 0:
+        await pg.mouse.click(480 + 60 * ((i // 6) % 3 - 1), 320 + 40 * ((i // 12) % 2))
+
+
+async def bounce_setup(pg):
+    await js_click(pg, "Pit")  # Enter the Pit -> Wanderer -> Mossy Pit
+    await pg.wait_for_timeout(800)
+    await js_click(pg, "Mossy Pit")
+    await pg.wait_for_timeout(1500)
+
+
+async def bounce_step(pg, i):
+    if i % 3 == 0:
+        await pg.mouse.click(480 + 80 * math.sin(i / 5), 300)
+
+
+async def blade_setup(pg):
+    await js_click(pg, selector="#btnPlay")
+    await pg.wait_for_timeout(800)
+    await js_click(pg, "1. Heart")
+    await pg.wait_for_timeout(2000)
+
+
+async def blade_step(pg, i):
+    a = i / 28 * math.tau
+    await pg.mouse.move(480 + 160 * math.cos(a), 330 + 90 * math.sin(a), steps=3)
+
+
+async def mochi_setup(pg):
+    await pg.evaluate("[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='1').click()")
+    await pg.wait_for_timeout(1000)
+    await click_first(pg, "button:has-text('Start')", "button:has-text('Go')", "button:has-text('Read')")
+    await pg.wait_for_timeout(800)
+
+
+async def mochi_step(pg, i):
+    if i % 4 == 1:  # read the warm-up words, then into the story
+        if not await js_click(pg, "Got it"):
+            await click_first(pg, "button:has-text('Next')", "button:has-text('Start')", "button:has-text('Go')")
+
+
+async def tap_to_play(pg):
+    await js_click(pg, "Tap to play")
+    await pg.wait_for_timeout(700)
+
+
+async def slice_step(pg, i):
+    if i % 4 == 0:
+        await tap(pg, "Space", 60)
+
+
+async def blip_setup(pg):
+    await pg.click("#bEasy")
+    await pg.wait_for_timeout(1500)
+    await pg.keyboard.down("w")
+
+
+async def climb_step(pg, i):
+    if i % 6 == 3:
+        await tap(pg, "Space", 200)
+
+
+async def dropper_setup(pg):
+    await pg.evaluate("[...document.querySelectorAll('button')].find(b=>b.textContent.trim().startsWith('1')).click()")
+    await pg.wait_for_timeout(1500)
+
+
+async def dropper_step(pg, i):
+    keys = ["ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown"]
+    if i % 5 == 0:
+        await hold(pg, keys[(i // 5) % 4], keys)
+
+
+async def ionut_setup(pg):
+    await js_click(pg, "1Muntele")
+    await pg.wait_for_timeout(2500)
+    await pg.keyboard.down("w")
+
+
+async def spark_step(pg, i):
+    await pg.mouse.click(480 + 200 * math.sin(i * 1.7), 320 + 140 * math.cos(i * 1.1))
+
+
+async def nova_setup(pg):
+    await js_click(pg, selector="#playBtn")
+    await pg.wait_for_timeout(1500)
+
+
+async def nova_step(pg, i):
+    if i % 8 == 0:
+        await hold(pg, "a" if (i // 8) % 2 else "d", ["a", "d"])
+
+
+async def underglow_step(pg, i):
+    if i % 2 == 0:
+        await pg.mouse.click(480 + 120 * math.cos(i / 4), 300 + 80 * math.sin(i / 3))
+
+
+async def pal_step(pg, i):
+    if i == 0:
+        await pg.mouse.move(380, 400)
+        await pg.mouse.down()
+    elif i < 24:
+        await pg.mouse.move(380 + i * 9, 400, steps=2)
+    elif i == 24:
+        await pg.mouse.up()
+
+
+async def wander_setup(pg):
+    await js_click(pg, "✨ New Game")
+    await pg.wait_for_timeout(1500)
+    await pg.keyboard.press("Enter")  # OK on the save name
+    for _ in range(6):  # through the story pages to level 1-1
+        await pg.wait_for_timeout(450)
+        await pg.keyboard.press("Enter")
+        await pg.wait_for_timeout(450)
+        await pg.keyboard.press("Space")
+    await pg.wait_for_timeout(1200)
+    await pg.keyboard.down("ArrowRight")
+
+
+async def wander_step(pg, i):
+    if i % 7 == 3:
+        await tap(pg, "Space", 220)
+
+
+async def chameleon_setup(pg):
+    await js_click(pg, selector="#startBtn")
+    await pg.wait_for_timeout(1500)
+    await pg.mouse.click(210, 456)  # Sunny Field, the first place on the map
+    await pg.wait_for_timeout(3500)
+    await js_click(pg, "🦉 Hide from Owly")
+    await pg.wait_for_timeout(2500)
+
+
+async def chameleon_step(pg, i):
+    keys = ["ArrowRight", "ArrowUp", "ArrowLeft", "ArrowDown"]
+    if i % 7 == 0:
+        await hold(pg, keys[(i // 7) % 4], keys)
+
+
+RECIPES_NEW = {
+    "tiny-realms": dict(path="tiny-realms/index.html", setup=tiny_setup, step=tiny_step, crop=(290, 40, 380)),
+    "bounce-pit": dict(path="bounce-pit/index.html", setup=bounce_setup, step=bounce_step, crop=(300, 0, 360)),
+    "blade-mosaic": dict(path="blade-mosaic/index.html", setup=blade_setup, step=blade_step, crop=(220, 60, 480)),
+    "mochi-star-quest": dict(path="mochi-star-quest/index.html", setup=mochi_setup, step=mochi_step, crop=(200, 0, 560), frames=40),
+    "slice-flip-3d": dict(path="slice-flip-3d/index.html", setup=tap_to_play, step=slice_step, crop=(160, 0, 640)),
+    "blips-climb": dict(path="blips-climb/index.html", setup=blip_setup, step=climb_step, crop=(160, 0, 640)),
+    "dropper-3d": dict(path="dropper-3d/index.html", setup=dropper_setup, step=dropper_step, crop=(160, 0, 640)),
+    "ionuts-climb": dict(path="ionuts-climb/index.html", setup=ionut_setup, step=climb_step, crop=(160, 0, 640)),
+    "spark-burst": dict(path="spark-burst/index.html", setup=tap_to_play, step=spark_step, crop=(160, 0, 640)),
+    "supernova-run": dict(path="supernova-run/index.html", setup=nova_setup, step=nova_step, crop=(160, 0, 640)),
+    "underglow": dict(path="underglow/index.html", setup=nothing, step=underglow_step, crop=(300, 90, 360)),
+    "pal-island": dict(path="pal-island/index.html", setup=nothing, step=pal_step, crop=(240, 80, 480)),
+    "hypernova-3d": dict(path="hypernova-3d/index.html", setup=nova_setup, step=nova_step, crop=(160, 0, 640), trim=(0, 16), still=8),
+    "wanderleaf": dict(path="wanderleaf/index.html", setup=wander_setup, step=wander_step, crop=(40, 140, 460)),
+    "chameleon-hide-seek": dict(path="chameleon-hide-seek/index.html", setup=chameleon_setup, step=chameleon_step, crop=(170, 40, 600)),
+}
+RECIPES.update(RECIPES_NEW)
+
+
 # ------------------------------------------------------------------ recording
 
 def serve():
@@ -477,7 +670,7 @@ async def record(browser, gid, r):
             resp = await route.fetch()
             await route.fulfill(response=resp, body=(await resp.text()).replace(find, repl, 1))
         await pg.route(f"**/{r['path']}", patch)
-    await pg.goto(f"http://127.0.0.1:{PORT}/{r['path']}")
+    await pg.goto(f"http://127.0.0.1:{PORT}/{r['path']}", wait_until="domcontentloaded")
     await pg.wait_for_timeout(r.get("load_ms", 1200))
     await r["setup"](pg)
     await pg.wait_for_timeout(r.get("warmup_ms", 300))

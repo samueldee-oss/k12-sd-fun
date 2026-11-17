@@ -32,6 +32,9 @@ k12-sd-fun/
 ├── capybara-rumble/ sprout-siege/ kitty-and-lotl/ endless-crucible/
 │   sensory-overload/ mothwicks-lantern/ prism-sprint/ thistle-king/ rooftop-flow/
 │   poirot-pigeon/ banana-slug-arena/ ships-and-villagers/
+│   tiny-realms/ bounce-pit/ blade-mosaic/ mochi-star-quest/ slice-flip-3d/
+│   blips-climb/ dropper-3d/ ionuts-climb/ spark-burst/ supernova-run/
+│   underglow/ pal-island/ hypernova-3d/ wanderleaf/ chameleon-hide-seek/
 │                             # More browser-native games (one index.html each)
 ├── experiments/              # Side projects, not part of the curriculum
 │   └── snake-blender-mode/
@@ -74,6 +77,21 @@ Links assume GitHub Pages is enabled for this repo (Settings → Pages → deplo
 | Poirot the Pigeon | `https://samueldee-oss.github.io/k12-sd-fun/poirot-pigeon/index.html` |
 | Banana Slug Arena | `https://samueldee-oss.github.io/k12-sd-fun/banana-slug-arena/index.html` |
 | Ships & Villagers | `https://samueldee-oss.github.io/k12-sd-fun/ships-and-villagers/index.html` |
+| Tiny Realms | `https://samueldee-oss.github.io/k12-sd-fun/tiny-realms/index.html` |
+| Bounce Pit: Skyward | `https://samueldee-oss.github.io/k12-sd-fun/bounce-pit/index.html` |
+| Blade Mosaic | `https://samueldee-oss.github.io/k12-sd-fun/blade-mosaic/index.html` |
+| Mochi's Star Quest | `https://samueldee-oss.github.io/k12-sd-fun/mochi-star-quest/index.html` |
+| Slice Flip 3D | `https://samueldee-oss.github.io/k12-sd-fun/slice-flip-3d/index.html` |
+| Only Up: Blip's Climb Home | `https://samueldee-oss.github.io/k12-sd-fun/blips-climb/index.html` |
+| Dropper 3D | `https://samueldee-oss.github.io/k12-sd-fun/dropper-3d/index.html` |
+| Ionuț's Climb: Through Romania | `https://samueldee-oss.github.io/k12-sd-fun/ionuts-climb/index.html` |
+| Spark Burst | `https://samueldee-oss.github.io/k12-sd-fun/spark-burst/index.html` |
+| Supernova Run | `https://samueldee-oss.github.io/k12-sd-fun/supernova-run/index.html` |
+| Underglow: A Fungal Network Game | `https://samueldee-oss.github.io/k12-sd-fun/underglow/index.html` |
+| Pal Island 3D | `https://samueldee-oss.github.io/k12-sd-fun/pal-island/index.html` |
+| Hypernova 3D | `https://samueldee-oss.github.io/k12-sd-fun/hypernova-3d/index.html` |
+| Wanderleaf | `https://samueldee-oss.github.io/k12-sd-fun/wanderleaf/index.html` |
+| Chameleon Hide & Seek | `https://samueldee-oss.github.io/k12-sd-fun/chameleon-hide-seek/index.html` |
 | Snake (experiment) | `https://samueldee-oss.github.io/k12-sd-fun/experiments/snake-blender-mode/index.html` |
 
 The Bank Game is a Pygame program; its web builds are not committed (see `.gitignore`), so it has no public link yet.

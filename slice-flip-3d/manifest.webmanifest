@@ -1,0 +1,23 @@
+{
+  "name": "Slice Flip 3D",
+  "short_name": "Slice Flip 3D",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#bfe0ff",
+  "theme_color": "#bfe0ff",
+  "icons": [
+    {
+      "src": "icons/icon-192.png?v=e4c94871",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png?v=e4c94871",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

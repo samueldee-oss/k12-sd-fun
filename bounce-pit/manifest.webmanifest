@@ -1,0 +1,23 @@
+{
+  "name": "Bounce Pit: Skyward",
+  "short_name": "Bounce Pit: Skyward",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1c2a1c",
+  "theme_color": "#1c2a1c",
+  "icons": [
+    {
+      "src": "icons/icon-192.png?v=2da8c39d",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png?v=2da8c39d",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
