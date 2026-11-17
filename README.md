@@ -98,7 +98,9 @@ If a game changes, the button says **Update offline games**; tap it on Wi-Fi.
 
 ### Icons and adding a game
 
-Each game has a cute picture icon drawn by `tools/game_icons.py`: animated GIFs for the dashboard grid (`dashboard/app-icons/`), and a still frame of the same picture for the Home Screen icon. To add a game: add a drawing to `tools/game_icons.py`, a line to `GAMES` in `tools/make_home_screen_apps.py`, and a line to `GAMES` in `dashboard/app.js`, then run `python tools/game_icons.py` and `python tools/make_home_screen_apps.py` (needs Pillow: `pip install pillow`). The second script makes each game's `icons/`, `manifest.webmanifest` and `sw.js`, adds the Home Screen tags to its `index.html`, and refreshes `dashboard/offline-files.json` (the list the airplane button downloads).
+The dashboard icons are short recordings of each game's real first level, made by `tools/capture_icons.py` (it opens every game in a hidden browser, plays a few seconds, and crops around the action). It writes `dashboard/app-icons/<game>.gif` plus a still `<game>.png` that becomes the Home Screen icon. Whisker Dash, Endless Crucible and Bank Game keep drawn icons from `tools/game_icons.py`. The Poirot icon shows the real Grand Hall search with John's pigeon from Banana Slug Arena, drawn by that game's own code.
+
+To add a game: add a recipe to `tools/capture_icons.py` (how to start level 1 and what to press), a line to `GAMES` in `tools/make_home_screen_apps.py`, and a line to `GAMES` in `dashboard/app.js`. Then run `python tools/capture_icons.py <game>` (needs Playwright: `pip install playwright` then `playwright install chromium`) and `python tools/make_home_screen_apps.py` (needs Pillow). The second script makes each game's `icons/`, `manifest.webmanifest` and `sw.js`, adds the Home Screen tags to its `index.html`, and refreshes `dashboard/offline-files.json` (the list the airplane button downloads).
 
 ## 🚀 Quick Start (Desktop)
 

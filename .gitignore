@@ -13,3 +13,4 @@ Thumbs.db
 # Remove the next two lines if you want to publish the built games from this repo (for example on GitHub Pages).
 web_sources/*/build/
 dashboard/web_builds/
+.capture-raw/

@@ -1,6 +1,6 @@
 # Status
 
-_Kept by Claude Code. Last updated 2026-11-15._
+_Kept by Claude Code. Last updated 2026-11-16._
 
 ## Games
 
@@ -37,6 +37,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-16: Dashboard and Home Screen icons are now recordings of each game's real first level (`tools/capture_icons.py`); Whisker Dash and Endless Crucible keep their drawn GIFs (owner's choice), Bank Game stays drawn. Poirot's icon is the real Grand Hall search with John's pigeon from Banana Slug Arena. Dashboard shows each game's full name (Snake is "Blender Mode Snake"); Home Screen names are full names too. Ships & Villagers' Home Screen icon is now its gameplay still (the starry-sky art is still in `tools/`). Commit `4efee58`.
 - 2026-11-15: Dashboard redesigned as a phone-style grid of animated picture icons (one per game, drawn by `tools/game_icons.py`); the same pictures are now every game's Home Screen icon. Notes and Copy link moved to the ⓘ button; Bank Game versions are one icon with a version menu; Snake and Rulebound added to the dashboard/Home Screen tool. New "⬇ Save for airplane" button saves every game for offline play (root `sw.js`, `dashboard/offline-files.json`); game service workers now keep Google Fonts offline. Commit `3adc92b`.
 - 2026-11-15: Ships & Villagers sheep pen: the gate won't close while you're inside (Greta tells you to step out), and after the job it opens and closes with E so you can't get trapped; the sheep stay in. Commit `c4dc2c0`.
 - 2026-11-15: Ships & Villagers walking easier on phones: a quick tap walks only a few steps (about 64 px), holding a finger keeps walking toward it, and letting go (or releasing a key) stops within a step thanks to gentle easing. Commit `34500be`.
