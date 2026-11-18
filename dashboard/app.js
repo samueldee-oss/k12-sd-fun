@@ -34,15 +34,14 @@ const GAMES = [
   { id: "pong", name: "Pong", desc: "Classic Pong with touch controls, 1–2 players.", src: "../pong/index.html" },
   { id: "snake", name: "Blender Mode Snake", desc: "Snake (side project). Swipe to steer.", src: "../experiments/snake-blender-mode/index.html" },
   {
-    id: "bank-game", name: "Bank Game", desc: "Stocks, flows and interest: save, buy, and watch money grow. Needs the PC server and internet.",
-    needsNet: true,
+    id: "bank-game", name: "Bank Game", desc: "Stocks, flows and interest: save, buy, and watch money grow. Current works anywhere; older copies need the PC server.",
     versions: [
-      { id: "bank-game-current", name: "Current", src: "web_builds/bank-game-current/index.html" },
-      { id: "bank-game-copy-5", name: "Copy 5", src: "web_builds/bank-game-copy-5/index.html" },
-      { id: "bank-game-copy-4", name: "Copy 4", src: "web_builds/bank-game-copy-4/index.html" },
-      { id: "bank-game-copy-3", name: "Copy 3", src: "web_builds/bank-game-copy-3/index.html" },
-      { id: "bank-game-copy-2", name: "Copy 2", src: "web_builds/bank-game-copy-2/index.html" },
-      { id: "bank-game-copy", name: "Copy 1", src: "web_builds/bank-game-copy/index.html" },
+      { id: "bank-game-current", name: "Current", src: "../bank-game/index.html" },
+      { id: "bank-game-copy-5", name: "Copy 5 (PC only)", src: "web_builds/bank-game-copy-5/index.html" },
+      { id: "bank-game-copy-4", name: "Copy 4 (PC only)", src: "web_builds/bank-game-copy-4/index.html" },
+      { id: "bank-game-copy-3", name: "Copy 3 (PC only)", src: "web_builds/bank-game-copy-3/index.html" },
+      { id: "bank-game-copy-2", name: "Copy 2 (PC only)", src: "web_builds/bank-game-copy-2/index.html" },
+      { id: "bank-game-copy", name: "Copy 1 (PC only)", src: "web_builds/bank-game-copy/index.html" },
     ],
   },
 ];

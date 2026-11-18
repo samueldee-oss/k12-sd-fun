@@ -278,6 +278,10 @@ def write_offline_list() -> None:
         files.append(rel + "sw.js")
         h.update(html.encode("utf-8"))
         fonts.update(re.findall(r'href="(https://fonts\.googleapis\.com/css2\?[^"]+)"', html))
+    bank = ROOT / "bank-game" / "index.html"  # Bank Game web version (single file, no Home Screen app yet)
+    if bank.exists():
+        files += ["../bank-game/", "../bank-game/index.html"]
+        h.update(bank.read_bytes())
     for f in ("index.html", "styles.css", "styles.css"):
         if (dash / f).exists():
             h.update((dash / f).read_bytes())

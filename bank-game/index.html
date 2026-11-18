@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Bank Game</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0c1018; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
+  body { display: flex; align-items: center; justify-content: center; }
+  canvas { display: block; background: #121824; }
+</style>
+</head>
+<body>
+<canvas id="game" width="1000" height="640"></canvas>
+<script>
+/*
+  Bank Game (web version)
+  A browser port of bank_game.py (the "Current" version), so it runs on GitHub Pages and iPads
+  with no Python and no build step. The money model is the same as bank_game.py.
+
+  MODEL RULES (from bank.stmx)
+  - Stock My_Account_Balance integrates (Deposits - Withdrawals)
+  - Deposits = Monthly_earnings + Monthly_Interest_Payments
+  - Monthly_Interest_Payments = My_Account_Balance * Monthly_Percent_Interest_Rate / 100
+  - Withdrawals = Monthly_spending (halved while Save is on)
+
+  CONTROLS
+  - Click / tap / Space: Work      - S or Save button: Save      - P or Pause button: Pause and shops
+  - Tap a garage slot, then V or Sell button: Sell      - R: Reset
+  - While paused: I bank offer, Tab next car, B buy, U upgrade garage (all also buttons)
+*/
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+const WIDTH = 1000, HEIGHT = 640;
+const FONT = "16px Arial", BIG = "26px Arial", SMALL = "14px Arial";
+
+function fit() {
+  const s = Math.min(window.innerWidth / WIDTH, window.innerHeight / HEIGHT);
+  canvas.style.width = WIDTH * s + "px";
+  canvas.style.height = HEIGHT * s + "px";
+}
+window.addEventListener("resize", fit); fit();
+
+const nowSec = () => performance.now() / 1000;
+const rgb = (c, a) => a === undefined ? `rgb(${c[0]},${c[1]},${c[2]})` : `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
+const rand = (a, b) => a + Math.random() * (b - a);
+const money = (v, d = 0) => "$" + v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+const fx = (v, d) => v.toFixed(d);
+
+function apyToMonthlyPercent(apy) { return (Math.pow(1 + apy / 100, 1 / 12) - 1) * 100; }
+function monthlyPercentToApy(m) { return (Math.pow(1 + m / 100, 12) - 1) * 100; }
+
+const LOW_APY = 2.0;
+const MEDIUM_APY = 2.6;
+const PREMIUM_MONTHLY_PERCENT = (50.0 / 20000.0) * 100.0;
+const PREMIUM_APY = monthlyPercentToApy(PREMIUM_MONTHLY_PERCENT);
+
+// ---------------- PARAMETERS (easy to tweak) ----------------
+const MODEL_DT = 0.25;            // months per model step
+const MONTHS_PER_SECOND = 1.5;    // simulation speed
+const CLICK_SAMPLE_WINDOW = 5.0;  // seconds used to estimate click rate
+const IDEAL_CPS = 2.0;            // clicks per second for full earnings
+const TARGET_MONTHLY_EARNINGS = 250.0;
+const ACTION_EFFECTS = {
+  work_deposit: 8.0,
+  save_multiplier: 0.5,
+  save_duration_months: 12.0,
+  neg_rate_duration_months: 24.0,
+  work_cooldown_seconds: 0.12,
+};
+const GARAGE_SLOTS = 6;
+const garagePos = [560, 170];
+const slotW = 120, slotH = 70;
+const CAR_CATALOG = [
+  { name: "Compact", price: 1000, color: [200, 200, 200], score: 1, dep: 1.0 },
+  { name: "Sedan", price: 3000, color: [120, 180, 240], score: 2, dep: 0.8 },
+  { name: "Sports", price: 8000, color: [255, 90, 90], score: 4, dep: 0.6 },
+  { name: "Lamborghini", price: 20000, color: [255, 215, 0], score: 10, dep: -0.2 },
+];
+const SELL_FRACTION = 0.8;
+const UPGRADE_COST = 20000;
+const UPGRADE_SLOTS = 3;
+const STARTER_PERIOD_SECONDS = 30.0;
+const STARTER_MULTIPLIER = 2.0;
+
+// ---------------- GAME STATE ----------------
+let state, flows, actionTimers, cooldowns, balanceHistory, clickTimestamps, coinParticles;
+let garageSlots, carAnimationQueue, liquiditySources, selectedSlot, selectedCarIndex;
+let timeAccumulator, negotiatedApy, negotiatedMinimum, startTime, gameOver, arrowStrength;
+let paused = true;
+let pauseButtons = {};
+let touchButtons = {};
+
+function resetGame() {
+  state = {
+    My_Account_Balance: 0.0,
+    Monthly_earnings: TARGET_MONTHLY_EARNINGS,
+    Monthly_spending: 50.0,
+    Monthly_Percent_Interest_Rate: apyToMonthlyPercent(LOW_APY),
+    Price_of_car: 5000.0,
+  };
+  flows = { Monthly_Interest_Payments: 0, Deposits: 0, Withdrawals: 0 };
+  actionTimers = { save_months: 0, neg_rate_months: 0 };
+  cooldowns = { work: 0 };
+  balanceHistory = [];
+  clickTimestamps = [];
+  coinParticles = [];
+  garageSlots = new Array(GARAGE_SLOTS).fill(null);
+  carAnimationQueue = [];
+  liquiditySources = { work: 0, interest: 0 };
+  selectedSlot = null;
+  selectedCarIndex = 0;
+  timeAccumulator = 0;
+  negotiatedApy = 0;
+  negotiatedMinimum = 0;
+  startTime = nowSec();
+  gameOver = false;
+  arrowStrength = 0;
+}
+resetGame();
+state.Monthly_earnings = 100.0; // same first-launch value as bank_game.py
+
+// ---------------- HELPERS ----------------
+function getAssetValue() { return garageSlots.reduce((s, c) => s + (c ? (c.value ?? c.price) : 0), 0); }
+function getEffectiveInterestRate() {
+  let rate = state.Monthly_Percent_Interest_Rate;
+  if (actionTimers.neg_rate_months > 0 && negotiatedApy > 0) rate = apyToMonthlyPercent(negotiatedApy);
+  return rate;
+}
+function getCurrentApy() { return monthlyPercentToApy(getEffectiveInterestRate()); }
+function getBankOffer(balance) {
+  if (balance >= 20000) return ["Premium Yield", PREMIUM_APY, 20000];
+  if (balance >= 5000) return ["Growth Savings", MEDIUM_APY, 5000];
+  return ["Starter Savings", LOW_APY, 0];
+}
+function getTotalTrackedLiquidity() { return liquiditySources.work + liquiditySources.interest; }
+function rebalanceLiquiditySources(target) {
+  const tracked = getTotalTrackedLiquidity();
+  if (target <= 0 || tracked <= 0) { liquiditySources.work = Math.max(0, target); liquiditySources.interest = 0; return; }
+  const scale = target / tracked;
+  liquiditySources.work *= scale;
+  liquiditySources.interest *= scale;
+}
+function addLiquidity(work = 0, interest = 0) { liquiditySources.work += work; liquiditySources.interest += interest; }
+function removeLiquidity(amount) {
+  if (amount <= 0) return;
+  const tracked = getTotalTrackedLiquidity();
+  if (tracked <= 0) { liquiditySources.work = Math.max(0, state.My_Account_Balance); liquiditySources.interest = 0; return; }
+  const ws = liquiditySources.work / tracked, is = liquiditySources.interest / tracked;
+  liquiditySources.work = Math.max(0, liquiditySources.work - amount * ws);
+  liquiditySources.interest = Math.max(0, liquiditySources.interest - amount * is);
+  rebalanceLiquiditySources(state.My_Account_Balance);
+}
+function getMonthlyLoopGain(rate) { if (rate === undefined) rate = getEffectiveInterestRate(); return rate / 100; }
+function getMonthlyMultiplier(rate) { return 1 + getMonthlyLoopGain(rate); }
+function getSustainBalance(rate, spending) {
+  if (rate === undefined) rate = getEffectiveInterestRate();
+  if (spending === undefined) spending = state.Monthly_spending;
+  const gain = getMonthlyLoopGain(rate);
+  return gain <= 0 ? null : spending / gain;
+}
+function radiusForBalance(bal) { return Math.floor(36 + Math.sqrt(Math.max(0, bal)) * 1.8); }
+function slotRect(i) {
+  return { x: garagePos[0] + (i % 3) * (slotW + 10), y: garagePos[1] + Math.floor(i / 3) * (slotH + 10), w: slotW, h: slotH };
+}
+const inRect = (r, x, y) => x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h;
+
+// ---------------- DRAWING HELPERS ----------------
+function text(t, x, y, color = [255, 255, 255], font = FONT) {
+  ctx.font = font; ctx.fillStyle = rgb(color); ctx.textBaseline = "top"; ctx.textAlign = "left";
+  ctx.fillText(t, x, y);
+}
+function rect(x, y, w, h, color, line = 0, radius = 0) {
+  ctx.beginPath();
+  if (radius > 0) ctx.roundRect(x, y, w, h, radius); else ctx.rect(x, y, w, h);
+  if (line > 0) { ctx.lineWidth = line; ctx.strokeStyle = rgb(color); ctx.stroke(); }
+  else { ctx.fillStyle = rgb(color); ctx.fill(); }
+}
+function line(a, b, color, width) {
+  ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]);
+  ctx.lineWidth = width; ctx.strokeStyle = rgb(color); ctx.lineCap = "butt"; ctx.stroke();
+}
+function circle(x, y, r, color, width = 0) {
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+  if (width > 0) { ctx.lineWidth = width; ctx.strokeStyle = rgb(color); ctx.stroke(); }
+  else { ctx.fillStyle = rgb(color); ctx.fill(); }
+}
+function drawBar(x, y, w, h, value, maxValue, color, label) {
+  rect(x, y, w, h, [34, 38, 48]);
+  const fill = maxValue <= 0 ? 0 : Math.floor(w * clamp(value / maxValue, 0, 1));
+  rect(x, y, fill, h, color);
+  rect(x, y, w, h, [220, 220, 220], 2);
+  text(label, x + 8, y + 5, [255, 255, 255], SMALL);
+}
+function drawButton(r, label, fill = [36, 46, 62], border = [235, 220, 170], textColor = [245, 245, 245], font = SMALL) {
+  rect(r.x, r.y, r.w, r.h, fill, 0, 10);
+  rect(r.x, r.y, r.w, r.h, border, 2, 10);
+  ctx.font = font; ctx.fillStyle = rgb(textColor); ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText(label, r.x + r.w / 2, r.y + r.h / 2);
+  ctx.textAlign = "left";
+}
+const R = (x, y, w, h) => ({ x, y, w, h });
+
+// ---------------- PAUSE SCREEN (bank and dealership) ----------------
+function drawPauseOverlay() {
+  pauseButtons = {};
+  ctx.fillStyle = "rgba(8,12,18,0.84)"; ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  const rate = getEffectiveInterestRate();
+  const currentApy = getCurrentApy();
+  const sustain = getSustainBalance(rate);
+  const [offerName, offerApy] = getBankOffer(state.My_Account_Balance);
+
+  const header = R(110, 36, 780, 70), bank = R(110, 124, 360, 330), dealer = R(500, 124, 390, 330), notes = R(110, 472, 780, 92);
+  for (const p of [header, bank, dealer, notes]) { rect(p.x, p.y, p.w, p.h, [20, 28, 40], 0, 16); rect(p.x, p.y, p.w, p.h, [235, 220, 170], 2, 16); }
+
+  text("Paused", header.x + 22, header.y + 14, [255, 245, 220], BIG);
+  text("I: bank   Tab/B: dealership   U: upgrade   (or tap the buttons)", header.x + 22, header.y + 46, [225, 232, 240], SMALL);
+  pauseButtons.resume = R(header.x + header.w - 210, header.y + 18, 84, 34);
+  pauseButtons.reset = R(header.x + header.w - 108, header.y + 18, 84, 34);
+  drawButton(pauseButtons.resume, "Resume");
+  drawButton(pauseButtons.reset, "Reset", [58, 42, 42]);
+
+  text("Bank", bank.x + 18, bank.y + 16, [255, 245, 220], BIG);
+  text(`Current APY: ${fx(currentApy, 2)}%`, bank.x + 18, bank.y + 54);
+  text(`Current monthly rate: ${fx(rate, 3)}%`, bank.x + 18, bank.y + 78);
+  text(`Best available now: ${offerName}`, bank.x + 18, bank.y + 114);
+  pauseButtons.apply_bank = R(bank.x + 18, bank.y + 138, 190, 34);
+  drawButton(pauseButtons.apply_bank, `Apply ${fx(offerApy, 2)}% APY`, [64, 82, 58], [235, 220, 170], [255, 245, 220]);
+  text(`Starter Savings: ${fx(LOW_APY, 2)}% APY`, bank.x + 18, bank.y + 180);
+  text(`Growth Savings: ${fx(MEDIUM_APY, 2)}% APY at $5,000+`, bank.x + 18, bank.y + 208);
+  text(`Premium Yield: ${fx(PREMIUM_APY, 2)}% APY at $20,000+`, bank.x + 18, bank.y + 236);
+  if (sustain === null) text("Interest-only sustain balance: not possible", bank.x + 18, bank.y + 278, [255, 210, 160]);
+  else text(`Interest-only sustain balance: ${money(sustain)}`, bank.x + 18, bank.y + 278,
+    state.My_Account_Balance >= sustain ? [120, 240, 160] : [255, 225, 140]);
+
+  text("Dealership", dealer.x + 18, dealer.y + 16, [255, 245, 220], BIG);
+  text("Tap a car (or Tab) to choose. Tap Buy (or B) to buy it.", dealer.x + 18, dealer.y + 54, [255, 255, 255], SMALL);
+  const sel = CAR_CATALOG[selectedCarIndex];
+  const pv = R(dealer.x + 18, dealer.y + 92, 160, 88);
+  rect(pv.x, pv.y, pv.w, pv.h, [28, 34, 46], 0, 12);
+  rect(pv.x + 12, pv.y + 14, 136, 28, sel.color, 0, 8);
+  rect(pv.x, pv.y, pv.w, pv.h, [200, 200, 200], 2, 12);
+  text(sel.name, pv.x + 12, pv.y + 52);
+  text(money(sel.price), pv.x + 12, pv.y + 70, [255, 255, 255], SMALL);
+  pauseButtons.buy_car = R(dealer.x + 196, dealer.y + 106, 170, 36);
+  pauseButtons.upgrade_garage = R(dealer.x + 196, dealer.y + 150, 170, 36);
+  drawButton(pauseButtons.buy_car, `Buy ${sel.name}`, [54, 76, 92]);
+  drawButton(pauseButtons.upgrade_garage, `Upgrade ${money(UPGRADE_COST)}`, [72, 64, 88]);
+  const gridY = dealer.y + 202;
+  CAR_CATALOG.forEach((car, idx) => {
+    const x = dealer.x + 18 + (idx % 2) * 178, y = gridY + Math.floor(idx / 2) * 58;
+    const r = R(x, y, 160, 46);
+    pauseButtons["car_" + idx] = r;
+    rect(x, y, 160, 46, [28, 34, 46], 0, 10);
+    rect(x + 8, y + 9, 20, 20, car.color, 0, 4);
+    rect(x, y, 160, 46, idx === selectedCarIndex ? [255, 215, 120] : [130, 140, 150], 2, 10);
+    text(car.name, x + 36, y + 7);
+    text(money(car.price), x + 36, y + 24, [255, 255, 255], SMALL);
+  });
+
+  text("Notes", notes.x + 18, notes.y + 14, [255, 245, 220], BIG);
+  text(`Each work input adds ${money(ACTION_EFFECTS.work_deposit)}. Work can drive up to ${money(TARGET_MONTHLY_EARNINGS)}/month.`, notes.x + 18, notes.y + 48);
+  text("Bank and dealership panels only appear while paused so the live view stays clear.", notes.x + 18, notes.y + 70, [255, 255, 255], SMALL);
+}
+
+// ---------------- MAIN SCREEN ----------------
+function drawUI() {
+  ctx.fillStyle = rgb([18, 24, 36]); ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+  // Balance bubble
+  const bal = state.My_Account_Balance;
+  const radius = clamp(Math.floor(36 + Math.sqrt(Math.max(0, bal)) * 1.8), 36, 260);
+  const cx = 220, cy = 200;
+  circle(cx, cy, radius, [30, 170, 100]);
+  circle(cx, cy, radius, [255, 255, 255], 3);
+  text(`Balance: ${money(bal, 2)}`, cx - 70, cy + radius + 8, [255, 255, 255], BIG);
+
+  // Reinforcing loop arrows: Balance -> Interest -> Deposits -> Balance
+  const thick = Math.floor(clamp(1 + arrowStrength * 10, 1, 12));
+  const ax1 = [cx + radius, cy], ax2 = [cx + radius + 140, cy - 40];
+  line(ax1, ax2, [200, 180, 40], thick);
+  text("Interest", ax2[0] - 10, ax2[1] - 24);
+  const bx2 = [cx + 80, cy + 110];
+  line(ax2, bx2, [200, 180, 40], thick);
+  text("Deposits", bx2[0] - 20, bx2[1] + 8);
+  line([cx + 30, cy + 80], [cx - radius, cy + 40], [200, 180, 40], thick);
+
+  for (const c of coinParticles) circle(Math.floor(c.x), Math.floor(c.y), Math.floor(c.r), [255, 223, 0]);
+
+  // Top-right summary
+  text(`Bank APY: ${fx(getCurrentApy(), 2)}%`, 520, 28, [255, 255, 255], BIG);
+  text("Pause to visit the bank and dealership.", 520, 58, [215, 220, 230]);
+
+  // Liquidity and asset bar
+  const bx = 520, by = 84, w = 420, h = 36;
+  const assetValue = getAssetValue();
+  const totalNet = bal + assetValue;
+  const liqW = Math.floor(w * (bal / (totalNet > 0 ? totalNet : 1)));
+  const tracked = Math.max(0.01, getTotalTrackedLiquidity());
+  const workLiq = Math.min(bal, liquiditySources.work), intLiq = Math.min(bal, liquiditySources.interest);
+  const workSplit = Math.floor(liqW * (workLiq / tracked)), intSplit = Math.floor(liqW * (intLiq / tracked));
+  rect(bx, by, w, h, [60, 60, 70]);
+  rect(bx, by, workSplit, h, [70, 170, 255]);
+  rect(bx + workSplit, by, intSplit, h, [255, 215, 80]);
+  const rem = Math.max(0, liqW - workSplit - intSplit);
+  if (rem > 0) rect(bx + workSplit + intSplit, by, rem, h, [0, 200, 120]);
+  rect(bx, by, w, h, [220, 220, 220], 2);
+  text(`Liquidity: ${money(bal)}`, bx + 6, by + 6);
+  text(`Assets: ${money(assetValue)}`, bx + 220, by + 6);
+  text(`Work ${money(workLiq)}`, bx, by + 42, [70, 170, 255], SMALL);
+  text(`Interest ${money(intLiq)}`, bx + 120, by + 42, [255, 215, 80], SMALL);
+
+  // Monthly cash flow panel
+  const px = 20, py = 360, pw = 470, ph = 215;
+  rect(px, py, pw, ph, [16, 20, 30]);
+  rect(px, py, pw, ph, [100, 110, 140], 2);
+  text("Monthly Cash Flow", px + 12, py + 10, [255, 255, 255], BIG);
+  const er = getEffectiveInterestRate();
+  const workIncome = state.Monthly_earnings, interestIncome = flows.Monthly_Interest_Payments, spending = state.Monthly_spending;
+  const sustain = getSustainBalance(er, spending);
+  const chartMax = Math.max(1, workIncome, interestIncome, spending);
+  drawBar(px + 12, py + 52, 300, 24, workIncome, chartMax, [70, 170, 255], `Work: ${money(workIncome, 1)}/month`);
+  drawBar(px + 12, py + 84, 300, 24, interestIncome, chartMax, [255, 215, 80], `Interest: ${money(interestIncome, 1)}/month`);
+  drawBar(px + 12, py + 116, 300, 24, spending, chartMax, [255, 120, 120], `Spending: ${money(spending, 1)}/month`);
+  text(`Interest rate: ${fx(monthlyPercentToApy(er), 2)}% APY`, px + 12, py + 154);
+  text(`Loop gain: ${fx(getMonthlyLoopGain(er), 4)}`, px + 12, py + 176);
+  text(`Multiplier: x${fx(getMonthlyMultiplier(er), 4)} / month`, px + 180, py + 176);
+  text(`Liquid from work: ${money(liquiditySources.work)}`, px + 320, py + 60, [70, 170, 255], SMALL);
+  text(`Liquid from interest: ${money(liquiditySources.interest)}`, px + 320, py + 82, [255, 215, 80], SMALL);
+  if (sustain === null) text("Interest-only sustain: not possible", px + 12, py + 198, [255, 210, 160]);
+  else {
+    const ok = bal >= sustain;
+    text(`Sustain target: ${money(sustain)} liquid`, px + 12, py + 198, ok ? [120, 240, 160] : [255, 225, 140]);
+    if (ok) text("Interest can cover the $50/month spend now.", px + 250, py + 198, [120, 240, 160], SMALL);
+    else text(`${money(sustain - bal)} more to self-sustain`, px + 250, py + 198, [255, 225, 140], SMALL);
+  }
+
+  // Garage
+  text("Garage:", garagePos[0], garagePos[1] - 34);
+  garageSlots.forEach((c, i) => {
+    const s = slotRect(i);
+    rect(s.x, s.y, s.w, s.h, [28, 28, 36]);
+    rect(s.x, s.y, s.w, s.h, [100, 100, 110], 2);
+    if (c) { rect(s.x + 10, s.y + 10, slotW - 20, slotH - 28, c.color); text(c.name, s.x + 6, s.y + slotH - 22); }
+    else text("Empty", s.x + 8, s.y + slotH - 22, [120, 120, 120]);
+  });
+
+  // Bottom stats and controls
+  text("P: Pause/shops  Click or Space: Work  S: Save  V: Sell  R: Reset", 20, HEIGHT - 40, [190, 190, 190]);
+  text(`Interest/month: $${fx(flows.Monthly_Interest_Payments, 2)}  Work/month: $${fx(state.Monthly_earnings, 1)}  Spending: $${fx(state.Monthly_spending, 0)}`, 20, HEIGHT - 64);
+
+  // Balance history sparkline
+  const hx = 20, hy = 20, hw = 380, hh = 120;
+  rect(hx, hy, hw, hh, [10, 10, 14]);
+  if (balanceHistory.length > 1) {
+    const maxb = Math.max(...balanceHistory) || 1, minb = Math.min(...balanceHistory);
+    const span = maxb > minb ? maxb - minb : 1;
+    ctx.beginPath();
+    balanceHistory.forEach((v, i) => {
+      const x = hx + Math.floor(i / (balanceHistory.length - 1) * (hw - 6));
+      const y = hy + hh - 6 - Math.floor((v - minb) / span * (hh - 12));
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.lineWidth = 2; ctx.strokeStyle = rgb([90, 220, 150]); ctx.stroke();
+  }
+
+  for (const a of carAnimationQueue) rect(a.x, a.y, a.w, a.h, a.color);
+
+  if (selectedSlot !== null && selectedSlot < garageSlots.length) {
+    const s = slotRect(selectedSlot);
+    rect(s.x, s.y, s.w, s.h, [255, 200, 120], 3);
+  }
+
+  // Touch buttons (for iPad): Save, Sell, Pause
+  touchButtons = {
+    save: R(560, 586, 120, 44),
+    sell: R(690, 586, 120, 44),
+    pause: R(820, 586, 160, 44),
+  };
+  const saving = actionTimers.save_months > 0;
+  drawButton(touchButtons.save, saving ? `Saving ${Math.ceil(actionTimers.save_months)}mo` : "Save (S)",
+    saving ? [40, 70, 50] : [36, 46, 62], [235, 220, 170], [245, 245, 245], FONT);
+  const canSell = selectedSlot !== null && garageSlots[selectedSlot];
+  drawButton(touchButtons.sell, "Sell (V)", canSell ? [70, 50, 40] : [30, 34, 44], canSell ? [235, 220, 170] : [90, 96, 110],
+    canSell ? [245, 245, 245] : [130, 130, 140], FONT);
+  drawButton(touchButtons.pause, "Pause / Shops (P)", [54, 76, 92], [235, 220, 170], [245, 245, 245], FONT);
+
+  if (gameOver) {
+    rect(300, 250, 400, 90, [20, 28, 40], 0, 16);
+    rect(300, 250, 400, 90, [255, 215, 120], 3, 16);
+    text("Garage full! You win!", 360, 268, [255, 245, 220], BIG);
+    text("Press R (or Pause, then Reset) to play again.", 330, 306, [225, 232, 240], SMALL);
+  }
+
+  if (paused) drawPauseOverlay();
+}
+
+// ---------------- MODEL UPDATE (Euler) ----------------
+function modelStep(dt) {
+  const now = nowSec();
+  while (clickTimestamps.length && clickTimestamps[0] < now - CLICK_SAMPLE_WINDOW) clickTimestamps.shift();
+  const idealClicks = IDEAL_CPS * CLICK_SAMPLE_WINDOW;
+  let perClick = TARGET_MONTHLY_EARNINGS / Math.max(1, idealClicks);
+  if (now - startTime < STARTER_PERIOD_SECONDS) perClick *= STARTER_MULTIPLIER;
+  state.Monthly_earnings = Math.min(TARGET_MONTHLY_EARNINGS, clickTimestamps.length * perClick);
+
+  let effSpending = state.Monthly_spending;
+  if (actionTimers.save_months > 0) effSpending *= ACTION_EFFECTS.save_multiplier;
+  let effRate = state.Monthly_Percent_Interest_Rate;
+  if (actionTimers.neg_rate_months > 0 && negotiatedApy > 0) effRate = apyToMonthlyPercent(negotiatedApy);
+
+  flows.Monthly_Interest_Payments = state.My_Account_Balance * effRate / 100;
+  flows.Deposits = state.Monthly_earnings + flows.Monthly_Interest_Payments;
+  flows.Withdrawals = effSpending;
+
+  const workIn = state.Monthly_earnings * dt, intIn = flows.Monthly_Interest_Payments * dt, spendOut = flows.Withdrawals * dt;
+  state.My_Account_Balance = Math.max(0, state.My_Account_Balance + (flows.Deposits - flows.Withdrawals) * dt);
+  addLiquidity(workIn, intIn);
+  removeLiquidity(spendOut);
+  rebalanceLiquiditySources(state.My_Account_Balance);
+
+  // Car values: depreciation (negative = appreciation), percent per month
+  for (const car of garageSlots) {
+    if (!car) continue;
+    car.value = car.value ?? car.price;
+    car.value = Math.max(0, car.value - car.value * ((car.dep ?? 1) / 100) * dt);
+  }
+
+  // Interest coins
+  const spawn = Math.floor(clamp(flows.Monthly_Interest_Payments * dt / 5, 0, 30));
+  for (let i = 0; i < spawn; i++) {
+    coinParticles.push({ x: 220 + radiusForBalance(state.My_Account_Balance), y: 200,
+      vx: rand(30, 140), vy: rand(-80, -20), r: rand(3, 7), life: rand(0.8, 1.6) });
+  }
+  const k = (dt / MODEL_DT) * 0.6;
+  coinParticles = coinParticles.filter((c) => {
+    c.x += c.vx * k; c.y += c.vy * k; c.vy += 80 * k; c.life -= dt / 6;
+    return c.life > 0;
+  });
+
+  arrowStrength = state.My_Account_Balance > 0 ? flows.Monthly_Interest_Payments / Math.max(0.01, state.My_Account_Balance) : 0;
+
+  // Negotiated contract: break it if balance drops below the minimum
+  if (actionTimers.neg_rate_months > 0 && negotiatedMinimum > 0 && state.My_Account_Balance < negotiatedMinimum) {
+    actionTimers.neg_rate_months = 0; negotiatedApy = 0; negotiatedMinimum = 0;
+  }
+  for (const key in actionTimers) if (actionTimers[key] > 0) actionTimers[key] = Math.max(0, actionTimers[key] - dt);
+
+  balanceHistory.push(state.My_Account_Balance);
+  if (balanceHistory.length > 300) balanceHistory.shift();
+}
+
+// ---------------- PLAYER ACTIONS ----------------
+function doWork() {
+  if (cooldowns.work > 0) return;
+  clickTimestamps.push(nowSec());
+  state.My_Account_Balance += ACTION_EFFECTS.work_deposit;
+  addLiquidity(ACTION_EFFECTS.work_deposit);
+  cooldowns.work = ACTION_EFFECTS.work_cooldown_seconds;
+}
+function doSave() { if (actionTimers.save_months > 0) return; actionTimers.save_months = ACTION_EFFECTS.save_duration_months; }
+function doNegotiate() {
+  const offer = getBankOffer(state.My_Account_Balance);
+  negotiatedApy = offer[1]; negotiatedMinimum = offer[2];
+  actionTimers.neg_rate_months = ACTION_EFFECTS.neg_rate_duration_months;
+}
+function buySelectedCar() {
+  const cc = CAR_CATALOG[selectedCarIndex];
+  if (state.My_Account_Balance < cc.price) return;
+  const busy = new Set(carAnimationQueue.map((a) => a.slot));
+  for (let i = 0; i < garageSlots.length; i++) {
+    if (garageSlots[i] === null && !busy.has(i)) {
+      state.My_Account_Balance -= cc.price;
+      removeLiquidity(cc.price);
+      const newcar = { name: cc.name, price: cc.price, color: cc.color, value: cc.price, dep: cc.dep };
+      const s = slotRect(i);
+      carAnimationQueue.push({ x: WIDTH - 180, y: 100, w: slotW - 20, h: slotH - 28, color: cc.color,
+        target: [s.x + 10, s.y + 10], speed: 600, newcar, slot: i });
+      return;
+    }
+  }
+}
+function placeCarInSlot(a) {
+  garageSlots[a.slot] = a.newcar;
+  if (garageSlots.every((s) => s !== null)) gameOver = true;
+  selectedSlot = null;
+}
+function upgradeGarage() {
+  if (state.My_Account_Balance >= UPGRADE_COST) {
+    state.My_Account_Balance -= UPGRADE_COST;
+    removeLiquidity(UPGRADE_COST);
+    for (let i = 0; i < UPGRADE_SLOTS; i++) garageSlots.push(null);
+  }
+}
+function sellSelected() {
+  if (selectedSlot === null || !garageSlots[selectedSlot]) return;
+  const car = garageSlots[selectedSlot];
+  const refund = (car.value ?? car.price) * SELL_FRACTION;
+  state.My_Account_Balance += refund;
+  addLiquidity(refund);
+  garageSlots[selectedSlot] = null;
+  selectedSlot = null;
+}
+
+// ---------------- INPUT ----------------
+window.addEventListener("keydown", (e) => {
+  const key = e.key.toLowerCase();
+  if (key === "tab" || key === " ") e.preventDefault();
+  if (e.repeat && key !== " ") return;
+  if (key === "p") { paused = !paused; return; }
+  if (paused) {
+    if (key === "r") resetGame();
+    else if (key === "i") doNegotiate();
+    else if (key === "tab") selectedCarIndex = (selectedCarIndex + 1) % CAR_CATALOG.length;
+    else if (key === "b") buySelectedCar();
+    else if (key === "u") upgradeGarage();
+    return;
+  }
+  if (key === "s") doSave();
+  else if (key === "v") sellSelected();
+  else if (key === "r") resetGame();
+  else if (key === " ") doWork();
+});
+
+canvas.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
+  const b = canvas.getBoundingClientRect();
+  const mx = (e.clientX - b.left) * WIDTH / b.width, my = (e.clientY - b.top) * HEIGHT / b.height;
+  if (paused) {
+    for (const [id, r] of Object.entries(pauseButtons)) {
+      if (!inRect(r, mx, my)) continue;
+      if (id === "resume") paused = false;
+      else if (id === "reset") resetGame();
+      else if (id === "apply_bank") doNegotiate();
+      else if (id === "buy_car") buySelectedCar();
+      else if (id === "upgrade_garage") upgradeGarage();
+      else if (id.startsWith("car_")) selectedCarIndex = parseInt(id.split("_")[1], 10);
+      break;
+    }
+    return;
+  }
+  if (inRect(touchButtons.save, mx, my)) { doSave(); return; }
+  if (inRect(touchButtons.sell, mx, my)) { sellSelected(); return; }
+  if (inRect(touchButtons.pause, mx, my)) { paused = true; return; }
+  for (let i = 0; i < garageSlots.length; i++) {
+    if (inRect(slotRect(i), mx, my)) { selectedSlot = i; return; }
+  }
+  doWork();
+});
+
+// ---------------- MAIN LOOP ----------------
+let lastTime = nowSec();
+function frame() {
+  const now = nowSec();
+  const elapsed = Math.min(0.25, now - lastTime); // avoid a big jump after the tab was hidden
+  lastTime = now;
+  if (!paused) for (const k in cooldowns) if (cooldowns[k] > 0) cooldowns[k] = Math.max(0, cooldowns[k] - elapsed);
+  if (!paused && !gameOver) {
+    timeAccumulator += elapsed * MONTHS_PER_SECOND;
+    while (timeAccumulator >= MODEL_DT) { modelStep(MODEL_DT); timeAccumulator -= MODEL_DT; }
+  }
+  carAnimationQueue = carAnimationQueue.filter((a) => {
+    const dx = a.target[0] - a.x, dy = a.target[1] - a.y, dist = Math.hypot(dx, dy);
+    if (dist < 8) { placeCarInSlot(a); return false; }
+    const step = Math.min(dist, a.speed * elapsed);
+    a.x += dx / dist * step; a.y += dy / dist * step;
+    return true;
+  });
+  drawUI();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

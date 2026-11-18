@@ -6,7 +6,7 @@ _Kept by Claude Code. Last updated 2026-11-16._
 
 | Game | Where | State | Plays on iPad? |
 |---|---|---|---|
-| Bank Game, Current | `bank_game.py` (web build: dashboard) | Works. Clickable buttons in the pause screen (bank, dealership, upgrade). | Loads. Shop buttons should work by tap; S (save), P (pause) and V (sell) need a keyboard. Not tested on a real iPad. |
+| Bank Game, Current | `bank_game.py`; browser version `bank-game/index.html` (dashboard uses this) | Works. Browser version is a JavaScript port with the same money model; plays on GitHub Pages with no PC server. | Save, Sell and Pause/Shops buttons on screen; tap anywhere to work, tap a garage slot to pick it (simulated touch tested; not yet tried on a real iPad). |
 | Bank Game, Copy 3 to Copy 5 | `bank_game copy 3.py` to `copy 5.py` | Work. Earlier iterations kept for comparison. | Keyboard needed. |
 | Bank Game, Copy and Copy 2 | `bank_game copy.py`, `bank_game copy 2.py` | Work. **Identical code**; one could be dropped from the dashboard. | Keyboard needed. |
 | Bank Game assessment | `bank_game_assessment.py` | Not reviewed yet. | Not checked. |
@@ -43,7 +43,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Known issues and limits
 
-- Bank Game has no touch controls for its keyboard-only actions (S, P, V).
+- Bank Game: the browser version (`bank-game/`) is a separate copy of `bank_game.py`'s logic. A change to one must be made to the other too. The older Bank Game copies still need the PC server.
 - Publishing on GitHub Pages would need the builds to load the runtime straight from the CDN (the same `/cdn/` problem), and the builds would need to stop being ignored by Git.
 - Dashboard "Save for airplane" (offline) tested in desktop Chrome with the network switched off; not yet tried on a real iPad. Google Fonts could not be reached from the test machine, so offline font saving is untested (games fall back to a plain font if it fails).
 - Home Screen apps: all 15 browser games and the dashboard have picture icons, manifests and offline support (2026-11-06). Not yet tried on a real iPad, and they only install from the GitHub Pages address, which this session could not check is live.
@@ -52,6 +52,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-17: Bank Game converted from Pygame to a browser page (`bank-game/index.html`) so it plays on GitHub Pages and iPads (it showed 404 online before). Same model; adds Save/Sell/Pause touch buttons and a "Garage full" win message. Dashboard "Current" now opens it; older copies marked "PC only". `bank_game.py` unchanged.
 - 2026-11-17: Miriam's Sky Day: Miriam's eyes are blue now (the eye pixel in her sprite). Same change as the claude.ai link. Commit `ea9cfbf`.
 - 2026-11-17: Dashboard GIFs for 10 of the new games sped up (some held each picture 2–12 seconds, so they looked like still pictures); dashboard now asks for fresh GIFs (`?v=3`). Miriam's Sky Day is in `miriams-sky-day/` with a Home Screen icon but stays off the dashboard; the scripture game also stays off the dashboard (owner's choice).
 - 2026-11-16: Added 15 more of John's claude.ai games to the repo, dashboard, Home Screen tool, README and offline list: Tiny Realms, Bounce Pit: Skyward, Blade Mosaic, Mochi's Star Quest (empty save in the repo copy), Slice Flip 3D, Only Up: Blip's Climb Home, Dropper 3D, Ionuț's Climb, Spark Burst, Supernova Run, Underglow, Pal Island 3D, Hypernova 3D, Wanderleaf, Chameleon Hide & Seek. Each has a recorded first-level icon. Left out on purpose: Miriam's Sky Day and the two Puffling games (personal gift), and the scripture games (not asked about yet). Commit `3e405f7`.
