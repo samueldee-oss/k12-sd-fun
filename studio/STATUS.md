@@ -52,6 +52,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-17: iPad typing warning fixed: Safari shows "It looks like you are typing" when a page in real full screen gets many taps. On iPad/iPhone the dashboard's ⤢ button now uses a pretend full screen (game fills the window, ✕ to leave); Capybara Rumble, Sprout Siege, Banana Slug Arena, Whisker Dash and Miriam's Sky Day skip real full screen there. Commit `97018c6`.
 - 2026-11-17: Home Screen apps and the dashboard now always ask the server for the newest files (the browser's 10-minute cache made the dashboard app keep the old Bank Game link and show 404). Commit `6c3d9fa`.
 - 2026-11-17: Bank Game converted from Pygame to a browser page (`bank-game/index.html`) so it plays on GitHub Pages and iPads (it showed 404 online before). Same model; adds Save/Sell/Pause touch buttons and a "Garage full" win message. Dashboard "Current" now opens it; older copies marked "PC only". `bank_game.py` unchanged. Commit `8f032b7`.
 - 2026-11-17: Miriam's Sky Day: Miriam's eyes are blue now (the eye pixel in her sprite). Same change as the claude.ai link. Commit `ea9cfbf`.
