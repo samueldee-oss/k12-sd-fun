@@ -1,6 +1,6 @@
 # Status
 
-_Kept by Claude Code. Last updated 2026-11-16._
+_Kept by Claude Code. Last updated 2026-11-18._
 
 ## Games
 
@@ -31,6 +31,7 @@ _Kept by Claude Code. Last updated 2026-11-16._
 | Hypernova 3D | `hypernova-3d/` | Works. Operius-style 3D tunnel flight, 7 trials. Built on claude.ai and added as-is (3D games use a local copy of three.js so they play offline). | Not yet tried on a real iPad. |
 | Wanderleaf | `wanderleaf/` | Works. Hand-drawn silkie chicken platformer. Built on claude.ai and added as-is (3D games use a local copy of three.js so they play offline). | Not yet tried on a real iPad. |
 | Chameleon Hide & Seek | `chameleon-hide-seek/` | Works. Hide by copying colors; map with levels. Built on claude.ai and added as-is (3D games use a local copy of three.js so they play offline). | Not yet tried on a real iPad. |
+| Brainy Owl (CogAT Level 7 practice) | `brainy-owl/` | Works. Adaptive no-reading practice for all 9 CogAT Level 7 question types, 5 levels each, generated and validated questions, 3-part diagnostic, skills profile, spaced review, parent dashboard. Tests in `brainy-owl/dev/test/` pass (2026-11-18). Not on the dashboard yet (needs a recorded icon). | Touch-first layout tested in a simulated phone size; not yet tried on a real iPad. Spoken instructions need a browser with speech synthesis. |
 | Snake (side project) | `experiments/snake-blender-mode/` | Works. Fixed 2026-10-20: body was invisible and the game "auto-ended" around 60-70 points. Swipe to steer. | Yes (simulated touch tested; not yet tried on a real iPad). |
 
 A comparison of the Bank Game versions (features, fun, systems lessons) is in `to-desktop/2026-10-21-1600-bank-game-version-comparison.md`.
@@ -52,6 +53,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-18: Added Brainy Owl (`brainy-owl/`), an adaptive CogAT Level 7 practice game built from the owner's spec. It has generators for all nine question types with answer checks. The paper-folding answers are checked against a second simulation. It also has a 3-part diagnostic, a reasoning-skills profile with error types, practice weighted toward weak areas (checked by a 40-day simulation), spaced review, and mastery based on transfer and retention. The parent dashboard is behind a multiplication gate. It is not on the dashboard or Home Screen tool yet. Commit `20d428d`.
 - 2026-11-17: Bank Game (web) has a start menu with Level 1 (Work: one inflow fills the stock, save $1,000 in 24 months) and Level 2 (Spend: $500, $50 bills, no work, 12 months). Flow: review sentence from an earlier level (put pieces in order; fill-the-blank and match-the-graph planned for higher levels) → predict quiz → play with a month timer → debrief with the stock-and-flow picture, the player's own inflow/outflow/balance graphs, their predictions and a sentence to remember. Old game is "Free play". Levels 3 (both flows, easy) and 4 (both flows, low pay) are next. Commit `31ccee0`.
 - 2026-11-17: iPad typing warning fixed: Safari shows "It looks like you are typing" when a page in real full screen gets many taps. On iPad/iPhone the dashboard's ⤢ button now uses a pretend full screen (game fills the window, ✕ to leave); Capybara Rumble, Sprout Siege, Banana Slug Arena, Whisker Dash and Miriam's Sky Day skip real full screen there. Commit `97018c6`.
 - 2026-11-17: Home Screen apps and the dashboard now always ask the server for the newest files (the browser's 10-minute cache made the dashboard app keep the old Bank Game link and show 404). Commit `6c3d9fa`.
