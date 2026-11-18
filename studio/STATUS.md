@@ -52,6 +52,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-17: Home Screen apps and the dashboard now always ask the server for the newest files (the browser's 10-minute cache made the dashboard app keep the old Bank Game link and show 404). Commit `6c3d9fa`.
 - 2026-11-17: Bank Game converted from Pygame to a browser page (`bank-game/index.html`) so it plays on GitHub Pages and iPads (it showed 404 online before). Same model; adds Save/Sell/Pause touch buttons and a "Garage full" win message. Dashboard "Current" now opens it; older copies marked "PC only". `bank_game.py` unchanged. Commit `8f032b7`.
 - 2026-11-17: Miriam's Sky Day: Miriam's eyes are blue now (the eye pixel in her sprite). Same change as the claude.ai link. Commit `ea9cfbf`.
 - 2026-11-17: The 15 new games' dashboard GIFs re-recorded smooth (20 frames a second, about 4 seconds each). `tools/capture_icons.py` now pauses the page's clock and moves it forward 1/20 s per frame for these games (`smooth=True`), so slow 3D games no longer come out choppy. Dashboard asks for fresh GIFs (`?v=4`). Miriam's Sky Day is in `miriams-sky-day/` with a Home Screen icon but stays off the dashboard; the scripture game also stays off the dashboard (owner's choice).
