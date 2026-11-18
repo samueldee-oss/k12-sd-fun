@@ -34,7 +34,7 @@ self.addEventListener("fetch", (event) => {
     let done = false;
     const finish = (res) => { if (!done && res) { done = true; resolve(res); } };
     const timer = setTimeout(() => fromCache(req).then(finish), SLOW_MS);
-    fetch(req)
+    fetch(req, { cache: "no-cache" }) // ask the server each time, so a new version shows right away
       .then((res) => { clearTimeout(timer); finish(res); })
       .catch(() => {
         clearTimeout(timer);

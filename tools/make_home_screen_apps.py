@@ -149,7 +149,7 @@ self.addEventListener("fetch", (event) => {{
   }}
   if (url.origin !== self.location.origin) return;
   event.respondWith(
-    fetch(req)
+    fetch(req, {{ cache: "no-cache" }}) // ask the server each time, so a new version shows right away
       .then((res) => {{
         if (res.ok) {{
           const copy = res.clone();
