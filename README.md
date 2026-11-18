@@ -35,6 +35,7 @@ k12-sd-fun/
 │   tiny-realms/ bounce-pit/ blade-mosaic/ mochi-star-quest/ slice-flip-3d/
 │   blips-climb/ dropper-3d/ ionuts-climb/ spark-burst/ supernova-run/
 │   underglow/ pal-island/ hypernova-3d/ wanderleaf/ chameleon-hide-seek/
+│   brainy-owl/
 │                             # More browser-native games (one index.html each)
 ├── experiments/              # Side projects, not part of the curriculum
 │   └── snake-blender-mode/
@@ -81,6 +82,7 @@ Links assume GitHub Pages is enabled for this repo (Settings → Pages → deplo
 | Bounce Pit: Skyward | `https://samueldee-oss.github.io/k12-sd-fun/bounce-pit/index.html` |
 | Blade Mosaic | `https://samueldee-oss.github.io/k12-sd-fun/blade-mosaic/index.html` |
 | Mochi's Star Quest | `https://samueldee-oss.github.io/k12-sd-fun/mochi-star-quest/index.html` |
+| Brainy Owl (CogAT Level 7 practice) | `https://samueldee-oss.github.io/k12-sd-fun/brainy-owl/index.html` |
 | Slice Flip 3D | `https://samueldee-oss.github.io/k12-sd-fun/slice-flip-3d/index.html` |
 | Only Up: Blip's Climb Home | `https://samueldee-oss.github.io/k12-sd-fun/blips-climb/index.html` |
 | Dropper 3D | `https://samueldee-oss.github.io/k12-sd-fun/dropper-3d/index.html` |

@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Brainy Owl: CogAT Level 7 Thinking Games</title>
+<meta name="description" content="Adaptive practice for all nine CogAT Level 7 question types. No reading needed.">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#2d2a40;--card:#fff;--line:#dfe3f2}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;font-family:Fredoka,'Trebuchet MS',Arial,sans-serif;color:var(--ink);background:linear-gradient(180deg,#bfe7ff 0%,#e8f6ff 55%,#fdf6e3 100%);background-attachment:fixed}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+svg{display:block}
+.screen{display:none;min-height:100vh;min-height:100dvh}.screen.on{display:flex;flex-direction:column}
+.plabel{font-size:11px;color:#6b7090;font-weight:500}
+/* ---------- home */
+#home{align-items:center;padding:10px 12px 20px;gap:10px}
+.homeTop{width:100%;max-width:1000px;display:flex;align-items:center;gap:12px}
+.owlWrap{width:clamp(70px,13vw,110px)}
+.owl{width:100%;height:auto}.owl.small{width:90px}
+.bob{animation:bob 2.6s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-6px)}}
+.jump{width:150px;animation:jump 1s ease-in-out 3}@keyframes jump{30%{transform:translateY(-24px) rotate(-6deg)}60%{transform:translateY(0) rotate(4deg)}}
+.sleepy{width:150px;opacity:.9}.sleepy .pupil{transform:scaleY(.2);transform-origin:center 56px}
+.jars{display:flex;gap:6px;flex:1;flex-wrap:wrap;align-items:flex-end}
+.jar{width:44px;height:52px;border:4px solid var(--ink);border-top-width:7px;border-radius:8px 8px 14px 14px;background:rgba(255,255,255,.7);position:relative;overflow:hidden;display:grid;place-items:center}
+.jar svg{position:relative;z-index:1}.jar.full{background:#fff3b0}
+.jarfill{position:absolute;left:0;right:0;bottom:0;background:#ffe680}
+.ibtn{width:clamp(52px,9vw,66px);height:clamp(52px,9vw,66px);border-radius:50%;background:#fff;box-shadow:0 4px 0 #c5cbe4,0 6px 14px rgba(45,42,64,.12);display:grid;place-items:center;padding:12px;transition:transform .12s;flex:none}
+.ibtn:active{transform:translateY(3px);box-shadow:0 1px 0 #c5cbe4}
+.ibtn svg{width:100%;height:100%}
+.ibtn.small{width:46px;height:46px;padding:10px}.ibtn.big{width:84px;height:84px}.ibtn.ghost{opacity:.6}
+.lockBtn{margin-left:auto}
+.playRow{display:flex;align-items:center;gap:22px}
+.playBig{width:clamp(110px,22vw,150px);height:clamp(110px,22vw,150px);border-radius:50%;background:radial-gradient(circle at 35% 30%,#7ee08a,#2fa24a);box-shadow:0 8px 0 #1f7a35,0 14px 30px rgba(31,122,53,.35);display:grid;place-items:center;padding:30px;position:relative;animation:breathe 2.2s ease-in-out infinite}
+.playBig.diag{background:radial-gradient(circle at 35% 30%,#ffd76b,#f2a01e);box-shadow:0 8px 0 #c47a07,0 14px 30px rgba(196,122,7,.35)}
+.playBig svg{width:100%;height:100%}@keyframes breathe{50%{transform:scale(1.05)}}
+.badge{position:absolute;right:-6px;top:-6px;width:52px;height:52px;background:#fff;border-radius:50%;padding:8px;box-shadow:0 3px 8px rgba(0,0,0,.2)}
+.chal{background:#fff7d6}
+.batts{width:100%;max-width:1000px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:760px){.batts{grid-template-columns:1fr}}
+.batt{border-radius:24px;padding:10px;box-shadow:0 6px 18px rgba(45,42,64,.12)}
+.bV{background:#ffe1ea}.bQ{background:#d6f5ee}.bN{background:#e8defc}
+.bhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}.bart{width:40px;height:40px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{background:#fff;border-radius:18px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 4px 0 rgba(0,0,0,.08);transition:transform .12s}
+.tile:hover{transform:translateY(-3px)}.tile:active{transform:translateY(2px)}
+.ticon{width:100%;aspect-ratio:12/7}.ticon svg{width:100%;height:100%}
+.tile .plabel{font-size:10px;text-align:center;line-height:1.1}
+.lstars{display:flex;gap:1px;align-items:center}.crown{font-size:14px;margin-right:2px}
+.foot{max-width:800px;text-align:center;margin-top:6px}
+/* ---------- question screen */
+#play{align-items:center;padding:8px 10px 18px;gap:clamp(8px,1.6vh,16px)}
+.bar{width:100%;max-width:1060px;display:flex;align-items:center;gap:10px}
+.dots{flex:1;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.dot{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid #c5cbe4}
+.dot.now{border-color:#3d82c4;transform:scale(1.25)}.dot.gold{background:#ffd23f;border-color:#e0a800}.dot.silver{background:#d6dbe6;border-color:#9aa0b5}.dot.tried{background:#fff;border-color:#9aa0b5}
+.spk{background:#ffe680;width:clamp(60px,11vw,78px);height:clamp(60px,11vw,78px)}
+.spk.talking .wave{animation:wave .8s infinite}.spk.talking .w2{animation-delay:.2s}@keyframes wave{50%{opacity:.2}}
+#hintBtn.used{opacity:.45}
+.watch{width:70px;height:46px;animation:bob 1.2s infinite}
+.stem{width:100%;max-width:1060px;background:var(--card);border-radius:26px;box-shadow:0 6px 20px rgba(45,42,64,.12);padding:clamp(10px,2vw,22px);display:flex;justify-content:center}
+.stem.nostem{background:none;box-shadow:none;padding:0}
+.oddArt{position:relative;width:110px}.oddArt .mag{position:absolute;right:-30px;bottom:6px;width:56px;height:56px;animation:bob 1.6s infinite}
+.choices{display:flex;justify-content:center;gap:clamp(10px,2.4vw,26px);flex-wrap:wrap;width:100%;max-width:1060px}
+.choice{width:clamp(76px,min(19vw,22vh),168px);aspect-ratio:1;background:#fff;border:5px solid var(--line);border-radius:24px;padding:clamp(6px,1.2vw,12px);box-shadow:0 6px 0 #c5cbe4;transition:transform .12s,opacity .3s,filter .3s;position:relative}
+.choice:hover{transform:translateY(-4px);border-color:#9fb4ff}
+.choice svg{width:100%;height:100%}
+.choice.gone{opacity:.22;filter:grayscale(1);pointer-events:none;transform:scale(.92)}
+.choice.right{border-color:#3aa35b;box-shadow:0 0 0 7px #b8f0c4,0 6px 0 #3aa35b;animation:pop .5s}
+.choice.reveal{border-color:#ffd23f;animation:glow 1.1s infinite}
+.shake{animation:shake .38s}
+@keyframes pop{40%{transform:scale(1.12)}}@keyframes glow{50%{box-shadow:0 0 0 12px #fff2a8,0 6px 0 #c5cbe4}}
+@keyframes shake{20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
+.choices.rods .choice{aspect-ratio:auto;width:clamp(60px,min(12vw,12vh),110px);height:clamp(130px,min(30vw,30vh),250px)}
+.choices.L-groups .choice{aspect-ratio:1.2}
+.ptext{display:none;font-size:15px;color:#5b6077;max-width:800px;text-align:center}.ptext.on{display:block}
+/* stems */
+.anaRow{display:flex;align-items:center;justify-content:center;gap:clamp(10px,3vw,40px);flex-wrap:wrap}
+.pair{display:flex;align-items:center;gap:clamp(4px,1.2vw,12px);padding:8px;border-radius:20px;background:#f7f8ff}
+.pic{width:clamp(60px,min(15vw,19vh),138px);aspect-ratio:1}.pic svg{width:100%;height:100%}
+.sep{width:6px;height:90px;border-radius:3px;background:#e1e5f5}
+.arrow{font-size:clamp(22px,4vw,40px);color:#8a8fa8;font-weight:700}.arrow.small{font-size:clamp(16px,2.6vw,28px)}
+.clsTop{display:flex;gap:clamp(8px,2.5vw,26px);justify-content:center;padding:10px;border-radius:20px;background:#f7f8ff}
+.sentStem{display:flex;justify-content:center}.earBtn{width:clamp(90px,min(20vw,20vh),160px);height:clamp(90px,min(20vw,20vh),160px);border-radius:50%;background:#ffe680;padding:26px;box-shadow:0 6px 0 #e0b800;animation:breathe 2s infinite}
+.naGrid{display:flex;flex-direction:column;gap:8px;align-items:center}
+.naRow{display:flex;align-items:center;gap:clamp(6px,2vw,18px);padding:6px 12px;border-radius:18px}
+.grp{width:clamp(58px,min(14vw,12vh),128px);aspect-ratio:1.2;background:#f7f8ff;border:3px solid #e1e5f5;border-radius:16px;padding:2px}.grp svg{width:100%;height:100%}
+.grp.q,.mcell.q,.term.q{background:none;border:none}
+.pzWrap{display:flex;flex-direction:column;gap:14px;align-items:center}
+.bal{display:flex;align-items:flex-end;justify-content:center;gap:clamp(4px,1.6vw,14px);padding:6px;border-radius:18px;flex-wrap:nowrap}
+.pan{display:flex;gap:6px;padding:8px;min-height:80px;align-items:center;background:#fff;border:3px solid #e1e5f5;border-bottom:9px solid #8a5a2b;border-radius:12px 12px 36px 36px}
+.pan.baskets{border:5px solid #c98b4f;border-radius:10px 10px 26px 26px;background:repeating-linear-gradient(45deg,#fff7ea 0 8px,#fbe7c8 8px 16px)}
+.pan .grp{width:clamp(52px,min(11vw,12vh),104px)}
+.fulcrum{flex:none;align-self:center}
+.srRow{display:flex;gap:clamp(4px,1.4vw,14px);align-items:flex-end;justify-content:center;padding:6px 10px;border-radius:18px}
+.term{width:clamp(36px,min(8vw,8vh),72px);height:clamp(120px,min(27vw,28vh),230px)}.term svg{width:100%;height:100%}
+.L-groups .term{width:clamp(52px,min(11vw,12vh),100px);height:auto;aspect-ratio:1.1;background:#f7f8ff;border:3px solid #e1e5f5;border-radius:12px}
+.matrix{display:flex;flex-direction:column;gap:10px;align-items:center}
+.mrow{display:flex;align-items:center;gap:clamp(6px,1.6vw,16px);padding:6px 10px;border-radius:18px}
+.mcell{width:clamp(66px,min(16vw,17vh),146px);aspect-ratio:1;background:#fff;border:3px solid var(--line);border-radius:16px;padding:4px}.mcell svg{width:100%;height:100%}
+.pfRow{display:flex;align-items:center;gap:clamp(4px,1.2vw,12px);flex-wrap:wrap;justify-content:center;padding:6px;border-radius:18px}
+.pf{width:clamp(66px,min(16vw,19vh),150px);aspect-ratio:1}.pf svg{width:100%;height:100%}
+.hint-on .hintable{animation:hintglow 1.2s 4;background:#fff6c9}
+@keyframes hintglow{50%{box-shadow:0 0 0 8px #ffe680}}
+@media (max-width:640px){
+ .grp{width:min(30vw,14vh)}.pan .grp{width:min(21vw,11vh)}.bal{gap:2px}.pan{padding:5px;gap:4px}
+ .pf{width:min(37vw,19vh)}.pfRow{gap:6px}.pfRow .arrow{display:none}
+ .mcell{width:min(30vw,16vh)}.choice{width:min(21.5vw,21vh);border-width:4px;border-radius:18px}
+ .pic{width:min(18vw,17vh)}.anaRow{gap:8px}.pair{padding:4px;gap:2px}.sep{display:none}
+ .term{width:min(11vw,7vh)}.L-groups .term{width:min(20vw,11vh)}.srRow{gap:4px}
+ .bar{gap:6px}.dots{gap:5px}.dot{width:14px;height:14px}
+}
+/* fx */
+#fx{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}
+.cf{position:absolute;top:30vh;width:12px;height:16px;border-radius:3px;animation:cf 1.6s cubic-bezier(.2,.6,.4,1) forwards}
+@keyframes cf{0%{transform:translate(0,0) rotate(0)}30%{transform:translate(calc(var(--dx)*.4),-22vh) rotate(calc(var(--r)*.4))}100%{transform:translate(var(--dx),80vh) rotate(var(--r));opacity:.2}}
+.burst{position:absolute;left:50%;top:38%;width:160px;height:160px;margin:-80px;animation:burst 1.2s ease-out forwards}
+@keyframes burst{0%{transform:scale(.2) rotate(-30deg);opacity:0}30%{transform:scale(1.2) rotate(10deg);opacity:1}70%{transform:scale(1);opacity:1}100%{transform:scale(1.4) translateY(-30vh);opacity:0}}
+.hand{position:fixed;left:50%;top:110%;font-size:54px;z-index:60;transition:left 1.1s ease-in-out,top 1.1s ease-in-out;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.25))}
+/* end */
+#end{align-items:center;justify-content:center;padding:20px}
+.endCard{background:#fff;border-radius:30px;padding:26px;display:flex;flex-direction:column;align-items:center;gap:16px;box-shadow:0 10px 30px rgba(45,42,64,.18);max-width:94vw}
+.starsRow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.bigIcon{width:90px;height:90px}.row{display:flex;gap:24px;align-items:center}
+/* parent */
+#parent{background:#f7f8fc}
+.pwrap h2{font-size:19px;font-weight:700;margin:22px 0 6px}
+.pnote{color:#4a4f66;margin:6px 0;font-family:system-ui,Arial,sans-serif;font-size:14px}.pnote.small,.small{font-size:12.5px}.warn{color:#b3541e}
+.ptable{overflow-x:auto;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.ptable table{border-collapse:collapse;width:100%;font-family:system-ui,Arial,sans-serif;font-size:13px}
+.ptable th{background:#eef0f7;text-align:left;padding:7px;font-weight:600;white-space:nowrap}.ptable td{padding:7px;border-top:1px solid #eef0f7;vertical-align:top}
+.tiny{font-size:11px;color:#6b7090}.ptable table.wide{min-width:1050px}.ck{display:inline-block;white-space:nowrap;margin-right:6px}
+.pbar{height:6px;background:#eef0f7;border-radius:3px;margin-top:3px;min-width:60px}.pbar div{height:100%;border-radius:3px}
+.pbtn{background:#fff;border:2px solid #c9cde0;border-radius:10px;padding:7px 12px;font-family:system-ui,Arial,sans-serif;font-size:14px;cursor:pointer;display:inline-block}.pbtn.danger{border-color:#e4473f;color:#c0312a}
+.pset{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;font-family:system-ui,Arial,sans-serif;font-size:14px}
+.pset select{border:1px solid #c9cde0;border-radius:6px;padding:3px}
+.chart{width:100%;max-width:700px;background:#fff;border-radius:12px;padding:8px;margin-bottom:8px}
+.modal{position:fixed;inset:0;background:rgba(45,42,64,.55);display:grid;place-items:center;z-index:80}
+.gate{background:#fff;border-radius:20px;padding:20px;position:relative;text-align:center;font-family:system-ui,Arial,sans-serif;width:280px}
+.gq{font-size:15px}.gq b{font-size:28px}.gin{font-size:30px;margin:8px 0;border-bottom:2px solid #c9cde0;min-height:44px}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pad button{background:#eef0f7;border-radius:10px;padding:12px;font-size:20px}
+.gclose{position:absolute;right:10px;top:8px;font-size:20px}
+</style></head><body>
+<svg id="defs" width="0" height="0" style="position:absolute" aria-hidden="true"></svg>
+<div id="home" class="screen"></div><div id="play" class="screen"></div><div id="end" class="screen"></div><div id="parent" class="screen"></div>
+<div id="fx"></div>
+<noscript>This game needs JavaScript.</noscript>
+<script>
+// ===== Picture library: consistent flat SVG icons (100x100), all same outline style =====
+const OL='stroke="#2d2a40" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"';
+const EYE=(x,y,r)=>`<circle cx="${x}" cy="${y}" r="${r||3}" fill="#2d2a40"/>`;
+// tags: properties used by verbal generators. amb: properties that are debatable for this picture (never used to decide a question).
+const ICONS={
+dog:{n:'dog',t:['animal','legs4','fur','pet','land'],amb:[],s:`<rect x="30" y="48" width="48" height="22" rx="11" fill="#d49a5c" ${OL}/><rect x="34" y="64" width="9" height="20" rx="4" fill="#d49a5c" ${OL}/><rect x="64" y="64" width="9" height="20" rx="4" fill="#d49a5c" ${OL}/><path d="M78 54 q12 -4 10 -18" fill="none" ${OL}/><circle cx="30" cy="40" r="16" fill="#d49a5c" ${OL}/><path d="M20 28 q-10 6 -6 24 q9 -2 10 -14z" fill="#8a5a2b" ${OL}/>${EYE(32,37)}<ellipse cx="16" cy="46" rx="4" ry="3" fill="#2d2a40"/>`},
+cat:{n:'cat',t:['animal','legs4','fur','pet','land'],amb:[],s:`<rect x="30" y="50" width="46" height="20" rx="10" fill="#9aa0b5" ${OL}/><rect x="34" y="64" width="8" height="20" rx="4" fill="#9aa0b5" ${OL}/><rect x="64" y="64" width="8" height="20" rx="4" fill="#9aa0b5" ${OL}/><path d="M76 56 q16 0 14 -24" fill="none" ${OL}/><path d="M16 26 l6 12 l12 0 l6 -12 l2 18 a16 15 0 1 1 -28 0z" fill="#9aa0b5" ${OL}/>${EYE(23,43,2.5)}${EYE(35,43,2.5)}<path d="M27 50 l2 2 l2 -2" fill="none" ${OL}/>`},
+bird:{n:'bird',t:['animal','flies','wings','bird','legs2'],amb:['pet'],s:`<ellipse cx="50" cy="52" rx="26" ry="20" fill="#5aa7e6" ${OL}/><circle cx="70" cy="38" r="13" fill="#5aa7e6" ${OL}/><path d="M82 36 l12 4 l-12 4z" fill="#f2b632" ${OL}/>${EYE(72,35)}<path d="M36 50 q14 -18 28 0 q-14 8 -28 0z" fill="#3d82c4" ${OL}/><path d="M24 50 l-16 -6 l6 14z" fill="#3d82c4" ${OL}/><path d="M46 72 v12 M56 72 v12" ${OL}/>`},
+fish:{n:'fish',t:['animal','water','swims','nolegs'],amb:['pet'],s:`<path d="M20 50 q30 -30 60 0 q-30 30 -60 0z" fill="#f28c38" ${OL}/><path d="M80 50 l14 -14 v28z" fill="#f28c38" ${OL}/>${EYE(34,46)}<path d="M50 38 q6 12 0 24" fill="none" ${OL}/>`},
+bee:{n:'bee',t:['animal','insect','flies','wings','small'],amb:[],s:`<ellipse cx="38" cy="34" rx="12" ry="16" fill="#e8f4ff" ${OL} transform="rotate(-25 38 34)"/><ellipse cx="58" cy="32" rx="12" ry="16" fill="#e8f4ff" ${OL} transform="rotate(25 58 32)"/><ellipse cx="50" cy="60" rx="28" ry="20" fill="#f6c932" ${OL}/><path d="M42 41 v38 M56 41 v38" stroke="#2d2a40" stroke-width="7"/><circle cx="24" cy="58" r="10" fill="#2d2a40"/><path d="M78 60 l10 0" ${OL}/>`},
+cow:{n:'cow',t:['animal','legs4','farm','big','fur'],amb:[],s:`<rect x="28" y="40" width="56" height="30" rx="10" fill="#fff" ${OL}/><circle cx="48" cy="52" r="7" fill="#2d2a40"/><circle cx="70" cy="48" r="5" fill="#2d2a40"/><rect x="32" y="64" width="9" height="22" rx="3" fill="#fff" ${OL}/><rect x="70" y="64" width="9" height="22" rx="3" fill="#fff" ${OL}/><rect x="8" y="30" width="26" height="30" rx="11" fill="#fff" ${OL}/><ellipse cx="21" cy="56" rx="13" ry="8" fill="#f5b5c2" ${OL}/><path d="M10 30 l-4 -10 M32 30 l4 -10" ${OL}/>${EYE(16,40)}${EYE(26,40)}`},
+rabbit:{n:'rabbit',t:['animal','legs4','fur','hops'],amb:['pet','farm'],s:`<ellipse cx="56" cy="64" rx="24" ry="18" fill="#eeeeee" ${OL}/><circle cx="34" cy="46" r="14" fill="#eeeeee" ${OL}/><ellipse cx="28" cy="20" rx="5" ry="15" fill="#eeeeee" ${OL}/><ellipse cx="40" cy="20" rx="5" ry="15" fill="#eeeeee" ${OL}/><circle cx="82" cy="62" r="6" fill="#fff" ${OL}/>${EYE(30,44)}<circle cx="22" cy="50" r="3" fill="#f5a0b5"/><ellipse cx="46" cy="82" rx="10" ry="4" fill="#eeeeee" ${OL}/>`},
+mouse:{n:'mouse',t:['animal','legs4','fur','small'],amb:['pet'],s:`<path d="M20 70 q10 -36 50 -22 q16 8 10 22z" fill="#b9b2c6" ${OL}/><circle cx="56" cy="40" r="10" fill="#f0c3cf" ${OL}/><path d="M80 70 q16 2 10 -16" fill="none" ${OL}/>${EYE(30,58)}<circle cx="18" cy="66" r="3" fill="#f5a0b5"/>`},
+monkey:{n:'monkey',t:['animal','fur','climbs'],amb:['legs4'],s:`<circle cx="50" cy="42" r="24" fill="#8a5a2b" ${OL}/><circle cx="24" cy="42" r="9" fill="#e9c39b" ${OL}/><circle cx="76" cy="42" r="9" fill="#e9c39b" ${OL}/><ellipse cx="50" cy="50" rx="16" ry="14" fill="#e9c39b" ${OL}/>${EYE(43,40)}${EYE(57,40)}<path d="M44 54 q6 5 12 0" fill="none" ${OL}/><path d="M36 64 q-6 20 6 24 h16 q12 -4 6 -24" fill="#8a5a2b" ${OL}/>`},
+hen:{n:'hen',t:['animal','bird','wings','farm','legs2'],amb:['flies'],s:`<path d="M24 52 q0 -26 26 -26 q4 -10 14 -6 l-2 8 q16 6 14 24 q0 24 -26 24 q-26 0 -26 -24z" fill="#fff" ${OL}/><path d="M50 26 q2 -12 10 -10 q0 -10 8 -4" fill="#e4473f" ${OL}/><path d="M76 40 l10 4 l-10 4z" fill="#f2b632" ${OL}/>${EYE(66,38)}<path d="M30 56 q10 -10 22 0" fill="none" ${OL}/><path d="M44 76 v12 M56 76 v12" ${OL}/>`},
+chick:{n:'chick',t:['animal','bird','baby','small','legs2','wings'],amb:['flies','farm'],s:`<circle cx="50" cy="56" r="24" fill="#ffe14d" ${OL}/><circle cx="62" cy="34" r="14" fill="#ffe14d" ${OL}/><path d="M76 34 l10 3 l-10 4z" fill="#f28c38" ${OL}/>${EYE(65,31)}<path d="M38 56 q8 -8 16 0" fill="none" ${OL}/><path d="M44 80 v8 M56 80 v8" ${OL}/>`},
+frog:{n:'frog',t:['animal','water','swims','legs4','hops'],amb:[],s:`<ellipse cx="50" cy="60" rx="32" ry="20" fill="#5cc062" ${OL}/><circle cx="34" cy="38" r="10" fill="#5cc062" ${OL}/><circle cx="66" cy="38" r="10" fill="#5cc062" ${OL}/>${EYE(34,37,4)}${EYE(66,37,4)}<path d="M36 62 q14 10 28 0" fill="none" ${OL}/><path d="M18 74 l-8 10 h14 M82 74 l8 10 h-14" fill="none" ${OL}/>`},
+tadpole:{n:'tadpole',t:['animal','water','swims','baby','small'],amb:['nolegs'],s:`<circle cx="36" cy="50" r="18" fill="#4b4f6b" ${OL}/><path d="M52 44 q20 -10 40 6 q-20 -2 -40 12z" fill="#4b4f6b" ${OL}/><circle cx="30" cy="46" r="4" fill="#fff"/>`},
+butterfly:{n:'butterfly',t:['animal','insect','flies','wings'],amb:[],s:`<path d="M48 48 q-30 -36 -36 -10 q-2 16 36 14z" fill="#b57be8" ${OL}/><path d="M52 48 q30 -36 36 -10 q2 16 -36 14z" fill="#b57be8" ${OL}/><path d="M48 54 q-26 6 -22 22 q8 8 22 -16z" fill="#f28cc6" ${OL}/><path d="M52 54 q26 6 22 22 q-8 8 -22 -16z" fill="#f28cc6" ${OL}/><rect x="46" y="34" width="8" height="40" rx="4" fill="#2d2a40"/><path d="M48 34 l-6 -12 M52 34 l6 -12" ${OL}/>`},
+caterpillar:{n:'caterpillar',t:['animal','insect','baby','crawls','small'],amb:[],s:`<circle cx="22" cy="60" r="11" fill="#7bcf4f" ${OL}/><circle cx="38" cy="58" r="11" fill="#7bcf4f" ${OL}/><circle cx="54" cy="56" r="11" fill="#7bcf4f" ${OL}/><circle cx="72" cy="48" r="14" fill="#9be06a" ${OL}/>${EYE(76,45)}<path d="M68 34 l-4 -10 M78 34 l4 -10" ${OL}/>`},
+sheep:{n:'sheep',t:['animal','legs4','farm','fur'],amb:[],s:`<path d="M30 40 a10 10 0 0 1 18 -6 a10 10 0 0 1 18 2 a10 10 0 0 1 10 16 a10 10 0 0 1 -8 18 h-34 a10 10 0 0 1 -8 -18 a10 10 0 0 1 4 -12z" fill="#fff" ${OL}/><rect x="36" y="68" width="8" height="18" rx="3" fill="#4b4f6b" ${OL}/><rect x="60" y="68" width="8" height="18" rx="3" fill="#4b4f6b" ${OL}/><ellipse cx="22" cy="50" rx="10" ry="13" fill="#4b4f6b" ${OL}/><circle cx="19" cy="47" r="2.5" fill="#fff"/>`},
+duck:{n:'duck',t:['animal','bird','flies','wings','water','swims','legs2'],amb:['farm'],s:`<path d="M18 56 q0 24 34 24 q32 0 32 -26 q-18 6 -30 -2z" fill="#ffd23f" ${OL}/><circle cx="38" cy="36" r="14" fill="#ffd23f" ${OL}/><path d="M24 36 l-14 4 l14 6z" fill="#f28c38" ${OL}/>${EYE(36,32)}<path d="M44 60 q12 -10 24 2" fill="none" ${OL}/><path d="M8 86 q20 -8 42 0 q22 8 44 0" fill="none" stroke="#5aa7e6" stroke-width="4"/>`},
+worm:{n:'worm',t:['animal','nolegs','crawls','small'],amb:['insect'],s:`<path d="M14 64 q12 -20 24 0 q12 20 24 0 q12 -20 24 -4" fill="none" stroke="#2d2a40" stroke-width="16" stroke-linecap="round"/><path d="M14 64 q12 -20 24 0 q12 20 24 0 q12 -20 24 -4" fill="none" stroke="#f29bb0" stroke-width="10" stroke-linecap="round"/>${EYE(84,58,2.5)}`},
+nest:{n:'nest',t:['home','animalhome'],amb:[],s:`<path d="M12 50 q38 44 76 0z" fill="#a8743f" ${OL}/><path d="M18 56 q32 10 64 0 M22 64 q28 8 56 0" fill="none" ${OL}/><ellipse cx="40" cy="46" rx="8" ry="10" fill="#bfe3f7" ${OL}/><ellipse cx="58" cy="46" rx="8" ry="10" fill="#bfe3f7" ${OL}/>`},
+hive:{n:'beehive',t:['home','animalhome'],amb:[],s:`<path d="M50 14 v8" ${OL}/><path d="M34 22 h32 q8 0 8 8 q14 0 14 12 q0 10 -8 10 q12 2 10 14 q-2 12 -14 12 h-52 q-12 0 -14 -12 q-2 -12 10 -14 q-8 0 -8 -10 q0 -12 14 -12 q0 -8 8 -8z" fill="#f6c932" ${OL}/><path d="M22 52 h56 M18 66 h64 M28 38 h44" ${OL}/><circle cx="50" cy="74" r="6" fill="#2d2a40"/>`},
+doghouse:{n:'doghouse',t:['home','animalhome'],amb:[],s:`<path d="M10 46 l40 -32 l40 32z" fill="#e4473f" ${OL}/><rect x="18" y="44" width="64" height="44" fill="#f2c27b" ${OL}/><path d="M38 88 v-20 a12 12 0 0 1 24 0 v20z" fill="#2d2a40"/>`},
+fishbowl:{n:'fishbowl',t:['home','animalhome','container'],amb:[],s:`<path d="M30 20 h40 v8 q22 14 18 38 q-6 24 -38 24 q-32 0 -38 -24 q-4 -24 18 -38z" fill="#d6f0ff" ${OL}/><path d="M16 52 q34 -8 68 0 q2 20 -12 28 q-22 8 -44 0 q-14 -8 -12 -28z" fill="#7cc7f0"/><path d="M40 62 q8 -8 16 0 q-8 8 -16 0z M56 62 l6 -5 v10z" fill="#f28c38" ${OL}/>`},
+barn:{n:'barn',t:['home','animalhome','building'],amb:[],s:`<path d="M8 44 l14 -26 h56 l14 26z" fill="#8f2d2d" ${OL}/><rect x="14" y="44" width="72" height="44" fill="#c7413a" ${OL}/><rect x="36" y="56" width="28" height="32" fill="#fff" ${OL}/><path d="M36 56 l28 32 M64 56 l-28 32" ${OL}/>`},
+pond:{n:'pond',t:['home','animalhome','water'],amb:[],s:`<ellipse cx="50" cy="64" rx="42" ry="20" fill="#7cc7f0" ${OL}/><path d="M22 52 v-30 M28 50 v-22 M74 52 v-28" stroke="#4f8a3a" stroke-width="4" stroke-linecap="round"/><ellipse cx="22" cy="20" rx="3" ry="7" fill="#8a5a2b"/><ellipse cx="74" cy="22" rx="3" ry="7" fill="#8a5a2b"/><ellipse cx="58" cy="64" rx="12" ry="5" fill="#5cc062" ${OL}/>`},
+house:{n:'house',t:['building','home'],amb:[],s:`<path d="M8 48 l42 -36 l42 36z" fill="#5a6fc2" ${OL}/><rect x="16" y="46" width="68" height="42" fill="#fff4dd" ${OL}/><rect x="42" y="60" width="16" height="28" fill="#d49a5c" ${OL}/><rect x="22" y="54" width="14" height="14" fill="#bfe3f7" ${OL}/><rect x="64" y="54" width="14" height="14" fill="#bfe3f7" ${OL}/>`},
+bone:{n:'bone',t:[],amb:[],s:`<path d="M26 40 a9 9 0 1 1 6 -14 l36 24 a9 9 0 1 1 10 14 a9 9 0 1 1 -6 14 l-36 -24 a9 9 0 1 1 -10 -14z" fill="#f7f1e1" ${OL}/>`},
+carrot:{n:'carrot',t:['food','veg','plant','grows'],amb:[],s:`<path d="M30 30 l40 4 l-34 54z" fill="#f28c38" ${OL} transform="rotate(10 50 50)"/><path d="M52 30 q-4 -16 -14 -18 M54 30 q2 -18 10 -22 M56 32 q10 -12 22 -10" fill="none" stroke="#4f8a3a" stroke-width="5" stroke-linecap="round"/><path d="M42 46 l8 2 M40 60 l8 2" ${OL}/>`},
+cheese:{n:'cheese',t:['food','fromanimal'],amb:[],s:`<path d="M10 70 l64 -40 l16 16 v24z" fill="#ffd23f" ${OL}/><path d="M10 70 h80" ${OL}/><circle cx="40" cy="60" r="5" fill="#e8b51e"/><circle cx="62" cy="52" r="4" fill="#e8b51e"/><circle cx="72" cy="62" r="3" fill="#e8b51e"/>`},
+banana:{n:'banana',t:['food','fruit','sweet','grows','plant'],amb:[],s:`<path d="M20 30 q-4 44 40 52 q24 2 30 -10 q-34 8 -54 -42z" fill="#ffe14d" ${OL}/><path d="M18 30 l-2 -10 l8 2z" fill="#8a5a2b" ${OL}/>`},
+apple:{n:'apple',t:['food','fruit','sweet','grows','plant'],amb:['round'],s:`<path d="M50 32 q-14 -12 -28 0 q-14 14 -4 38 q10 20 32 12 q22 8 32 -12 q10 -24 -4 -38 q-14 -12 -28 0z" fill="#e4473f" ${OL}/><path d="M50 32 q0 -12 6 -18" fill="none" ${OL}/><path d="M56 22 q12 -10 20 0 q-10 8 -20 0z" fill="#5cc062" ${OL}/>`},
+appleslice:{n:'apple slice',t:['food','fruit','cut','sweet'],amb:[],s:`<path d="M14 40 a40 40 0 0 0 72 0z" fill="#fff6d6" ${OL}/><path d="M14 40 a40 40 0 0 0 72 0" fill="none" stroke="#e4473f" stroke-width="7"/><ellipse cx="42" cy="50" rx="3" ry="5" fill="#5a3b1e"/><ellipse cx="58" cy="50" rx="3" ry="5" fill="#5a3b1e"/>`},
+orange:{n:'orange',t:['food','fruit','round','sweet','grows','plant'],amb:[],s:`<circle cx="50" cy="54" r="32" fill="#f7942e" ${OL}/><path d="M50 22 q8 -12 18 -8 q-6 10 -18 8z" fill="#5cc062" ${OL}/><circle cx="40" cy="48" r="2" fill="#d77519"/><circle cx="60" cy="62" r="2" fill="#d77519"/><circle cx="56" cy="44" r="2" fill="#d77519"/>`},
+orangeslice:{n:'orange slice',t:['food','fruit','cut','sweet'],amb:[],s:`<path d="M10 42 a40 40 0 0 0 80 0z" fill="#ffb54d" ${OL}/><path d="M18 42 a32 32 0 0 0 64 0z" fill="#ffd38a"/><path d="M50 42 v30 M50 42 l-22 20 M50 42 l22 20 M50 42 l-30 4 M50 42 l30 4" stroke="#f7942e" stroke-width="3"/>`},
+bread:{n:'bread',t:['food'],amb:[],s:`<path d="M14 70 v-26 q0 -20 36 -20 q36 0 36 20 v26z" fill="#e3a65a" ${OL}/><path d="M36 34 l-6 10 M52 32 l-6 10 M68 34 l-6 10" ${OL}/><path d="M14 70 h72" ${OL}/>`},
+breadslice:{n:'bread slice',t:['food','cut'],amb:[],s:`<path d="M24 86 v-40 a14 14 0 0 1 -4 -24 q30 -16 60 0 a14 14 0 0 1 -4 24 v40z" fill="#c98b4f" ${OL}/><path d="M32 80 v-36 a10 10 0 0 1 -2 -16 q20 -12 40 0 a10 10 0 0 1 -2 16 v36z" fill="#fbe7c2"/>`},
+egg:{n:'egg',t:['food','fromanimal'],amb:['round'],s:`<ellipse cx="50" cy="54" rx="24" ry="32" fill="#fff8ec" ${OL}/><ellipse cx="42" cy="42" rx="5" ry="8" fill="#fff"/>`},
+milk:{n:'milk',t:['food','drink','fromanimal'],amb:[],s:`<path d="M30 30 l10 -16 h20 l10 16 v56 h-40z" fill="#fff" ${OL}/><path d="M30 30 h40" ${OL}/><rect x="30" y="46" width="40" height="22" fill="#5aa7e6"/><path d="M42 58 q8 -10 16 0" fill="none" stroke="#fff" stroke-width="3"/>`},
+honey:{n:'honey',t:['food','sweet','fromanimal'],amb:[],s:`<rect x="26" y="18" width="48" height="12" rx="3" fill="#a8743f" ${OL}/><path d="M24 30 h52 q6 0 6 8 v42 q0 8 -8 8 h-48 q-8 0 -8 -8 v-42 q0 -8 6 -8z" fill="#f6b21e" ${OL}/><path d="M40 52 l10 -6 l10 6 v12 l-10 6 l-10 -6z" fill="#ffe14d" ${OL}/>`},
+yarn:{n:'yarn',t:['fromanimal','soft'],amb:['round'],s:`<circle cx="46" cy="50" r="30" fill="#e86aa6" ${OL}/><path d="M22 36 q24 10 46 -6 M18 52 q30 12 56 -14 M24 68 q28 6 48 -22 M40 78 q20 -10 34 -36" fill="none" stroke="#b83d78" stroke-width="3"/><path d="M74 62 q14 10 18 24" fill="none" ${OL}/>`},
+grass:{n:'grass',t:['plant','grows'],amb:[],s:`<path d="M10 86 q4 -30 12 -46 q0 26 6 46 q2 -40 14 -60 q-4 34 2 60 q6 -36 16 -52 q-6 30 0 52 q8 -30 18 -42 q-6 22 -2 42z" fill="#5cc062" ${OL}/>`},
+sun:{n:'sun',t:['weather','hot','light','round'],amb:[],s:`<circle cx="50" cy="50" r="20" fill="#ffd23f" ${OL}/><path d="M50 12 v12 M50 76 v12 M12 50 h12 M76 50 h12 M23 23 l8 8 M69 69 l8 8 M77 23 l-8 8 M31 69 l-8 8" stroke="#f2a01e" stroke-width="6" stroke-linecap="round"/>`},
+rain:{n:'rain cloud',t:['weather','wet'],amb:[],s:`<path d="M24 58 a14 14 0 0 1 4 -28 a18 18 0 0 1 34 -6 a14 14 0 0 1 14 34z" fill="#c3cbe0" ${OL}/><path d="M32 68 l-4 12 M50 68 l-4 12 M68 68 l-4 12" stroke="#3d82c4" stroke-width="5" stroke-linecap="round"/>`},
+snow:{n:'snowflake',t:['weather','cold'],amb:[],s:`<g stroke="#4aa0e0" stroke-width="6" stroke-linecap="round"><path d="M50 12 v76 M17 31 l66 38 M17 69 l66 -38"/><path d="M42 18 l8 8 l8 -8 M42 82 l8 -8 l8 8 M16 42 l10 -2 l-4 -10 M84 58 l-10 2 l4 10 M16 58 l10 2 l-4 10 M84 42 l-10 -2 l4 -10"/></g>`},
+umbrella:{n:'umbrella',t:['keepsdry'],amb:[],s:`<path d="M10 50 a40 36 0 0 1 80 0 q-6 -6 -13 0 q-7 -6 -14 0 q-6 -6 -13 0 q-7 -6 -14 0 q-6 -6 -13 0 q-7 -6 -13 0z" fill="#e4473f" ${OL}/><path d="M50 50 v30 q0 8 -8 8 q-8 0 -8 -8" fill="none" ${OL}/><path d="M50 14 v-4" ${OL}/>`},
+sunglasses:{n:'sunglasses',t:['wear'],amb:[],s:`<path d="M8 40 h84" ${OL}/><path d="M14 40 h28 v10 q0 14 -14 14 q-14 0 -14 -14z" fill="#2d2a40" ${OL}/><path d="M58 40 h28 v10 q0 14 -14 14 q-14 0 -14 -14z" fill="#2d2a40" ${OL}/><path d="M20 46 l8 -4 M64 46 l8 -4" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`},
+mitten:{n:'mitten',t:['wear','clothing','warm','hand'],amb:[],s:`<path d="M30 84 v-50 q0 -20 20 -20 q20 0 20 20 v18 l10 -10 q8 -6 12 2 q2 6 -6 12 l-16 18 v10z" fill="#5a6fc2" ${OL}/><rect x="26" y="74" width="48" height="14" rx="4" fill="#fff" ${OL}/>`},
+hat:{n:'winter hat',t:['wear','clothing','warm','head'],amb:[],s:`<path d="M20 70 q0 -46 30 -46 q30 0 30 46z" fill="#e4473f" ${OL}/><rect x="14" y="66" width="72" height="16" rx="6" fill="#fff" ${OL}/><circle cx="50" cy="20" r="9" fill="#fff" ${OL}/><path d="M36 50 h28" stroke="#fff" stroke-width="4"/>`},
+shoe:{n:'shoe',t:['wear','clothing','foot'],amb:['warm'],s:`<path d="M12 72 v-26 q0 -6 8 -6 h18 l10 14 q24 2 36 10 q8 4 8 10 v4 h-80z" fill="#3d82c4" ${OL}/><rect x="12" y="74" width="80" height="10" rx="4" fill="#fff" ${OL}/><path d="M40 52 l8 -4 M44 58 l8 -4" ${OL}/>`},
+hammer:{n:'hammer',t:['tool'],amb:[],s:`<rect x="44" y="34" width="12" height="54" rx="4" fill="#d49a5c" ${OL}/><path d="M22 18 h50 q10 0 16 10 h-16 v10 h-50z" fill="#8c93a8" ${OL}/>`},
+nail:{n:'nail',t:['sharp','metal'],amb:[],s:`<rect x="30" y="14" width="40" height="10" rx="3" fill="#8c93a8" ${OL}/><path d="M44 24 h12 v50 l-6 14 l-6 -14z" fill="#b8bfd0" ${OL}/>`},
+key:{n:'key',t:['metal','opens'],amb:['tool'],s:`<circle cx="30" cy="50" r="16" fill="#f2b632" ${OL}/><circle cx="30" cy="50" r="6" fill="#fff" ${OL}/><path d="M46 46 h40 v8 h-6 v10 h-8 v-10 h-6 v8 h-8 v-8 h-12z" fill="#f2b632" ${OL}/>`},
+lock:{n:'lock',t:['metal'],amb:[],s:`<path d="M32 44 v-12 a18 18 0 0 1 36 0 v12" fill="none" stroke="#2d2a40" stroke-width="10"/><path d="M32 44 v-12 a18 18 0 0 1 36 0 v12" fill="none" stroke="#8c93a8" stroke-width="5"/><rect x="22" y="42" width="56" height="44" rx="6" fill="#f2b632" ${OL}/><circle cx="50" cy="60" r="5" fill="#2d2a40"/><path d="M50 62 v12" ${OL}/>`},
+pencil:{n:'pencil',t:['writes','tool'],amb:['sharp','wood'],s:`<path d="M20 80 l8 -20 l46 -46 l12 12 l-46 46z" fill="#ffd23f" ${OL}/><path d="M20 80 l8 -20 l12 12z" fill="#f7e1b5" ${OL}/><path d="M20 80 l3 -8 l5 5z" fill="#2d2a40"/><path d="M74 14 l12 12 l6 -6 l-12 -12z" fill="#f29bb0" ${OL}/>`},
+paper:{n:'paper',t:[],amb:[],s:`<path d="M24 12 h38 l16 16 v60 h-54z" fill="#fff" ${OL}/><path d="M62 12 v16 h16" fill="#e6e8f0" ${OL}/><path d="M32 42 h38 M32 54 h38 M32 66 h28" stroke="#b8bfd0" stroke-width="3"/>`},
+toothbrush:{n:'toothbrush',t:['tool'],amb:[],s:`<rect x="12" y="56" width="62" height="12" rx="6" fill="#5aa7e6" ${OL}/><rect x="70" y="52" width="20" height="16" rx="3" fill="#fff" ${OL}/><path d="M72 52 v-12 M77 52 v-12 M82 52 v-12 M87 52 v-12" stroke="#7cc7f0" stroke-width="4"/>`},
+tooth:{n:'tooth',t:['bodypart'],amb:[],s:`<path d="M28 20 q22 -10 44 0 q12 8 6 30 l-8 34 q-4 6 -8 0 l-6 -22 q-6 -8 -12 0 l-6 22 q-4 6 -8 0 l-8 -34 q-6 -22 6 -30z" fill="#fff" ${OL}/>`},
+saw:{n:'saw',t:['tool','cuts','sharp'],amb:[],s:`<path d="M30 30 l62 22 l-8 22 l-58 -20z" fill="#c4c9d6" ${OL}/><path d="M26 54 l6 6 l4 -4 l6 6 l4 -4 l6 6 l4 -4 l6 6 l4 -4 l6 6 l4 -4 l6 6 l4 -4" fill="none" ${OL}/><rect x="6" y="24" width="28" height="34" rx="8" fill="#d49a5c" ${OL}/><rect x="14" y="32" width="12" height="16" rx="4" fill="#fff" ${OL}/>`},
+log:{n:'log',t:['wood'],amb:[],s:`<rect x="18" y="34" width="60" height="36" fill="#a8743f" ${OL}/><ellipse cx="78" cy="52" rx="10" ry="18" fill="#e3b77b" ${OL}/><ellipse cx="78" cy="52" rx="4" ry="8" fill="none" stroke="#a8743f" stroke-width="2"/><ellipse cx="18" cy="52" rx="10" ry="18" fill="#a8743f" ${OL}/><path d="M30 46 h30 M36 58 h30" stroke="#7a5229" stroke-width="3"/>`},
+scissors:{n:'scissors',t:['tool','cuts','sharp'],amb:[],s:`<path d="M40 56 l46 -40 M40 44 l46 40" stroke="#8c93a8" stroke-width="8" stroke-linecap="round"/><path d="M40 56 l46 -40 M40 44 l46 40" stroke="#2d2a40" stroke-width="2" fill="none"/><circle cx="26" cy="34" r="12" fill="none" stroke="#e4473f" stroke-width="7"/><circle cx="26" cy="66" r="12" fill="none" stroke="#e4473f" stroke-width="7"/>`},
+knife:{n:'knife',t:['tool','cuts','sharp','kitchen'],amb:[],s:`<rect x="8" y="44" width="34" height="14" rx="6" fill="#2d2a40"/><path d="M42 42 h44 q6 0 6 6 q-20 10 -50 10z" fill="#d6dbe6" ${OL}/>`},
+spoon:{n:'spoon',t:['kitchen','eatwith'],amb:[],s:`<ellipse cx="28" cy="50" rx="18" ry="13" fill="#c4c9d6" ${OL}/><path d="M44 48 l46 -4 v8 l-46 0z" fill="#c4c9d6" ${OL}/>`},
+fork:{n:'fork',t:['kitchen','eatwith'],amb:['sharp'],s:`<path d="M10 40 h26 M10 48 h26 M10 56 h26" ${OL}/><path d="M34 38 h8 q4 0 4 4 v12 q0 4 -4 4 h-8z" fill="#c4c9d6" ${OL}/><path d="M46 46 h44 v6 h-44z" fill="#c4c9d6" ${OL}/>`},
+cup:{n:'cup',t:['kitchen','container'],amb:[],s:`<path d="M20 26 h50 l-6 58 h-38z" fill="#5cc0b0" ${OL}/><path d="M68 38 q20 0 18 16 q-2 14 -20 12" fill="none" ${OL}/><path d="M22 36 h46" stroke="#fff" stroke-width="3"/>`},
+crayon:{n:'crayon',t:['writes'],amb:[],s:`<path d="M16 82 l4 -18 l50 -50 l14 14 l-50 50z" fill="#b57be8" ${OL}/><path d="M16 82 l4 -18 l14 14z" fill="#d9b8f5" ${OL}/><path d="M40 44 l14 14 M56 28 l14 14" stroke="#fff" stroke-width="3"/>`},
+car:{n:'car',t:['vehicle','wheels','motor','land'],amb:[],s:`<path d="M10 64 v-14 q0 -6 8 -6 h8 l12 -16 h28 l12 16 h8 q8 0 8 8 v12z" fill="#e4473f" ${OL}/><path d="M40 32 h10 v12 h-20z M56 32 h8 l9 12 h-17z" fill="#bfe3f7" ${OL}/><circle cx="30" cy="66" r="10" fill="#2d2a40"/><circle cx="72" cy="66" r="10" fill="#2d2a40"/><circle cx="30" cy="66" r="4" fill="#c4c9d6"/><circle cx="72" cy="66" r="4" fill="#c4c9d6"/>`},
+bike:{n:'bike',t:['vehicle','wheels','land','nomotor'],amb:[],s:`<circle cx="24" cy="64" r="16" fill="none" ${OL}/><circle cx="76" cy="64" r="16" fill="none" ${OL}/><path d="M24 64 l18 -28 h26 l8 28 M42 36 l12 28 l14 -28 M54 64 h-30 M40 30 h12 M68 36 l-2 -10 h10" fill="none" stroke="#3d82c4" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/>`},
+bus:{n:'bus',t:['vehicle','wheels','motor','land','big'],amb:[],s:`<rect x="8" y="22" width="84" height="52" rx="8" fill="#f6c932" ${OL}/><rect x="14" y="30" width="16" height="16" fill="#bfe3f7" ${OL}/><rect x="36" y="30" width="16" height="16" fill="#bfe3f7" ${OL}/><rect x="58" y="30" width="16" height="16" fill="#bfe3f7" ${OL}/><rect x="78" y="30" width="10" height="30" fill="#bfe3f7" ${OL}/><circle cx="28" cy="76" r="9" fill="#2d2a40"/><circle cx="72" cy="76" r="9" fill="#2d2a40"/>`},
+boat:{n:'sailboat',t:['vehicle','water','nomotor'],amb:[],s:`<path d="M48 12 v52" ${OL}/><path d="M52 16 l30 40 h-30z" fill="#fff" ${OL}/><path d="M44 22 l-24 34 h24z" fill="#f28c38" ${OL}/><path d="M12 64 h76 l-12 16 h-52z" fill="#a8743f" ${OL}/><path d="M6 88 q12 -6 22 0 q11 6 22 0 q11 -6 22 0 q11 6 22 0" fill="none" stroke="#5aa7e6" stroke-width="4"/>`},
+plane:{n:'airplane',t:['vehicle','flies','motor','wings'],amb:['wheels'],s:`<path d="M10 52 q0 -8 10 -8 h56 q16 0 16 8 q0 8 -16 8 h-56 q-10 0 -10 -8z" fill="#e6e8f0" ${OL}/><path d="M44 46 l-6 -30 h10 l18 30z M44 58 l-6 26 h10 l18 -26z" fill="#5a6fc2" ${OL}/><path d="M14 46 l-4 -16 h8 l10 16z" fill="#5a6fc2" ${OL}/><circle cx="72" cy="52" r="3" fill="#3d82c4"/><circle cx="62" cy="52" r="3" fill="#3d82c4"/>`},
+train:{n:'train',t:['vehicle','wheels','motor','land'],amb:[],s:`<rect x="12" y="38" width="56" height="34" rx="4" fill="#5cc062" ${OL}/><rect x="52" y="22" width="30" height="50" rx="4" fill="#3d82c4" ${OL}/><rect x="58" y="30" width="18" height="14" fill="#bfe3f7" ${OL}/><rect x="20" y="22" width="10" height="16" fill="#2d2a40"/><circle cx="26" cy="76" r="9" fill="#2d2a40"/><circle cx="50" cy="76" r="9" fill="#2d2a40"/><circle cx="72" cy="76" r="9" fill="#2d2a40"/>`},
+wheel:{n:'wheel',t:['round','part'],amb:[],s:`<circle cx="50" cy="50" r="36" fill="#2d2a40"/><circle cx="50" cy="50" r="20" fill="#c4c9d6" ${OL}/><path d="M50 30 v40 M30 50 h40 M36 36 l28 28 M64 36 l-28 28" stroke="#2d2a40" stroke-width="3"/><circle cx="50" cy="50" r="5" fill="#2d2a40"/>`},
+kite:{n:'kite',t:['flies','toy'],amb:['wings'],s:`<path d="M50 8 l26 30 l-26 34 l-26 -34z" fill="#f28cc6" ${OL}/><path d="M50 8 v64 M24 38 h52" ${OL}/><path d="M50 72 q-10 8 0 14 q10 6 -4 12" fill="none" ${OL}/>`},
+ball:{n:'ball',t:['toy','round'],amb:[],s:`<circle cx="50" cy="50" r="34" fill="#ffd23f" ${OL}/><path d="M16 50 q34 -18 68 0 M50 16 q-14 34 0 68" fill="none" stroke="#e4473f" stroke-width="6"/>`},
+balloon:{n:'balloon',t:['toy'],amb:['flies','round'],s:`<ellipse cx="50" cy="38" rx="24" ry="28" fill="#e4473f" ${OL}/><path d="M46 66 h8 l-4 6z" fill="#e4473f" ${OL}/><path d="M50 72 q-8 10 0 16 q6 4 0 8" fill="none" ${OL}/><ellipse cx="40" cy="28" rx="5" ry="9" fill="#fff" opacity=".6"/>`},
+tree:{n:'tree',t:['plant','grows','big','wood'],amb:[],s:`<rect x="42" y="56" width="16" height="34" fill="#a8743f" ${OL}/><circle cx="50" cy="34" r="22" fill="#5cc062" ${OL}/><circle cx="30" cy="48" r="16" fill="#5cc062" ${OL}/><circle cx="70" cy="48" r="16" fill="#5cc062" ${OL}/>`},
+leaf:{n:'leaf',t:['plant','part'],amb:[],s:`<path d="M16 84 q-4 -60 70 -70 q8 70 -70 70z" fill="#5cc062" ${OL}/><path d="M16 84 q30 -30 56 -58 M36 64 h18 M48 50 v-14" fill="none" ${OL}/>`},
+flower:{n:'flower',t:['plant','grows'],amb:[],s:`<path d="M50 50 v38" stroke="#4f8a3a" stroke-width="5"/><path d="M50 74 q-16 -10 -20 0 q12 8 20 0z" fill="#5cc062" ${OL}/><circle cx="50" cy="20" r="11" fill="#f28cc6" ${OL}/><circle cx="34" cy="34" r="11" fill="#f28cc6" ${OL}/><circle cx="66" cy="34" r="11" fill="#f28cc6" ${OL}/><circle cx="40" cy="52" r="11" fill="#f28cc6" ${OL}/><circle cx="60" cy="52" r="11" fill="#f28cc6" ${OL}/><circle cx="50" cy="38" r="10" fill="#ffd23f" ${OL}/>`},
+acorn:{n:'acorn',t:['plant','seed','grows'],amb:[],s:`<path d="M30 46 q0 34 20 40 q20 -6 20 -40z" fill="#c98b4f" ${OL}/><path d="M24 46 q0 -22 26 -22 q26 0 26 22z" fill="#8a5a2b" ${OL}/><path d="M50 24 v-10" ${OL}/>`},
+door:{n:'door',t:['part','opens'],amb:[],s:`<rect x="26" y="12" width="48" height="78" rx="3" fill="#d49a5c" ${OL}/><rect x="34" y="20" width="32" height="26" rx="2" fill="none" ${OL}/><rect x="34" y="54" width="32" height="28" rx="2" fill="none" ${OL}/><circle cx="64" cy="52" r="4" fill="#f2b632" ${OL}/>`},
+clock:{n:'clock',t:['round','tellstime'],amb:[],s:`<circle cx="50" cy="50" r="36" fill="#fff" stroke="#5a6fc2" stroke-width="7"/><path d="M50 50 v-20 M50 50 l14 8" ${OL}/><circle cx="50" cy="50" r="3" fill="#2d2a40"/><path d="M50 18 v5 M50 77 v5 M18 50 h5 M77 50 h5" ${OL}/>`},
+candle:{n:'candle',t:['hot','light'],amb:[],s:`<rect x="38" y="42" width="24" height="46" rx="3" fill="#fff4dd" ${OL}/><path d="M50 42 v-6" ${OL}/><path d="M50 36 q-12 -12 0 -26 q12 14 0 26z" fill="#ffb02e" ${OL}/>`},
+fire:{n:'campfire',t:['hot','light'],amb:[],s:`<path d="M50 68 q-26 -4 -18 -30 q4 10 10 8 q-6 -20 10 -36 q0 18 14 24 q4 -6 2 -12 q16 18 4 40 q-6 6 -22 6z" fill="#ff8a2e" ${OL}/><path d="M50 66 q-10 -8 -2 -22 q8 10 10 4 q8 12 -8 18z" fill="#ffd23f"/><path d="M18 80 l64 -10 M18 70 l64 12" stroke="#8a5a2b" stroke-width="9" stroke-linecap="round"/>`},
+pig:{n:'pig',t:['animal','legs4','farm'],amb:[],s:`<ellipse cx="54" cy="54" rx="32" ry="22" fill="#f7b3c4" ${OL}/><rect x="34" y="68" width="9" height="16" rx="3" fill="#f7b3c4" ${OL}/><rect x="66" y="68" width="9" height="16" rx="3" fill="#f7b3c4" ${OL}/><circle cx="24" cy="46" r="15" fill="#f7b3c4" ${OL}/><path d="M18 32 l-4 -10 l10 6z M30 32 l4 -10 l-10 6z" fill="#f29bb0" ${OL}/><ellipse cx="14" cy="50" rx="7" ry="6" fill="#f29bb0" ${OL}/>${EYE(26,42)}<path d="M86 50 q8 -4 4 -10" fill="none" ${OL}/>`},
+paintbrush:{n:'paintbrush',t:['writes','tool'],amb:[],s:`<path d="M20 84 l38 -38 l8 8 l-38 38z" fill="#d49a5c" ${OL}/><rect x="56" y="34" width="14" height="18" fill="#c4c9d6" ${OL} transform="rotate(45 63 43)"/><path d="M66 34 q10 -18 24 -22 q-4 14 -22 24z" fill="#3d82c4" ${OL}/>`},
+drum:{n:'drum',t:['music'],amb:[],s:`<ellipse cx="50" cy="40" rx="32" ry="10" fill="#fff" ${OL}/><path d="M18 40 v34 q32 18 64 0 v-34" fill="#e4473f" ${OL}/><path d="M18 52 l16 20 l16 -20 l16 20 l16 -20" fill="none" stroke="#fff" stroke-width="3"/><path d="M60 26 l24 -16 M40 26 l-20 -16" ${OL}/>`},
+};
+const ICON_IDS=Object.keys(ICONS);
+function iconSVG(id,size){const ic=ICONS[id];return `<svg viewBox="0 0 100 100" width="${size||'100%'}" height="${size||'100%'}" aria-hidden="true">${ic.s}</svg>`}
+function has(id,tag){return ICONS[id].t.includes(tag)}
+function amb(id,tag){return ICONS[id].amb.includes(tag)}
+
+// ===== Question generation engine =====
+// Every generator returns {type, level, concept, surface, dims, say, stem, choices:[{html,key,kind}], answer, sig, hintSay, layout}
+// or null when its own validation fails (the caller then tries again).
+const R={ri:(a,b)=>a+Math.floor(Math.random()*(b-a+1)),pick:a=>a[Math.floor(Math.random()*a.length)],
+ shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a},
+ sample(a,n){return R.shuffle(a).slice(0,n)},chance:p=>Math.random()<p};
+const QBOX=`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="6" y="6" width="88" height="88" rx="14" fill="#fff8e6" stroke="#f2a01e" stroke-width="4" stroke-dasharray="10 7"/><text x="50" y="68" text-anchor="middle" font-size="54" font-weight="700" fill="#f2a01e" font-family="Fredoka,Arial,sans-serif">?</text></svg>`;
+const NCH=l=>l<=2?3:4; // 3 picture choices at early levels, 4 later (more plausible distractors)
+
+function finalize(q,correct,dists){
+  const all=[{...correct,kind:'correct'},...dists];
+  const keys=new Set(all.map(c=>c.key));
+  if(keys.size!==all.length) return null;           // two choices look the same -> reject
+  const sh=R.shuffle(all);
+  q.choices=sh; q.answer=sh.findIndex(c=>c.kind==='correct');
+  q.sig=q.type+'|'+q.stemKey+'|'+[...keys].sort().join(',');
+  return q;
+}
+
+// ---------------------------------------------------------------- 1. PICTURE ANALOGIES
+const RELS={
+ eats:{lvl:1,name:'what an animal eats',pairs:[['dog','bone'],['rabbit','carrot'],['mouse','cheese'],['monkey','banana'],['bird','worm'],['cow','grass']]},
+ home:{lvl:1,name:'where an animal lives',pairs:[['bird','nest'],['bee','hive'],['dog','doghouse'],['fish','fishbowl'],['cow','barn'],['frog','pond'],['duck','pond'],['sheep','barn']]},
+ weather:{lvl:2,name:'what you need for the weather',pairs:[['sun','sunglasses'],['rain','umbrella'],['snow','mitten'],['snow','hat']]},
+ tool:{lvl:2,name:'a tool and what it works on',pairs:[['hammer','nail'],['key','lock'],['pencil','paper'],['toothbrush','tooth'],['saw','log']]},
+ part:{lvl:3,name:'a whole and its part',pairs:[['car','wheel'],['bike','wheel'],['bus','wheel'],['tree','leaf'],['house','door']]},
+ cut:{lvl:3,name:'whole and cut into pieces',pairs:[['apple','appleslice'],['orange','orangeslice'],['bread','breadslice']]},
+ becomes:{lvl:4,name:'what something grows into',pairs:[['egg','chick'],['tadpole','frog'],['caterpillar','butterfly'],['acorn','tree'],['chick','hen']]},
+ gives:{lvl:4,name:'what an animal gives us',pairs:[['hen','egg'],['cow','milk'],['bee','honey'],['sheep','yarn']]},
+};
+function relHolds(rel,rev,a,b){return RELS[rel].pairs.some(p=>rev?(p[1]===a&&p[0]===b):(p[0]===a&&p[1]===b))}
+function relsOf(a,b){const out=[];for(const r in RELS){if(relHolds(r,0,a,b))out.push([r,0]);if(relHolds(r,1,a,b))out.push([r,1])}return out}
+function genAnalogy(level,opt){
+  const allowed=Object.keys(RELS).filter(r=>RELS[r].lvl<=level);
+  let rel=opt.concept&&allowed.includes(opt.concept)?opt.concept:R.pick(level>=3?allowed.filter(r=>RELS[r].lvl>=level-2):allowed);
+  if(!rel) rel=R.pick(allowed);
+  const rev=level>=3&&R.chance(level>=4?0.4:0.25)?1:0;
+  const pairs=R.sample(RELS[rel].pairs,2); if(pairs.length<2) return null;
+  let [A,B]=pairs[0],[C,D]=pairs[1]; if(rev){[A,B]=[B,A];[C,D]=[D,C]}
+  if(new Set([A,B,C,D]).size<4) return null;
+  const rAB=relsOf(A,B);
+  const valid=x=>rAB.some(([r,rv])=>relHolds(r,rv,C,x));
+  // plausible distractors: same kind as the answer, or things linked to C/A in other ways
+  const sameKind=RELS[rel].pairs.map(p=>rev?p[0]:p[1]);
+  const assocC=[];for(const r in RELS)for(const p of RELS[r].pairs){if(p[0]===C)assocC.push(p[1]);if(p[1]===C)assocC.push(p[0])}
+  const used=new Set([A,B,C,D]);
+  const ok=x=>!used.has(x)&&!valid(x);
+  const nearPool=R.shuffle([...new Set([...assocC,...sameKind])].filter(ok));
+  const farPool=R.shuffle(ICON_IDS.filter(x=>ok(x)&&!nearPool.includes(x)&&!assocC.includes(x)));
+  const n=NCH(level)-1; const nNear=level===1?0:level===2?1:level===3?2:n;
+  const d=[];
+  for(const x of nearPool){if(d.length>=nNear)break;d.push({id:x,kind:'near'})}
+  for(const x of farPool){if(d.length>=n)break;d.push({id:x,kind:'far'})}
+  if(d.length<n) return null;
+  const q={type:'va',level,concept:rel,surface:(rev?'rev:':'fwd:')+C,dims:['REL'].concat(nNear>=2?['DIS']:[]),
+    say:'Look at the first two pictures. They go together. Which picture goes with this one in the same way?',
+    hintSay:'Think about how the first two pictures go together. Then find the one that goes with this picture the same way.',
+    stemKey:[A,B,C].join('-'),layout:'pics'};
+  q.stem=`<div class="anaRow"><div class="pair hintable"><div class="pic">${iconSVG(A)}</div><div class="arrow">➜</div><div class="pic">${iconSVG(B)}</div></div><div class="sep"></div><div class="pair"><div class="pic">${iconSVG(C)}</div><div class="arrow">➜</div><div class="pic q">${QBOX}</div></div></div>`;
+  return finalize(q,{html:iconSVG(D),key:D},d.map(x=>({html:iconSVG(x.id),key:x.id,kind:x.kind})));
+}
+
+// ---------------------------------------------------------------- 2. PICTURE CLASSIFICATION
+const CLS=[
+ {T:['animal'],l:1},{T:['food'],l:1},{T:['vehicle'],l:1},{T:['wear'],l:1},
+ {T:['fruit'],l:2},{T:['animalhome'],l:2},{T:['weather'],l:2},{T:['kitchen'],l:2},{T:['animal','flies'],l:2},{T:['animal','water'],l:2},{T:['plant'],l:2},
+ {T:['insect'],l:3},{T:['legs4'],l:3},{T:['wheels'],l:3},{T:['cuts'],l:3},{T:['writes'],l:3},{T:['baby'],l:3},{T:['farm'],l:3},{T:['cut'],l:3},{T:['fromanimal'],l:3},
+ {T:['flies'],l:4,cross:1},{T:['round'],l:4,cross:1},{T:['hot'],l:4,cross:1},{T:['sharp'],l:4,cross:1},{T:['water'],l:4,cross:1},{T:['wings'],l:4,cross:1},{T:['light'],l:4,cross:1},
+ {T:['animal','water','flies'],l:5,conj:1},{T:['vehicle','nomotor'],l:5,conj:1},{T:['food','fromanimal'],l:5,conj:1},{T:['fruit','cut'],l:5,conj:1},{T:['animal','baby'],l:5,conj:1},{T:['wear','warm'],l:5,conj:1},{T:['vehicle','motor','wheels'],l:5,conj:1},{T:['animal','legs4','farm'],l:5,conj:1},{T:['flies','motor'],l:5,conj:1},
+];
+const CAT_ORDER=['animal','vehicle','food','wear','plant','weather','toy','tool','animalhome'];
+const catOf=id=>CAT_ORDER.find(c=>has(id,c))||'other';
+const clsName=T=>T.join(' + ');
+function defTags(id){return ICONS[id].t}
+function genVClass(level,opt){
+  let pool=CLS.filter(c=>c.l===level); if(level>=4) pool=pool.concat(CLS.filter(c=>c.l===level-1&&R.chance(.3)));
+  let rule=opt.concept?CLS.find(c=>clsName(c.T)===opt.concept&&c.l<=level):null; if(!rule) rule=R.pick(pool);
+  const T=rule.T, okT=id=>T.every(t=>has(id,t));
+  const members=ICON_IDS.filter(okT);
+  const failsT=id=>T.some(t=>!has(id,t)&&!amb(id,t)) && !T.some(t=>amb(id,t));
+  if(members.length<3) return null;
+  const odd=members.length===3||(level<=3&&R.chance(.35));
+  const stems=R.sample(members,odd?3:3);
+  if(rule.cross&&new Set(stems.map(catOf)).size<2) return null;
+  const S=stems.map(defTags).reduce((a,b)=>a.filter(t=>b.includes(t)));
+  const near=id=>{const c=new Set(stems.map(catOf));return c.has(catOf(id))};
+  const simScore=id=>S.filter(t=>has(id,t)).length+(near(id)?2:0);
+  let nonm=ICON_IDS.filter(id=>!stems.includes(id)&&failsT(id)&&!S.some(t=>amb(id,t)));
+  if(rule.conj) nonm=nonm.filter(id=>T.filter(t=>has(id,t)).length===T.length-1).concat(nonm.filter(id=>T.filter(t=>has(id,t)).length<T.length-1&&near(id)));
+  if(odd){
+    // odd one out: 3 that share the rule + 1 that does not. Exactly one picture may be "clearly odd".
+    const oddPool=level===1?nonm.filter(x=>!near(x)):nonm.filter(near);
+    if(!oddPool.length) return null;
+    const o=R.pick(oddPool); const four=R.shuffle([...stems,o]);
+    const clearlyOdd=x=>{const others=four.filter(y=>y!==x);const I=others.map(defTags).reduce((a,b)=>a.filter(t=>b.includes(t)));return I.some(t=>!has(x,t))};
+    const oddOnes=four.filter(clearlyOdd); if(oddOnes.length!==1||oddOnes[0]!==o) return null;
+    const q={type:'vc',level,concept:clsName(T),surface:'odd:'+T.join('+'),dims:['REL'].concat(level>=2?['DIS']:[]),fmt:'odd',
+      say:'One of these pictures does not belong with the others. Which one does not belong?',hintSay:'Three of these are alike in some way. Find the one that is different.',stemKey:'odd'+four.join('-'),layout:'pics'};
+    q.stem=`<div class="clsTop hintable"><div class="hand">☝️</div></div>`;
+    q.noStem=true;
+    // In odd-one-out every picture is a choice; distractor kind is near (they all share the rule)
+    return finalize(q,{html:iconSVG(o),key:o},four.filter(x=>x!==o).map(x=>({html:iconSVG(x),key:x,kind:'near'})));
+  }
+  const corrPool=members.filter(id=>!stems.includes(id)&&S.every(t=>has(id,t)));
+  if(!corrPool.length) return null;
+  const corr=R.pick(corrPool);
+  const n=NCH(level)-1;
+  nonm=R.shuffle(nonm).sort((a,b)=>level<=1?simScore(a)-simScore(b):simScore(b)-simScore(a));
+  if(level===2) nonm=[nonm[0],...R.shuffle(nonm.slice(1))];
+  const ds=nonm.slice(0,n); if(ds.length<n) return null;
+  for(const x of ds) if(S.every(t=>has(x,t))) return null; // a distractor that fits the group -> ambiguous
+  const q={type:'vc',level,concept:clsName(T),surface:'goes:'+T.join('+')+':'+[...stems].sort().join(''),dims:['REL'].concat(T.length>1&&rule.conj?['WM']:[]).concat(level>=3?['DIS']:[]),
+    say:'These three pictures are alike in some way. Which picture below goes with them?',hintSay:'Look at the three pictures at the top. How are they alike? Find the one below that is alike in the same way.',stemKey:stems.slice().sort().join('-'),layout:'pics'};
+  q.stem=`<div class="clsTop hintable">${stems.map(s=>`<div class="pic">${iconSVG(s)}</div>`).join('')}</div>`;
+  return finalize(q,{html:iconSVG(corr),key:corr},ds.map(x=>({html:iconSVG(x),key:x,kind:simScore(x)>=2?'near':'far'})));
+}
+
+// ---------------------------------------------------------------- 3. SENTENCE COMPLETION
+const NAMES=['Mia','Sam','Ben','Ana','Leo','Zoe','Max','Lily','Omar','Ivy','Noah','Ruby'];
+// ok = pictures that correctly complete the sentence; near = tempting but wrong; no = clearly wrong
+const SENT=[
+ {l:1,c:'describe',s:'Which one can fly?',ok:['bird','bee','butterfly','plane','kite'],near:['hen','car'],no:['dog','cat','cow','fish','apple','shoe','tree','bus']},
+ {l:1,c:'describe',s:'Which one do we eat?',ok:['apple','banana','bread','carrot','cheese','orange'],near:['bone','grass'],no:['shoe','car','key','hammer','ball','hat','cup']},
+ {l:1,c:'describe',s:'Which one swims in the water?',ok:['fish','duck','tadpole'],near:['boat','cat'],no:['cow','car','bike','tree','mouse','sheep']},
+ {l:1,c:'describe',s:'Which one has wheels?',ok:['car','bike','bus','train'],near:['boat','kite'],no:['dog','tree','shoe','kite','house','apple']},
+ {l:1,c:'describe',s:'Which one do you wear on your head?',ok:['hat'],near:['shoe','mitten'],no:['ball','cup','apple','key','bus']},
+ {l:1,c:'describe',s:'Which one tells you what time it is?',ok:['clock'],near:['wheel','ball'],no:['cup','drum','orange','shoe','tree']},
+ {l:1,c:'describe',s:'Which animal lives on a farm and says moo?',ok:['cow'],near:['sheep','hen'],no:['fish','bird','mouse','frog','bee']},
+ {l:1,c:'describe',s:'Which one makes music when you hit it?',ok:['drum'],near:['ball','hammer'],no:['shoe','apple','leaf','hat','cup']},
+ {l:2,c:'function',s:'Which one do you use to eat soup?',ok:['spoon'],near:['fork','knife','cup'],no:['hammer','pencil','key','shoe']},
+ {l:2,c:'function',s:'Which one do you use to open a lock?',ok:['key'],near:['hammer','door'],no:['spoon','ball','hat','cup','apple']},
+ {l:2,c:'function',s:'Which one do you use to clean your teeth?',ok:['toothbrush'],near:['spoon','pencil'],no:['shoe','apple','car','hat','drum']},
+ {l:2,c:'function',s:'It is raining hard. Which one will keep you dry?',ok:['umbrella'],near:['sunglasses','mitten'],no:['ball','kite','spoon','apple','drum']},
+ {l:2,c:'function',s:'The sun is very bright. Which one will help your eyes?',ok:['sunglasses'],near:['mitten','shoe'],no:['cup','key','ball','drum','bread']},
+ {l:2,c:'function',s:'Which one do you use to cut paper?',ok:['scissors'],near:['pencil','crayon','spoon'],no:['spoon','cup','ball','hat']},
+ {l:2,c:'function',s:'Which one helps you draw a picture?',ok:['pencil','crayon'],near:['scissors','spoon'],no:['hammer','shoe','apple','car']},
+ {l:2,c:'function',s:'Which one do you drink from?',ok:['cup'],near:['fork','key'],no:['hat','ball','key','shoe','tree']},
+ {l:2,c:'location',s:'Where does a bee live?',ok:['hive'],near:['nest','doghouse','barn'],no:['car','cup','shoe']},
+ {l:2,c:'location',s:'Where would a fish live?',ok:['fishbowl','pond'],near:['nest','hive','doghouse'],no:['car','shoe','tree']},
+ {l:2,c:'location',s:'Where does a bird lay its eggs?',ok:['nest'],near:['hive','fishbowl','doghouse'],no:['shoe','car','cup']},
+ {l:3,c:'context',s:'{n} mixed flour and water and baked it in the oven. What did {n} make?',ok:['bread'],near:['egg','cheese','milk','apple'],no:['shoe','car','ball']},
+ {l:3,c:'context',s:'{n}\'s bike will not roll. Which part needs to be fixed?',ok:['wheel'],near:['door','key'],no:['leaf','shoe','apple','cup']},
+ {l:3,c:'source',s:'Which one comes from a cow?',ok:['milk','cheese'],near:['egg','honey','yarn'],no:['apple','shoe','car']},
+ {l:3,c:'source',s:'Which one comes from a hen?',ok:['egg'],near:['milk','honey','yarn','cheese'],no:['ball','car']},
+ {l:3,c:'source',s:'Which one is made by bees?',ok:['honey'],near:['milk','egg','yarn'],no:['ball','car','shoe']},
+ {l:3,c:'growth',s:'Which one will grow up to be a frog?',ok:['tadpole'],near:['fish','caterpillar','chick'],no:['car','shoe','cup']},
+ {l:3,c:'growth',s:'Which one will turn into a butterfly?',ok:['caterpillar'],near:['worm','bee','tadpole','chick'],no:['car','cup']},
+ {l:3,c:'growth',s:'Which one can grow into a big tree?',ok:['acorn'],near:['leaf','flower','grass','log'],no:['car','cup','shoe']},
+ {l:3,c:'context',s:'{n} is going out to play in the snow. What should {n} wear?',ok:['mitten','hat'],near:['umbrella','sunglasses','kite'],no:['spoon','cup','cheese']},
+ {l:3,c:'context',s:'Which one would feel hot if you got close to it?',ok:['sun','fire','candle'],near:['snow','milk','mitten'],no:['shoe','key','leaf']},
+ {l:3,c:'describe',s:'Which one is smaller than a mouse?',ok:['bee','caterpillar','worm'],near:['cat','dog','rabbit'],no:['cow','bus','house','tree']},
+ {l:4,c:'multi',s:'Which one has wings but is not an animal?',ok:['plane'],near:['bird','bee','butterfly','duck','car','train'],no:['shoe','cup']},
+ {l:4,c:'multi',s:'Which animal can fly and can also swim?',ok:['duck'],near:['fish','bird','bee','frog','plane','boat'],no:['cup']},
+ {l:4,c:'multi',s:'Which one has wheels but no motor?',ok:['bike'],near:['car','bus','train','boat'],no:['shoe','apple']},
+ {l:4,c:'multi',s:'Which animal can swim and can also hop on land?',ok:['frog'],near:['fish','tadpole','bird','mouse','cow'],no:['car']},
+ {l:4,c:'negation',s:'Which one is a fruit, but is not round?',ok:['banana'],near:['orange','ball','carrot'],no:['shoe','car']},
+ {l:4,c:'negation',s:'Which one is round, but is not a toy and is not food?',ok:['wheel','clock','sun'],near:['ball','orange'],no:['shoe','key','banana']},
+ {l:4,c:'negation',s:'Which one do you wear, but not on your hands or your head?',ok:['shoe'],near:['mitten','hat'],no:['spoon','car','apple','ball']},
+ {l:4,c:'negation',s:'Which bug cannot fly?',ok:['caterpillar'],near:['bee','butterfly','bird','plane'],no:['cup','shoe']},
+ {l:4,c:'multi',s:'Which one is sharp and is used in the kitchen?',ok:['knife'],near:['spoon','saw','nail','cup'],no:['ball','hat']},
+ {l:4,c:'negation',s:'Which one is not alive?',ok:['car','ball','cup','key','shoe'],near:['tree','flower','bird','fish','dog','frog'],no:[]},
+ {l:5,c:'multi',s:'Which one comes from an animal, but we do not eat it?',ok:['yarn'],near:['milk','egg','honey','cheese'],no:['apple','ball']},
+ {l:5,c:'multi',s:'Which one is a baby that will grow up to have feathers?',ok:['chick'],near:['tadpole','caterpillar','hen','bird'],no:['ball','cup']},
+ {l:5,c:'multi',s:'Which one can go up in the sky, but has no motor and is not alive?',ok:['kite'],near:['plane','bird','bus','boat'],no:['cup','shoe']},
+ {l:5,c:'inference',s:'It was so hot outside that {n}\'s ice cream melted. What was up in the sky?',ok:['sun'],near:['rain','snow','umbrella'],no:['shoe','cup']},
+ {l:5,c:'inference',s:'{n} cut the bread for sandwiches. Which one shows the bread now?',ok:['breadslice'],near:['bread','appleslice','orangeslice','cheese'],no:['shoe','car']},
+ {l:5,c:'inference',s:'{n} needed to cut a big branch off a tree. Which one should {n} use?',ok:['saw'],near:['hammer','pencil','key','spoon'],no:['ball','hat']},
+ {l:5,c:'inference',s:'{n}\'s dog was hungry. Which one should {n} give the dog?',ok:['bone'],near:['grass','worm','ball','doghouse'],no:['shoe','car']},
+ {l:5,c:'inference',s:'First it was a tiny tadpole. Then it grew legs. What will it be when it grows up?',ok:['frog'],near:['fish','tadpole','mouse','duck'],no:['car','cup']},
+ {l:5,c:'negation',s:'Which one is not made by an animal?',ok:['apple','bread'],near:['honey','egg','milk','yarn','nest','hive'],no:[]},
+ {l:5,c:'inference',s:'A seed was planted. It got sun and rain. What could grow from it?',ok:['flower','tree','grass'],near:['log','bread','egg'],no:['ball','key','car','cup']},
+];
+SENT.forEach((s,i)=>s.id='s'+i);
+function genSentence(level,opt){
+  let pool=SENT.filter(s=>s.l===level||(s.l===level-1&&R.chance(.25)));
+  if(opt.concept){const p=SENT.filter(s=>s.c===opt.concept&&s.l<=level);if(p.length)pool=p}
+  if(opt.avoidTpl){const p=pool.filter(s=>!opt.avoidTpl.has(s.id));if(p.length)pool=p}
+  const t=R.pick(pool); const name=R.pick(NAMES);
+  const corr=R.pick(t.ok); const n=NCH(level)-1; const nNear=level<=2?1:level===3?2:n;
+  const nearP=R.shuffle(t.near.filter(x=>!t.ok.includes(x))), noP=R.shuffle(t.no.filter(x=>!t.ok.includes(x)));
+  const d=[];
+  for(const x of nearP){if(d.length>=nNear)break;d.push({id:x,kind:'near'})}
+  for(const x of noP){if(d.length>=n)break;d.push({id:x,kind:'far'})}
+  for(const x of nearP){if(d.length>=n)break;if(!d.some(y=>y.id===x))d.push({id:x,kind:'near'})}
+  if(d.length<n) return null;
+  const say=t.s.replace(/\{n\}/g,name);
+  const q={type:'vs',level,concept:t.c,surface:t.id,tpl:t.id,dims:['REL'].concat(['multi','negation','inference'].includes(t.c)?['WM']:[]).concat(level>=3?['DIS']:[]),
+    say,hintSay:'Listen again carefully. '+say,stemKey:t.id+name,layout:'pics',sentence:true};
+  q.stem=`<div class="sentStem hintable"><div class="bigEar">👂</div></div>`;
+  return finalize(q,{html:iconSVG(corr),key:corr},d.map(x=>({html:iconSVG(x.id),key:x.id,kind:x.kind})));
+}
+
+// ---------------------------------------------------------------- shared counters (quantitative)
+const QCOL=['#e4473f','#3d82c4','#3aa35b','#f28c38','#8e5bd6','#e86aa6'];
+function counterSVG(shape,x,y,r,c,crossed){
+  let s;
+  if(shape==='dot') s=`<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" stroke="#2d2a40" stroke-width="1.6"/>`;
+  else if(shape==='square') s=`<rect x="${x-r*.9}" y="${y-r*.9}" width="${r*1.8}" height="${r*1.8}" rx="2" fill="${c}" stroke="#2d2a40" stroke-width="1.6"/>`;
+  else if(shape==='tri') s=`<path d="M${x} ${y-r} L${x+r} ${y+r*.8} L${x-r} ${y+r*.8}Z" fill="${c}" stroke="#2d2a40" stroke-width="1.6" stroke-linejoin="round"/>`;
+  else {let p='';for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.45:r*1.1;p+=(i?'L':'M')+(x+rr*Math.cos(a)).toFixed(1)+' '+(y+rr*Math.sin(a)).toFixed(1)}s=`<path d="${p}Z" fill="${c}" stroke="#2d2a40" stroke-width="1.4" stroke-linejoin="round"/>`}
+  if(crossed) s=`<g opacity=".45">${s}</g><path d="M${x-r} ${y-r} L${x+r} ${y+r} M${x+r} ${y-r} L${x-r} ${y+r}" stroke="#2d2a40" stroke-width="2.4" stroke-linecap="round"/>`;
+  return s;
+}
+// A group of n counters. layout rows = rows of five (easy to see), scatter = loose (must count/estimate carefully)
+function groupSVG(n,st,crossed){
+  crossed=crossed||0;let pos=[];
+  if(st.layout==='scatter'){
+    if(!st.cells) st.cells={};
+    const key=n+'/'+crossed; if(!st.cells[key]) st.cells[key]=R.sample([...Array(20).keys()],n).map(i=>[i%5,Math.floor(i/5),R.ri(-1,1)*1.5,R.ri(-1,1)*1.5]);
+    pos=st.cells[key].map(([cx,cy,jx,jy])=>[16+cx*22+jx,14+cy*22+jy]);
+  } else {
+    const rows=Math.ceil(n/5)||1, top=50-(rows-1)*11;
+    for(let i=0;i<n;i++) pos.push([16+(i%5)*22,top+Math.floor(i/5)*22]);
+  }
+  return `<svg viewBox="0 0 120 100" width="100%" height="100%">${pos.map((p,i)=>counterSVG(st.shape,p[0],p[1],9,st.color,i>=n-crossed)).join('')}</svg>`;
+}
+function qStyle(level){return {shape:R.pick(['dot','star','square','tri']),color:R.pick(QCOL),layout:level>=3&&R.chance(.45)?'scatter':'rows'}}
+const styleName=st=>st.shape+'/'+st.layout;
+
+// ---------------------------------------------------------------- 4. NUMBER ANALOGIES
+const NRULES={
+ add1:x=>x+1,add2:x=>x+2,add3:x=>x+3,add4:x=>x+4,add5:x=>x+5,sub1:x=>x-1,sub2:x=>x-2,sub3:x=>x-3,sub4:x=>x-4,same:x=>x,
+ dbl:x=>2*x,half:x=>x%2?NaN:x/2,dblp1:x=>2*x+1,dblm1:x=>2*x-1,halfp1:x=>x%2?NaN:x/2+1,triple:x=>3*x,
+};
+const NA_LV={1:{r:['add1','sub1','add2'],max:7},2:{r:['add2','sub2','add3','same','sub1'],max:9},3:{r:['dbl','add3','sub3','add4'],max:12},4:{r:['half','dbl','sub4','add5','sub3'],max:14},5:{r:['dblp1','dblm1','halfp1','triple','half'],max:16}};
+const NA_NAME={add1:'add one',add2:'add two',add3:'add three',add4:'add four',add5:'add five',sub1:'take away one',sub2:'take away two',sub3:'take away three',sub4:'take away four',same:'stays the same',dbl:'double',half:'half',dblp1:'double and one more',dblm1:'double and one less',halfp1:'half and one more',triple:'three times as many'};
+// every rule a child might plausibly see: used to prove the answer is the only one that fits both examples
+const UNIVERSE=(()=>{const u=[];for(let k=-10;k<=10;k++)u.push(x=>x+k);u.push(x=>2*x,x=>x%2?NaN:x/2,x=>3*x,x=>2*x+1,x=>2*x-1,x=>x%2?NaN:x/2+1,x=>x%2?NaN:x/2-1,x=>x%3?NaN:x/3);return u})();
+function genNumAnalogy(level,opt){
+  const L=NA_LV[level]; let rid=opt.concept&&L.r.includes(opt.concept)?opt.concept:R.pick(L.r); const f=NRULES[rid];
+  const xs=R.sample([...Array(L.max).keys()].map(i=>i+1).filter(x=>{const y=f(x);return Number.isInteger(y)&&y>=1&&y<=L.max+4}),3);
+  if(xs.length<3) return null;
+  const [x1,x2,x3]=xs, y1=f(x1),y2=f(x2),ans=f(x3);
+  const preds=new Set(UNIVERSE.filter(g=>g(x1)===y1&&g(x2)===y2).map(g=>g(x3)));
+  if(preds.size!==1||!preds.has(ans)) return null;
+  const n=NCH(level)-1; const cand=[];
+  const add=(v,k)=>{if(Number.isInteger(v)&&v>=1&&v<=20&&v!==ans&&!cand.some(c=>c.v===v))cand.push({v,kind:k})};
+  add(x3+(y1-x1),'rule');add(x3,'copy');add(ans+1,'near');add(ans-1,'near');add(y2,'copy');add(ans+2,'near');add(ans-2,'near');add(ans+3,'far');
+  const d=(level<=2?R.shuffle(cand.slice(0,5)):cand.slice(0,2).concat(R.shuffle(cand.slice(2)))).slice(0,n);
+  if(d.length<n) return null;
+  const st=qStyle(level);if(Math.max(x1,x2,x3,y1,y2,ans)>10)st.layout='rows';
+  const box=(v,cls)=>`<div class="grp ${cls||''}">${groupSVG(v,st)}</div>`;
+  const q={type:'qa',level,concept:rid,surface:styleName(st),dims:['NUM','REL'].concat(level>=5?['WM']:[]).concat(level>=3?['DIS']:[]),
+    say:'Look how the first group changes into the next group. Which group goes with the last one, changing the same way?',
+    hintSay:'Count how the first group changed. Did it get more, or fewer? Make the last one change the same way.',stemKey:[x1,x2,x3,rid].join('-'),layout:'groups',qstyle:st};
+  q.stem=`<div class="naGrid"><div class="naRow hintable">${box(x1)}<div class="arrow">➜</div>${box(y1)}</div><div class="naRow hintable">${box(x2)}<div class="arrow">➜</div>${box(y2)}</div><div class="naRow">${box(x3)}<div class="arrow">➜</div><div class="grp q">${QBOX}</div></div></div>`;
+  return finalize(q,{html:groupSVG(ans,st),key:'n'+ans},d.map(c=>({html:groupSVG(c.v,st),key:'n'+c.v,kind:c.kind})));
+}
+
+// ---------------------------------------------------------------- 5. NUMBER PUZZLES
+const SYM=`<svg viewBox="0 0 120 100" width="100%" height="100%"><path d="M60 14 L100 84 L20 84Z" fill="#8e5bd6" stroke="#2d2a40" stroke-width="3" stroke-linejoin="round"/><circle cx="60" cy="60" r="8" fill="#fff"/></svg>`;
+const PZ_FORMS={1:['ab'],2:['sum','ab'],3:['two'],4:['three','take'],5:['sym1','sym2']};
+const PZ_NAME={ab:'missing part',sum:'put together',two:'balance two sides',three:'three groups',take:'take away',sym1:'symbol puzzle',sym2:'symbol puzzle (doubles)'};
+function genPuzzle(level,opt){
+  const forms=PZ_FORMS[level]; const form=opt.concept&&forms.includes(opt.concept)?opt.concept:R.pick(forms);
+  const st=qStyle(level); st.layout=level>=4&&R.chance(.3)?'scatter':'rows'; if(st.shape==='tri')st.shape=R.pick(['dot','star','square']);
+  const surf=R.pick(['scale','baskets']);
+  let L=[],Rr=[],ans,lines=null,extraD=[];
+  const G=v=>({v}),Q={q:1};
+  if(form==='ab'){const b=R.ri(level===1?3:5,level===1?6:10),a=R.ri(1,b-1);L=[G(a),Q];Rr=[G(b)];ans=b-a;extraD=[b,a]}
+  else if(form==='sum'){const a=R.ri(1,6),b=R.ri(1,Math.min(6,10-a));L=[G(a),G(b)];Rr=[Q];ans=a+b;extraD=[a,b]}
+  else if(form==='two'){const b=R.ri(1,6),c=R.ri(1,6),a=R.ri(1,b+c-1);L=[G(a),Q];Rr=[G(b),G(c)];ans=b+c-a;extraD=[b+c,a+b+c-1]}
+  else if(form==='three'){const c=R.ri(2,7),dd=R.ri(2,7),a=R.ri(1,4),b=R.ri(1,Math.max(1,c+dd-a-1));if(a+b>=c+dd)return null;L=[G(a),G(b),Q];Rr=[G(c),G(dd)];ans=c+dd-a-b;extraD=[c+dd,c+dd-a]}
+  else if(form==='take'){const a=R.ri(5,12),k=R.ri(1,a-2);L=[{v:a,x:k}];Rr=[Q];ans=a-k;extraD=[a,k]}
+  else if(form==='sym1'){const v=R.ri(2,5),m=v+R.ri(1,5);lines=[[[{s:1},{s:1}],[G(2*v)]],[[{s:1},Q],[G(m)]]];ans=m-v;extraD=[v,m,2*v-m>0?2*v-m:m+1]}
+  else {const a=R.ri(1,4),b=R.ri(1,4);lines=[[[{s:1}],[G(a),G(b)]],[[{s:1},{s:1}],[Q]]];ans=2*(a+b);extraD=[a+b,a+b+1,2*(a+b)-1]}
+  if(!lines) lines=[[L,Rr]];
+  // deterministic check: solve each line in order; the missing amount must come out as a whole number from 1 to 20
+  let symV=null,solved=null;
+  for(const [l,r] of lines){
+    const tot=s=>s.reduce((t,g)=>t+(g.v!=null?g.v-(g.x||0):0),0), cnt=(s,k)=>s.filter(g=>g[k]).length;
+    const ls=cnt(l,'s')-cnt(r,'s'), lq=cnt(l,'q')-cnt(r,'q'); let rhs=tot(r)-tot(l);
+    if(lq===0){ if(ls===0) return null; symV=rhs/ls; }
+    else { if(ls) rhs-=ls*symV; solved=rhs/lq; }
+  }
+  if(solved!==ans||!Number.isInteger(ans)||ans<1||ans>20) return null;
+  if(ans>10||lines.some(([l,r])=>l.concat(r).some(g=>g.v>10))) st.layout='rows';
+  if(symV!=null&&(!Number.isInteger(symV)||symV<1)) return null;
+  const n=NCH(level)-1; const cand=[];
+  const add=(v,k)=>{if(Number.isInteger(v)&&v>=1&&v<=20&&v!==ans&&!cand.some(c=>c.v===v))cand.push({v,kind:k})};
+  extraD.forEach(v=>add(v,'rule'));add(ans+1,'near');add(ans-1,'near');add(ans+2,'near');add(ans-2,'far');add(ans+3,'far');
+  const d=(level<=2?R.shuffle(cand):[cand[0],...R.shuffle(cand.slice(1))]).slice(0,n); if(d.length<n) return null;
+  const g=x=>x.q?`<div class="grp q">${QBOX}</div>`:x.s?`<div class="grp sym">${SYM}</div>`:`<div class="grp">${groupSVG(x.v,st,x.x)}</div>`;
+  const side=s=>`<div class="pan ${surf}">${s.map(g).join('')}</div>`;
+  const stem=lines.map(([l,r],i)=>`<div class="bal ${surf} ${i<lines.length-1?'hintable':''}">${side(l)}<div class="fulcrum">${surf==='scale'?'<svg viewBox="0 0 60 70" width="54" height="64"><rect x="2" y="2" width="56" height="8" rx="4" fill="#8a5a2b"/><path d="M30 10 L50 66 H10Z" fill="#c98b4f" stroke="#2d2a40" stroke-width="3" stroke-linejoin="round"/></svg>':'<svg viewBox="0 0 60 60" width="50" height="50"><path d="M10 22 h40 M10 38 h40" stroke="#2d2a40" stroke-width="7" stroke-linecap="round"/></svg>'}</div>${side(r)}</div>`).join('');
+  const say=(form.startsWith('sym')?'The purple triangle always means the same amount. ':'')+(surf==='scale'?'Both sides of the scale have the same amount. ':'Both baskets have the same amount. ')+'Which group goes where the question mark is?';
+  const q={type:'qp',level,concept:form,surface:surf+':'+styleName(st),dims:['NUM'].concat(['two','three','sym1','sym2','take'].includes(form)?['WM']:[]).concat(level>=3?['DIS']:[]),
+    say,hintSay:form.startsWith('sym')?'First figure out how many the purple triangle is. Then use it in the next line.':'Count everything on the side without the question mark. The other side must have the same amount.',stemKey:form+JSON.stringify(lines),layout:'groups',qstyle:st};
+  q.stem=`<div class="pzWrap">${stem}</div>`;
+  return finalize(q,{html:groupSVG(ans,st),key:'n'+ans},d.map(c=>({html:groupSVG(c.v,st),key:'n'+c.v,kind:c.kind})));
+}
+
+// ---------------------------------------------------------------- 6. NUMBER SERIES
+const SMAX=16;
+function seriesFits(seq){ // seq with exactly one null. returns set of predicted values from every rule that is over-determined and fits
+  const u=seq.indexOf(null), known=seq.map((v,i)=>[i,v]).filter(p=>p[1]!=null), preds=new Set();
+  const tryModel=(nParams,fn)=>{ if(known.length<nParams+1) return; const p=fn(); if(p!=null&&Number.isFinite(p)) preds.add(Math.round(p*1000)/1000) };
+  // arithmetic
+  tryModel(2,()=>{const [i0,v0]=known[0],[i1,v1]=known[1];const d=(v1-v0)/(i1-i0);return known.every(([i,v])=>Math.abs(v0+d*(i-i0)-v)<1e-9)?v0+d*(u-i0):null});
+  // repeating with period p
+  for(const p of [2,3,4]) tryModel(p,()=>{const cls={};for(const [i,v] of known){const k=i%p;if(k in cls&&cls[k]!==v)return null;cls[k]=v}return (u%p) in cls?cls[u%p]:null});
+  // geometric with ratio 2 or 3 (and halving)
+  for(const r of [2,3,0.5]) tryModel(1,()=>{const [i0,v0]=known[0];return known.every(([i,v])=>Math.abs(v0*Math.pow(r,i-i0)-v)<1e-9)?v0*Math.pow(r,u-i0):null});
+  // alternating differences d0,d1
+  tryModel(3,()=>{const full=seq.slice();const diffs={};for(let i=1;i<full.length;i++){if(full[i]!=null&&full[i-1]!=null){const k=i%2,d=full[i]-full[i-1];if(k in diffs&&diffs[k]!==d)return null;diffs[k]=d}}
+    if(!(0 in diffs&&1 in diffs))return null;
+    if(u>0&&seq[u-1]!=null) {const v=seq[u-1]+diffs[u%2]; if(u+1<seq.length&&seq[u+1]!=null&&v+diffs[(u+1)%2]!==seq[u+1]) return null; return v}
+    if(u+1<seq.length&&seq[u+1]!=null) return seq[u+1]-diffs[(u+1)%2]; return null});
+  // constant second difference (quadratic)
+  tryModel(3,()=>{const [a,b,c]=known.slice(0,3);const den=(a[0]-b[0])*(a[0]-c[0])*(b[0]-c[0]);
+    const A=(c[0]*(b[1]-a[1])+b[0]*(a[1]-c[1])+a[0]*(c[1]-b[1]))/den, B=(c[0]*c[0]*(a[1]-b[1])+b[0]*b[0]*(c[1]-a[1])+a[0]*a[0]*(b[1]-c[1]))/den, C0=(b[0]*c[0]*(b[0]-c[0])*a[1]+c[0]*a[0]*(c[0]-a[0])*b[1]+a[0]*b[0]*(a[0]-b[0])*c[1])/den;
+    const f=x=>A*x*x+B*x+C0; return known.every(([i,v])=>Math.abs(f(i)-v)<1e-6)?f(u):null});
+  // two interleaved arithmetic sequences
+  tryModel(4,()=>{const sub=k=>known.filter(([i])=>i%2===k);const pr={};for(const k of [0,1]){const s=sub(k);if(s.length<3)return null;const d=(s[1][1]-s[0][1])/((s[1][0]-s[0][0])/2);if(!s.every(([i,v])=>Math.abs(s[0][1]+d*(i-s[0][0])/2-v)<1e-9))return null;pr[k]=x=>s[0][1]+d*(x-s[0][0])/2}return pr[u%2](u)});
+  return preds;
+}
+const SR_LV={1:['up1','rep2'],2:['down1','up2','rep2'],3:['up3','down2','rep3','up2mid'],4:['alt','grow','down3mid','rep3mid'],5:['dbl','interleave','shrink','alt2']};
+const SR_NAME={up1:'count up by one',rep2:'repeat two',down1:'count down by one',up2:'count up by two',up3:'count up by three',down2:'count down by two',rep3:'repeat three',up2mid:'count up by two (middle missing)',alt:'up two, down one',grow:'growing steps',down3mid:'count down by three (middle missing)',rep3mid:'repeat three (middle missing)',dbl:'doubling',interleave:'two mixed patterns',shrink:'shrinking steps',alt2:'up three, down one'};
+function genSeries(level,opt){
+  const rules=SR_LV[level]; const rid=opt.concept&&rules.includes(opt.concept)?opt.concept:R.pick(rules);
+  let seq,len=level>=4?7:6,mid=false;
+  const arith=(s,d,n)=>[...Array(n)].map((_,i)=>s+d*i);
+  switch(rid){
+    case 'up1':seq=arith(R.ri(1,5),1,len);break;
+    case 'rep2':{const a=R.ri(1,6),b=R.ri(1,6);if(a===b)return null;seq=[...Array(len)].map((_,i)=>i%2?b:a);break}
+    case 'down1':seq=arith(R.ri(7,12),-1,len);break;
+    case 'up2':seq=arith(R.ri(1,4),2,len);break;
+    case 'up3':seq=arith(R.ri(1,2),3,len);break;
+    case 'down2':seq=arith(R.ri(11,14),-2,len);break;
+    case 'rep3':case 'rep3mid':{const v=R.sample([1,2,3,4,5,6,7],3);seq=[...Array(len)].map((_,i)=>v[i%3]);mid=rid==='rep3mid';break}
+    case 'up2mid':seq=arith(R.ri(1,4),2,len);mid=true;break;
+    case 'alt':{const s=R.ri(1,3);seq=[s];for(let i=1;i<len;i++)seq.push(seq[i-1]+(i%2?2:-1));mid=R.chance(.5);break}
+    case 'alt2':{const s=R.ri(1,2);seq=[s];for(let i=1;i<len;i++)seq.push(seq[i-1]+(i%2?3:-1));mid=R.chance(.5);break}
+    case 'grow':{seq=[R.ri(1,2)];for(let i=1;i<6;i++)seq.push(seq[i-1]+i);len=6;mid=R.chance(.5);break}
+    case 'shrink':{seq=[16];for(let i=1;i<6;i++)seq.push(seq[i-1]-(6-i));len=6;mid=R.chance(.5);break}
+    case 'down3mid':seq=arith(R.ri(16,16),-3,len-1);len=6;mid=true;break;
+    case 'dbl':seq=[1,2,4,8,16];len=5;mid=R.chance(.5);break;
+    case 'interleave':{const a=R.ri(1,3),b=R.ri(5,8);seq=[...Array(len)].map((_,i)=>i%2?b+(i-1)/2:a+i/2);mid=false;break}
+  }
+  seq=seq.slice(0,len);
+  if(seq.some(v=>v<1||v>SMAX)) return null;
+  const u=mid?R.ri(2,seq.length-2):seq.length-1; const ans=seq[u];
+  const shown=seq.map((v,i)=>i===u?null:v);
+  const preds=seriesFits(shown);
+  if(preds.size!==1||!preds.has(ans)) return null; // another simple rule would give a different answer -> ambiguous
+  const n=NCH(level)-1;const cand=[];
+  const add=(v,k)=>{if(Number.isInteger(v)&&v>=1&&v<=SMAX&&v!==ans&&!cand.some(c=>c.v===v))cand.push({v,kind:k})};
+  if(u>0) add(seq[u-1],'copy'); add(ans+1,'near');add(ans-1,'near'); if(u>0) add(seq[u-1]+1,'rule'); add(ans+2,'near');add(ans-2,'near');add(ans+3,'far');
+  const d=(level<=2?R.shuffle(cand.slice(0,4)):cand.slice(0,1).concat(R.shuffle(cand.slice(1)))).slice(0,n);
+  if(d.length<n) return null;
+  const rep=R.pick(level<=1?['beads','towers']:['beads','towers','cards']);
+  const col=R.shuffle(QCOL).slice(0,2);
+  const term=v=>termSVG(v,rep,col);
+  const q={type:'qs',level,concept:rid,surface:rep,dims:['NUM','REL'].concat(['alt','alt2','grow','shrink','interleave','dbl'].includes(rid)?['WM']:[]).concat(level>=3?['DIS']:[]),
+    say:mid?'The '+(rep==='beads'?'beads':rep==='towers'?'towers':'cards')+' follow a pattern. One is missing. Which one goes in the empty spot?':'The '+(rep==='beads'?'beads':rep==='towers'?'towers':'cards')+' follow a pattern. Which one comes next?',
+    hintSay:'Look at how each one changes from the one before it. Does it get bigger, smaller, or repeat?',stemKey:rid+shown.join(','),layout:rep==='cards'?'groups':'rods'};
+  q.stem=`<div class="srRow hintable">${shown.map(v=>`<div class="term ${v==null?'q':''}">${v==null?QBOX:term(v)}</div>`).join('')}</div>`;
+  q.choiceRender=rep;
+  return finalize(q,{html:term(ans),key:'n'+ans},d.map(c=>({html:term(c.v),key:'n'+c.v,kind:c.kind})));
+}
+function termSVG(v,rep,col){
+  if(rep==='cards') return groupSVG(v,{shape:'dot',color:col[0],layout:'rows'}).replace('viewBox="0 0 120 100"','viewBox="0 -2 120 104"');
+  let s=`<svg viewBox="0 0 50 190" width="100%" height="100%">`;
+  if(rep==='beads'){s+=`<rect x="4" y="182" width="42" height="6" rx="3" fill="#8a5a2b"/><rect x="23" y="12" width="4" height="172" fill="#8a5a2b"/>`;
+    for(let i=0;i<v;i++){const y=176-i*10.5;s+=`<ellipse cx="25" cy="${y}" rx="16" ry="5.6" fill="${Math.floor(i/5)%2?col[1]:col[0]}" stroke="#2d2a40" stroke-width="1.5"/>`}}
+  else {s+=`<rect x="2" y="182" width="46" height="6" rx="2" fill="#5b6077"/>`;for(let i=0;i<v;i++){const y=171-i*10.6;s+=`<rect x="9" y="${y}" width="32" height="10" rx="1.5" fill="${Math.floor(i/5)%2?col[1]:col[0]}" stroke="#2d2a40" stroke-width="1.4"/>`}}
+  return s+'</svg>';
+}
+
+// ---------------------------------------------------------------- shapes (nonverbal)
+function regPoly(n,r,rot){return [...Array(n)].map((_,i)=>{const a=(rot||-Math.PI/2)+i*2*Math.PI/n;return [r*Math.cos(a),r*Math.sin(a)]})}
+const SHAPES={
+ circle:{pts:regPoly(40,.95),sym:90,sides:0},
+ square:{pts:[[-.82,-.82],[.82,-.82],[.82,.82],[-.82,.82]],sym:90,sides:4},
+ triangle:{pts:[[0,-1],[.95,.78],[-.95,.78]],sym:360,sides:3,orient:1},
+ diamond:{pts:[[0,-1],[1,0],[0,1],[-1,0]],sym:90,sides:4},
+ pentagon:{pts:regPoly(5,1),sym:0,sides:5},
+ hexagon:{pts:regPoly(6,1,0),sym:0,sides:6},
+ star:{pts:[...Array(10)].map((_,i)=>{const a=-Math.PI/2+i*Math.PI/5,r=i%2?.45:1.05;return [r*Math.cos(a),r*Math.sin(a)]}),sym:0,sides:10},
+ heart:{pts:[...Array(48)].map((_,i)=>{const t=i/48*2*Math.PI;return [16*Math.pow(Math.sin(t),3)/17,-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))/17+.1]}),sym:360,sides:-1,orient:1},
+ arrow:{pts:[[0,-1],[.72,-.15],[.28,-.15],[.28,1],[-.28,1],[-.28,-.15],[-.72,-.15]],sym:360,sides:7,orient:1},
+ plus:{pts:[[-.3,-1],[.3,-1],[.3,-.3],[1,-.3],[1,.3],[.3,.3],[.3,1],[-.3,1],[-.3,.3],[-1,.3],[-1,-.3],[-.3,-.3]],sym:90,sides:12},
+ dome:{pts:[...Array(25)].map((_,i)=>{const a=Math.PI+i*Math.PI/24;return [Math.cos(a),Math.sin(a)*1.0+.45]}),sym:360,sides:-1,orient:1},
+ moon:{pts:[...[...Array(25)].map((_,i)=>{const a=-Math.PI/2+i*Math.PI/24;return [Math.cos(a)*.95,Math.sin(a)*.95]}),...[...Array(25)].map((_,i)=>{const a=Math.PI/2-i*Math.PI/24;return [Math.cos(a)*.55+.05,Math.sin(a)*.95]})],sym:360,sides:-1,orient:1},
+ rect:{pts:[[-1,-.55],[1,-.55],[1,.55],[-1,.55]],sym:180,sides:4},
+ trapezoid:{pts:[[-.5,-.6],[.5,-.6],[1,.6],[-1,.6]],sym:360,sides:4},
+ parallelogram:{pts:[[-.55,-.6],[1,-.6],[.55,.6],[-1,.6]],sym:180,sides:4},
+ righttri:{pts:[[-.85,-.9],[-.85,.85],[.9,.85]],sym:360,sides:3,orient:1},
+ tallTri:{pts:[[0,-1],[.55,.9],[-.55,.9]],sym:360,sides:3,orient:1},
+};
+const FAMILIES={basic:['circle','square','triangle','diamond','pentagon','hexagon','star','heart','plus'],orient:['triangle','arrow','heart','dome','moon','righttri'],four:['square','rect','diamond','trapezoid','parallelogram'],three:['triangle','righttri','tallTri']};
+const NCOL={red:'#e4473f',blue:'#3d82c4',green:'#3aa35b',orange:'#f28c38',purple:'#8e5bd6'};
+const FILLS=['empty','solid','striped','dotted'];
+function rotKey(shape,rot){const s=SHAPES[shape].sym;if(!s)return 0;return ((rot%s)+s)%s}
+function figKey(f){return [f.shape,f.fill,f.color,f.size,SHAPES[f.shape].sym===0?0:rotKey(f.shape,f.rot||0),f.count||1,f.inner||'none',f.dots||0,f.innerShape||''].join('|')}
+function shapePath(shape,cx,cy,r,rot){const a=(rot||0)*Math.PI/180,c=Math.cos(a),s=Math.sin(a);return 'M'+SHAPES[shape].pts.map(([x,y])=>((cx+r*(x*c-y*s)).toFixed(1)+' '+(cy+r*(x*s+y*c)).toFixed(1))).join('L')+'Z'}
+function fillOf(f){return f.fill==='solid'?NCOL[f.color]:f.fill==='striped'?`url(#st-${f.color})`:f.fill==='dotted'?`url(#dt-${f.color})`:'#fff'}
+// One figure drawn into a 100x100 cell. slots=true lays out 1-3 copies in fixed slots so size stays comparable between cells.
+function figSVG(f,slots){
+  const cnt=f.count||1; let out='';
+  const centers=slots?(cnt===1?[[50,50]]:cnt===2?[[30,50],[70,50]]:[[18,50],[50,50],[82,50]]):[[50,50]];
+  const base=slots?(f.size==='l'?15.5:9.5):(f.size==='l'?38:21);
+  for(const [cx,cy] of centers){
+    out+=`<path d="${shapePath(f.shape,cx,cy,base,f.rot)}" fill="${fillOf(f)}" stroke="${NCOL[f.color]}" stroke-width="${slots?3:4.5}" stroke-linejoin="round"/>`;
+    if(f.inner&&f.inner!=='none'){const r=base*.32;out+=f.inner==='dot'?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="#fff" stroke="#2d2a40" stroke-width="2.5"/>`:`<rect x="${cx-r}" y="${cy-r}" width="${2*r}" height="${2*r}" fill="#2d2a40"/>`}
+    if(f.innerShape){out+=`<path d="${shapePath(f.innerShape,cx,cy,base*.42,0)}" fill="#fff" stroke="#2d2a40" stroke-width="2.5" stroke-linejoin="round"/>`}
+    if(f.dots){const pos=[[0,0]].concat(regPoly(Math.max(f.dots-1,1),.42).map(p=>p));const pts=f.dots===1?[[0,0]]:f.dots<=5?regPoly(f.dots,.38):[[0,0],...regPoly(f.dots-1,.45)];
+      out+=pts.map(([x,y])=>`<circle cx="${(cx+x*base).toFixed(1)}" cy="${(cy+y*base+ (f.shape==='triangle'?base*.18:0)).toFixed(1)}" r="${base*.11}" fill="#2d2a40"/>`).join('')}
+  }
+  return `<svg viewBox="0 0 100 100" width="100%" height="100%">${out}</svg>`;
+}
+
+// ---------------------------------------------------------------- 7. FIGURE MATRICES
+const MX_ATTRS={1:['fill','size','color','shape'],2:['rot','count','fill','shape','size','color'],3:['rot','count','fill','shape','size','color'],4:['rot','count','fill','shape','size','color','inner'],5:['rot','count','fill','shape','size','color','inner']};
+const VALS={fill:FILLS,size:['s','l'],color:Object.keys(NCOL),rot:[0,90,180,270],count:[1,2,3],inner:['none','dot','sq']};
+function genMatrix(level,opt){
+  const plan={1:[1,1],2:[1,1],3:[2,1],4:[2,2],5:[3,R.pick([1,2])]}[level];
+  let attrs=MX_ATTRS[level].slice();
+  let rowA=R.sample(attrs,plan[0]);
+  if(opt.concept&&attrs.includes(opt.concept)&&!rowA.includes(opt.concept)) rowA[0]=opt.concept;
+  if(level===5&&!rowA.includes('inner')&&R.chance(.5)) rowA[rowA.length-1]='inner';
+  const colA=R.sample(attrs.filter(a=>!rowA.includes(a)),plan[1]);
+  const usesRot=rowA.includes('rot')||colA.includes('rot');
+  const fam=usesRot?'orient':R.pick(['basic','basic','orient']);
+  const shapes=FAMILIES[fam];
+  const A={shape:R.pick(shapes),fill:R.pick(FILLS),color:R.pick(Object.keys(NCOL)),size:R.pick(['s','l']),rot:usesRot?R.pick(VALS.rot):0,count:1,inner:'none'};
+  if(!SHAPES[A.shape].orient) A.rot=0;
+  if(level>=4&&R.chance(.3)&&!rowA.includes('inner')&&!colA.includes('inner')) A.inner=R.pick(['dot','sq']);
+  if(A.inner!=='none'&&A.fill!=='solid'&&R.chance(.6)) A.fill='solid';
+  const change=(f,a)=>{const g={...f};let tries=0;do{g[a]=a==='shape'?R.pick(shapes):R.pick(VALS[a]);tries++}while((figKey(g)===figKey(f))&&tries<30);return g};
+  let B={...A};for(const a of rowA)B=change(B,a);
+  let C={...A};for(const a of colA)C=change(C,a);
+  const D={...C};for(const a of rowA)D[a]=B[a];
+  const all=[A,B,C,D];
+  if(usesRot&&all.some(f=>!SHAPES[f.shape].orient)) return null;
+  if(all.some(f=>f.inner!=='none'&&f.fill!=='solid'&&f.fill!=='empty')) { /* inner marks stay visible on any fill */ }
+  if(new Set(all.map(figKey)).size<4) return null;
+  // every changed attribute must be visible (e.g. rotating a symmetric shape shows nothing)
+  for(const a of rowA){const t={...A};t[a]=B[a];if(figKey(t)===figKey(A))return null}
+  for(const a of colA){const t={...A};t[a]=C[a];if(figKey(t)===figKey(A))return null}
+  const slots=all.some(f=>(f.count||1)>1);
+  const cand=[];const add=(f,k)=>{if(f&&figKey(f)!==figKey(D)&&!cand.some(c=>figKey(c.f)===figKey(f))&&(!usesRot||SHAPES[f.shape].orient))cand.push({f,kind:k})};
+  for(const a of R.shuffle(rowA)){const t={...D};t[a]=C[a];add(t,'partial')}
+  for(const a of R.shuffle(colA)){const t={...D};t[a]=B[a];add(t,'colmiss')}
+  add(C,'copy');
+  for(const a of R.shuffle(MX_ATTRS[level].filter(x=>!rowA.includes(x)&&!colA.includes(x)&&x!=='count'))) add(change(D,a),'near');
+  add(B,'copy');
+  const n=NCH(level)-1;
+  let d=level<=2?[cand.find(c=>c.kind==='partial'),...R.shuffle(cand.filter(c=>c.kind!=='partial'))].filter(Boolean).slice(0,n):cand.slice(0,n);
+  if(d.length<n) return null;
+  const cell=(f,cls)=>`<div class="mcell ${cls||''}">${figSVG(f,slots)}</div>`;
+  const q={type:'nm',level,concept:rowA.slice().sort().join('+'),surface:fam+':'+rowA.concat(colA).sort().join('+'),dims:['REL'].concat(rowA.length+colA.length>=3?['WM']:[]).concat(usesRot?['SPA']:[]).concat(level>=3?['DIS']:[]),
+    say:'Look at how the picture changes in the top row. Which picture goes in the empty box, so the bottom row changes the same way?',
+    hintSay:'Look at the top two boxes. What changed? Make the bottom row change the same way.',stemKey:[A,B,C].map(figKey).join('/'),layout:'figs'};
+  q.stem=`<div class="matrix"><div class="mrow hintable">${cell(A)}<div class="arrow small">➜</div>${cell(B)}</div><div class="mrow">${cell(C)}<div class="arrow small">➜</div><div class="mcell q">${QBOX}</div></div></div>`;
+  return finalize(q,{html:figSVG(D,slots),key:figKey(D)},d.map(c=>({html:figSVG(c.f,slots),key:figKey(c.f),kind:c.kind})));
+}
+
+// ---------------------------------------------------------------- 8. PAPER FOLDING (simulated geometry)
+// Paper is the unit square; y grows downward. A fold keeps one half; the other half is reflected onto it.
+function applyFoldRegion(reg,fold){
+  const {x0,y0,x1,y1}=reg, cx=(x0+x1)/2, cy=(y0+y1)/2;
+  switch(fold.k){
+    case 'L': return {f:{...fold,line:cx},reg:{x0:cx,y0,x1,y1}};      // left flap folded over onto right
+    case 'R': return {f:{...fold,line:cx},reg:{x0,y0,x1:cx,y1}};
+    case 'T': return {f:{...fold,line:cy},reg:{x0,y0:cy,x1,y1}};      // top flap folded down
+    case 'B': return {f:{...fold,line:cy},reg:{x0,y0,x1,y1:cy}};
+    case 'D': return {f:{...fold,sq:{x0,y0,x1,y1}},reg:{x0,y0,x1,y1,tri:'D'}}; // top-right corner folded down onto bottom-left
+    case 'A': return {f:{...fold,sq:{x0,y0,x1,y1}},reg:{x0,y0,x1,y1,tri:'A'}}; // top-left corner folded down onto bottom-right
+  }
+}
+function reflectPt([x,y],f){
+  if(f.k==='L'||f.k==='R') return [2*f.line-x,y];
+  if(f.k==='T'||f.k==='B') return [x,2*f.line-y];
+  const s=f.sq;
+  if(f.k==='D') return [s.x0+(y-s.y0),s.y0+(x-s.x0)];
+  return [s.x0+(s.y1-y),s.y0+(s.x1-x)];
+}
+function onFlap([x,y],f){ // is the point on the part that gets folded over (before folding)?
+  if(f.k==='L')return x<f.line; if(f.k==='R')return x>f.line; if(f.k==='T')return y<f.line; if(f.k==='B')return y>f.line;
+  const s=f.sq; if(f.k==='D') return (y-s.y0)<(x-s.x0); return (y-s.y0)<(s.x1-x);
+}
+const reflHole=(h,f)=>({...h,pts:h.pts.map(p=>reflectPt(p,f)),c:reflectPt(h.c,f)});
+function unfoldHoles(holes,folds,skip){let hs=holes.slice();for(let i=folds.length-1;i>=0;i--){if(skip&&skip.has(i))continue;hs=hs.concat(hs.map(h=>reflHole(h,folds[i])))}return hs}
+function holeKey(hs){return hs.map(h=>h.c.map(v=>v.toFixed(3)).join(',')+':'+h.pts.map(p=>[(p[0]-h.c[0]).toFixed(2),(p[1]-h.c[1]).toFixed(2)].join(',')).join(';')).sort().join('|')}
+function inRegion([x,y],reg,m){
+  if(x<reg.x0+m||x>reg.x1-m||y<reg.y0+m||y>reg.y1-m) return false;
+  if(reg.tri==='D') return (y-reg.y0)-(x-reg.x0)>m*1.42;
+  if(reg.tri==='A') return (y-reg.y0)-(reg.x1-x)>m*1.42;
+  return true;
+}
+function makeHole(c,kind,dir){
+  const r=.05; if(kind==='circle') return {kind,c,pts:regPoly(16,r).map(([x,y])=>[c[0]+x,c[1]+y])};
+  const base=[[0,-1.2],[1,.8],[-1,.8]].map(([x,y])=>[x*r*1.1,y*r*1.1]);   // small triangle hole, points one way
+  const a=dir*Math.PI/2;return {kind,c,pts:base.map(([x,y])=>[c[0]+x*Math.cos(a)-y*Math.sin(a),c[1]+x*Math.sin(a)+y*Math.cos(a)])};
+}
+const PF_NAME={one:'one fold',oneTwo:'one fold, two holes',two:'two folds',twoTwo:'two folds, two holes',diag:'corner (diagonal) fold',three:'three folds',shape:'shaped hole'};
+const PF_LV={1:['one'],2:['one','oneTwo'],3:['two'],4:['twoTwo','diag'],5:['three','shape']};
+function genFolding(level,opt){
+  const forms=PF_LV[level];const form=opt.concept&&forms.includes(opt.concept)?opt.concept:R.pick(forms);
+  const V=()=>R.pick(['L','R']),H=()=>R.pick(['T','B']);
+  let seq;
+  if(form==='one'||form==='oneTwo') seq=[R.chance(.5)?V():H()];
+  else if(form==='two'||form==='twoTwo'||form==='shape') seq=R.chance(.5)?[V(),H()]:[H(),V()];
+  else if(form==='diag') seq=[R.pick(['D','A'])];
+  else seq=R.chance(.5)?[V(),H(),R.pick(['D','A'])]:[H(),V(),R.pick(['D','A'])];
+  let reg={x0:0,y0:0,x1:1,y1:1};const folds=[],regs=[reg];
+  for(const k of seq){const r=applyFoldRegion(reg,{k});folds.push(r.f);reg=r.reg;regs.push(reg)}
+  const grid=[];for(let i=0;i<8;i++)for(let j=0;j<8;j++)grid.push([(2*i+1)/16,(2*j+1)/16]);
+  const cands=grid.filter(p=>inRegion(p,reg,folds.length===1&&!reg.tri?.09:.055));
+  const nh=form==='oneTwo'||form==='twoTwo'?2:1;
+  if(cands.length<nh) return null;
+  const kind=form==='shape'?'tri':'circle', dir=R.ri(0,3);
+  const punched=R.sample(cands,nh).map(c=>makeHole(c,kind,dir));
+  const correct=unfoldHoles(punched,folds);
+  // holes must not overlap once opened
+  for(let i=0;i<correct.length;i++)for(let j=i+1;j<correct.length;j++)if(Math.hypot(correct[i].c[0]-correct[j].c[0],correct[i].c[1]-correct[j].c[1])<.1)return null;
+  const ck=holeKey(correct);
+  const cand=[];const add=(hs,k)=>{const key=holeKey(hs);if(key!==ck&&!cand.some(c=>c.key===key)&&hs.every(h=>h.c[0]>0&&h.c[0]<1&&h.c[1]>0&&h.c[1]<1))cand.push({hs,key,kind:k})};
+  // wrong axis: treat one fold as if it were the other direction
+  for(let i=0;i<folds.length;i++){const alt=folds.slice();const f=folds[i];
+    if('LR'.includes(f.k)) alt[i]={k:'T',line:f.line}; else if('TB'.includes(f.k)) alt[i]={k:'L',line:f.line}; else alt[i]={...f,k:f.k==='D'?'A':'D'};
+    add(unfoldHoles(punched,alt),'wrongaxis')}
+  if(folds.length>1) add(unfoldHoles(punched,folds,new Set([0])),'lastonly');
+  add(punched,'nounfold');
+  add(correct.map(h=>({...h,c:[1-h.c[0],h.c[1]],pts:h.pts.map(p=>[1-p[0],p[1]])})),'mirror');
+  add(correct.map(h=>({...h,c:[h.c[0],1-h.c[1]],pts:h.pts.map(p=>[p[0],1-p[1]])})),'mirror');
+  if(correct.length>=4) add(correct.slice(1),'missing');
+  if(kind==='tri') add(correct.map(h=>makeHole(h.c,'tri',dir)),'noflip');
+  const n=NCH(level)-1;
+  const pri=['noflip','wrongaxis','lastonly','nounfold','missing','mirror'];
+  const d=R.shuffle(cand).sort((a,b)=>pri.indexOf(a.kind)-pri.indexOf(b.kind)).slice(0,n);
+  if(d.length<n) return null;
+  const q={type:'nf',level,concept:form,surface:seq.join('')+':'+kind,dims:['SPA'].concat(folds.length>=2||nh>1?['WM']:[]).concat(level>=4?['DIS']:[]),
+    say:'Watch the paper. It gets folded, and then a hole is punched. What will the paper look like when it is opened up?',
+    hintSay:'When you open a fold, the hole gets a twin on the other side of the fold line, like a mirror.',stemKey:seq.join('')+holeKey(punched),layout:'paper'};
+  q.stem=`<div class="pfRow hintable">${foldPanels(folds,regs,punched)}</div>`;
+  q.folds=folds;q.punched=punched;
+  return finalize(q,{html:paperSVG(correct),key:ck},d.map(c=>({html:paperSVG(c.hs),key:c.key,kind:c.kind})));
+}
+const PX=v=>(10+v*100).toFixed(1);
+function holesSVG(hs){return hs.map(h=>h.kind==='circle'?`<circle cx="${PX(h.c[0])}" cy="${PX(h.c[1])}" r="5.2" fill="#2d2a40"/>`:`<path d="M${h.pts.map(p=>PX(p[0])+' '+PX(p[1])).join('L')}Z" fill="#2d2a40" stroke="#2d2a40" stroke-width="1" stroke-linejoin="round"/>`).join('')}
+function regionPath(r){if(!r.tri)return `M${PX(r.x0)} ${PX(r.y0)}H${PX(r.x1)}V${PX(r.y1)}H${PX(r.x0)}Z`;if(r.tri==='D')return `M${PX(r.x0)} ${PX(r.y0)}L${PX(r.x1)} ${PX(r.y1)}H${PX(r.x0)}Z`;return `M${PX(r.x1)} ${PX(r.y0)}L${PX(r.x1)} ${PX(r.y1)}H${PX(r.x0)}Z`}
+function paperSVG(hs){return `<svg viewBox="0 0 120 120" width="100%" height="100%"><rect x="10" y="10" width="100" height="100" rx="2" fill="#fffdf6" stroke="#2d2a40" stroke-width="2.5"/>${holesSVG(hs)}</svg>`}
+function foldPanels(folds,regs,punched){
+  let out='';
+  for(let i=0;i<folds.length;i++){
+    const f=folds[i],r=regs[i];let line,arrow;
+    const mx=(r.x0+r.x1)/2,my=(r.y0+r.y1)/2;
+    if('LR'.includes(f.k)){line=`M${PX(f.line)} ${PX(r.y0)-4}V${+PX(r.y1)+4}`;const s=f.k==='L'?(r.x0+f.line)/2:(f.line+r.x1)/2,e=2*f.line-s;arrow=[s,my-.08,e,my-.08,(s+e)/2,my-.3]}
+    else if('TB'.includes(f.k)){line=`M${PX(r.x0)-4} ${PX(f.line)}H${+PX(r.x1)+4}`;const s=f.k==='T'?(r.y0+f.line)/2:(f.line+r.y1)/2,e=2*f.line-s;arrow=[mx+.08,s,mx+.08,e,mx+.3,(s+e)/2]}
+    else if(f.k==='D'){line=`M${PX(r.x0)} ${PX(r.y0)}L${PX(r.x1)} ${PX(r.y1)}`;const s=[r.x0+(r.x1-r.x0)*.75,r.y0+(r.y1-r.y0)*.25],e=reflectPt(s,f);arrow=[s[0],s[1],e[0],e[1],r.x1-(r.x1-r.x0)*.1,r.y1-(r.y1-r.y0)*.1]}
+    else {line=`M${PX(r.x1)} ${PX(r.y0)}L${PX(r.x0)} ${PX(r.y1)}`;const s=[r.x0+(r.x1-r.x0)*.25,r.y0+(r.y1-r.y0)*.25],e=reflectPt(s,f);arrow=[s[0],s[1],e[0],e[1],r.x0+(r.x1-r.x0)*.1,r.y1-(r.y1-r.y0)*.1]}
+    const [sx,sy,ex,ey,qx,qy]=arrow;
+    out+=`<div class="pf"><svg viewBox="0 0 120 120" width="100%" height="100%"><rect x="10" y="10" width="100" height="100" fill="none" stroke="#c9cde0" stroke-width="1.5" stroke-dasharray="4 4"/><path d="${regionPath(r)}" fill="#fffdf6" stroke="#2d2a40" stroke-width="2.5" stroke-linejoin="round"/><path d="${line}" stroke="#3d82c4" stroke-width="2.6" stroke-dasharray="6 5"/><path d="M${PX(sx)} ${PX(sy)}Q${PX(qx)} ${PX(qy)} ${PX(ex)} ${PX(ey)}" fill="none" stroke="#e4473f" stroke-width="3.2" marker-end="url(#ah)"/></svg></div><div class="arrow small">➜</div>`;
+  }
+  const last=regs[regs.length-1];
+  out+=`<div class="pf"><svg viewBox="0 0 120 120" width="100%" height="100%"><rect x="10" y="10" width="100" height="100" fill="none" stroke="#c9cde0" stroke-width="1.5" stroke-dasharray="4 4"/><path d="${regionPath(last)}" fill="#fffdf6" stroke="#2d2a40" stroke-width="2.5" stroke-linejoin="round"/>${holesSVG(punched)}</svg></div>`;
+  return out;
+}
+
+// ---------------------------------------------------------------- 9. FIGURE CLASSIFICATION
+const DIRSH=['triangle','arrow','tallTri'];
+const FC_LV={1:['shape'],2:['fill','count'],3:['sides','dir'],4:['fill+size','count+shape','dir+fill','sides+fill'],5:['dotsEqSides','innerSame','sides+count']};
+function figFeatures(f){
+  const S=SHAPES[f.shape],fs=['shape:'+f.shape,'fill:'+f.fill,'size:'+f.size,'count:'+(f.count||1)];
+  if(S.sides>0) fs.push('sides:'+S.sides);
+  if(S.orient) fs.push('dir:'+(f.rot%360));
+  if(f.dots&&S.sides===f.dots) fs.push('dotsEqSides');
+  if(f.innerShape) fs.push(f.innerShape===f.shape?'innerSame':'innerDiff');
+  return fs;
+}
+function genFigClass(level,opt){
+  const rules=FC_LV[level];const rule=opt.concept&&rules.includes(opt.concept)?opt.concept:R.pick(rules);
+  const parts=rule.split('+');
+  const usesCount=parts.includes('count'), usesDots=rule==='dotsEqSides', usesInner=rule==='innerSame';
+  const shapeFam=parts.includes('dir')?DIRSH:parts.includes('sides')?FAMILIES.four.concat(FAMILIES.three):usesDots?['triangle','square','pentagon','hexagon','righttri','diamond','rect']:usesInner?['circle','square','triangle','diamond','star','heart']:FAMILIES.basic;
+  const rnd=()=>{const f={shape:R.pick(shapeFam),fill:R.pick(FILLS),color:R.pick(Object.keys(NCOL)),size:R.pick(['s','l']),rot:0,count:1};
+    if(SHAPES[f.shape].orient) f.rot=R.pick([0,90,180,270]);
+    if(usesCount) f.count=R.ri(1,3);
+    if(usesDots){f.size='l';f.fill='empty';f.dots=R.ri(3,6)}
+    if(usesInner){f.size='l';f.fill=R.pick(['solid','striped']);f.innerShape=R.pick(shapeFam)}
+    if(level===1){f.fill=R.pick(['solid','empty'])}
+    return f};
+  // target value(s)
+  const tgt={};
+  const T=()=>{
+    if(parts.includes('shape')) tgt.shape=R.pick(shapeFam);
+    if(parts.includes('fill')) tgt.fill=R.pick(FILLS);
+    if(parts.includes('count')) tgt.count=R.ri(1,3);
+    if(parts.includes('size')) tgt.size=R.pick(['s','l']);
+    if(parts.includes('sides')) tgt.sides=R.pick([3,4]);
+    if(parts.includes('dir')) tgt.rot=R.pick([0,90,180,270]);
+  };T();
+  const fam=parts.includes('sides')?(tgt.sides===3?FAMILIES.three:FAMILIES.four):null;
+  const conform=f=>{const g={...f};if('shape' in tgt)g.shape=tgt.shape;if('fill' in tgt)g.fill=tgt.fill;if('count' in tgt)g.count=tgt.count;if('size' in tgt)g.size=tgt.size;
+    if(fam&&!fam.includes(g.shape))g.shape=R.pick(fam);if('rot' in tgt){if(!DIRSH.includes(g.shape))g.shape=R.pick(DIRSH);g.rot=tgt.rot}
+    if(usesDots){g.dots=SHAPES[g.shape].sides} if(usesInner){g.innerShape=g.shape}
+    if('sides' in tgt&&!fam.includes(g.shape))return null; if(SHAPES[g.shape].orient&&!('rot' in tgt)&&usesCount===false&&level<3)g.rot=0; return g};
+  const targetFeats=f=>{const fs=figFeatures(f),out=[];
+    if('shape' in tgt)out.push(fs.includes('shape:'+tgt.shape));if('fill' in tgt)out.push(fs.includes('fill:'+tgt.fill));if('count' in tgt)out.push(fs.includes('count:'+tgt.count));
+    if('size' in tgt)out.push(fs.includes('size:'+tgt.size));if('sides' in tgt)out.push(fs.includes('sides:'+tgt.sides));if('rot' in tgt)out.push(fs.includes('dir:'+tgt.rot));
+    if(usesDots)out.push(fs.includes('dotsEqSides'));if(usesInner)out.push(fs.includes('innerSame'));return out};
+  const stems=[];for(let i=0;i<20&&stems.length<3;i++){const f=conform(rnd());if(f&&!stems.some(s=>figKey(s)===figKey(f)))stems.push(f)}
+  if(stems.length<3) return null;
+  if(new Set(stems.map(s=>s.color)).size<2) stems[0].color=Object.keys(NCOL).find(c=>c!==stems[1].color);
+  // the varying attributes must really vary, so the target is the only thing they share
+  const S=stems.map(figFeatures).reduce((a,b)=>a.filter(t=>b.includes(t)));
+  let corr=null;for(let i=0;i<40&&!corr;i++){const f=conform(rnd());if(f&&!stems.some(s=>figKey(s)===figKey(f))&&S.every(t=>figFeatures(f).includes(t)))corr=f}
+  if(!corr) return null;
+  const n=NCH(level)-1;const ds=[];
+  for(let i=0;i<80&&ds.length<n;i++){
+    let f=conform(rnd());if(!f)continue;
+    // break exactly one target attribute (near miss) or, at low levels, more
+    const breakers=[];
+    if('shape' in tgt)breakers.push(g=>{g.shape=R.pick(shapeFam.filter(s=>s!==tgt.shape))});
+    if('fill' in tgt)breakers.push(g=>{g.fill=R.pick(FILLS.filter(x=>x!==tgt.fill))});
+    if('count' in tgt)breakers.push(g=>{g.count=R.pick([1,2,3].filter(x=>x!==tgt.count))});
+    if('size' in tgt)breakers.push(g=>{g.size=tgt.size==='s'?'l':'s'});
+    if('sides' in tgt)breakers.push(g=>{g.shape=R.pick((tgt.sides===3?FAMILIES.four:FAMILIES.three).concat(['pentagon','circle']))});
+    if('rot' in tgt)breakers.push(g=>{g.rot=R.pick([0,90,180,270].filter(x=>x!==tgt.rot))});
+    if(usesDots)breakers.push(g=>{g.dots=SHAPES[g.shape].sides+R.pick([-1,1])});
+    if(usesInner)breakers.push(g=>{g.innerShape=R.pick(shapeFam.filter(s=>s!==g.shape))});
+    R.pick(breakers)(f);
+    const tf=targetFeats(f);
+    if(tf.every(Boolean)) continue;
+    if(S.every(t=>figFeatures(f).includes(t))) continue;
+    if(ds.some(x=>figKey(x.f)===figKey(f))||figKey(f)===figKey(corr)) continue;
+    ds.push({f,kind:tf.filter(Boolean).length>=tf.length-1&&tf.length>1?'near':'far'});
+  }
+  if(ds.length<n) return null;
+  const slots=usesCount;
+  const q={type:'nc',level,concept:rule,surface:rule+':'+[...new Set(stems.map(s=>s.shape))].sort().join(','),
+    dims:['REL'].concat(parts.length>1||usesDots||usesInner?['WM']:[]).concat(parts.includes('dir')?['SPA']:[]).concat(level>=3?['DIS']:[]),
+    say:'These three shapes are alike in some way. Which shape below goes with them?',hintSay:'Look closely at the three shapes at the top. Do not just look at the colors. What else is the same about them?',stemKey:stems.map(figKey).join('/'),layout:'figs'};
+  q.stem=`<div class="clsTop hintable">${stems.map(s=>`<div class="mcell">${figSVG(s,slots)}</div>`).join('')}</div>`;
+  return finalize(q,{html:figSVG(corr,slots),key:figKey(corr)},ds.map(x=>({html:figSVG(x.f,slots),key:figKey(x.f),kind:x.kind})));
+}
+
+// ---------------------------------------------------------------- registry
+const TYPES={
+ va:{b:'V',name:'Picture Analogies',gen:genAnalogy,concepts:Object.keys(RELS),cname:k=>RELS[k]?RELS[k].name:k},
+ vc:{b:'V',name:'Picture Classification',gen:genVClass,concepts:CLS.map(c=>clsName(c.T)),cname:k=>'groups by: '+k},
+ vs:{b:'V',name:'Sentence Completion',gen:genSentence,concepts:['describe','function','location','context','source','growth','multi','negation','inference'],cname:k=>({describe:'describing words',function:'what things are used for',location:'where things live/belong',context:'everyday situations',source:'where things come from',growth:'what things grow into',multi:'two clues at once',negation:'"not" sentences',inference:'figuring out from clues'})[k]||k},
+ qa:{b:'Q',name:'Number Analogies',gen:genNumAnalogy,concepts:Object.keys(NA_NAME),cname:k=>NA_NAME[k]||k},
+ qp:{b:'Q',name:'Number Puzzles',gen:genPuzzle,concepts:Object.keys(PZ_NAME),cname:k=>PZ_NAME[k]||k},
+ qs:{b:'Q',name:'Number Series',gen:genSeries,concepts:Object.keys(SR_NAME),cname:k=>SR_NAME[k]||k},
+ nm:{b:'N',name:'Figure Matrices',gen:genMatrix,concepts:[],cname:k=>'changes in '+k.replace(/rot/g,'turning').replace(/\+/g,' & ')},
+ nf:{b:'N',name:'Paper Folding',gen:genFolding,concepts:Object.keys(PF_NAME),cname:k=>PF_NAME[k]||k},
+ nc:{b:'N',name:'Figure Classification',gen:genFigClass,concepts:[],cname:k=>({shape:'same shape',fill:'same pattern',count:'same number',sides:'same number of sides',dir:'pointing the same way','fill+size':'pattern and size','count+shape':'number and shape','dir+fill':'direction and pattern','sides+fill':'sides and pattern',dotsEqSides:'dots match the sides',innerSame:'inside matches outside','sides+count':'sides and number'})[k]||k},
+};
+const TYPE_IDS=Object.keys(TYPES);
+function generate(type,level,opt){
+  opt=opt||{};level=Math.max(1,Math.min(5,level));
+  for(let i=0;i<200;i++){
+    let q=null;try{q=TYPES[type].gen(level,{...opt,concept:i<60?opt.concept:null})}catch(e){if(typeof console!=='undefined'&&i===0)console.warn(type,e)}
+    if(!q) continue;
+    if(opt.avoid&&opt.avoid.has(q.sig)&&i<150) continue;
+    return q;
+  }
+  return null;
+}
+if(typeof module!=='undefined'&&typeof window==='undefined') module.exports={ICONS,ICON_IDS,TYPES,TYPE_IDS,generate,SENT,RELS,CLS,seriesFits,unfoldHoles,reflectPt,onFlap,holeKey,applyFoldRegion,figFeatures,figKey,SHAPES};
+
+// ===== Adaptive learning engine: storage, levels, mastery, skills profile, practice planning =====
+const KEY='brainyOwl_cogat7_v1';
+const DAY=864e5;
+const DIMS={REL:'Recognizing the relationship',WM:'Holding several attributes in mind',SPA:'Spatial transformations',NUM:'Number patterns',DIS:'Telling apart look-alike answers'};
+const PLAUSIBLE=new Set(['near','partial','colmiss','rule','copy','lastonly','wrongaxis','nounfold','mirror','missing','noflip']);
+const SR_INT=[0,1*DAY,3*DAY,7*DAY,21*DAY]; // spaced repetition boxes: again, 1 day, 3 days, 7 days, 3 weeks
+let S=null, memOnly=false;
+function freshType(){return {level:1,placed:false,hist:[],since:0,queue:[],boxes:{},last:0,retDays:[],dropFrom:0,demo:false,ups:[]}}
+function fresh(){const t={};TYPE_IDS.forEach(id=>t[id]=freshType());
+  return {v:1,created:Date.now(),settings:{rate:0.9,voice:true,sfx:true,roundLen:6,dailyCap:3,voiceName:''},diag:{V:null,Q:null,N:null},types:t,stars:0,rounds:[],recent:[],recentTpl:[],challenges:[],resume:null}}
+function load(){
+  try{const raw=localStorage.getItem(KEY);if(raw)S=JSON.parse(raw)}catch(e){memOnly=true}
+  if(!S||S.v!==1) S=fresh();
+  TYPE_IDS.forEach(id=>{if(!S.types[id])S.types[id]=freshType()});
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){memOnly=true}}
+const today=()=>new Date().toISOString().slice(0,10);
+const dayOf=ts=>new Date(ts).toISOString().slice(0,10);
+
+// ---------- recording a finished question
+// r: 'f' first try, 'r' right on a later try (no hint), 'h' right after a hint, 'x' not found (answer shown)
+function record(q,res,mode){
+  const T=S.types[q.type], now=Date.now();
+  const prevCorrect=T.hist.some(h=>h.c===q.concept&&h.r==='f');
+  const seenSurf=T.hist.some(h=>h.c===q.concept&&h.s===q.surface);
+  const e={d:now,l:q.level,r:res.r,c:q.concept,s:q.surface,m:mode,ms:res.ms,g:res.ms<1600&&res.r==='f',dims:q.dims,ek:res.firstWrongKind||null,tries:res.tries};
+  e.tr=res.r==='f'&&!e.g&&prevCorrect&&!seenSurf;                       // transfer: known idea, brand-new look
+  if(T.last&&now-T.last>=20*3600e3&&res.r==='f'&&!e.g&&q.level>=T.level-1){e.ret=true;const dd=dayOf(now);if(!T.retDays.includes(dd))T.retDays.push(dd)}
+  T.hist.push(e); if(T.hist.length>600){const cut=T.hist.length-600;T.hist=T.hist.slice(cut);T.since=Math.max(0,T.since-cut)}
+  T.last=now;
+  // spaced repetition per concept
+  const b=T.boxes[q.concept]||{box:0,due:0};
+  if(res.r==='f'&&!e.g){b.box=Math.min(4,b.box+1);b.due=now+SR_INT[b.box]}else if(res.r!=='f'){b.box=0;b.due=now+10*60e3;
+    if(!T.queue.some(x=>x.c===q.concept)) T.queue.push({c:q.concept,n:R.ri(2,3)})}  // come back to it soon, in a new picture
+  T.boxes[q.concept]=b;
+  S.recent.push(q.sig);if(S.recent.length>400)S.recent=S.recent.slice(-400);
+  if(q.tpl){S.recentTpl.push(q.tpl);if(S.recentTpl.length>14)S.recentTpl=S.recentTpl.slice(-14)}
+  if(mode==='p'||mode==='t'||mode==='r') adapt(q.type,q.level);
+  save(); return e;
+}
+function adapt(t,qLevel){
+  const T=S.types[t]; if(qLevel!==T.level) return;
+  const at=T.hist.slice(T.since).filter(h=>h.l===T.level&&h.m!=='c'&&h.m!=='d');
+  const ft=h=>h.r==='f'&&!h.g;
+  const last=n=>at.slice(-n);
+  const up=()=>{T.level++;T.since=T.hist.length;T.ups.push({d:Date.now(),l:T.level})};
+  if(T.dropFrom&&T.level<T.dropFrom&&last(2).length===2&&last(2).every(ft)){T.level=T.dropFrom-1;up();T.dropFrom=0;return}
+  if(T.level<5&&at.length>=4&&last(3).every(ft)&&at.filter(ft).length/at.length>=0.7&&new Set(last(3).map(h=>h.s)).size>=2){up();T.dropFrom=0;return}
+  const l3=last(3);
+  if(T.level>1&&l3.length===3&&l3.filter(h=>h.r!=='f').length>=2&&l3[2].r!=='f'){T.dropFrom=T.level;T.level--;T.since=T.hist.length;T.ups.push({d:Date.now(),l:T.level,down:1})}
+}
+
+// ---------- mastery (accuracy, difficulty, independence, retention, transfer)
+function wilsonLB(k,n){if(!n)return 0;const z=1.96,p=k/n;return (p+z*z/(2*n)-z*Math.sqrt(p*(1-p)/n+z*z/(4*n*n)))/(1+z*z/n)}
+function typeStats(t){
+  const T=S.types[t],ALL=T.hist,H=ALL.filter(h=>h.m!=='e'),n=H.length,c=x=>H.filter(x).length;
+  const ft=h=>h.r==='f'&&!h.g;
+  const last=H.slice(-25),k=last.filter(ft).length,lb=wilsonLB(k,last.length);
+  let Lr=0;const rec=H.slice(-60);for(let L=5;L>=1;L--){if(rec.filter(h=>h.l>=L&&ft(h)).length>=3){Lr=L;break}}
+  const corr=H.filter(h=>h.r!=='x'),indep=corr.length?corr.filter(h=>h.r!=='h').length/corr.length:0;
+  const transfer=new Set(H.filter(h=>h.tr).map(h=>h.c+'@'+h.s)).size;
+  const ret=T.retDays.length;
+  const high=H.filter(h=>h.l>=4),highConcepts=new Set(high.filter(ft).map(h=>h.c)).size;
+  const score=n?Math.round(100*(0.3*lb+0.3*Lr/5+0.1*indep+0.15*Math.min(1,ret/3)+0.15*Math.min(1,transfer/4))):0;
+  const checks={accuracy:last.length>=20&&lb>=0.65,difficulty:Lr===5&&high.length>=10,variety:highConcepts>=3,transfer:transfer>=3,retention:ret>=2};
+  let status='Not enough data yet';
+  if(n>=8){status='Needs practice';if(Lr>=2&&lb>=0.4)status='Developing';if(Lr>=4&&lb>=0.6)status='Strong';if(Object.values(checks).every(Boolean))status='Mastered'}
+  return {n,easy:ALL.length-n,ft:n?c(ft)/n:0,retry:n?c(h=>h.r==='r')/n:0,hint:n?c(h=>h.r==='h')/n:0,shown:n?c(h=>h.r==='x')/n:0,quick:c(h=>h.g),
+    level:T.level,Lr,lb,indep,transfer,ret,score,status,checks,mastered:status==='Mastered'};
+}
+// ---------- reasoning-skills profile (what kind of thinking is hard), from every recorded question
+function skillProfile(){
+  const out={};for(const d in DIMS)out[d]={n:0,ft:0,err:0,plaus:0,unrel:0};
+  const all=[];for(const t of TYPE_IDS)for(const h of S.types[t].hist)all.push({...h,t});
+  for(const h of all){for(const d of h.dims||[]){const o=out[d];o.n++;if(h.r==='f'&&!h.g)o.ft++;else{o.err++;if(h.ek){if(PLAUSIBLE.has(h.ek))o.plaus++;else o.unrel++}}}}
+  // working memory: compare multi-attribute questions with single-rule questions of the same kinds
+  const wmTypes=new Set(all.filter(h=>(h.dims||[]).includes('WM')).map(h=>h.t));
+  const single=all.filter(h=>wmTypes.has(h.t)&&!(h.dims||[]).includes('WM'));
+  out.WM.compare=single.length?single.filter(h=>h.r==='f'&&!h.g).length/single.length:null;out.WM.compareN=single.length;
+  const errs=all.filter(h=>h.r!=='f'&&h.ek);
+  out._err={n:errs.length,plaus:errs.filter(h=>PLAUSIBLE.has(h.ek)).length,unrel:errs.filter(h=>!PLAUSIBLE.has(h.ek)).length,quick:all.filter(h=>h.g).length,total:all.length};
+  return out;
+}
+function skillNote(d,o){
+  if(o.n<5) return 'Too few questions yet to say.';
+  const acc=o.ft/o.n, pl=o.err?o.plaus/o.err:0;
+  if(d==='WM'&&o.compare!=null&&o.compareN>=5){const drop=o.compare-acc;if(drop>0.2)return `Clearly harder than single-rule questions (${pct(acc)} vs ${pct(o.compare)}). He likely tracks one change but loses the second. Practice: name each change out loud.`;if(drop<0.1)return 'About as easy as single-rule questions. Keeping several things in mind is not the bottleneck.'}
+  if(acc>=0.8) return 'A strength right now.';
+  if(o.err>=3&&pl>=0.65) return 'Errors are mostly almost-right answers: he seems to see the idea but misses a detail. Encourage checking every choice before tapping.';
+  if(o.err>=3&&pl<=0.35) return 'Errors are mostly unrelated answers: the relationship itself is not clicking yet. Short, easier examples and talking through "how do these go together?" help most.';
+  return acc>=0.6?'Developing; keep practising.':'A focus area: the practice plan gives this more time.';
+}
+const pct=x=>Math.round(100*x)+'%';
+
+// ---------- what to practise next (weak areas get most of the time; strong areas only come back for spaced review)
+function accAtLevel(t){const T=S.types[t];const h=T.hist.filter(x=>x.m!=='e'&&x.l===T.level).slice(-8);return h.length>=3?h.filter(x=>x.r==='f'&&!x.g).length/h.length:0.5}
+function needWeight(t){
+  const st=typeStats(t),T=S.types[t];
+  if(st.mastered) return {w:dueConcepts(t).length?0.25:0.05,why:'review only'};
+  let w=0.15+0.8*(5-T.level)/4+0.6*(1-accAtLevel(t)); let why=[];
+  if(T.level<=2) why.push('still at an early level');
+  if(accAtLevel(t)<0.6) why.push('missing often at its current level');
+  if(!T.hist.length){w+=0.4;why.push('not tried yet')}
+  const prof=skillProfile();
+  for(const d in DIMS){const o=prof[d];if(o.n>=5&&o.ft/o.n<0.6&&typeHasDim(t,d)){w+=0.25;why.push('builds a weak skill: '+DIMS[d].toLowerCase())}}
+  if(dueConcepts(t).length){w+=0.2;why.push('ideas due for review')}
+  return {w,why:why.join('; ')||'below mastery'};
+}
+function typeHasDim(t,d){return ({REL:['va','vc','vs','qa','qs','nm','nc'],WM:['vc','vs','qp','qs','nm','nf','nc','qa'],SPA:['nf','nm','nc'],NUM:['qa','qp','qs'],DIS:TYPE_IDS})[d].includes(t)}
+function dueConcepts(t){const T=S.types[t],now=Date.now();return Object.entries(T.boxes).filter(([c,b])=>b.box>0&&b.due<=now).map(([c])=>c)}
+function pickConcept(t){
+  const T=S.types[t];
+  for(const it of T.queue){it.n--}
+  const ready=T.queue.find(x=>x.n<=0);if(ready){T.queue=T.queue.filter(x=>x!==ready);return {c:ready.c,why:'again'}}
+  const due=dueConcepts(t);if(due.length&&R.chance(.5))return {c:R.pick(due),why:'review'};
+  return {c:null};
+}
+function strongTypes(){return TYPE_IDS.filter(t=>S.types[t].hist.length).sort((a,b)=>recentAcc(b)-recentAcc(a))}
+function recentAcc(t){const h=S.types[t].hist.slice(-8);return h.length?h.filter(x=>x.r==='f').length/h.length:0}
+// Decide the next question of a round
+function nextItem(ses){
+  const i=ses.items.length,len=ses.len,res=ses.items.map(x=>x.res&&x.res.r);
+  const missed2=i>=2&&res[i-1]&&res[i-2]&&res[i-1]!=='f'&&res[i-2]!=='f';
+  const easy=(t,tag)=>({t,level:Math.max(1,S.types[t].level-1),tag,easy:true});
+  if(ses.mode==='t'){
+    const T=S.types[ses.type];
+    if((i===0||i===len-1||missed2)&&T.level>1&&T.hist.length) return easy(ses.type,i===0?'warm-up':missed2?'confidence':'finish on a win');
+    const pc=pickConcept(ses.type);return {t:ses.type,level:T.level,concept:pc.c,tag:pc.why||'practice'};
+  }
+  if(ses.mode==='c'){const t=ses.order[i];return {t,level:Math.min(5,S.types[t].level+(typeStats(t).Lr>=S.types[t].level?1:0)),tag:'challenge'}}
+  // mixed adaptive "Play"
+  const counts={};ses.items.forEach(x=>counts[x.t]=(counts[x.t]||0)+1);
+  // warm-up, confidence and last questions are easier versions of FOCUS areas: success without spending time on strengths
+  const focus=TYPE_IDS.filter(t=>!(counts[t]>=2)&&!typeStats(t).mastered).map(t=>({t,w:needWeight(t).w})).sort((a,b)=>b.w-a.w).slice(0,3).map(x=>x.t);
+  const pool=focus.length?focus:strongTypes();
+  if((i===0||i===len-1||missed2)&&pool.length) return easy(R.pick(pool),i===0?'warm-up':missed2?'confidence':'finish on a win');
+  const ws=TYPE_IDS.filter(t=>(counts[t]||0)<2).map(t=>({t,...needWeight(t)}));
+  let tot=ws.reduce((a,b)=>a+b.w,0),r=Math.random()*tot,ch=ws[0];for(const x of ws){r-=x.w;if(r<=0){ch=x;break}}
+  const st=typeStats(ch.t),pc=pickConcept(ch.t);
+  return {t:ch.t,level:S.types[ch.t].level,concept:pc.c,tag:st.mastered?'spaced review':(pc.why==='review'?'spaced review':'focus: '+ch.why),review:st.mastered||pc.why==='review'};
+}
+function roundsToday(){return S.rounds.filter(r=>r.day===today()).length}
+// ---------- diagnostic: per battery, each type gets a single-rule item, then a harder multi-attribute item (or an easier one)
+const BATT={V:['va','vc','vs'],Q:['qa','qp','qs'],N:['nm','nf','nc']};
+function diagNext(ses){
+  const done=ses.items.length,ts=BATT[ses.batt];if(done>=6) return null;
+  const t=ts[Math.floor(done/2)];
+  if(done%2===0) return {t,level:2,tag:'diagnostic: one rule'};
+  const prev=ses.items[done-1];return {t,level:prev.res.r==='f'?3:1,tag:prev.res.r==='f'?'diagnostic: several attributes':'diagnostic: easier check'};
+}
+function diagPlace(ses){
+  const ts=BATT[ses.batt],out={};
+  ts.forEach((t,k)=>{const a=ses.items[2*k],b=ses.items[2*k+1];const fa=a.res.r==='f',fb=b.res.r==='f';
+    const lvl=fa&&fb?3:fa?2:fb?1:1;const T=S.types[t];if(!T.placed||T.level<lvl){T.level=lvl;T.since=T.hist.length}T.placed=true;
+    out[t]={a:a.res.r,b:b.res.r,bLevel:b.level,ek:[a.res.firstWrongKind,b.res.firstWrongKind],dimsB:b.dims,level:lvl}});
+  S.diag[ses.batt]={d:Date.now(),types:out};save();
+}
+
+// ===== Child interface, speech, feedback, parent dashboard =====
+const $=s=>document.querySelector(s);
+const KID={va:'Picture pairs',vc:'Which ones go together',vs:'Listen and find',qa:'Number pairs',qp:'Balance puzzles',qs:'Bead patterns',nm:'Shape boxes',nf:'Paper folding',nc:'Shape groups'};
+const PRAISE=['Great job!','You got it!','Super thinking!','Wonderful!','Yes! Nice work!','Awesome!','You figured it out!','Brilliant!'];
+const AGAIN="Let's try that one again!";
+// ---------- art for the child interface (no words needed)
+const OWL=(cls)=>`<svg class="${cls||''}" viewBox="0 0 120 120"><ellipse cx="60" cy="72" rx="40" ry="42" fill="#8e6bd6" stroke="#2d2a40" stroke-width="4"/><ellipse cx="60" cy="84" rx="26" ry="26" fill="#d9c8f7"/><path d="M26 40 l6 -24 l16 18z M94 40 l-6 -24 l-16 18z" fill="#8e6bd6" stroke="#2d2a40" stroke-width="4" stroke-linejoin="round"/><circle cx="44" cy="54" r="17" fill="#fff" stroke="#2d2a40" stroke-width="4"/><circle cx="76" cy="54" r="17" fill="#fff" stroke="#2d2a40" stroke-width="4"/><circle class="pupil" cx="46" cy="56" r="7" fill="#2d2a40"/><circle class="pupil" cx="74" cy="56" r="7" fill="#2d2a40"/><path d="M54 68 l6 10 l6 -10z" fill="#f2b632" stroke="#2d2a40" stroke-width="3" stroke-linejoin="round"/><path d="M40 112 l-4 6 M48 113 l0 6 M80 113 l0 6 M88 112 l4 6" stroke="#f2b632" stroke-width="4" stroke-linecap="round"/></svg>`;
+const ICON={
+ play:'<svg viewBox="0 0 100 100"><path d="M34 22 L80 50 L34 78Z" fill="#fff" stroke="#fff" stroke-width="8" stroke-linejoin="round"/></svg>',
+ home:'<svg viewBox="0 0 100 100"><path d="M14 50 L50 18 L86 50" fill="none" stroke="#2d2a40" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M26 46 V84 H74 V46" fill="#ffd23f" stroke="#2d2a40" stroke-width="8" stroke-linejoin="round"/><rect x="42" y="60" width="16" height="24" fill="#2d2a40"/></svg>',
+ speaker:'<svg viewBox="0 0 100 100"><path d="M16 38 H34 L56 18 V82 L34 62 H16Z" fill="#2d2a40" stroke="#2d2a40" stroke-width="5" stroke-linejoin="round"/><path class="wave w1" d="M66 36 Q76 50 66 64" fill="none" stroke="#2d2a40" stroke-width="7" stroke-linecap="round"/><path class="wave w2" d="M76 24 Q94 50 76 76" fill="none" stroke="#2d2a40" stroke-width="7" stroke-linecap="round"/></svg>',
+ bulb:'<svg viewBox="0 0 100 100"><path d="M50 12 a26 26 0 0 1 16 46 v10 h-32 v-10 a26 26 0 0 1 16 -46z" fill="#ffd23f" stroke="#2d2a40" stroke-width="6" stroke-linejoin="round"/><rect x="36" y="72" width="28" height="8" rx="3" fill="#2d2a40"/><rect x="40" y="84" width="20" height="6" rx="3" fill="#2d2a40"/></svg>',
+ eye:'<svg viewBox="0 0 100 100"><path d="M8 50 Q50 10 92 50 Q50 90 8 50Z" fill="#fff" stroke="#2d2a40" stroke-width="7"/><circle cx="50" cy="50" r="15" fill="#3d82c4" stroke="#2d2a40" stroke-width="5"/><circle cx="50" cy="50" r="6" fill="#2d2a40"/></svg>',
+ lock:'<svg viewBox="0 0 100 100"><path d="M32 46 V34 a18 18 0 0 1 36 0 V46" fill="none" stroke="#5b6077" stroke-width="9"/><rect x="22" y="44" width="56" height="42" rx="8" fill="#9aa0b5" stroke="#5b6077" stroke-width="5"/></svg>',
+ trophy:'<svg viewBox="0 0 100 100"><path d="M30 14 H70 V40 a20 20 0 0 1 -40 0Z" fill="#ffd23f" stroke="#2d2a40" stroke-width="6" stroke-linejoin="round"/><path d="M30 22 H16 q0 22 18 24 M70 22 H84 q0 22 -18 24" fill="none" stroke="#2d2a40" stroke-width="6"/><rect x="44" y="58" width="12" height="14" fill="#f2a01e" stroke="#2d2a40" stroke-width="5"/><rect x="30" y="72" width="40" height="14" rx="3" fill="#f2a01e" stroke="#2d2a40" stroke-width="6"/></svg>',
+ moon:'<svg viewBox="0 0 100 100"><path d="M62 12 a38 38 0 1 0 26 58 a30 30 0 1 1 -26 -58z" fill="#ffe14d" stroke="#2d2a40" stroke-width="6"/></svg>',
+ resume:'<svg viewBox="0 0 100 100"><path d="M24 22 L64 50 L24 78Z" fill="#fff" stroke="#fff" stroke-width="8" stroke-linejoin="round"/><rect x="70" y="22" width="12" height="56" rx="4" fill="#fff"/></svg>',
+ search:'<svg viewBox="0 0 100 100"><circle cx="42" cy="42" r="24" fill="#bfe3f7" stroke="#2d2a40" stroke-width="8"/><path d="M60 60 L84 84" stroke="#2d2a40" stroke-width="12" stroke-linecap="round"/></svg>',
+};
+const STAR=(fill,sz)=>`<svg viewBox="0 0 100 100" width="${sz}" height="${sz}"><path d="M50 6 L62 37 L95 38 L69 59 L78 92 L50 73 L22 92 L31 59 L5 38 L38 37Z" fill="${fill}" stroke="#2d2a40" stroke-width="5" stroke-linejoin="round"/></svg>`;
+const TILE={
+ va:`<svg viewBox="0 0 120 70">${'<g transform="translate(0,8) scale(.5)">'+ICONS.bird.s+'</g><text x="52" y="40" font-size="20" fill="#8a8fa8">➜</text><g transform="translate(66,8) scale(.5)">'+ICONS.nest.s+'</g>'}</svg>`,
+ vc:`<svg viewBox="0 0 120 70"><g transform="translate(0,14) scale(.4)">${ICONS.apple.s}</g><g transform="translate(40,14) scale(.4)">${ICONS.banana.s}</g><g transform="translate(80,14) scale(.4)">${ICONS.orange.s}</g></svg>`,
+ vs:`<svg viewBox="0 0 120 70"><g transform="translate(18,6) scale(.6)">${ICON.speaker.replace(/<\/?svg[^>]*>/g,'')}</g><g transform="translate(66,10) scale(.5)">${ICONS.umbrella.s}</g></svg>`,
+ qa:`<svg viewBox="0 0 120 70">${[0,1].map(i=>`<circle cx="${14+i*14}" cy="35" r="6" fill="#3d82c4" stroke="#2d2a40" stroke-width="2"/>`).join('')}<text x="44" y="42" font-size="18" fill="#8a8fa8">➜</text>${[0,1,2,3].map(i=>`<circle cx="${70+(i%2)*14}" cy="${28+Math.floor(i/2)*14}" r="6" fill="#3d82c4" stroke="#2d2a40" stroke-width="2"/>`).join('')}</svg>`,
+ qp:`<svg viewBox="0 0 120 70"><rect x="20" y="20" width="80" height="6" rx="3" fill="#8a5a2b"/><path d="M60 26 L72 62 H48Z" fill="#c98b4f" stroke="#2d2a40" stroke-width="2.5"/><circle cx="30" cy="14" r="5" fill="#e4473f"/><circle cx="42" cy="14" r="5" fill="#e4473f"/><circle cx="84" cy="14" r="5" fill="#e4473f"/><circle cx="96" cy="14" r="5" fill="#e4473f"/></svg>`,
+ qs:`<svg viewBox="0 0 120 70">${[1,2,3,4].map((v,i)=>`<rect x="${20+i*24}" y="8" width="3" height="56" fill="#8a5a2b"/>`+[...Array(v)].map((_,k)=>`<ellipse cx="${21.5+i*24}" cy="${58-k*10}" rx="9" ry="4.5" fill="#f28c38" stroke="#2d2a40" stroke-width="1.6"/>`).join('')).join('')}</svg>`,
+ nm:`<svg viewBox="0 0 120 70"><rect x="30" y="4" width="28" height="28" rx="4" fill="#fff" stroke="#c9cde0" stroke-width="2"/><circle cx="44" cy="18" r="9" fill="#e4473f"/><rect x="62" y="4" width="28" height="28" rx="4" fill="#fff" stroke="#c9cde0" stroke-width="2"/><circle cx="76" cy="18" r="9" fill="none" stroke="#e4473f" stroke-width="3"/><rect x="30" y="36" width="28" height="28" rx="4" fill="#fff" stroke="#c9cde0" stroke-width="2"/><rect x="36" y="42" width="16" height="16" fill="#3d82c4"/><rect x="62" y="36" width="28" height="28" rx="4" fill="#fff8e6" stroke="#f2a01e" stroke-width="2" stroke-dasharray="4 3"/></svg>`,
+ nf:`<svg viewBox="0 0 120 70"><rect x="14" y="10" width="44" height="50" fill="#fffdf6" stroke="#2d2a40" stroke-width="2.5"/><path d="M36 8 V62" stroke="#3d82c4" stroke-width="2.5" stroke-dasharray="5 4"/><rect x="70" y="10" width="44" height="50" fill="#fffdf6" stroke="#2d2a40" stroke-width="2.5"/><circle cx="82" cy="28" r="4" fill="#2d2a40"/><circle cx="102" cy="28" r="4" fill="#2d2a40"/></svg>`,
+ nc:`<svg viewBox="0 0 120 70"><path d="M20 52 L32 26 L44 52Z" fill="#3aa35b"/><path d="M54 56 L66 18 L78 56Z" fill="none" stroke="#8e5bd6" stroke-width="3.5"/><path d="M88 50 L98 30 L108 50Z" fill="url(#st-orange)" stroke="#f28c38" stroke-width="3"/></svg>`,
+};
+const BATT_ART={V:`<svg viewBox="0 0 100 100"><path d="M14 20 h72 a8 8 0 0 1 8 8 v36 a8 8 0 0 1 -8 8 h-40 l-18 16 v-16 h-14 a8 8 0 0 1 -8 -8 v-36 a8 8 0 0 1 8 -8z" fill="#fff" stroke="#2d2a40" stroke-width="5"/><circle cx="34" cy="46" r="6" fill="#e86aa6"/><circle cx="50" cy="46" r="6" fill="#e86aa6"/><circle cx="66" cy="46" r="6" fill="#e86aa6"/></svg>`,
+ Q:`<svg viewBox="0 0 100 100">${[0,1,2,3,4,5].map(i=>`<circle cx="${26+(i%3)*24}" cy="${36+Math.floor(i/3)*26}" r="10" fill="#fff" stroke="#2d2a40" stroke-width="4"/>`).join('')}</svg>`,
+ N:`<svg viewBox="0 0 100 100"><path d="M12 80 L32 40 L52 80Z" fill="#fff" stroke="#2d2a40" stroke-width="5" stroke-linejoin="round"/><rect x="56" y="18" width="30" height="30" fill="#fff" stroke="#2d2a40" stroke-width="5"/><circle cx="72" cy="70" r="14" fill="#fff" stroke="#2d2a40" stroke-width="5"/></svg>`};
+
+// ---------- speech
+const SP={ok:typeof window!=='undefined'&&'speechSynthesis' in window&&typeof SpeechSynthesisUtterance!=='undefined',voice:null,token:0};
+function pickVoice(){if(!SP.ok)return;const vs=speechSynthesis.getVoices();if(!vs.length)return;
+  const want=S&&S.settings.voiceName;let v=want&&vs.find(x=>x.name===want);
+  if(!v)v=['Samantha','Google US English','Microsoft Aria Online (Natural) - English (United States)','Microsoft Jenny Online (Natural) - English (United States)','Karen','Moira','Microsoft Zira - English (United States)'].map(n=>vs.find(x=>x.name===n)).find(Boolean);
+  if(!v)v=vs.find(x=>/^en[-_]US/i.test(x.lang))||vs.find(x=>/^en/i.test(x.lang))||vs[0];SP.voice=v}
+function speak(text,cb,rate){
+  const tok=++SP.token;const btn=$('#spk');
+  const done=()=>{if(tok!==SP.token)return;btn&&btn.classList.remove('talking');cb&&cb()};
+  if(!SP.ok||!S.settings.voice){setTimeout(done,Math.min(2500,300+text.length*25));return}
+  try{speechSynthesis.cancel();
+    setTimeout(()=>{if(tok!==SP.token)return;const u=new SpeechSynthesisUtterance(text);if(SP.voice)u.voice=SP.voice;u.rate=rate||S.settings.rate;u.pitch=1.08;
+      u.onend=done;u.onerror=done;btn&&btn.classList.add('talking');speechSynthesis.speak(u);
+      setTimeout(()=>{if(tok===SP.token&&!speechSynthesis.speaking)done()},Math.max(4000,text.length*120))},60);
+  }catch(e){setTimeout(done,500)}
+}
+// ---------- sound effects
+let AC=null;
+function tone(freqs,dur,type){if(!S.settings.sfx)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const t0=AC.currentTime;
+  freqs.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=type||'sine';o.frequency.value=f;g.gain.setValueAtTime(0.0001,t0+i*dur);g.gain.exponentialRampToValueAtTime(0.18,t0+i*dur+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t0+i*dur+dur*1.6);o.connect(g);g.connect(AC.destination);o.start(t0+i*dur);o.stop(t0+i*dur+dur*1.8)})}catch(e){}}
+const sfxRight=()=>tone([523,659,784,1047],0.09,'triangle'), sfxSoft=()=>tone([330,294],0.12,'sine');
+function confetti(n){const box=$('#fx');const cols=['#e4473f','#ffd23f','#3aa35b','#3d82c4','#8e5bd6','#f28cc6'];
+  for(let i=0;i<(n||40);i++){const d=document.createElement('i');d.className='cf';d.style.left=(30+Math.random()*40)+'vw';d.style.background=cols[i%cols.length];
+    d.style.setProperty('--dx',(Math.random()*80-40)+'vw');d.style.setProperty('--r',(Math.random()*720)+'deg');d.style.animationDelay=(Math.random()*.15)+'s';box.appendChild(d);setTimeout(()=>d.remove(),1800)}}
+function starBurst(){const s=document.createElement('div');s.className='burst';s.innerHTML=STAR('#ffd23f','100%');$('#fx').appendChild(s);setTimeout(()=>s.remove(),1300)}
+
+// ---------- screens
+function show(id){document.querySelectorAll('.screen').forEach(e=>e.classList.toggle('on',e.id===id));window.scrollTo(0,0)}
+function levelStars(l,crown){return `<span class="lstars">${crown?'<span class="crown">👑</span>':''}${[1,2,3,4,5].map(i=>STAR(i<=l?'#ffd23f':'#eef0f7','16')).join('')}</span>`}
+function jarHTML(){const s=Math.floor(S.stars),per=30,full=Math.floor(s/per),part=s%per;
+  return `<div class="jars" title="Stars earned (parents: ${s})">${[...Array(Math.min(full,8))].map(()=>`<div class="jar full">${STAR('#ffd23f','70%')}</div>`).join('')}<div class="jar"><div class="jarfill" style="height:${Math.round(100*part/per)}%"></div>${STAR(part?'#ffd23f':'#eef0f7','60%')}</div></div>`}
+function diagDone(){return S.diag.V&&S.diag.Q&&S.diag.N}
+function renderHome(){
+  const playIcon=S.resume?ICON.resume:ICON.play;
+  const needDiag=!diagDone();
+  let h=`<div class="homeTop"><div class="owlWrap">${OWL('owl bob')}</div>${jarHTML()}<button class="ibtn small lockBtn" id="parentBtn" aria-label="Grown-ups">${ICON.lock}</button></div>
+  <div class="playRow"><button class="playBig ${needDiag?'diag':''}" id="playBtn" aria-label="Play">${playIcon}${needDiag&&!S.resume?`<span class="badge">${ICON.search}</span>`:''}</button>
+  <button class="ibtn chal" id="chalBtn" aria-label="Challenge">${ICON.trophy}</button></div><div class="batts">`;
+  for(const b of ['V','Q','N']){
+    h+=`<div class="batt b${b}"><div class="bhead"><div class="bart">${BATT_ART[b]}</div><span class="plabel">${{V:'Verbal',Q:'Quantitative',N:'Nonverbal'}[b]}</span></div><div class="tiles">`;
+    for(const t of BATT[b]){const st=typeStats(t);h+=`<button class="tile" data-t="${t}" aria-label="${TYPES[t].name}"><div class="ticon">${TILE[t]}</div>${levelStars(S.types[t].level,st.mastered)}<span class="plabel">${TYPES[t].name}</span></button>`}
+    h+=`</div></div>`;
+  }
+  h+=`</div><div class="foot plabel">${memOnly?'⚠ This browser is not saving progress (private mode?). ':''}${SP.ok?'':'🔇 Spoken instructions are not supported in this browser. A grown-up can read the instructions shown under each question. '}Parents: tap the lock for reports.</div>`;
+  $('#home').innerHTML=h;
+  $('#playBtn').onclick=()=>{unlockAudio();if(S.resume)return resumeRound();if(needDiag)return startDiag();if(roundsToday()>=S.settings.dailyCap&&S.settings.dailyCap<99)return restScreen();startRound({mode:'p'})};
+  $('#chalBtn').onclick=()=>{unlockAudio();speak('Challenge time! One puzzle of every kind.');startRound({mode:'c'})};
+  $('#parentBtn').onclick=parentGate;
+  document.querySelectorAll('.tile').forEach(b=>b.onclick=()=>{unlockAudio();const t=b.dataset.t;startRound({mode:'t',type:t})});
+  show('home');
+}
+function unlockAudio(){try{if(SP.ok&&!SP.unlocked){SP.unlocked=1;const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}}catch(e){}}
+function restScreen(){
+  $('#end').innerHTML=`<div class="endCard">${OWL('owl sleepy')}<div class="bigIcon">${ICON.moon}</div><div class="row"><button class="ibtn big" id="restHome">${ICON.home}</button><button class="ibtn small ghost" id="oneMore">${ICON.play}</button></div></div>`;
+  show('end');speak("Wow, you did so much thinking today! Your brain grows while you rest. Let's play again tomorrow!");
+  $('#restHome').onclick=renderHome;$('#oneMore').onclick=()=>startRound({mode:'p'});
+}
+
+// ---------- rounds
+let SES=null,CUR=null;
+function startRound(o){
+  SES={mode:o.mode,type:o.type,batt:o.batt,len:o.mode==='c'?9:o.mode==='d'?6:S.settings.roundLen,items:[],order:o.mode==='c'?R.shuffle(TYPE_IDS):null,start:Date.now()};
+  persistSes();nextQ();
+}
+function startDiag(){const b=['V','Q','N'].find(x=>!S.diag[x]);
+  $('#end').innerHTML=`<div class="endCard">${OWL('owl bob')}<div class="bigIcon">${ICON.search}</div><button class="playBig" id="goDiag">${ICON.play}</button></div>`;show('end');
+  speak("Let's find out which puzzles you like! Some will be easy and some will be tricky. Just try your best.");
+  $('#goDiag').onclick=()=>startRound({mode:'d',batt:b});
+}
+function persistSes(){S.resume=SES&&SES.items.length<SES.len?{mode:SES.mode,type:SES.type,batt:SES.batt,len:SES.len,order:SES.order,items:SES.items.map(x=>({t:x.t,level:x.level,dims:x.dims,res:x.res})),start:SES.start}:null;save()}
+function resumeRound(){const r=S.resume;SES={...r,items:r.items.slice()};speak("Welcome back! Let's keep going.");setTimeout(nextQ,400)}
+function nextQ(){
+  if(SES.items.length>=SES.len) return endRound();
+  const it=SES.mode==='d'?diagNext(SES):nextItem(SES);
+  if(!it) return endRound();
+  const opt={concept:it.concept,avoid:new Set(S.recent),avoidTpl:new Set(S.recentTpl)};
+  const q=generate(it.t,it.level,opt); if(!q){SES.items.push({t:it.t,level:it.level,res:{r:'skip'}});return nextQ()}
+  CUR={q,it,tries:0,hint:false,revealed:false,firstWrongKind:null,t0:0,locked:false};
+  const T=S.types[it.t];
+  if(!T.demo&&SES.mode!=='c') return runDemo(it.t,()=>{T.demo=true;save();present()});
+  present();
+}
+function dotsHTML(){let h='';for(let i=0;i<SES.len;i++){const x=SES.items[i];h+=`<span class="dot ${x?(x.res.r==='f'?'gold':x.res.r==='x'?'tried':'silver'):i===SES.items.length?'now':''}"></span>`}return h}
+function renderQ(q,demo){
+  const sp=SP.ok&&S.settings.voice;
+  $('#play').innerHTML=`<div class="bar"><button class="ibtn" id="homeBtn" aria-label="Home">${ICON.home}</button><div class="dots">${dotsHTML()}</div>
+   <button class="ibtn spk" id="spk" aria-label="Say it again">${ICON.speaker}</button>${SES.mode==='c'||demo?'':`<button class="ibtn" id="hintBtn" aria-label="Clue">${ICON.bulb}</button>`}<button class="ibtn small" id="demoBtn" aria-label="Show me how">${ICON.eye}</button></div>
+   ${demo?`<div class="watch">${ICON.eye}</div>`:''}
+   <div class="stem L-${q.layout} ${q.noStem?'nostem':''}" id="stem">${q.noStem?`<div class="oddArt">${OWL('owl small')}<div class="mag">${ICON.search}</div></div>`:q.stem}</div>
+   <div class="choices L-${q.layout} ${q.choiceRender==='beads'||q.choiceRender==='towers'?'rods':''}" id="choices">${q.choices.map((c,i)=>`<button class="choice" data-i="${i}" aria-label="choice">${c.html}</button>`).join('')}</div>
+   <div class="ptext ${sp?'':'on'}">${q.say}</div>`;
+  if(q.sentence&&$('#stem .bigEar')) $('#stem .bigEar').innerHTML=`<button class="earBtn" id="earBtn">${ICON.speaker}</button>`;
+  $('#homeBtn').onclick=()=>{SP.token++;try{speechSynthesis.cancel()}catch(e){}persistSes();renderHome()};
+  $('#spk').onclick=()=>speak(CUR.q.say);
+  if($('#earBtn')) $('#earBtn').onclick=()=>speak(CUR.q.say);
+  if($('#hintBtn')) $('#hintBtn').onclick=()=>giveHint();
+  $('#demoBtn').onclick=()=>{if(demo)return;runDemo(CUR.q.type,()=>present(true))};
+  show('play');
+}
+function present(again){
+  const q=CUR.q;renderQ(q);CUR.t0=Date.now();CUR.locked=false;
+  document.querySelectorAll('#choices .choice').forEach(b=>b.onclick=()=>choose(+b.dataset.i,b));
+  speak(q.say);
+}
+function choose(i,btn){
+  if(CUR.locked||btn.classList.contains('gone'))return;
+  const q=CUR.q;CUR.tries++;
+  if(CUR.tries===1) CUR.ms=Date.now()-CUR.t0;
+  if(i===q.answer){
+    CUR.locked=true;btn.classList.add('right');
+    const r=CUR.revealed?'x':CUR.tries===1&&!CUR.hint?'f':CUR.hint?'h':'r';
+    if(r!=='x'){sfxRight();starBurst();confetti(r==='f'?46:22);speak(R.pick(PRAISE))}else speak('That is the one. Good looking!');
+    S.stars+=r==='f'?1:r==='x'?0:0.5;
+    const res={r,ms:CUR.ms,tries:CUR.tries,firstWrongKind:CUR.firstWrongKind};
+    const mode=SES.mode==='d'?'d':SES.mode==='c'?'c':CUR.it.easy?'e':SES.mode==='t'?'t':(CUR.it.review?'r':'p');
+    record(q,res,mode);
+    SES.items.push({t:q.type,level:q.level,dims:q.dims,res});persistSes();
+    setTimeout(nextQ,r==='f'?1700:1500);
+    return;
+  }
+  if(CUR.tries===1) CUR.firstWrongKind=q.choices[i].kind;
+  btn.classList.add('shake');setTimeout(()=>btn.classList.add('gone'),380);sfxSoft();
+  const left=[...document.querySelectorAll('#choices .choice')].filter((b,k)=>k!==i&&!b.classList.contains('gone'));
+  if(left.length<=1||CUR.tries>=3) return reveal();
+  if(CUR.tries===2&&SES.mode!=='c'&&!CUR.hint){giveHint(true);return}
+  if(CUR.tries===2&&SES.mode==='c') return reveal();
+  speak(AGAIN);
+}
+function giveHint(auto){
+  if(CUR.locked||CUR.hint&&!auto)return; const q=CUR.q;CUR.hint=true;
+  $('#stem').classList.add('hint-on');
+  const bs=[...document.querySelectorAll('#choices .choice')];const live=bs.filter((b,k)=>k!==q.answer&&!b.classList.contains('gone'));
+  if(live.length>=2&&bs.filter(b=>!b.classList.contains('gone')).length>=3) R.pick(live).classList.add('gone');
+  speak((auto?AGAIN+' Here is a clue. ':'')+q.hintSay,null,q.sentence?0.8:undefined);
+  if($('#hintBtn'))$('#hintBtn').classList.add('used');
+}
+function reveal(){
+  CUR.revealed=true;const b=document.querySelectorAll('#choices .choice')[CUR.q.answer];b.classList.add('reveal');
+  speak("Here it is! This is the one that fits. Tap it.");
+}
+function runDemo(t,cb){
+  const q=generate(t,1,{});if(!q)return cb();
+  CUR={...(CUR||{}),demoQ:q};renderQ(q,true);const realCur=CUR;
+  const hand=document.createElement('div');hand.className='hand';hand.innerHTML='👆';document.body.appendChild(hand);
+  speak(q.say+' Watch me!',()=>{
+    const target=document.querySelectorAll('#choices .choice')[q.answer];if(!target){hand.remove();return cb()}
+    const r=target.getBoundingClientRect();hand.style.left=(r.left+r.width/2-20)+'px';hand.style.top=(r.top+r.height/2)+'px';hand.classList.add('go');
+    setTimeout(()=>{target.classList.add('right');starBurst();sfxRight();
+      setTimeout(()=>{hand.remove();speak('Now you try!',()=>{CUR=realCur;cb()})},900)},1300);
+  });
+}
+function endRound(){
+  const items=SES.items.filter(x=>x.res.r!=='skip');
+  if(SES.mode==='d') diagPlace(SES);
+  if(SES.mode==='c') S.challenges.push({d:Date.now(),res:Object.fromEntries(SES.items.map(x=>[x.t,{r:x.res.r,l:x.level}]))});
+  S.rounds.push({day:today(),d:Date.now(),mode:SES.mode,n:items.length,f:items.filter(x=>x.res.r==='f').length});
+  if(S.rounds.length>500)S.rounds=S.rounds.slice(-500);
+  S.resume=null;save();
+  const stars=items.map(x=>STAR(x.res.r==='f'?'#ffd23f':x.res.r==='x'?'#fff':'#d6dbe6','56')).join('');
+  const nextDiag=SES.mode==='d'&&!diagDone();
+  $('#end').innerHTML=`<div class="endCard">${OWL('owl jump')}<div class="starsRow">${stars}</div>${SES.mode==='c'?`<div class="bigIcon">${ICON.trophy}</div>`:''}<div class="row"><button class="ibtn big" id="endHome">${ICON.home}</button><button class="playBig" id="endAgain">${ICON.play}</button></div></div>`;
+  show('end');confetti(70);tone([523,659,784,659,1047],0.12,'triangle');
+  speak(SES.mode==='c'?'You finished the challenge! You should be proud of your thinking!':nextDiag?'Great work! Ready for more puzzles?':'You did it! Great thinking!');
+  const last=SES;
+  $('#endHome').onclick=renderHome;
+  $('#endAgain').onclick=()=>{if(nextDiag)return startDiag();if(last.mode==='t')return startRound({mode:'t',type:last.type});if(!diagDone())return startDiag();if(roundsToday()>=S.settings.dailyCap)return restScreen();startRound({mode:'p'})};
+}
+
+// ---------- parent area
+function parentGate(){
+  const a=R.ri(6,9),b=R.ri(6,9);let val='';
+  const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="gate"><div class="gq">Grown-ups only<br><b>${a} × ${b} = ?</b></div><div class="gin" id="gin">&nbsp;</div><div class="pad">${[1,2,3,4,5,6,7,8,9,'⌫',0,'OK'].map(k=>`<button data-k="${k}">${k}</button>`).join('')}</div><button class="gclose" id="gclose">✕</button></div>`;
+  document.body.appendChild(m);
+  m.querySelectorAll('.pad button').forEach(btn=>btn.onclick=()=>{const k=btn.dataset.k;if(k==='⌫')val=val.slice(0,-1);else if(k==='OK'){if(+val===a*b){m.remove();renderParent()}else{val='';m.querySelector('.gate').classList.add('shake');setTimeout(()=>m.querySelector('.gate').classList.remove('shake'),400)}}else if(val.length<3)val+=k;if(m.isConnected)$('#gin').innerHTML=val||'&nbsp;'});
+  $('#gclose').onclick=()=>m.remove();
+}
+function bar(p,col){return `<div class="pbar"><div style="width:${Math.round(100*p)}%;background:${col||'#3d82c4'}"></div></div>`}
+function fmtDate(d){return new Date(d).toLocaleDateString(undefined,{month:'short',day:'numeric'})}
+function renderParent(){
+  const prof=skillProfile();const E=prof._err;const totalQ=TYPE_IDS.reduce((a,t)=>a+S.types[t].hist.length,0);
+  let h=`<div class="pwrap max-w-5xl mx-auto p-4"><div class="flex items-center justify-between gap-2 flex-wrap"><h1 class="text-2xl font-bold">Parent dashboard</h1><button class="pbtn" id="pBack">← Back to the game</button></div>
+  <p class="pnote">Total questions answered: <b>${totalQ}</b> · Practice rounds today: <b>${roundsToday()}</b> · Diagnostic: ${['V','Q','N'].map(b=>`${{V:'Verbal',Q:'Quantitative',N:'Nonverbal'}[b]} ${S.diag[b]?'✓ '+fmtDate(S.diag[b].d):'not yet'}`).join(' · ')}</p>
+  <p class="pnote small">"Mastery" here means consistent, independent performance in this game, at the hardest level, on new-looking problems, and again on later days. It is a practice measure; it does <b>not</b> predict a CogAT percentile, stanine, or score. Levels are the game's own learning stages, not official score bands.</p>`;
+  // skills profile
+  h+=`<h2>Reasoning skills profile</h2><p class="pnote small">Built from every question (diagnostic and practice). First-try accuracy on questions that need each skill, plus what kind of wrong answer he picks.</p><div class="ptable"><table><tr><th>Skill</th><th>Questions</th><th>First-try</th><th>Wrong picks: almost-right / unrelated</th><th>What it suggests</th></tr>`;
+  for(const d in DIMS){const o=prof[d];h+=`<tr><td><b>${DIMS[d]}</b></td><td>${o.n}</td><td>${o.n?pct(o.ft/o.n)+bar(o.ft/o.n,o.ft/o.n>=.75?'#3aa35b':o.ft/o.n>=.5?'#f2a01e':'#e4473f'):'–'}</td><td>${o.err?`${o.plaus} / ${o.unrel}`:'–'}</td><td>${skillNote(d,o)}</td></tr>`}
+  h+=`</table></div><p class="pnote small">Error pattern overall: ${E.n?`${pct(E.plaus/E.n)} of first wrong picks were almost-right answers (he sees the idea but misses a detail) and ${pct(E.unrel/E.n)} were unrelated (the relationship was not recognized yet).`:'no errors recorded yet.'} ${E.quick?`Very fast taps (under 1.6 s, before the question was heard): ${E.quick} of ${E.total}; these never count toward levelling up.`:''}</p>`;
+  // per type table
+  h+=`<h2>Question types</h2><div class="ptable"><table class="wide"><tr><th>Type</th><th>Done <span class="tiny">(+ easy)</span></th><th>First-try</th><th>Right after retry</th><th>Right after hint</th><th>Answer shown</th><th>Level now</th><th>Highest solid level</th><th>New-look wins</th><th>Kept on later days</th><th>Mastery score</th><th>Status</th></tr>`;
+  for(const b of ['V','Q','N'])for(const t of BATT[b]){const st=typeStats(t);
+    const ck=Object.entries(st.checks).map(([k,v])=>`<span class="ck">${v?'✓':'○'} ${k}</span>`).join('');
+    h+=`<tr><td><b>${TYPES[t].name}</b><div class="tiny">${{V:'Verbal',Q:'Quantitative',N:'Nonverbal'}[b]}</div></td><td>${st.n}${st.easy?` <span class="tiny">+${st.easy}</span>`:''}</td><td>${st.n?pct(st.ft):'–'}</td><td>${st.n?pct(st.retry):'–'}</td><td>${st.n?pct(st.hint):'–'}</td><td>${st.n?pct(st.shown):'–'}</td><td>${S.types[t].level} / 5</td><td>${st.Lr||'–'}</td><td>${st.transfer}</td><td>${st.ret} day${st.ret===1?'':'s'}</td><td>${st.n?st.score:'–'}${st.n?bar(st.score/100,'#8e5bd6'):''}</td><td><b>${st.status}</b><div class="tiny">${ck}</div>${st.n&&st.n<20?'<div class="tiny warn">small sample: treat with caution</div>':''}</td></tr>`}
+  h+=`</table></div><p class="pnote small">Mastered needs all five: accuracy (Wilson lower bound ≥ 65% over the last 20+), difficulty (solid at level 5, 10+ hard questions), variety (3+ different ideas at levels 4–5), transfer (3+ first-try wins on known ideas shown in a new way), retention (right again on 2+ later days).</p>`;
+  // trouble concepts
+  const trouble=[];for(const t of TYPE_IDS){const by={};for(const e of S.types[t].hist){const k=e.c;by[k]=by[k]||{n:0,f:0,pl:0,un:0};by[k].n++;if(e.r==='f'&&!e.g)by[k].f++;else if(e.ek){PLAUSIBLE.has(e.ek)?by[k].pl++:by[k].un++}}
+    for(const k in by){const o=by[k];if(o.n>=3&&o.f/o.n<0.6)trouble.push({t,k,...o})}}
+  trouble.sort((a,b)=>a.f/a.n-b.f/b.n);
+  h+=`<h2>Ideas that keep causing difficulty</h2>${trouble.length?`<div class="ptable"><table><tr><th>Type</th><th>Idea</th><th>Tries</th><th>First-try</th><th>Wrong picks (almost / unrelated)</th></tr>${trouble.slice(0,10).map(o=>`<tr><td>${TYPES[o.t].name}</td><td>${TYPES[o.t].cname(o.k)}</td><td>${o.n}</td><td>${pct(o.f/o.n)}</td><td>${o.pl} / ${o.un}</td></tr>`).join('')}</table></div><p class="pnote small">These ideas are automatically brought back a few questions later in a new picture, and scheduled for spaced review.</p>`:'<p class="pnote">None yet (an idea is listed after 3+ tries with under 60% first-try).</p>'}`;
+  // plan
+  const plan=TYPE_IDS.map(t=>({t,...needWeight(t)})).sort((a,b)=>b.w-a.w);const tot=plan.reduce((a,b)=>a+b.w,0);
+  h+=`<h2>What “Play” will focus on next</h2><p class="pnote small">Each round starts with a warm-up and ends on an easier “win”. The middle questions are shared out like this (weak and unmastered areas get most of the time; mastered areas only return for spaced review). After two misses in a row the next question is easier.</p><div class="ptable"><table><tr><th>Type</th><th>Share of focus questions</th><th>Why</th></tr>${plan.map(p=>`<tr><td>${TYPES[p.t].name}</td><td>${pct(p.w/tot)}${bar(p.w/tot,'#f2a01e')}</td><td>${p.why}</td></tr>`).join('')}</table></div>`;
+  // progress over time
+  h+=`<h2>Progress over time</h2>${progressChart()}<div class="ptable"><table><tr><th>Type</th><th>Level changes</th></tr>${TYPE_IDS.map(t=>`<tr><td>${TYPES[t].name}</td><td>${S.types[t].ups.length?S.types[t].ups.slice(-8).map(u=>`${u.down?'↓':'↑'} L${u.l} <span class="tiny">${fmtDate(u.d)}</span>`).join(' · '):'<span class="tiny">no changes yet</span>'}</td></tr>`).join('')}</table></div>`;
+  // diagnostic snapshot
+  h+=`<h2>Diagnostic snapshot</h2>`;
+  if(['V','Q','N'].some(b=>S.diag[b])){h+=`<div class="ptable"><table><tr><th>Type</th><th>One-rule question (level 2)</th><th>Follow-up</th><th>Starting level</th><th>First wrong pick</th></tr>`;
+    for(const b of ['V','Q','N'])if(S.diag[b])for(const t in S.diag[b].types){const o=S.diag[b].types[t];const R2={f:'✓ first try',r:'✓ on retry',h:'✓ with clue',x:'✗ shown'};
+      h+=`<tr><td>${TYPES[t].name}</td><td>${R2[o.a]}</td><td>${R2[o.b]} <span class="tiny">(level ${o.bLevel}${o.bLevel>=3?', several attributes / look-alike answers':', easier check'})</span></td><td>${o.level}</td><td class="tiny">${o.ek.map(k=>k?(PLAUSIBLE.has(k)?'almost-right ('+k+')':'unrelated'):'–').join(' · ')}</td></tr>`}
+    h+=`</table></div>`}else h+='<p class="pnote">Not taken yet. “Play” starts it automatically (three short parts, one per battery, 6 questions each).</p>';
+  if(S.challenges.length){h+=`<h2>Challenge results</h2><div class="ptable"><table><tr><th>Date</th>${TYPE_IDS.map(t=>`<th class="tiny">${TYPES[t].name}</th>`).join('')}</tr>${S.challenges.slice(-8).reverse().map(c=>`<tr><td>${fmtDate(c.d)}</td>${TYPE_IDS.map(t=>{const x=c.res[t];return `<td>${x?(x.r==='f'?'✓':'○')+' <span class="tiny">L'+x.l+'</span>':''}</td>`}).join('')}</tr>`).join('')}</table></div><p class="pnote small">Challenge: one question per type at a stretch level, no clue button. ✓ = first try.</p>`}
+  // settings
+  const vs=SP.ok?speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang)):[];
+  h+=`<h2>Settings</h2><div class="pset">
+   <label>Questions per round <select id="sLen">${[4,5,6,8,10].map(n=>`<option ${S.settings.roundLen==n?'selected':''}>${n}</option>`).join('')}</select></label>
+   <label>Rounds per day before a rest suggestion <select id="sCap">${[[2,'2'],[3,'3'],[4,'4'],[6,'6'],[99,'no limit']].map(([v,l])=>`<option value="${v}" ${S.settings.dailyCap==v?'selected':''}>${l}</option>`).join('')}</select></label>
+   <label>Voice speed <input type="range" id="sRate" min="0.7" max="1.15" step="0.05" value="${S.settings.rate}"></label>
+   <label><input type="checkbox" id="sVoice" ${S.settings.voice?'checked':''}> Spoken instructions</label>
+   <label><input type="checkbox" id="sSfx" ${S.settings.sfx?'checked':''}> Sound effects</label>
+   ${vs.length?`<label>Voice <select id="sVoiceName"><option value="">Automatic</option>${vs.map(v=>`<option ${S.settings.voiceName===v.name?'selected':''}>${v.name}</option>`).join('')}</select></label>`:''}
+   <button class="pbtn" id="sTest">Test voice</button></div>
+   ${SP.ok?'':'<p class="pnote warn">This browser has no speech synthesis. The instruction text is shown under each question so you can read it aloud.</p>'}
+  <h2>Data</h2><div class="pset"><button class="pbtn" id="dExport">Export progress (backup file)</button><label class="pbtn">Import progress<input type="file" id="dImport" accept=".json" hidden></label><button class="pbtn" id="dDiag">Run the diagnostic again</button><button class="pbtn danger" id="dReset">Reset all progress</button></div>
+  <p class="pnote small">Progress is saved only in this browser on this device (no account, no server). Use Export/Import to move it.</p></div>`;
+  $('#parent').innerHTML=h;show('parent');
+  $('#pBack').onclick=renderHome;
+  const set=(k,v)=>{S.settings[k]=v;save()};
+  $('#sLen').onchange=e=>set('roundLen',+e.target.value);$('#sCap').onchange=e=>set('dailyCap',+e.target.value);$('#sRate').oninput=e=>set('rate',+e.target.value);
+  $('#sVoice').onchange=e=>set('voice',e.target.checked);$('#sSfx').onchange=e=>set('sfx',e.target.checked);
+  if($('#sVoiceName'))$('#sVoiceName').onchange=e=>{set('voiceName',e.target.value);pickVoice()};
+  $('#sTest').onclick=()=>speak('Look at the first two pictures. They go together.');
+  $('#dExport').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='brainy-owl-progress-'+today()+'.json';a.click()};
+  $('#dImport').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const o=JSON.parse(t);if(o.v!==1||!o.types)throw 0;S=o;TYPE_IDS.forEach(id=>{if(!S.types[id])S.types[id]=freshType()});save();renderParent()}catch(err){alert('That file is not a Brainy Owl progress file.')}})};
+  $('#dDiag').onclick=()=>{if(confirm('Run the three short diagnostic parts again next time Play is pressed? (Progress is kept.)')){S.diag={V:null,Q:null,N:null};save();renderParent()}};
+  $('#dReset').onclick=()=>{if(confirm('Erase ALL progress, history and settings on this device?')&&confirm('Are you sure? This cannot be undone.')){localStorage.removeItem(KEY);S=fresh();save();renderHome()}};
+}
+function progressChart(){
+  const days=[...Array(14)].map((_,i)=>dayOf(Date.now()-(13-i)*DAY));const by={};days.forEach(d=>by[d]={n:0,f:0});
+  for(const t of TYPE_IDS)for(const e of S.types[t].hist){const d=dayOf(e.d);if(by[d]){by[d].n++;if(e.r==='f'&&!e.g)by[d].f++}}
+  const mx=Math.max(10,...days.map(d=>by[d].n)),W=640,H=190,bw=W/14;
+  let s=`<svg viewBox="0 0 ${W} ${H+34}" class="chart"><line x1="0" y1="${H}" x2="${W}" y2="${H}" stroke="#c9cde0"/>`;
+  days.forEach((d,i)=>{const o=by[d],bh=o.n/mx*(H-20);s+=`<rect x="${i*bw+6}" y="${H-bh}" width="${bw-12}" height="${bh}" rx="4" fill="#bfe3f7"><title>${d}: ${o.n} questions</title></rect>`;if(o.n)s+=`<text x="${i*bw+bw/2}" y="${H-bh-4}" font-size="11" text-anchor="middle" fill="#5b6077">${o.n}</text>`;s+=`<text x="${i*bw+bw/2}" y="${H+16}" font-size="10" text-anchor="middle" fill="#8a8fa8">${d.slice(5)}</text>`});
+  const pts=days.map((d,i)=>by[d].n?[i*bw+bw/2,H-(by[d].f/by[d].n)*(H-20)]:null).filter(Boolean);
+  if(pts.length)s+=`<polyline points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="#8e5bd6" stroke-width="3"/>`+pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#8e5bd6"/>`).join('');
+  return s+`<text x="4" y="${H+32}" font-size="11" fill="#5b6077">Blue bars: questions per day. Purple line: first-try accuracy (top = 100%).</text></svg>`;
+}
+function init(){
+  load();
+  let defs='<marker id="ah" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#e4473f"/></marker>';
+  for(const [k,c] of Object.entries(NCOL)) defs+=`<pattern id="st-${k}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" fill="#fff"/><rect width="3.2" height="7" fill="${c}"/></pattern><pattern id="dt-${k}" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#fff"/><circle cx="3.5" cy="3.5" r="1.9" fill="${c}"/></pattern>`;
+  $('#defs').innerHTML=`<defs>${defs}</defs>`;
+  if(SP.ok){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+  renderHome();
+}
+window.addEventListener('DOMContentLoaded',init);
+
+</script>
+</body></html>
