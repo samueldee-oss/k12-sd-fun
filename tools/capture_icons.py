@@ -642,6 +642,30 @@ RECIPES_NEW = {
     "chameleon-hide-seek": dict(path="chameleon-hide-seek/index.html", setup=chameleon_setup, step=chameleon_step, crop=(170, 40, 600)),
 }
 RECIPES.update(RECIPES_NEW)
+for _r in RECIPES_NEW.values():
+    _r.setdefault("smooth", True)
+
+# Smooth recordings: the page's clock is paused while recording and moved forward a fixed
+# 1/20 s per GIF frame, so slow 3D games (which can't draw fast in a headless browser)
+# still come out as smooth 20 fps GIFs. Each old "step" lasts SMOOTH_SUB GIF frames.
+SMOOTH_MS = 50
+SMOOTH_SUB = 3
+VIRTUAL_CLOCK = """(() => {
+  const rAF = window.requestAnimationFrame.bind(window), cAF = window.cancelAnimationFrame.bind(window);
+  const pn = performance.now.bind(performance), dn = Date.now;
+  let on = false, vt = 0, base = 0, dbase = 0, q = [], id = 1e6;
+  window.requestAnimationFrame = cb => { if (!on) return rAF(cb); const k = id++; q.push([k, cb]); return k; };
+  window.cancelAnimationFrame = k => { q = q.filter(e => e[0] !== k); cAF(k); };
+  performance.now = () => on ? base + vt : pn();
+  Date.now = () => on ? dbase + vt : dn();
+  window.__vtStart = () => { base = pn(); dbase = dn(); vt = 0; on = true; };
+  window.__vtStep = (ms, n) => {
+    for (let s = 0; s < n; s++) {
+      vt += ms / n; const run = q; q = [];
+      for (const [, cb] of run) { try { cb(base + vt); } catch (e) { console.error(e); } }
+    }
+  };
+})();"""
 
 
 # ------------------------------------------------------------------ recording
@@ -660,6 +684,8 @@ async def record(browser, gid, r):
     view = r.get("view", (960, 640))
     ctx = await browser.new_context(viewport={"width": view[0], "height": view[1]},
                                     device_scale_factor=r.get("dpr", 2), has_touch=r.get("touch", False))
+    if r.get("smooth"):
+        await ctx.add_init_script(VIRTUAL_CLOCK)
     pg = await ctx.new_page()
     errors = []
     pg.on("pageerror", lambda e: errors.append(str(e)))
@@ -674,6 +700,8 @@ async def record(browser, gid, r):
     await pg.wait_for_timeout(r.get("load_ms", 1200))
     await r["setup"](pg)
     await pg.wait_for_timeout(r.get("warmup_ms", 300))
+    if r.get("smooth"):
+        return await record_smooth(pg, ctx, gid, r, errors)
     d = RAW / gid
     shutil.rmtree(d, ignore_errors=True)
     d.mkdir(parents=True)
@@ -689,6 +717,28 @@ async def record(browser, gid, r):
         if crop:
             (d / f"{i:03d}.crop").write_text(json.dumps(crop))
         await pg.wait_for_timeout(r.get("gap_ms", 40))
+    (d / "times.json").write_text(json.dumps(times))
+    await ctx.close()
+    return errors
+
+
+async def record_smooth(pg, ctx, gid, r, errors):
+    d = RAW / gid
+    shutil.rmtree(d, ignore_errors=True)
+    d.mkdir(parents=True)
+    await pg.evaluate("window.__vtStart()")
+    times = []
+    for i in range(r.get("frames", 28) * SMOOTH_SUB):
+        if i % SMOOTH_SUB == 0:
+            await r["step"](pg, i // SMOOTH_SUB)
+        await pg.evaluate(f"window.__vtStep({SMOOTH_MS}, 3)")
+        crop = r.get("crop")
+        if callable(crop):
+            crop = await crop(pg)
+        await pg.screenshot(path=str(d / f"{i:03d}.png"))
+        times.append(i * SMOOTH_MS / 1000)
+        if crop:
+            (d / f"{i:03d}.crop").write_text(json.dumps(crop))
     (d / "times.json").write_text(json.dumps(times))
     await ctx.close()
     return errors
@@ -719,14 +769,16 @@ def build_gif(gid, r):
         box = json.loads(cf.read_text()) if cf.exists() else r.get("crop")
         box = [v * k for v in box] if box else [0, 0, im.width, im.height]
         frames.append(square(im, box))
-    first, last = r.get("trim", (0, len(frames)))
+    sub = SMOOTH_SUB if r.get("smooth") else 1
+    first, last = r.get("trim", (0, len(frames) // sub))
+    first, last = first * sub, last * sub
     frames, times = frames[first:last], times[first:last]
-    si = min(len(frames) - 1, r.get("still", len(frames) // 2))
+    si = min(len(frames) - 1, r.get("still", len(frames) // 2 // sub) * sub)
     still = frames[si].resize((STILL_SIZE, STILL_SIZE), Image.LANCZOS)
     frames = [f.resize((GIF_SIZE, GIF_SIZE), Image.LANCZOS) for f in frames]
     if r.get("post"):
         frames = r["post"](frames, r.get("_extra", {}))
-        still = r["post"]([still], r.get("_extra", {}), start=si)[0]
+        still = r["post"]([still], r.get("_extra", {}), start=si // sub)[0]
     durs = [max(40, int(1000 * (b - a))) for a, b in zip(times, times[1:])] + [int(1000 * (times[-1] - times[-2]))]
     sheet = Image.new("RGB", (GIF_SIZE, GIF_SIZE * len(frames)))
     for i, f in enumerate(frames):
