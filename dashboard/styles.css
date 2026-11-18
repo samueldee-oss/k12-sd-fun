@@ -225,3 +225,13 @@ h1 { margin: 0 auto 0 4px; font-size: 1.25rem; letter-spacing: 0.01em; }
   body.playing { overflow: hidden; }
 }
 @media (min-width: 600px) and (max-width: 899px) { :root { --icon: 84px; } }
+
+/* Pretend full screen (iPad/iPhone): the game fills the window without Safari's typing warning */
+.exit-full { display: none; }
+body.pretend-full .stage { position: fixed; inset: 0; z-index: 1000; }
+body.pretend-full .exit-full {
+  display: block; position: absolute; z-index: 1001;
+  top: max(8px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right));
+  width: 40px; height: 40px; border-radius: 50%; border: 0;
+  background: rgba(0, 0, 0, 0.55); color: #fff; font-size: 20px; opacity: 0.7;
+}

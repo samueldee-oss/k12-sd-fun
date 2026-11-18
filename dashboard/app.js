@@ -127,6 +127,7 @@ $("#versionPick").addEventListener("change", (e) => {
 });
 
 function closePlayer() {
+  setPretendFull(false);
   player.classList.remove("open");
   document.body.classList.remove("playing");
   frame.src = "about:blank"; // stops the game's music
@@ -142,11 +143,16 @@ $("#infoBtn").addEventListener("click", () => {
 });
 $("#notes").addEventListener("input", (e) => { if (current) store.set(noteKey(), e.target.value); });
 
+// iPad/iPhone Safari shows "It looks like you are typing" whenever a page in real full screen
+// gets many taps, so there we use a pretend full screen: the game fills the whole window.
+const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+function setPretendFull(on) { document.body.classList.toggle("pretend-full", on); }
 $("#fullBtn").addEventListener("click", () => {
   const el = $(".stage");
   const req = el.requestFullscreen || el.webkitRequestFullscreen;
-  if (req) req.call(el); else toast("Full screen isn't available here");
+  if (IS_IOS || !req) setPretendFull(true); else req.call(el);
 });
+$("#exitFull").addEventListener("click", () => setPretendFull(false));
 
 $("#copyLink").addEventListener("click", async () => {
   const url = PAGES_BASE + current.src.replace("../", "");
