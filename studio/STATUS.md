@@ -31,7 +31,7 @@ _Kept by Claude Code. Last updated 2026-11-18._
 | Hypernova 3D | `hypernova-3d/` | Works. Operius-style 3D tunnel flight, 7 trials. Built on claude.ai and added as-is (3D games use a local copy of three.js so they play offline). | Not yet tried on a real iPad. |
 | Wanderleaf | `wanderleaf/` | Works. Hand-drawn silkie chicken platformer. Built on claude.ai and added as-is (3D games use a local copy of three.js so they play offline). | Not yet tried on a real iPad. |
 | Chameleon Hide & Seek | `chameleon-hide-seek/` | Works. Hide by copying colors; map with levels. Built on claude.ai and added as-is (3D games use a local copy of three.js so they play offline). | Not yet tried on a real iPad. |
-| Brainy Owl (CogAT Level 7 practice) | `brainy-owl/` | Works. Adaptive no-reading practice for all 9 CogAT Level 7 question types, 5 levels each, generated and validated questions, 3-part diagnostic, skills profile, spaced review, parent dashboard. Tests in `brainy-owl/dev/test/` pass (2026-11-18). Not on the dashboard yet (needs a recorded icon). | Touch-first layout tested in a simulated phone size; not yet tried on a real iPad. Spoken instructions need a browser with speech synthesis. |
+| Brainy Owl (CogAT Level 7 practice) | `brainy-owl/` | Works. Adaptive no-reading practice for all 9 CogAT Level 7 question types, 5 levels each, generated and validated questions, 3-part diagnostic, skills profile, spaced review, parent dashboard. Tests in `brainy-owl/dev/test/` pass (2026-11-18). On the dashboard with a drawn folding-owl icon; Home Screen app and offline copy work. | Touch-first layout tested in a simulated phone size; not yet tried on a real iPad. Spoken instructions need a browser with speech synthesis. |
 | Snake (side project) | `experiments/snake-blender-mode/` | Works. Fixed 2026-10-20: body was invisible and the game "auto-ended" around 60-70 points. Swipe to steer. | Yes (simulated touch tested; not yet tried on a real iPad). |
 
 A comparison of the Bank Game versions (features, fun, systems lessons) is in `to-desktop/2026-10-21-1600-bank-game-version-comparison.md`.
@@ -53,6 +53,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-18: Brainy Owl added to the dashboard. The animated owl folds a paper, punches a hole and opens it to two holes (`d_brainy` in `tools/game_icons.py`). It is also set up as a Home Screen app and included in the offline list. Commit `9b0aa95`.
 - 2026-11-18: Tiny Realms: back to smooth (not pixelated) units, autosave after every move so trained units survive leaving the game, a Continue button, and buildable Foam/Algae for the bug tribe on water next to its land. Commit `ae0d290`.
 - 2026-11-18: Tiny Realms: Lighthouses, working peace treaties (offer peace, declare war, embassies, AI offers), cute pixel-art units for every tribe, New Dawn bugs closer to the original, Flowers/Fungi for the bug tribe. Commit `0e1a115`.
 - 2026-11-18: Tiny Realms rebuilt as 2D low-poly (replaces the 3D copy): corrected tech tree, clearer move squares with damage preview, Next/End Turn/Tech buttons at the bottom, world sizes Tiny to Massive and world types Drylands to Water World, "While you waited" enemy recap, classic and New Dawn Cymanti looks. Home-screen setup kept, offline cache bumped to v3. Commit `81ba8d6`.
