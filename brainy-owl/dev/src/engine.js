@@ -13,7 +13,7 @@ function load(){
   if(!S||S.v!==1) S=fresh();
   TYPE_IDS.forEach(id=>{if(!S.types[id])S.types[id]=freshType()});
 }
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){memOnly=true}}
+function save(){S.lastSaved=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){memOnly=true}}
 const today=()=>new Date().toISOString().slice(0,10);
 const dayOf=ts=>new Date(ts).toISOString().slice(0,10);
 

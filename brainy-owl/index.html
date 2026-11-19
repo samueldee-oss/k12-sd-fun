@@ -56,7 +56,13 @@ svg{display:block}
 .spk{background:#ffe680;width:clamp(60px,11vw,78px);height:clamp(60px,11vw,78px)}
 .spk.talking .wave{animation:wave .8s infinite}.spk.talking .w2{animation-delay:.2s}@keyframes wave{50%{opacity:.2}}
 #hintBtn.used{opacity:.45}
-.watch{width:70px;height:46px;animation:bob 1.2s infinite}
+.demoBanner{display:flex;align-items:center;gap:14px;background:#fff7d6;border:4px dashed #f2a01e;border-radius:22px;padding:6px 14px}
+.demoBanner .teach{width:64px}.watch{width:70px;height:46px;animation:bob 1.2s infinite}
+.myTurn{width:64px;height:64px;padding:16px;opacity:.35;animation:none}.myTurn.ready{width:110px;height:110px;padding:28px;opacity:1;animation:breathe 1.2s ease-in-out infinite}
+.demoMode .stem,.demoMode .choices{outline:5px dashed #f2a01e;outline-offset:6px;border-radius:26px;background-color:#fffaf0}
+.demoMode .choice{pointer-events:none}.demoMode #hintBtn{display:none}
+.soundFix{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);width:120px;height:120px;border-radius:50%;background:#ffe680;box-shadow:0 8px 0 #e0b800,0 14px 30px rgba(0,0,0,.25);padding:26px;z-index:90;animation:breathe 1.2s infinite}
+.soundFix svg{width:100%;height:100%}.soundFix .tapHand{position:absolute;right:-8px;bottom:-10px;font-size:40px;animation:bob 1s infinite}
 .stem{width:100%;max-width:1060px;background:var(--card);border-radius:26px;box-shadow:0 6px 20px rgba(45,42,64,.12);padding:clamp(10px,2vw,22px);display:flex;justify-content:center}
 .stem.nostem{background:none;box-shadow:none;padding:0}
 .oddArt{position:relative;width:110px}.oddArt .mag{position:absolute;right:-30px;bottom:6px;width:56px;height:56px;animation:bob 1.6s infinite}
@@ -931,7 +937,7 @@ function load(){
   if(!S||S.v!==1) S=fresh();
   TYPE_IDS.forEach(id=>{if(!S.types[id])S.types[id]=freshType()});
 }
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){memOnly=true}}
+function save(){S.lastSaved=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){memOnly=true}}
 const today=()=>new Date().toISOString().slice(0,10);
 const dayOf=ts=>new Date(ts).toISOString().slice(0,10);
 
@@ -1119,15 +1125,34 @@ function speak(text,cb,rate){
   const tok=++SP.token;const btn=$('#spk');
   const done=()=>{if(tok!==SP.token)return;btn&&btn.classList.remove('talking');cb&&cb()};
   if(!SP.ok||!S.settings.voice){setTimeout(done,Math.min(2500,300+text.length*25));return}
-  try{speechSynthesis.cancel();
-    setTimeout(()=>{if(tok!==SP.token)return;const u=new SpeechSynthesisUtterance(text);if(SP.voice)u.voice=SP.voice;u.rate=rate||S.settings.rate;u.pitch=1.08;
-      u.onend=done;u.onerror=done;btn&&btn.classList.add('talking');speechSynthesis.speak(u);
-      setTimeout(()=>{if(tok===SP.token&&!speechSynthesis.speaking)done()},Math.max(4000,text.length*120))},60);
+  try{
+    const syn=speechSynthesis;
+    const go=()=>{if(tok!==SP.token)return;
+      const u=new SpeechSynthesisUtterance(text);if(SP.voice)u.voice=SP.voice;u.lang=(SP.voice&&SP.voice.lang)||'en-US';
+      u.rate=rate||S.settings.rate;u.pitch=1.08;u.volume=1;
+      u.onstart=()=>{SP.works=true;hideSoundFix()};u.onend=done;
+      u.onerror=e=>{if(e&&(e.error==='not-allowed'||e.error==='audio-busy'))showSoundFix();done()};
+      btn&&btn.classList.add('talking');try{syn.resume()}catch(e){}syn.speak(u);
+      // if the browser silently refuses to talk (common on iPad before a tap), offer a big "turn sound on" button
+      setTimeout(()=>{if(tok===SP.token&&!SP.works&&!syn.speaking){showSoundFix();done()}},2600);
+      setTimeout(()=>{if(tok===SP.token&&!syn.speaking)done()},Math.max(4000,text.length*120));
+    };
+    // speak right away when nothing is playing, so it happens inside the tap (iPad/iPhone need that);
+    // only wait a moment when we first have to stop an older sentence
+    if(syn.speaking||syn.pending){syn.cancel();setTimeout(go,120)}else go();
   }catch(e){setTimeout(done,500)}
 }
+function showSoundFix(){
+  if(SP.works||!S.settings.voice||$('#soundFix'))return;
+  const b=document.createElement('button');b.id='soundFix';b.className='soundFix';b.setAttribute('aria-label','Turn sound on');
+  b.innerHTML=ICON.speaker+'<span class="tapHand">👆</span>';
+  b.onclick=()=>{unlockAudio(true);const say=CUR&&CUR.q&&$('#play').classList.contains('on')?CUR.q.say:"Hi! Let's play!";speak(say)};
+  document.body.appendChild(b);
+}
+function hideSoundFix(){const b=$('#soundFix');if(b)b.remove()}
 // ---------- sound effects
 let AC=null;
-function tone(freqs,dur,type){if(!S.settings.sfx)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const t0=AC.currentTime;
+function tone(freqs,dur,type){if(!S.settings.sfx)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state!=='running')AC.resume();const t0=AC.currentTime;
   freqs.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=type||'sine';o.frequency.value=f;g.gain.setValueAtTime(0.0001,t0+i*dur);g.gain.exponentialRampToValueAtTime(0.18,t0+i*dur+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t0+i*dur+dur*1.6);o.connect(g);g.connect(AC.destination);o.start(t0+i*dur);o.stop(t0+i*dur+dur*1.8)})}catch(e){}}
 const sfxRight=()=>tone([523,659,784,1047],0.09,'triangle'), sfxSoft=()=>tone([330,294],0.12,'sine');
 function confetti(n){const box=$('#fx');const cols=['#e4473f','#ffd23f','#3aa35b','#3d82c4','#8e5bd6','#f28cc6'];
@@ -1160,7 +1185,12 @@ function renderHome(){
   document.querySelectorAll('.tile').forEach(b=>b.onclick=()=>{unlockAudio();const t=b.dataset.t;startRound({mode:'t',type:t})});
   show('home');
 }
-function unlockAudio(){try{if(SP.ok&&!SP.unlocked){SP.unlocked=1;const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}}catch(e){}}
+function unlockAudio(force){
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state!=='running')AC.resume();const b=AC.createBuffer(1,1,22050),src=AC.createBufferSource();src.buffer=b;src.connect(AC.destination);src.start(0)}catch(e){}
+  try{if(SP.ok&&(force||!SP.unlocked)){SP.unlocked=1;if(!speechSynthesis.speaking){const u=new SpeechSynthesisUtterance('hi');u.volume=0.01;u.rate=2;speechSynthesis.speak(u)}}}catch(e){}
+}
+document.addEventListener('pointerdown',()=>unlockAudio(),{capture:true,once:true});
+document.addEventListener('touchend',()=>unlockAudio(),{capture:true,once:true});
 function restScreen(){
   $('#end').innerHTML=`<div class="endCard">${OWL('owl sleepy')}<div class="bigIcon">${ICON.moon}</div><div class="row"><button class="ibtn big" id="restHome">${ICON.home}</button><button class="ibtn small ghost" id="oneMore">${ICON.play}</button></div></div>`;
   show('end');speak("Wow, you did so much thinking today! Your brain grows while you rest. Let's play again tomorrow!");
@@ -1188,7 +1218,7 @@ function nextQ(){
   const q=generate(it.t,it.level,opt); if(!q){SES.items.push({t:it.t,level:it.level,res:{r:'skip'}});return nextQ()}
   CUR={q,it,tries:0,hint:false,revealed:false,firstWrongKind:null,t0:0,locked:false};
   const T=S.types[it.t];
-  if(!T.demo&&SES.mode!=='c') return runDemo(it.t,()=>{T.demo=true;save();present()});
+  if(!T.demo&&SES.mode!=='c'&&S.settings.demos!==false) return runDemo(it.t,()=>{T.demo=true;save();present()});
   present();
 }
 function dotsHTML(){let h='';for(let i=0;i<SES.len;i++){const x=SES.items[i];h+=`<span class="dot ${x?(x.res.r==='f'?'gold':x.res.r==='x'?'tried':'silver'):i===SES.items.length?'now':''}"></span>`}return h}
@@ -1196,16 +1226,16 @@ function renderQ(q,demo){
   const sp=SP.ok&&S.settings.voice;
   $('#play').innerHTML=`<div class="bar"><button class="ibtn" id="homeBtn" aria-label="Home">${ICON.home}</button><div class="dots">${dotsHTML()}</div>
    <button class="ibtn spk" id="spk" aria-label="Say it again">${ICON.speaker}</button>${SES.mode==='c'||demo?'':`<button class="ibtn" id="hintBtn" aria-label="Clue">${ICON.bulb}</button>`}<button class="ibtn small" id="demoBtn" aria-label="Show me how">${ICON.eye}</button></div>
-   ${demo?`<div class="watch">${ICON.eye}</div>`:''}
+   ${demo?`<div class="demoBanner"><div class="teach">${OWL('owl')}</div><div class="watch">${ICON.eye}</div><button class="playBig myTurn" id="skipDemo" aria-label="My turn">${ICON.play}</button></div>`:''}
    <div class="stem L-${q.layout} ${q.noStem?'nostem':''}" id="stem">${q.noStem?`<div class="oddArt">${OWL('owl small')}<div class="mag">${ICON.search}</div></div>`:q.stem}</div>
    <div class="choices L-${q.layout} ${q.choiceRender==='beads'||q.choiceRender==='towers'?'rods':''}" id="choices">${q.choices.map((c,i)=>`<button class="choice" data-i="${i}" aria-label="choice">${c.html}</button>`).join('')}</div>
    <div class="ptext ${sp?'':'on'}">${q.say}</div>`;
   if(q.sentence&&$('#stem .bigEar')) $('#stem .bigEar').innerHTML=`<button class="earBtn" id="earBtn">${ICON.speaker}</button>`;
-  $('#homeBtn').onclick=()=>{SP.token++;try{speechSynthesis.cancel()}catch(e){}persistSes();renderHome()};
+  $('#homeBtn').onclick=()=>{document.querySelectorAll('.hand').forEach(h=>h.remove());$('#play').classList.remove('demoMode');if(CUR&&CUR.demo)CUR=null;SP.token++;try{speechSynthesis.cancel()}catch(e){}persistSes();renderHome()};
   $('#spk').onclick=()=>speak(CUR.q.say);
   if($('#earBtn')) $('#earBtn').onclick=()=>speak(CUR.q.say);
   if($('#hintBtn')) $('#hintBtn').onclick=()=>giveHint();
-  $('#demoBtn').onclick=()=>{if(demo)return;runDemo(CUR.q.type,()=>present(true))};
+  $('#demoBtn').onclick=()=>{if(demo)return;const keep=CUR;runDemo(CUR.q.type,()=>{CUR=keep;present(true)})};
   show('play');
 }
 function present(again){
@@ -1214,7 +1244,7 @@ function present(again){
   speak(q.say);
 }
 function choose(i,btn){
-  if(CUR.locked||btn.classList.contains('gone'))return;
+  if(!CUR||CUR.demo||CUR.locked||btn.classList.contains('gone'))return;
   const q=CUR.q;CUR.tries++;
   if(CUR.tries===1) CUR.ms=Date.now()-CUR.t0;
   if(i===q.answer){
@@ -1251,13 +1281,20 @@ function reveal(){
 }
 function runDemo(t,cb){
   const q=generate(t,1,{});if(!q)return cb();
-  CUR={...(CUR||{}),demoQ:q};renderQ(q,true);const realCur=CUR;
+  const realCur=CUR;CUR={q,demo:true,locked:true};renderQ(q,true);
+  $('#play').classList.add('demoMode');
   const hand=document.createElement('div');hand.className='hand';hand.innerHTML='👆';document.body.appendChild(hand);
-  speak(q.say+' Watch me!',()=>{
-    const target=document.querySelectorAll('#choices .choice')[q.answer];if(!target){hand.remove();return cb()}
+  let gone=false;const cleanup=()=>{if(gone)return;gone=true;hand.remove();$('#play').classList.remove('demoMode')};
+  const finish=()=>{cleanup();CUR=realCur;cb()};
+  $('#skipDemo').onclick=finish;
+  speak('Let me show you how this game works. '+q.say,()=>{
+    if(gone)return;const target=document.querySelectorAll('#choices .choice')[q.answer];if(!target){return finish()}
     const r=target.getBoundingClientRect();hand.style.left=(r.left+r.width/2-20)+'px';hand.style.top=(r.top+r.height/2)+'px';hand.classList.add('go');
-    setTimeout(()=>{target.classList.add('right');starBurst();sfxRight();
-      setTimeout(()=>{hand.remove();speak('Now you try!',()=>{CUR=realCur;cb()})},900)},1300);
+    setTimeout(()=>{if(gone)return;target.classList.add('right');starBurst();sfxRight();
+      setTimeout(()=>{hand.remove();if(gone)return;
+        // wait for HIM to tap "my turn": the demo never runs into his own question
+        const go=$('#skipDemo');go.classList.add('ready');
+        speak("That's how you play. Now it's your turn! Tap the green button.")},900)},1400);
   });
 }
 function endRound(){
@@ -1327,23 +1364,31 @@ function renderParent(){
    <label>Voice speed <input type="range" id="sRate" min="0.7" max="1.15" step="0.05" value="${S.settings.rate}"></label>
    <label><input type="checkbox" id="sVoice" ${S.settings.voice?'checked':''}> Spoken instructions</label>
    <label><input type="checkbox" id="sSfx" ${S.settings.sfx?'checked':''}> Sound effects</label>
+   <label><input type="checkbox" id="sDemo" ${S.settings.demos!==false?'checked':''}> Show a "watch me" demo the first time he meets each puzzle type</label>
    ${vs.length?`<label>Voice <select id="sVoiceName"><option value="">Automatic</option>${vs.map(v=>`<option ${S.settings.voiceName===v.name?'selected':''}>${v.name}</option>`).join('')}</select></label>`:''}
    <button class="pbtn" id="sTest">Test voice</button></div>
    ${SP.ok?'':'<p class="pnote warn">This browser has no speech synthesis. The instruction text is shown under each question so you can read it aloud.</p>'}
+  <h2>Saving</h2><p class="pnote">This game has <b>one player</b>, so there is nothing to choose or log in to. Progress saves automatically after every question${S.lastSaved?` (last saved ${new Date(S.lastSaved).toLocaleString()})`:''}.${memOnly?' <b class="warn">Right now this browser is blocking saving (private browsing?), so progress will be lost when the page closes.</b>':''}</p>
+  <p class="pnote small">The save lives inside the browser on this device. To keep one continuous record: <b>always open the game the same way on the same device</b> (for example, always from the K12 Games dashboard in Safari, or always from the Home Screen icon). On iPad and iPhone, the Home Screen app and Safari keep <i>separate</i> saves, and Safari may clear the saves of sites not opened for about a week, so using the Home Screen icon is the safest choice. To move to another device, use Export there and Import here.${persistNote()}</p>
+  ${backupNag()}
   <h2>Data</h2><div class="pset"><button class="pbtn" id="dExport">Export progress (backup file)</button><label class="pbtn">Import progress<input type="file" id="dImport" accept=".json" hidden></label><button class="pbtn" id="dDiag">Run the diagnostic again</button><button class="pbtn danger" id="dReset">Reset all progress</button></div>
   <p class="pnote small">Progress is saved only in this browser on this device (no account, no server). Use Export/Import to move it.</p></div>`;
   $('#parent').innerHTML=h;show('parent');
   $('#pBack').onclick=renderHome;
   const set=(k,v)=>{S.settings[k]=v;save()};
   $('#sLen').onchange=e=>set('roundLen',+e.target.value);$('#sCap').onchange=e=>set('dailyCap',+e.target.value);$('#sRate').oninput=e=>set('rate',+e.target.value);
-  $('#sVoice').onchange=e=>set('voice',e.target.checked);$('#sSfx').onchange=e=>set('sfx',e.target.checked);
+  $('#sVoice').onchange=e=>set('voice',e.target.checked);$('#sDemo').onchange=e=>set('demos',e.target.checked);$('#sSfx').onchange=e=>set('sfx',e.target.checked);
   if($('#sVoiceName'))$('#sVoiceName').onchange=e=>{set('voiceName',e.target.value);pickVoice()};
   $('#sTest').onclick=()=>speak('Look at the first two pictures. They go together.');
-  $('#dExport').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='brainy-owl-progress-'+today()+'.json';a.click()};
+  $('#dExport').onclick=()=>{S.lastExport=Date.now();save();const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='brainy-owl-progress-'+today()+'.json';a.click()};
   $('#dImport').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const o=JSON.parse(t);if(o.v!==1||!o.types)throw 0;S=o;TYPE_IDS.forEach(id=>{if(!S.types[id])S.types[id]=freshType()});save();renderParent()}catch(err){alert('That file is not a Brainy Owl progress file.')}})};
   $('#dDiag').onclick=()=>{if(confirm('Run the three short diagnostic parts again next time Play is pressed? (Progress is kept.)')){S.diag={V:null,Q:null,N:null};save();renderParent()}};
   $('#dReset').onclick=()=>{if(confirm('Erase ALL progress, history and settings on this device?')&&confirm('Are you sure? This cannot be undone.')){localStorage.removeItem(KEY);S=fresh();save();renderHome()}};
 }
+function persistNote(){return SP.persisted===true?' This browser has agreed to keep the save permanently.':''}
+function backupNag(){const n=TYPE_IDS.reduce((a,t)=>a+S.types[t].hist.length,0);if(n<40)return '';const last=S.lastExport||0;
+  if(Date.now()-last<14*DAY)return `<p class="pnote small">Last backup: ${fmtDate(last)}.</p>`;
+  return `<p class="pnote warn">${last?'Last backup was '+fmtDate(last)+'.':'No backup yet.'} Tap “Export progress” below to save a copy of ${n} answered questions, in case this browser's data is ever cleared.</p>`}
 function progressChart(){
   const days=[...Array(14)].map((_,i)=>dayOf(Date.now()-(13-i)*DAY));const by={};days.forEach(d=>by[d]={n:0,f:0});
   for(const t of TYPE_IDS)for(const e of S.types[t].hist){const d=dayOf(e.d);if(by[d]){by[d].n++;if(e.r==='f'&&!e.g)by[d].f++}}
@@ -1360,6 +1405,7 @@ function init(){
   for(const [k,c] of Object.entries(NCOL)) defs+=`<pattern id="st-${k}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" fill="#fff"/><rect width="3.2" height="7" fill="${c}"/></pattern><pattern id="dt-${k}" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#fff"/><circle cx="3.5" cy="3.5" r="1.9" fill="${c}"/></pattern>`;
   $('#defs').innerHTML=`<defs>${defs}</defs>`;
   if(SP.ok){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().then(v=>SP.persisted=v)}catch(e){}
   renderHome();
 }
 window.addEventListener('DOMContentLoaded',init);

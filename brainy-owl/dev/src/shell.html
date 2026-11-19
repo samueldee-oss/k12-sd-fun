@@ -56,7 +56,13 @@ svg{display:block}
 .spk{background:#ffe680;width:clamp(60px,11vw,78px);height:clamp(60px,11vw,78px)}
 .spk.talking .wave{animation:wave .8s infinite}.spk.talking .w2{animation-delay:.2s}@keyframes wave{50%{opacity:.2}}
 #hintBtn.used{opacity:.45}
-.watch{width:70px;height:46px;animation:bob 1.2s infinite}
+.demoBanner{display:flex;align-items:center;gap:14px;background:#fff7d6;border:4px dashed #f2a01e;border-radius:22px;padding:6px 14px}
+.demoBanner .teach{width:64px}.watch{width:70px;height:46px;animation:bob 1.2s infinite}
+.myTurn{width:64px;height:64px;padding:16px;opacity:.35;animation:none}.myTurn.ready{width:110px;height:110px;padding:28px;opacity:1;animation:breathe 1.2s ease-in-out infinite}
+.demoMode .stem,.demoMode .choices{outline:5px dashed #f2a01e;outline-offset:6px;border-radius:26px;background-color:#fffaf0}
+.demoMode .choice{pointer-events:none}.demoMode #hintBtn{display:none}
+.soundFix{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);width:120px;height:120px;border-radius:50%;background:#ffe680;box-shadow:0 8px 0 #e0b800,0 14px 30px rgba(0,0,0,.25);padding:26px;z-index:90;animation:breathe 1.2s infinite}
+.soundFix svg{width:100%;height:100%}.soundFix .tapHand{position:absolute;right:-8px;bottom:-10px;font-size:40px;animation:bob 1s infinite}
 .stem{width:100%;max-width:1060px;background:var(--card);border-radius:26px;box-shadow:0 6px 20px rgba(45,42,64,.12);padding:clamp(10px,2vw,22px);display:flex;justify-content:center}
 .stem.nostem{background:none;box-shadow:none;padding:0}
 .oddArt{position:relative;width:110px}.oddArt .mag{position:absolute;right:-30px;bottom:6px;width:56px;height:56px;animation:bob 1.6s infinite}
