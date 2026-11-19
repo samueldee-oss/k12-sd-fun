@@ -53,7 +53,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
-- 2026-11-18: Tiny Realms: cuter Polytopia-style people (rounded cube heads, floating hands and feet, big shiny eyes) and classic Cymanti drawn as people with a bug on their head instead of green bug blocks. Commit `COMMIT`.
+- 2026-11-18: Tiny Realms: cuter Polytopia-style people (rounded cube heads, floating hands and feet, big shiny eyes) and classic Cymanti drawn as people with a bug on their head instead of green bug blocks. Commit `a097ad8`.
 - 2026-11-18: Brainy Owl added to the dashboard. The animated owl folds a paper, punches a hole and opens it to two holes (`d_brainy` in `tools/game_icons.py`). It is also set up as a Home Screen app and included in the offline list. Commit `9b0aa95`.
 - 2026-11-18: Tiny Realms: back to smooth (not pixelated) units, autosave after every move so trained units survive leaving the game, a Continue button, and buildable Foam/Algae for the bug tribe on water next to its land. Commit `ae0d290`.
 - 2026-11-18: Tiny Realms: Lighthouses, working peace treaties (offer peace, declare war, embassies, AI offers), cute pixel-art units for every tribe, New Dawn bugs closer to the original, Flowers/Fungi for the bug tribe. Commit `0e1a115`.
