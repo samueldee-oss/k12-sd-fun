@@ -143,7 +143,7 @@ const TECH={
  fishing:{n:'Fishing',t:1,req:null,d:'Fish, build Ports and move on shallow water (units on a port become Rafts). Shows starfish.'},
  sailing:{n:'Sailing',t:2,req:'fishing',d:'Sail on the deep ocean. Upgrade Rafts into Scouts.'},
  navigation:{n:'Navigation',t:3,req:'sailing',d:'Upgrade Rafts into Bombers. Harvest Starfish for 8 stars.'},
- ramming:{n:'Ramming',t:2,req:'fishing',d:'Upgrade Rafts into Rammers.'},
+ ramming:{n:'Ramming',t:2,req:'fishing',d:'Upgrade Rafts into Rammers. Bug tribe: build Foam on water so anyone can walk across.'},
  aquatism:{n:'Aquatism',t:3,req:'ramming',d:'Water Temples. Defense bonus on water and ocean.'},
  hunting:{n:'Hunting',t:1,req:null,d:'Hunt wild animals.'},
  archery:{n:'Archery',t:2,req:'hunting',d:'Unlocks the Archer. Defense bonus in forests.'},
@@ -252,6 +252,7 @@ const IMPS=[
  {k:'mtemple',n:'Mountain Temple',tech:'meditation',c:20,pop:1,ok:t=>t.ter==='mountain'&&!t.imp},
  {k:'ftemple',n:'Forest Temple',tech:'spiritualism',c:15,pop:1,ok:t=>t.ter==='forest'&&!t.imp&&!t.res},
  {k:'wtemple',n:'Water Temple',tech:'aquatism',c:20,pop:1,ok:t=>(t.ter==='water'||t.ter==='ocean')&&!t.imp&&!t.res},
+ {k:'foam',n:'Foam',tech:'ramming',c:3,pop:0,onlyBug:1,ok:t=>(t.ter==='water'||t.ter==='ocean')&&!t.imp&&!t.res},
  {k:'road',n:'Road',tech:'roads',c:3,pop:0,ok:t=>(t.ter==='field'||t.ter==='forest'||t.ter==='ice')&&!t.road},
 ];
 const TEMPLES=['temple','mtemple','ftemple','wtemple'];
@@ -493,21 +494,24 @@ function examine(u){const p=P(u.owner);const t=T(u.x,u.y);t.ruin=0;u.cm=u.ca=fal
 
 // ----- economy -----
 function addPop(c,n){c.pop+=n;while(c.pop>=c.level+1){c.pop-=c.level+1;c.level++;logEv(c.owner,c.name+' grew to level '+c.level,-1,'grow');if(P(c.owner).ai)aiReward(c);else G.lvq.push(c.id);}}
-function impList(p,x,y){const t=T(x,y);if(t.city>=0||t.village)return[];if(tileOwner(t)!==p.i)return[];const c=G.cities[t.terr];
+function canFoamAt(p,x,y){const t=T(x,y);return psp(p)==='bug'&&isWater(t)&&!t.imp&&!t.res&&t.city<0&&(tileOwner(t)===p.i||nbrs(x,y).some(([a,b])=>tileOwner(T(a,b))===p.i||T(a,b).foam&&tileOwner(t)<0));}
+function impList(p,x,y){const t=T(x,y);if(t.city>=0||t.village)return[];if(tileOwner(t)!==p.i){if(canFoamAt(p,x,y))return IMPS.filter(im=>im.k==='foam');return[];}const c=G.cities[t.terr];
  return IMPS.filter(im=>im.ok(t,x,y)&&!(im.noBug&&psp(p)==='bug')&&!(im.onlyBug&&psp(p)!=='bug')).filter(im=>{if(im.lvl){return !cityHas(c,im.k);}return true;});}
 function cityHas(c,k){for(let i=0;i<G.map.length;i++){const t=G.map[i];if(t.terr===c.id&&t.imp===k)return true;}return false;}
-function impName(p,im){if(im.k==='flowers')return isND(p)?'Flowers':'Fungi';if(psp(p)==='bug'){if(im.k==='fruit')return'Collect Nectar';if(im.k==='hunt')return'Catch Snulle';}return im.n;}
+function impName(p,im){if(im.k==='flowers')return isND(p)?'Flowers':'Fungi';if(im.k==='foam')return isND(p)?'Foam':'Algae';if(psp(p)==='bug'){if(im.k==='fruit')return'Collect Nectar';if(im.k==='hunt')return'Catch Snulle';}return im.n;}
 function impCost(im){return Math.max(0,im.c);}
 function impPop(im,x,y){if(im.lvl){let n=0;for(const[a,b]of nbrs(x,y)){if(T(a,b).imp===im.lvl&&T(a,b).terr===T(x,y).terr)n++;}return n*im.per;}return im.pop||0;}
-function doImp(p,x,y,im){const t=T(x,y);const c=G.cities[t.terr];const cost=impCost(im);if(p.stars<cost)return false;p.stars-=cost;
+function doImp(p,x,y,im){const t=T(x,y);const c=t.terr>=0?G.cities[t.terr]:null;const cost=impCost(im);if(p.stars<cost)return false;p.stars-=cost;
  const pop=impPop(im,x,y);
  switch(im.k){case'fruit':case'hunt':case'fish':t.res=null;break;
   case'flowers':case'farm':case'mine':case'lumber':case'port':case'market':case'windmill':case'forge':case'sawmill':case'temple':case'mtemple':case'ftemple':case'wtemple':t.imp=im.k;break;
   case'clear':t.ter='field';p.stars+=1;break;
   case'burn':t.ter='field';t.res='crop';break;
   case'grow':t.ter='forest';break;
-  case'road':t.road=1;break;}
- if(pop)addPop(c,pop);
+  case'road':t.road=1;break;
+  case'foam':foamTile(t);{const v=unitAt(x,y);if(v&&has(v,'naval')){v.type=v.base||'warrior';v.base=null;}}break;
+  case'foam':foamTile(t);{const v=unitAt(x,y);if(v&&has(v,'naval')){v.type=v.base||'warrior';v.base=null;}}break;}
+ if(pop&&c)addPop(c,pop);
  // adjacency for level buildings
  const L={farm:['windmill',1],mine:['forge',2],lumber:['sawmill',1]}[im.k];
  if(L){for(const[a,b]of nbrs(x,y)){const n=T(a,b);if(n.imp===L[0]&&n.terr>=0&&G.cities[n.terr].owner===p.i)addPop(G.cities[n.terr],L[1]);}}
@@ -642,9 +646,9 @@ function aiSpend(p){
  for(let guard=0;guard<40;guard++){const opts=[];
   const threat=G.cities.some(c=>c.owner===p.i&&G.units.some(v=>v.owner!==p.i&&dist(v.x,v.y,c.x,c.y)<=3));
   for(const k in TECH){if(!techAvail(p,k))continue;const c=techCost(p,k);if(c>p.stars)continue;opts.push({v:techValue(p,k)/c*1.4,f:()=>research(p,k)});}
-  for(let y=0;y<G.N;y++)for(let x=0;x<G.N;x++){const t=T(x,y);if(t.terr<0||G.cities[t.terr].owner!==p.i)continue;
+  for(let y=0;y<G.N;y++)for(let x=0;x<G.N;x++){const t=T(x,y);if((t.terr<0||G.cities[t.terr].owner!==p.i)&&!canFoamAt(p,x,y))continue;
    for(const im of impList(p,x,y)){if(!p.techs[im.tech])continue;const c=impCost(im);if(c>p.stars)continue;const pop=impPop(im,x,y);
-    let v=pop*1.7/Math.max(1,c);if(im.k==='clear')v=.05;if(im.k==='road'||im.k==='grow'||im.k==='burn')v=.02;if(im.k==='market')v=.25;if(TEMPLES.includes(im.k))v=p.stars>30?.3:.05;
+    let v=pop*1.7/Math.max(1,c);if(im.k==='clear')v=.05;if(im.k==='road'||im.k==='grow'||im.k==='burn')v=.02;if(im.k==='market')v=.25;if(im.k==='foam')v=.16;if(TEMPLES.includes(im.k))v=p.stars>30?.3:.05;
     if(im.lvl&&pop<2)v=0;const cc=G.cities[t.terr];if(cc.pop+pop>=cc.level+1)v*=1.3;
     if(v>0)opts.push({v,f:()=>doImp(p,x,y,im)});}}
   const myU=G.units.filter(u=>u.owner===p.i).length,myC=cityCount(p);
@@ -964,14 +968,13 @@ function unitSprite(type,col,col2,hat,base){const key=[type,col,col2,hat,base].j
  for(let i=0;i<SW*SH;i++){const a=d[i*4+3];if(a<80){d[i*4+3]=0;}else{d[i*4+3]=255;op[i]=1;}}
  for(let yy=0;yy<SH;yy++)for(let xx=0;xx<SW;xx++){const i=yy*SW+xx;if(op[i])continue;if((xx>0&&op[i-1])||(xx<SW-1&&op[i+1])||(yy>0&&op[i-SW])||(yy<SH-1&&op[i+SW])){d[i*4]=34;d[i*4+1]=24;d[i*4+2]=44;d[i*4+3]=255;}}
  x.putImageData(id,0,0);let x0=SW,x1=0,y0=SH,y1=0;for(let yy=0;yy<SH;yy++)for(let xx=0;xx<SW;xx++)if(d[(yy*SW+xx)*4+3]){if(xx<x0)x0=xx;if(xx>x1)x1=xx;if(yy<y0)y0=yy;if(yy>y1)y1=yy;}c.bb=[x0,y0,x1-x0+1,y1-y0+1];SPR[key]=c;return c;}
-function drawSprite(c,type,x,y,s,col,col2,hat,base){const sp=unitSprite(type,col,col2,hat,base);const f=s/PXK;const sm=c.imageSmoothingEnabled;c.imageSmoothingEnabled=false;
- c.drawImage(sp,Math.round(x-AX*f),Math.round(y-AY*f),Math.round(SW*f),Math.round(SH*f));c.imageSmoothingEnabled=sm;}
+function drawSprite(c,type,x,y,s,col,col2,hat,base){drawUnit(c,type,x,y,s,col,col2,hat,base);}
 // ---------- icons ----------
 const ICACHE={};
 function iconCanvas(type,col,col2,hat,sz,base){const key=[type,col,col2,hat,base,sz].join('|');
  if(!ICACHE[key]){const c=document.createElement('canvas');c.width=c.height=sz*2;const x=c.getContext('2d');x.scale(2,2);
   const big=UNITS[type].sup||['knight','rider','wildhorn','firewyrm','leviacrab','megapede','icesled','lilyisle','mothkin','scout','bomber','rammer','catapult'].includes(type);
-  const sp=unitSprite(type,col,col2,hat,base);const[bx,by,bw,bh]=sp.bb;const f=Math.max(1,Math.floor(Math.min(sz*2*.9/bh,sz*2*.92/bw)*2)/2);x.setTransform(1,0,0,1,0,0);x.imageSmoothingEnabled=false;x.drawImage(sp,bx,by,bw,bh,Math.round(sz-bw*f/2),Math.round(sz*2-4-bh*f),Math.round(bw*f),Math.round(bh*f));ICACHE[key]=c;}
+  drawUnit(x,type,sz/2,sz*.88,sz/46*(big?.72:.92),col,col2,hat,base||'warrior');ICACHE[key]=c;}
  const c=document.createElement('canvas');c.width=c.height=sz*2;c.style.width=c.style.height=sz+'px';c.getContext('2d').drawImage(ICACHE[key],0,0);return c;}
 
 // ---------- camera ----------
@@ -1070,7 +1073,8 @@ requestAnimationFrame(loop);
 
 // ---------- HUD ----------
 function CUR(p){p=p||(G&&(humanP()&&!humanP().ai?humanP():P(G.view)));return p&&isND(p)?'<span class="heart"></span>':'<span class="star"></span>';}
-function updHud(){if(!G){$('top').style.display='none';$('bottom').style.display='none';return;}$('top').style.display='flex';$('bottom').style.display='flex';const p=humanP()&&!humanP().ai?humanP():P(G.view);
+let _svT=0;function autoSave(){if(!G||G.over)return;const p=P(G.cur);if(!p||p.ai||busy)return;clearTimeout(_svT);_svT=setTimeout(()=>saveGame('auto'),300);}
+function updHud(){autoSave();if(!G){$('top').style.display='none';$('bottom').style.display='none';return;}$('top').style.display='flex';$('bottom').style.display='flex';const p=humanP()&&!humanP().ai?humanP():P(G.view);
  const[c1]=pcol(p);$('who').style.background=c1;$('who').style.color=lum(c1)>.6?'#222':'#fff';$('who').textContent=pname(p);
  $('stars').innerHTML=CUR()+' '+p.stars+' <small>(+'+income(p)+')</small>';
  $('turn').textContent='Turn '+G.turn+(G.mode==='perf'?'/'+G.maxT:'')+'  |  '+score(p);
@@ -1114,6 +1118,7 @@ function showPanel(){const pn=$('panel');if(!SEL){pn.style.display='none';return
   h.innerHTML=(c?title:'<b>'+title+'</b>')+info;
   if(c&&c.owner===p.i){const lab=document.createElement('div');lab.className='sub';lab.textContent='Train units';pn.appendChild(lab);
    for(const[ty,tc]of trainList(p)){const why=canTrain(p,c,ty,tc);acts.appendChild(btn(uname(ty,p),tc&&!p.techs[tc]?'Needs '+TECH[tc].n:CUR()+UNITS[ty].c,!why,()=>{train(p,c,ty);select(x,y,'tile');updHud();},unitIcon(ty,p)));}}
+  else if(t.city<0&&tileOwner(t)!==p.i&&canFoamAt(p,x,y)){const im=IMPS.find(i=>i.k==='foam');const have=!!p.techs.ramming;acts.appendChild(btn(impName(p,im),!have?'Needs Ramming':CUR()+im.c+' &middot; walk on water',have&&p.stars>=im.c,()=>{doImp(p,x,y,im);select(x,y,'tile');updHud();}));}
   else if(tileOwner(t)===p.i&&t.city<0){const ims=IMPS.filter(im=>im.ok(t,x,y)&&!(im.noBug&&psp(p)==='bug')&&!(im.onlyBug&&psp(p)!=='bug')&&(!t.res||seesRes(t)||!['farm','mine'].includes(im.k)));
    for(const im of ims){if(im.lvl&&cityHas(G.cities[t.terr],im.k))continue;const have=!!p.techs[im.tech];const cost=impCost(im);const pop=impPop(im,x,y);
     acts.appendChild(btn(impName(p,im),!have?'Needs '+TECH[im.tech].n:(im.c<0?'free, +1 star':CUR()+cost)+(pop?' &middot; +'+pop+' pop':''),have&&p.stars>=cost,()=>{doImp(p,x,y,im);select(x,y,'tile');showLvq();updHud();}));}
@@ -1212,9 +1217,9 @@ function help(){modal('<h2>How to play</h2><div class="help"><p><b>Goal:</b> Per
 // ---------- title / setup ----------
 let SETUP=null;
 function showTitle(){$('top').style.display='none';$('bottom').style.display='none';$('panel').style.display='none';$('tech').style.display='none';$('modal').style.display='none';$('modal').classList.remove('dark');
- const s=$('setup');s.style.display='block';s.innerHTML='<div class="title"><h1>Tiny Realms</h1><p>A little tribe strategy game</p><div id="tcan" class="tcan"></div><button class="btn big" id="bNew">New Game</button><button class="btn big" id="bLoad">Load Game</button><button class="btn" id="bHelp">How to play</button></div>';
+ const s=$('setup');s.style.display='block';s.innerHTML='<div class="title"><h1>Tiny Realms</h1><p>A little tribe strategy game</p><div id="tcan" class="tcan"></div>'+(saveInfo('auto')&&!saveInfo('auto').over?'<button class="btn big go" id="bCont">Continue</button>':'')+'<button class="btn big" id="bNew">New Game</button><button class="btn big" id="bLoad">Load Game</button><button class="btn" id="bHelp">How to play</button></div>';
  [0,4,6,14,5,2].forEach((t,i)=>{const tr=TRIBES[t];const ty=['warrior','petalshaman','snowling','tidecrawler','wildhorn','rider'][i];$('tcan').appendChild(iconCanvas(ty,tr.c[0],tr.c[1],tr.hat[0],56));});resetWorld();dirty=true;
- $('bNew').onclick=()=>{sfx('click');setupScreen();};$('bLoad').onclick=()=>{sfx('click');loadScreen();};$('bHelp').onclick=help;}
+ $('bNew').onclick=()=>{sfx('click');setupScreen();};if($('bCont'))$('bCont').onclick=()=>{if(loadGame('auto')){$('setup').style.display='none';resumeLoaded();}};$('bLoad').onclick=()=>{sfx('click');loadScreen();};$('bHelp').onclick=help;}
 function loadScreen(){const s=$('setup');let h='<div class="title"><h1>Load Game</h1>';
  for(const sl of['auto',1,2,3]){const i=saveInfo(sl);h+='<div class="slot"><div><b>'+(sl==='auto'?'Autosave':'Slot '+sl)+'</b><div class="sk">'+slotLabel(sl)+'</div></div>'+(i?'<button class="btn" data-l="'+sl+'">Load</button><button class="btn red" data-d="'+sl+'">X</button>':'')+'</div>';}
  h+='<button class="btn" id="bBack">Back</button></div>';s.innerHTML=h;$('bBack').onclick=showTitle;
@@ -1250,6 +1255,8 @@ function startGame(){const S=SETUP;const used=S.slots.map(x=>x.t);const free=shu
  const p0=G.cities.find(c=>c.owner===0);centerOn(p0.x,p0.y);nextPlayer();}
 
 $('endBtn').onclick=endTurn;$('nextBtn').onclick=nextUnit;$('tribeBtn').onclick=openTribes;$('techBtn').onclick=openTech;$('menuBtn').onclick=openMenu;
+addEventListener('pagehide',()=>{if(G&&!busy&&P(G.cur)&&!P(G.cur).ai)saveGame('auto');});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&G&&!busy&&P(G.cur)&&!P(G.cur).ai)saveGame('auto');});
 showTitle();
 
 </script>
