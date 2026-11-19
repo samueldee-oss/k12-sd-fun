@@ -574,8 +574,8 @@ function checkWin(){if(G.over)return null;const al=aliveList();const humans=al.f
 
 // ----- save -----
 const SAVE_KEY='tinyrealms_slot_';
-function saveGame(slot){try{const s=JSON.stringify({v:1,G,when:Date.now()});localStorage.setItem(SAVE_KEY+slot,s);return true;}catch(e){return false;}}
-function loadGame(slot){try{const s=localStorage.getItem(SAVE_KEY+slot);if(!s)return false;const o=JSON.parse(s);G=o.G;occDirty();return true;}catch(e){return false;}}
+function saveGame(slot){if(!G)return false;try{const s=JSON.stringify({v:1,G,when:Date.now()},(k,v)=>(k==='t0'||k==='ax'||k==='ay')?undefined:v);localStorage.setItem(SAVE_KEY+slot,s);return true;}catch(e){return false;}}
+function loadGame(slot){try{const s=localStorage.getItem(SAVE_KEY+slot);if(!s)return false;const o=JSON.parse(s);if(!o.G)return false;G=o.G;for(const u of G.units){delete u.t0;delete u.ax;delete u.ay;}occDirty();return true;}catch(e){return false;}}
 function saveInfo(slot){try{const s=localStorage.getItem(SAVE_KEY+slot);if(!s)return null;const o=JSON.parse(s);const hs=o.G.players.filter(p=>!p.ai).map(p=>pname(p));return{when:o.when,turn:o.G.turn,who:hs.join(', '),n:o.G.players.length,over:o.G.over};}catch(e){return null;}}
 function delSave(slot){try{localStorage.removeItem(SAVE_KEY+slot);}catch(e){}}
 
@@ -1067,7 +1067,7 @@ function render(now){
   drawFeature(ctx,t,X,Y,sx,sy,HW,HH,s);
   if(t.city>=0){drawCity(ctx,G.cities[t.city],sx,sy,HW,HH,s);labels.push([G.cities[t.city],sx,sy]);}
   const u=unitAt(X,Y);
-  if(u&&canSee(u,G.view)){let ux=sx,uy=sy;if(u.t0&&now-u.t0<240){const f=(now-u.t0)/240,e=f*f*(3-2*f);const ox=(u.ax-u.ay)*HW+cam.x,oy=(u.ax+u.ay)*HH+cam.y;ux=ox+(sx-ox)*e;uy=oy+(sy-oy)*e-Math.sin(f*Math.PI)*6*s;anim=true;}
+  if(u&&canSee(u,G.view)){let ux=sx,uy=sy;if(u.t0&&now-u.t0>=0&&now-u.t0<240){const f=(now-u.t0)/240,e=f*f*(3-2*f);const ox=(u.ax-u.ay)*HW+cam.x,oy=(u.ax+u.ay)*HH+cam.y;ux=ox+(sx-ox)*e;uy=oy+(sy-oy)*e-Math.sin(f*Math.PI)*6*s;anim=true;}
    const p=P(u.owner),[c1,c2]=pcol(p);const done=u.owner===G.cur&&!u.cm&&!u.ca&&!humanP().ai;
    if(u===selUnit){El(ctx,ux,uy+HH*.25,15*s,5.5*s,'rgba(255,225,74,.55)');}
    ctx.globalAlpha=done?.6:1;if(has(u,'hide'))ctx.globalAlpha*=.75;
