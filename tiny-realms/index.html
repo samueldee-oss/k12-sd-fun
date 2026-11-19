@@ -219,7 +219,7 @@ const TRIBES=[
 {n:'Aurelia',s:'Ferrum',like:'Imperius',c:['#2f5bd0','#f2c94c'],sc:['#7b2fb0','#d9d9e0'],g:'#b7cc5e',tr:'#3f7f3f',hat:['plume','crown'],tech:'organization',unit:'warrior',w:[1.3,.8,.9],wa:1,r:{fruit:1.8,crop:1,animal:.8,fish:1,ore:1},syl:['Ro','Va','Lum','Cor','Tir','Ves','Ma','Pal','Aur','Sen','Qui','Lan'],perk:'Starts with Organization. Lots of fruit.'},
 {n:'Sahrim',s:'Duneah',like:'Oumaji',c:['#e8b923','#ffffff'],sc:['#e0662a','#2a2a2a'],g:'#e6cf8e',tr:'#6f9f3f',hat:['turban','band'],tech:'riding',unit:'rider',w:[2,.3,.5],wa:.8,r:{fruit:.6,crop:.8,animal:1.2,fish:1,ore:1},syl:['Sah','Ra','Kas','Mir','Dun','Zar','Ali','Bah','Qa','Fir','Tal','Am'],perk:'Starts with Riding and a Rider. Wide open deserts.'},
 {n:'Tlaxqo',s:'Itzmal',like:'Quetzali',c:['#2fae4f','#c0392b'],sc:['#c94f8a','#2fd0c0'],g:'#7fc35a',tr:'#2f7f4f',hat:['feather','tall'],tech:'strategy',unit:'defender',w:[1.2,1,.8],wa:1,r:{fruit:1.8,crop:.5,animal:1,fish:1,ore:1},syl:['Tla','Xo','Itz','Co','Mal','Que','Tec','Pan','Ol','Hua','Chi','Ten'],perk:'Starts with Strategy and a Defender. Lots of fruit.'},
-{n:'Myrmex',s:'Petalyn',s3:'Chitara',like:'Cymanti / New Dawn',c:['#f2d04a','#5a3a6a'],sc:['#ff8fc4','#9a5ae0'],tc:['#8fd4ff','#a6e83a'],g:'#a8b86a',tr:'#8a6a4a',hat:['bug','nd','nd'],tech:'farming',unit:'petalshaman',sp:'bug',w:[1,1.4,.6],wa:1.1,r:{fruit:1.2,crop:1,animal:.6,fish:1.2,ore:.8},syl:['Myr','Pip','Chi','Lulu','Bon','Mimi','Pom','Kiki','Bun','Ix','Qel','Nini'],perk:'Bug tribe with 3 looks: classic Cymanti (Myrmex) or cute New Dawn (Petalyn, Chitara). Starts with Farming and a Shaman/Guru. No ports: Living Isles / Super-Sponges (Ramming) make Foam to cross water. Poison attacks.'},
+{n:'Myrmex',s:'Petalyn',s3:'Chitara',like:'Cymanti / New Dawn',c:['#f2d04a','#5a3a6a'],sc:['#ff8fc4','#9a5ae0'],tc:['#8fd4ff','#a6e83a'],g:'#a8b86a',tr:'#8a6a4a',hat:['bug','nd','nd'],tech:'farming',unit:'petalshaman',sp:'bug',w:[1,1.4,.6],wa:1.1,r:{fruit:1.2,crop:1,animal:.6,fish:1.2,ore:.8},syl:['Myr','Pip','Chi','Lulu','Bon','Mimi','Pom','Kiki','Bun','Ix','Qel','Nini'],perk:'Bug tribe with 3 looks: classic Cymanti (Myrmex) or cute New Dawn (Petalyn, Chitara). Starts with Farming and a Shaman/Guru. No ports: build Foam/Algae (Ramming) to walk across water. Poison attacks.'},
 {n:'Sylvane',s:'Emberwild',like:'Elyrion',c:['#e85fb0','#7af0ff'],sc:['#f07a1a','#ffd23f'],g:'#b9cf72',tr:'#c75aa0',hat:['leaf','spike'],tech:'hunting',unit:'wildhorn',sp:'elyr',w:[.9,1.6,.7],wa:1,r:{fruit:1,crop:.8,animal:1.4,fish:1,ore:.8},syl:['Syl','Va','Eli','Ryn','Lae','Thi','Ora','Fen','Aen','Myl','Iri','Ael'],perk:'Magic forest tribe. Starts with a Wildhorn (Hunting). Navigation unlocks Wyrm Eggs that grow into dragons.'},
 {n:'Glacira',s:'Solvara',like:'Polaris / Solaris',c:['#e8f2ff','#3a7fd0'],sc:['#ffb43a','#c0392b'],g:'#eef4f8',tr:'#5f8f8f',hat:['fur','hood'],tech:null,unit:'snowling',sp:'polar',w:[1.4,.6,1],wa:1.1,r:{fruit:.3,crop:.3,animal:.8,fish:1.3,ore:1},syl:['Gla','Cir','Fro','Nix','Pol','Ska','Ys','Hel','Bor','Ise','Sol','Var'],perk:'Ice tribe! Snowlings (Fishing) freeze water into ice. Units skate fast on ice. Specials: Frost Archer, Ice Sled (Sailing), Glacier Keep (Navigation), Frost Titan.'},
 {n:'Fjordheim',s:'Runeholt',like:'Bardur',c:['#3a3a46','#e0e0e0'],sc:['#8a2f2f','#e0b040'],g:'#9fb47e',tr:'#2f5f3f',hat:['horns','hood'],tech:'hunting',unit:'warrior',w:[1,1.4,.8],wa:1,r:{fruit:.6,crop:.8,animal:2,fish:1,ore:1},syl:['Fjor','Heim','Ulf','Rag','Sig','Thor','Bjor','Ka','Vik','Grim','Eir','Hal'],perk:'Starts with Hunting. Lots of animals.'},
@@ -237,14 +237,14 @@ const IMPS=[
  {k:'hunt',n:'Hunt',tech:'hunting',c:2,pop:1,ok:t=>t.res==='animal'},
  {k:'fish',n:'Fish',tech:'fishing',c:2,pop:1,ok:t=>t.res==='fish'},
  {k:'farm',n:'Farm',tech:'farming',c:5,pop:2,noBug:1,ok:t=>t.res==='crop'&&!t.imp},
- {k:'flowers',n:'Flowers',tech:'farming',c:5,pop:2,onlyBug:1,ok:t=>t.ter==='field'&&!t.imp&&!t.res},
+ {k:'flowers',n:'Flowers',tech:'farming',c:5,pop:2,onlyBug:1,ok:t=>t.ter==='field'&&!t.imp&&(!t.res||t.res==='crop')},
  {k:'mine',n:'Mine',tech:'mining',c:5,pop:2,ok:t=>t.res==='ore'&&!t.imp},
  {k:'lumber',n:'Lumber Hut',tech:'forestry',c:3,pop:1,ok:t=>t.ter==='forest'&&!t.imp&&!t.res},
  {k:'clear',n:'Clear Forest (+1)',tech:'forestry',c:-1,pop:0,ok:t=>t.ter==='forest'&&!t.imp},
  {k:'burn',n:'Burn Forest',tech:'construction',c:5,pop:0,ok:t=>t.ter==='forest'&&!t.imp},
  {k:'grow',n:'Grow Forest',tech:'spiritualism',c:5,pop:0,ok:t=>t.ter==='field'&&!t.imp&&!t.res},
  {k:'port',n:'Port',tech:'fishing',c:7,pop:1,noBug:1,ok:(t,x,y)=>t.ter==='water'&&!t.imp&&!t.res&&nbrs(x,y).some(([a,b])=>isLandT(T(a,b)))},
- {k:'windmill',n:'Windmill',tech:'construction',c:5,lvl:'farm',per:1,noBug:1,ok:t=>t.ter==='field'&&!t.imp&&!t.res},
+ {k:'windmill',n:'Windmill',tech:'construction',c:5,lvl:'farm',per:1,ok:t=>t.ter==='field'&&!t.imp&&!t.res},
  {k:'forge',n:'Forge',tech:'smithery',c:5,lvl:'mine',per:2,ok:t=>t.ter==='field'&&!t.imp&&!t.res},
  {k:'sawmill',n:'Sawmill',tech:'mathematics',c:5,lvl:'lumber',per:1,ok:t=>t.ter==='field'&&!t.imp&&!t.res},
  {k:'market',n:'Market',tech:'trade',c:5,pop:0,ok:t=>t.ter==='field'&&!t.imp&&!t.res},
@@ -257,6 +257,17 @@ const IMPS=[
 ];
 const TEMPLES=['temple','mtemple','ftemple','wtemple'];
 const REWARDS={2:[['workshop','Workshop','+1 star every turn'],['explorer','Explorer','Reveals land around the city']],3:[['wall','City Wall','Huge defense bonus in this city'],['resources','Resources','+5 stars now']],4:[['popgrowth','Population Growth','+3 population'],['border','Border Growth','Bigger territory']],5:[['park','Park','+250 score'],['super','Super Unit','A giant warrior']]};
+
+const TASKS=[
+ {k:'pacifist',n:'Pacifist',tech:'meditation',d:'Do not attack anyone for 5 turns',mon:'Altar of Peace',col:'#9fe0ff'},
+ {k:'wealth',n:'Wealth',tech:'trade',d:'Save up 100 stars',mon:'Golden Tomb',col:'#ffd23f'},
+ {k:'genius',n:'Genius',tech:'philosophy',d:'Learn every tech',mon:'Tower of Wisdom',col:'#c8a0ff'},
+ {k:'network',n:'Network',tech:'roads',d:'Build 10 roads',mon:'Grand Bazaar',col:'#ff9a5a'},
+ {k:'explorer',n:'Explorer',tech:null,d:'Explore the whole map',mon:'Eye of the World',col:'#7affc8'},
+ {k:'killer',n:'Killer',tech:'chivalry',d:'Defeat 10 enemy units',mon:'Gate of Power',col:'#ff6a6a'},
+ {k:'metropolis',n:'Metropolis',tech:'construction',d:'Grow a city to level 5',mon:'Park of Fortune',col:'#8aff6a'},
+];
+const WORLD_TYPES=['drylands','lakes','pangea','continents','archipelago','waterworld'];
 
 // ================= CORE LOGIC =================
 let G=null;
@@ -443,7 +454,7 @@ function targets(u){if(!u.ca||u.frozen)return[];const D=UD(u);if(D.a<=0&&!has(u,
  for(const v of G.units){if(v.owner===u.owner||atPeace(u.owner,v.owner))continue;if(dist(u.x,u.y,v.x,v.y)>D.r)continue;if(!canSee(v,u.owner))continue;o.push(v);}return o;}
 function doAttack(a,d){
  const p=P(a.owner);
- a.ca=false;if(!has(a,'escape'))a.cm=false;noteHit(a.owner,d.owner);
+ a.ca=false;if(!has(a,'escape'))a.cm=false;noteHit(a.owner,d.owner);p.lastAtk=G.turn;
  if(has(a,'convert')){logEv(a.owner,pname(p)+' converted '+pname(P(d.owner))+'\'s '+uname(d.type,P(d.owner)),d.owner,'conv');d.owner=a.owner;d.city=a.city;d.cm=d.ca=false;occDirty();fx(d.x,d.y,'Converted!','#e0a0ff');unitSight(d);sfx('magic');return;}
  if(UD(a).a<=0&&has(a,'freeze')){d.frozen=1;fx(d.x,d.y,'Frozen!','#bfe8ff');sfx('magic');return;}
  const{dmg,ret}=calcDmg(a,d);a.boost=0;
@@ -500,11 +511,11 @@ function impList(p,x,y){const t=T(x,y);if(t.city>=0||t.village)return[];if(tileO
 function cityHas(c,k){for(let i=0;i<G.map.length;i++){const t=G.map[i];if(t.terr===c.id&&t.imp===k)return true;}return false;}
 function impName(p,im){if(im.k==='flowers')return isND(p)?'Flowers':'Fungi';if(im.k==='foam')return isND(p)?'Foam':'Algae';if(psp(p)==='bug'){if(im.k==='fruit')return'Collect Nectar';if(im.k==='hunt')return'Catch Snulle';}return im.n;}
 function impCost(im){return Math.max(0,im.c);}
-function impPop(im,x,y){if(im.lvl){let n=0;for(const[a,b]of nbrs(x,y)){if(T(a,b).imp===im.lvl&&T(a,b).terr===T(x,y).terr)n++;}return n*im.per;}return im.pop||0;}
+function impPop(im,x,y){if(im.lvl){let n=0;for(const[a,b]of nbrs(x,y)){if((T(a,b).imp===im.lvl||(im.lvl==='farm'&&T(a,b).imp==='flowers'))&&T(a,b).terr===T(x,y).terr)n++;}return n*im.per;}return im.pop||0;}
 function doImp(p,x,y,im){const t=T(x,y);const c=t.terr>=0?G.cities[t.terr]:null;const cost=impCost(im);if(p.stars<cost)return false;p.stars-=cost;
  const pop=impPop(im,x,y);
  switch(im.k){case'fruit':case'hunt':case'fish':t.res=null;break;
-  case'flowers':case'farm':case'mine':case'lumber':case'port':case'market':case'windmill':case'forge':case'sawmill':case'temple':case'mtemple':case'ftemple':case'wtemple':t.imp=im.k;break;
+  case'flowers':if(im.k==='flowers')t.res=null;case'farm':case'mine':case'lumber':case'port':case'market':case'windmill':case'forge':case'sawmill':case'temple':case'mtemple':case'ftemple':case'wtemple':t.imp=im.k;break;
   case'clear':t.ter='field';p.stars+=1;break;
   case'burn':t.ter='field';t.res='crop';break;
   case'grow':t.ter='forest';break;
@@ -513,11 +524,11 @@ function doImp(p,x,y,im){const t=T(x,y);const c=t.terr>=0?G.cities[t.terr]:null;
   case'foam':foamTile(t);{const v=unitAt(x,y);if(v&&has(v,'naval')){v.type=v.base||'warrior';v.base=null;}}break;}
  if(pop&&c)addPop(c,pop);
  // adjacency for level buildings
- const L={farm:['windmill',1],mine:['forge',2],lumber:['sawmill',1]}[im.k];
+ const L={farm:['windmill',1],flowers:['windmill',1],mine:['forge',2],lumber:['sawmill',1]}[im.k];
  if(L){for(const[a,b]of nbrs(x,y)){const n=T(a,b);if(n.imp===L[0]&&n.terr>=0&&G.cities[n.terr].owner===p.i)addPop(G.cities[n.terr],L[1]);}}
  sfx('build');return true;}
 function income(p){let s=0;for(const c of G.cities){if(c.owner!==p.i)continue;const o=unitAt(c.x,c.y);if(o&&o.owner!==p.i)continue;s+=c.level+(c.cap?1:0)+(c.ws?1:0);}
- for(let y=0;y<G.N;y++)for(let x=0;x<G.N;x++){const t=T(x,y);if(t.imp==='market'&&tileOwner(t)===p.i){let n=0;for(const[a,b]of nbrs(x,y)){const q=T(a,b).imp;if(q==='windmill'||q==='forge'||q==='sawmill')n++;}s+=Math.min(n,4)*2;}}
+ for(let y=0;y<G.N;y++)for(let x=0;x<G.N;x++){const t=T(x,y);if(t.imp==='market'&&tileOwner(t)===p.i){let n=0;for(const[a,b]of nbrs(x,y)){const q=T(a,b).imp;if(q==='windmill'||q==='forge'||q==='sawmill'||(q==='flowers'&&psp(p)==='bug'))n++;}s+=Math.min(n,4)*2;}}
  s+=embassyIncome(p.i);if(p.ai)s+=[0,1,3][G.diff]||0;return s;}
 function applyReward(c,k){const p=P(c.owner);
  switch(k){case'workshop':c.ws=1;break;
@@ -543,12 +554,20 @@ function embassyIncome(i){let s=0;if(!G.rel)return 0;for(const k in G.rel){const
 // ----- lighthouses -----
 function checkLighthouses(u){const p=P(u.owner);if(!p.lh)p.lh=[];const r=(T(u.x,u.y).ter==='mountain'||has(u,'sight'))?2:1;
  for(const L of G.lights||[]){if(p.lh.includes(L[0]+','+L[1]))continue;if(dist(u.x,u.y,L[0],L[1])<=r){p.lh.push(L[0]+','+L[1]);reveal(p,L[0],L[1],3);p.stars+=3;fx(L[0],L[1],'Lighthouse found!','#ffe14a');logEv(p.i,pname(p)+' found a lighthouse',-1,'lh');if(p.lh.length===4){p.stars+=10;logEv(p.i,pname(p)+' found all 4 lighthouses!',-1,'lh');if(!p.ai&&typeof toast==='function')toast('All 4 lighthouses found! +10');}}}}
+
+// ----- tasks & monuments -----
+function taskDone(p,k){if(!p.tasks)p.tasks={};const T_=TASKS.find(t=>t.k===k);if(T_.tech&&!p.techs[T_.tech]&&!(T_.tech==='construction'&&psp(p)==='bug'&&p.techs.farming&&p.techs.construction))return false;
+ switch(k){case'pacifist':return G.turn>=5&&G.turn-(p.lastAtk||0)>=5;case'wealth':return p.stars>=100;case'genius':return Object.keys(TECH).every(t=>p.techs[t]);
+  case'network':return G.map.filter(t=>t.road&&tileOwner(t)===p.i).length>=10;case'explorer':return p.ex.every(e=>e);case'killer':return(p.kills||0)>=10;case'metropolis':return G.cities.some(c=>c.owner===p.i&&c.level>=5);}return false;}
+function checkTasks(p){if(!p.tasks)p.tasks={};if(!p.mons)p.mons={};for(const T_ of TASKS){if(p.tasks[T_.k])continue;if(taskDone(p,T_.k)){p.tasks[T_.k]=1;p.mons[T_.k]=0;logEv(p.i,pname(p)+' completed the '+T_.n+' task',-1,'task');if(!p.ai&&typeof toast==='function')toast('Task done: '+T_.n+'! Build the '+T_.mon+'.');}}}
+function monumentsToBuild(p){return TASKS.filter(T_=>p.mons&&p.mons[T_.k]===0);}
+function buildMonument(p,x,y,k){const t=T(x,y);t.imp='mon';t.mon=k;p.mons[k]=1;const c=G.cities[t.terr];if(c)addPop(c,3);logEv(p.i,pname(p)+' built the '+TASKS.find(q=>q.k===k).mon,-1,'mon');sfx('city');}
 // ----- score -----
 function score(p){let s=0;for(const e of p.ex)if(e)s+=5;
  for(const c of G.cities)if(c.owner===p.i)s+=100+c.level*50+c.parks*250;
  for(const k in p.techs)s+=TECH[k].t*100;s+=(p.lh||[]).length*100;
  for(const u of G.units)if(u.owner===p.i)s+=(UNITS[u.base||u.type].c||5)*5;
- for(const t of G.map)if(TEMPLES.includes(t.imp)&&tileOwner(t)===p.i)s+=150;
+ for(const t of G.map){if(TEMPLES.includes(t.imp)&&tileOwner(t)===p.i)s+=150;if(t.imp==='mon'&&tileOwner(t)===p.i)s+=400;}
  return s;}
 
 // ----- turns -----
@@ -559,6 +578,7 @@ function startTurn(i){const p=P(i);
   if(u.frozen){u.cm=u.ca=false;u.frozen=0;u.wasFrozen=1;}else{u.cm=u.ca=true;u.wasFrozen=0;}
  }
  p.stars+=income(p);
+ checkTasks(p);
 }
 function endTurnEffects(i){
  for(const u of G.units.slice()){if(u.owner!==i||!has(u,'foamarea'))continue;for(const[a,b]of nbrs(u.x,u.y)){const t=T(a,b);if(isWater(t)&&!t.imp&&t.city<0){const v=unitAt(a,b);foamTile(t);if(v&&has(v,'naval')){v.type=v.base||'warrior';v.base=null;}}}}
@@ -569,7 +589,7 @@ function endTurnEffects(i){
 function aliveList(){return G.players.filter(p=>p.alive);}
 function checkWin(){if(G.over)return null;const al=aliveList();const humans=al.filter(p=>!p.ai);
  if(humans.length===0){return{lose:true};}
- if(al.length===1)return{win:al[0].i};
+ if(al.length===1){if(G.mode==='inf'){if(!G.wonShown){G.wonShown=1;if(typeof toast==='function')toast(pname(al[0])+' rules the world! Keep playing as long as you like.');}return null;}return{win:al[0].i};}
  return null;}
 
 // ----- save -----
@@ -648,9 +668,10 @@ function aiSpend(p){
   for(const k in TECH){if(!techAvail(p,k))continue;const c=techCost(p,k);if(c>p.stars)continue;opts.push({v:techValue(p,k)/c*1.4,f:()=>research(p,k)});}
   for(let y=0;y<G.N;y++)for(let x=0;x<G.N;x++){const t=T(x,y);if((t.terr<0||G.cities[t.terr].owner!==p.i)&&!canFoamAt(p,x,y))continue;
    for(const im of impList(p,x,y)){if(!p.techs[im.tech])continue;const c=impCost(im);if(c>p.stars)continue;const pop=impPop(im,x,y);
-    let v=pop*1.7/Math.max(1,c);if(im.k==='clear')v=.05;if(im.k==='road'||im.k==='grow'||im.k==='burn')v=.02;if(im.k==='market')v=.25;if(im.k==='foam')v=.16;if(TEMPLES.includes(im.k))v=p.stars>30?.3:.05;
+    let v=pop*1.7/Math.max(1,c);if(im.k==='clear')v=.05;if(im.k==='road'||im.k==='grow'||im.k==='burn')v=.02;if(im.k==='market')v=(()=>{let n=0;for(const[a2,b2]of nbrs(x,y)){const q=T(a2,b2).imp;if(['windmill','forge','sawmill','flowers'].includes(q))n++;}return n*.4;})();if(im.k==='foam')v=.16;if(TEMPLES.includes(im.k))v=p.stars>30?.3:.05;
     if(im.lvl&&pop<2)v=0;const cc=G.cities[t.terr];if(cc.pop+pop>=cc.level+1)v*=1.3;
     if(v>0)opts.push({v,f:()=>doImp(p,x,y,im)});}}
+  for(const T_ of monumentsToBuild(p)){const sp=G.map.findIndex(t=>t.terr>=0&&G.cities[t.terr].owner===p.i&&t.city<0&&!t.village&&(t.ter==='field'||t.ter==='forest')&&!t.imp&&!t.res);if(sp>=0)opts.push({v:3,f:()=>buildMonument(p,sp%G.N,(sp/G.N)|0,T_.k)});}
   const myU=G.units.filter(u=>u.owner===p.i).length,myC=cityCount(p);
   const need=threat?1.2:myU<myC*1.5+1?.75:myU<myC*3?.3:.08;
   for(const c of G.cities){if(c.owner!==p.i||cityUnits(c)>=cityCap(c)||unitAt(c.x,c.y))continue;
@@ -936,7 +957,7 @@ function drawTerrain(c,t,X,Y,sx,sy,hw,hh,s,now){
  if(t.foam){for(const[a,b,r]of[[-12,-2,3],[8,-4,2.4],[2,4,3.4],[-5,6,2],[13,3,2.2]])Ci(c,sx+a*s,sy+b*s,r*s,'rgba(255,255,255,.95)');}else if(t.ter==='ice'){Ln(c,sx-10*s,sy-2*s,sx+4*s,sy+4*s,.8*s,'#fff');Ln(c,sx+2*s,sy-6*s,sx+8*s,sy,.8*s,'#fff');}
  if(bug&&t.ter==='field'&&((X*7+Y*13)%5===0))flowerSm(c,sx+((X*5)%7-3)*2*s,sy+((Y*3)%5-2)*2*s,1.6*s,(X+Y)%2?'#ff8fc8':'#b48cff');
 }
-function seesRes(t){if(!G)return true;const v=P(G.view);if(!v)return true;if(t.res==='crop')return!!v.techs.organization||psp(v)==='bug';if(t.res==='ore')return!!v.techs.climbing;if(t.res==='starfish')return!!v.techs.fishing;return true;}
+function seesRes(t){if(!G)return true;const v=P(G.view);if(!v)return true;if(t.res==='crop')return!!v.techs.organization||!!v.techs.farming;if(t.res==='ore')return!!v.techs.climbing;if(t.res==='starfish')return!!v.techs.fishing;return true;}
 function drawFeature(c,t,X,Y,sx,sy,hw,hh,s){const seeR=seesRes(t);
  const tr=TRIBES[t.clim];const polar=tr.sp==='polar'||tr.sp===undefined&&false;const nd=tr.sp==='bug'&&t.cs>0,shroom=tr.sp==='bug'&&!t.cs;const pink=tr.sp==='elyr'||nd;
  if(t.road){for(const[a,b]of nbrs(X,Y)){if(Math.abs(a-X)+Math.abs(b-Y)!==1)continue;const n=T(a,b);if(n.road||n.city>=0){const nx=sx+((a-X)-(b-Y))*hw,ny=sy+((a-X)+(b-Y))*hh;Ln(c,sx,sy,(sx+nx)/2,(sy+ny)/2,3*s,'#b08a5a');}}Ci(c,sx,sy,1.6*s,'#b08a5a');}
@@ -952,6 +973,9 @@ function drawFeature(c,t,X,Y,sx,sy,hw,hh,s){const seeR=seesRes(t);
  if(t.res==='fish'){const fx_=sx,fy=sy+2*s;El(c,fx_,fy,5*s,2.4*s,'#dff4ff');Pg(c,[[fx_-4*s,fy],[fx_-8*s,fy-3*s],[fx_-8*s,fy+3*s]],'#dff4ff');Ci(c,fx_+2.5*s,fy-.5*s,.7*s,'#123');}
  switch(t.imp){
  case'flowers':{const ndF=tr.sp==='bug'&&t.cs>0;for(const[a,b2]of[[-12,-2],[-4,-6],[5,-3],[12,1],[-6,4],[3,5],[9,-7]]){if(ndF){Ln(c,sx+a*s,sy+b2*s,sx+a*s,sy+(b2-6)*s,.8*s,'#5fa04a');flowerSm(c,sx+a*s,sy+(b2-7)*s,1.6*s,(a+b2)%3?'#ff8fc8':'#b48cff');}else{Rc(c,sx+a*s-.8*s,sy+(b2-4)*s,1.6*s,4*s,'#efe4cc');El(c,sx+a*s,sy+(b2-4.5)*s,3.2*s,1.8*s,(a+b2)%2?'#c0503a':'#d8a040');}}break;}
+ case'mon':{const M=TASKS.find(q=>q.k===t.mon)||TASKS[0];El(c,sx,sy+1*s,13*s,5.5*s,'#a8a8b0');Pg(c,[[sx-9*s,sy-1*s],[sx+9*s,sy-1*s],[sx+7*s,sy-5*s],[sx-7*s,sy-5*s]],'#e8e4da');
+  Pg(c,[[sx-4*s,sy-5*s],[sx+4*s,sy-5*s],[sx+2.6*s,sy-26*s],[sx-2.6*s,sy-26*s]],'#f4f0e6','rgba(0,0,0,.25)',.6*s);Pg(c,[[sx-2.6*s,sy-26*s],[sx+2.6*s,sy-26*s],[sx,sy-31*s]],M.col);
+  Ci(c,sx,sy-16*s,2.6*s,M.col,'rgba(0,0,0,.3)',.5*s);c.beginPath();c.arc(sx,sy-29*s,8*s,0,TAU);c.fillStyle='rgba(255,240,170,.18)';c.fill();break;}
  case'farm':diamond(c,sx,sy,hw*.7,hh*.7);c.fillStyle='#d8b84a';c.fill();for(let i=-2;i<=2;i++)Ln(c,sx+i*5*s-4*s,sy-2*s+i*.5*s,sx+i*5*s+4*s,sy+2*s+i*.5*s,1.2*s,'#a07a2a');break;
  case'mine':El(c,sx-1*s,sy-1*s,5*s,4.5*s,'#2a2a2a');Rc(c,sx-6*s,sy-6*s,10*s,2*s,'#7a5230');break;
  case'lumber':tree(c,sx-hw*.4,sy,s*.8,tr.tr,false,pink);Rc(c,sx-3*s,sy-6*s,10*s,7*s,'#9a6a3a');Pg(c,[[sx-4*s,sy-6*s],[sx+8*s,sy-6*s],[sx+2*s,sy-11*s]],'#6a4a2a');break;
@@ -1145,7 +1169,7 @@ function showPanel(){const pn=$('panel');if(!SEL){pn.style.display='none';return
    const tb=document.createElement('div');tb.className='lnk';tb.textContent='Show tile';tb.onclick=()=>select(x,y,'tile');pn.appendChild(tb);}
  }else{
   let title=terName(t);if(t.res&&seesRes(t)){const bg=isND(p);title+=' with '+{fruit:bg?'Pupli Nectar':'Fruit',crop:'Crops',animal:bg?'Snulles':'Wild Animals',fish:'Fish',ore:'Ore'}[t.res];}
-  if(t.imp){const im=IMPS.find(i=>i.k===t.imp);if(im)title+=' &middot; '+impName(p,im);}if(t.road)title+=' &middot; Road';
+  if(t.imp==='mon'){const M=TASKS.find(q=>q.k===t.mon);if(M)title+=' &middot; '+M.mon;}else if(t.imp){const im=IMPS.find(i=>i.k===t.imp);if(im)title+=' &middot; '+impName(p,im);}if(t.road)title+=' &middot; Road';
   let info='';const c=cityOf(t);
   if(c){const op=P(c.owner);title='<b>'+(c.cap?'Capital: ':'')+c.name+'</b> <span class="tag" style="background:'+pcol(op)[0]+';color:'+(lum(pcol(op)[0])>.6?'#222':'#fff')+'">'+pname(op)+'</span>';
    info='<div class="stats">Level '+c.level+' &nbsp; Population '+c.pop+'/'+(c.level+1)+' &nbsp; Income '+(c.level+(c.cap?1:0)+(c.ws?1:0))+' &nbsp; Units '+cityUnits(c)+'/'+cityCap(c)+(c.wall?' &nbsp; Walls':'')+(c.ws?' &nbsp; Workshop':'')+'</div>';}
@@ -1156,9 +1180,10 @@ function showPanel(){const pn=$('panel');if(!SEL){pn.style.display='none';return
   if(c&&c.owner===p.i){const lab=document.createElement('div');lab.className='sub';lab.textContent='Train units';pn.appendChild(lab);
    for(const[ty,tc]of trainList(p)){const why=canTrain(p,c,ty,tc);acts.appendChild(btn(uname(ty,p),tc&&!p.techs[tc]?'Needs '+TECH[tc].n:CUR()+UNITS[ty].c,!why,()=>{train(p,c,ty);select(x,y,'tile');updHud();},unitIcon(ty,p)));}}
   else if(t.city<0&&tileOwner(t)!==p.i&&canFoamAt(p,x,y)){const im=IMPS.find(i=>i.k==='foam');const have=!!p.techs.ramming;acts.appendChild(btn(impName(p,im),!have?'Needs Ramming':CUR()+im.c+' &middot; walk on water',have&&p.stars>=im.c,()=>{doImp(p,x,y,im);select(x,y,'tile');updHud();}));}
-  else if(tileOwner(t)===p.i&&t.city<0){const ims=IMPS.filter(im=>im.ok(t,x,y)&&!(im.noBug&&psp(p)==='bug')&&!(im.onlyBug&&psp(p)!=='bug')&&(!t.res||seesRes(t)||!['farm','mine'].includes(im.k)));
+  else if(tileOwner(t)===p.i&&t.city<0){const ims=IMPS.filter(im=>im.ok(t,x,y)&&!(im.noBug&&psp(p)==='bug')&&!(im.onlyBug&&psp(p)!=='bug')&&(!t.res||seesRes(t)||!['farm','mine'].includes(im.k))&&!(t.res&&!seesRes(t)&&['grow','windmill','forge','sawmill','market','temple'].includes(im.k)));
    for(const im of ims){if(im.lvl&&cityHas(G.cities[t.terr],im.k))continue;const have=!!p.techs[im.tech];const cost=impCost(im);const pop=impPop(im,x,y);
     acts.appendChild(btn(impName(p,im),!have?'Needs '+TECH[im.tech].n:(im.c<0?'free, +1 star':CUR()+cost)+(pop?' &middot; +'+pop+' pop':''),have&&p.stars>=cost,()=>{doImp(p,x,y,im);select(x,y,'tile');showLvq();updHud();}));}
+   if(!t.imp&&!t.res&&(t.ter==='field'||t.ter==='forest'))for(const M of monumentsToBuild(p))acts.appendChild(btn('Build '+M.mon,'free &middot; +3 pop &middot; +400 score',true,()=>{buildMonument(p,x,y,M.k);select(x,y,'tile');showLvq();updHud();}));
    if((t.imp||t.road)&&p.techs.chivalry)acts.appendChild(btn('Destroy','remove building',true,()=>{destroyImp(p,x,y);select(x,y,'tile');}));
    if(!ims.length&&!t.imp){const n=document.createElement('div');n.className='hint';n.textContent='Nothing to build here.';pn.appendChild(n);}}
   const v=unitAt(x,y);if(v&&canSee(v,p.i)){const tb=document.createElement('div');tb.className='lnk';tb.textContent='Show unit';tb.onclick=()=>select(x,y,'unit');pn.appendChild(tb);}
@@ -1244,9 +1269,13 @@ function gameOver(w){G.over=true;busy=false;$('aiwait').style.display='none';sav
  modal('<h2>Game Over</h2><p>'+title+'</p><table class="rank">'+rows+'</table>',[['Look at map',null],['Main menu',()=>{G=null;showTitle();}, 'big']]);}
 
 // ---------- menus ----------
+function openTasks(){const p=humanP()&&!humanP().ai?humanP():P(G.view);checkTasks(p);let h='<h2>Tasks & Monuments</h2><p class="sk">Finish a task to unlock its monument. Build it on an empty field or forest in your land for +3 population and +400 score.</p><div class="dip">';
+ for(const T_ of TASKS){const done=p.tasks&&p.tasks[T_.k],built=p.mons&&p.mons[T_.k]===1,locked=T_.tech&&!p.techs[T_.tech];
+  h+='<div class="drow"><span class="dot" style="background:'+T_.col+'"></span><div class="dn"><b>'+T_.n+'</b><small>'+T_.d+(locked?' &middot; needs '+TECH[T_.tech].n:'')+'</small></div><div class="db"><small class="'+(built||done?'pc':'wr')+'">'+(built?'Built: '+T_.mon:done?'Ready to build!':'Not done')+'</small></div></div>';}
+ modal(h+'</div>',[['Close',null]]);}
 function openMenu(){if(!G)return;const rank=G.players.slice().sort((a,b)=>score(b)-score(a));
  const rows=rank.map(p=>'<tr><td><span class="dot" style="background:'+pcol(p)[0]+'"></span>'+pname(p)+(p.ai?'':' (player)')+'</td><td>'+score(p)+'</td><td>'+(p.alive?'':'out')+'</td></tr>').join('');
- modal('<h2>Menu</h2><table class="rank">'+rows+'</table>',[['Resume',null],['Save game',saveMenu],['How to play',help],[MUTE?'Sound: off':'Sound: on',()=>{MUTE=!MUTE;}],['Quit to title',()=>{G=null;clearSel();showTitle();}]]);}
+ modal('<h2>Menu</h2><table class="rank">'+rows+'</table>',[['Resume',null],['Tasks & Monuments',openTasks],['Save game',saveMenu],['How to play',help],[MUTE?'Sound: off':'Sound: on',()=>{MUTE=!MUTE;}],['Quit to title',()=>{G=null;clearSel();showTitle();}]]);}
 function slotLabel(s){const i=saveInfo(s);if(!i)return'Empty';return'Turn '+i.turn+' &middot; '+i.who+' &middot; '+i.n+' tribes'+(i.over?' (over)':'')+'<small>'+new Date(i.when).toLocaleString()+'</small>';}
 function saveMenu(){modal('<h2>Save game</h2><p>Pick a slot.</p>',[1,2,3].map(s=>['Slot '+s+': '+slotLabel(s),()=>{toast(saveGame(s)?'Saved to slot '+s:'Could not save');}]).concat([['Back',openMenu]]));}
 function help(){modal('<h2>How to play</h2><div class="help"><p><b>Goal:</b> Perfection mode: highest score after 30 turns. Domination: be the last tribe standing.</p><p><b>Stars</b> come in every turn from your cities. Spend them on tech, units and buildings.</p><p><b>Units:</b> tap a unit, then a white tile to move or a red enemy to attack. Most units can move then attack.</p><p><b>Villages:</b> move a unit onto one, then next turn tap Capture to make a new city.</p><p><b>Grow cities:</b> tap tiles in your land to harvest fruit, hunt, fish, build farms and mines. Full population bars level the city up and give you a reward.</p><p><b>Water:</b> learn Fishing and build a Port. Walk onto it to become a Raft.</p><p><b>Pass and play:</b> each human player takes a turn, then hands the device to the next player.</p><p>Drag to look around, pinch or scroll to zoom.</p></div>',[['Got it',null]]);}
@@ -1268,7 +1297,7 @@ function setupScreen(){if(!SETUP){SETUP={slots:[{t:0,skin:0,ai:false}],ai:3,size
 function renderSetup(){const S=SETUP,s=$('setup');let h='<div class="setup"><h2>New Game</h2><div class="sub">Players (pass and play)</div><div id="hl"></div><button class="btn" id="addH">+ Add human player</button>';
  h+='<div class="sub">Computer tribes: <button class="btn sm" id="aim">-</button> <b id="ain">'+S.ai+'</b> <button class="btn sm" id="aip">+</button></div>';
  const seg=(id,opts,val)=>'<div class="seg" id="'+id+'">'+opts.map(([v,l])=>'<button class="'+(v===val?'on':'')+'" data-v="'+v+'">'+l+'</button>').join('')+'</div>';
- h+='<div class="sub">Map size</div>'+seg('sz',[[11,'Tiny'],[14,'Small'],[16,'Normal'],[18,'Large'],[20,'Huge'],[30,'Massive']],S.size)+'<div class="sub">World type</div>'+seg('mt',[['drylands','Drylands'],['lakes','Lakes'],['pangea','Pangea'],['continents','Continents'],['archipelago','Archipelago'],['waterworld','Water World']],S.mt)+'<div class="sub">Game mode</div>'+seg('md',[['perf','Perfection (30 turns)'],['dom','Domination']],S.mode)+'<div class="sub">Computer skill</div>'+seg('df',[[0,'Easy'],[1,'Normal'],[2,'Hard']],S.diff);
+ h+='<div class="sub">Map size</div>'+seg('sz',[[11,'Tiny'],[14,'Small'],[16,'Normal'],[18,'Large'],[20,'Huge'],[30,'Massive']],S.size)+'<div class="sub">World type</div>'+seg('mt',[['random','Random'],['drylands','Drylands'],['lakes','Lakes'],['pangea','Pangea'],['continents','Continents'],['archipelago','Archipelago'],['waterworld','Water World']],S.mt)+'<button class="btn sm" id="rndAll" style="margin-top:6px;width:100%">Surprise me: random size, world and tribes</button>'+'<div class="sub">Game mode</div>'+seg('md',[['perf','Perfection (30 turns)'],['dom','Domination'],['inf','Infinite']],S.mode)+'<div class="sub">Computer skill</div>'+seg('df',[[0,'Easy'],[1,'Normal'],[2,'Hard']],S.diff);
  h+='<div class="row"><button class="btn" id="sBack">Back</button><button class="btn big go" id="sGo">Start!</button></div></div>';s.innerHTML=h;
  const hl=$('hl');S.slots.forEach((sl,i)=>{const tr=TRIBES[sl.t];const d=document.createElement('div');d.className='prow';const col=[tr.c,tr.sc,tr.tc||tr.sc][sl.skin|0];d.appendChild(iconCanvas(tr.unit,col[0],col[1],(tr.hat[sl.skin|0]||tr.hat[0]),52));
   const info=document.createElement('div');info.className='pi';info.innerHTML='<b>Player '+(i+1)+': '+([tr.n,tr.s,tr.s3||tr.s][sl.skin|0])+'</b><small>'+tr.perk+'</small>';d.appendChild(info);
@@ -1278,7 +1307,7 @@ function renderSetup(){const S=SETUP,s=$('setup');let h='<div class="setup"><h2>
  $('addH').onclick=()=>{const used=S.slots.map(x=>x.t);const free=TRIBES.map((_,i)=>i).filter(i=>!used.includes(i));if(!free.length||S.slots.length+S.ai>=15)return toast('Too many tribes');S.slots.push({t:free[0],skin:0,ai:false});renderSetup();};
  $('aim').onclick=()=>{S.ai=Math.max(S.slots.length>1?0:1,S.ai-1);renderSetup();};$('aip').onclick=()=>{if(S.slots.length+S.ai<15)S.ai++;renderSetup();};
  for(const[id,k,num]of[['sz','size',1],['mt','mt',0],['md','mode',0],['df','diff',1]])$(id).querySelectorAll('button').forEach(b=>b.onclick=()=>{S[k]=num?+b.dataset.v:b.dataset.v;renderSetup();});
- $('sBack').onclick=showTitle;$('sGo').onclick=startGame;}
+ $('sBack').onclick=showTitle;$('sGo').onclick=startGame;$('rndAll').onclick=()=>{S.size=pick([11,14,16,18,20]);S.mt='random';S.ai=1+ri(Math.min(6,14-S.slots.length+1));for(const sl of S.slots){const used=S.slots.filter(o=>o!==sl).map(o=>o.t);const fr=TRIBES.map((_,i)=>i).filter(i=>!used.includes(i));sl.t=pick(fr);sl.skin=ri(skinCount(sl.t));}sfx('magic');renderSetup();toast('Random world! Size '+S.size+', '+S.ai+' computer tribes');};}
 function tribePicker(i){const S=SETUP;const s=$('setup');let h='<div class="setup"><h2>Pick a tribe for Player '+(i+1)+'</h2><div class="tgrid">';
  TRIBES.forEach((tr,ti)=>{const taken=S.slots.some((x,j)=>j!==i&&x.t===ti);h+='<div class="tcard'+(taken?' taken':'')+'"><div class="pics" data-ti="'+ti+'"></div><b>'+tr.n+'</b><small>'+tr.like+'</small><div class="skins">'+[0,1,2].slice(0,skinCount(ti)).map(sk=>{const cc=[tr.c,tr.sc,tr.tc][sk][0],nm=[tr.n,tr.s,tr.s3][sk];return'<button class="btn sm" data-t="'+ti+'" data-s="'+sk+'" style="background:'+cc+';color:'+(lum(cc)>.6?'#222':'#fff')+'">'+nm+'</button>';}).join('')+'</div><small class="perk">'+tr.perk+'</small></div>';});
  h+='</div><button class="btn" id="pBack">Back</button></div>';s.innerHTML=h;s.scrollTop=0;
@@ -1288,7 +1317,7 @@ function tribePicker(i){const S=SETUP;const s=$('setup');let h='<div class="setu
 function startGame(){const S=SETUP;const used=S.slots.map(x=>x.t);const free=shuffle(TRIBES.map((_,i)=>i).filter(i=>!used.includes(i)));
  const slots=S.slots.map(x=>({...x}));for(let k=0;k<S.ai&&free.length;k++)slots.push({t:free.pop(),skin:ri(skinCount(0)&&TRIBES[free[free.length-1]].s3?3:2),ai:true});
  if(slots.length<2)return toast('Add at least one opponent');
- newGame({slots,size:S.size,mt:S.mt,mode:S.mode,diff:S.diff});$('setup').style.display='none';FX=[];
+ newGame({slots,size:S.size,mt:S.mt==='random'?pick(WORLD_TYPES):S.mt,mode:S.mode,diff:S.diff});$('setup').style.display='none';FX=[];
  const p0=G.cities.find(c=>c.owner===0);centerOn(p0.x,p0.y);nextPlayer();}
 
 $('endBtn').onclick=endTurn;$('nextBtn').onclick=nextUnit;$('tribeBtn').onclick=openTribes;$('techBtn').onclick=openTech;$('menuBtn').onclick=openMenu;
