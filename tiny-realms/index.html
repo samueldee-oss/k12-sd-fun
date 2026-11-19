@@ -219,7 +219,7 @@ const TRIBES=[
 {n:'Aurelia',s:'Ferrum',like:'Imperius',c:['#2f5bd0','#f2c94c'],sc:['#7b2fb0','#d9d9e0'],g:'#b7cc5e',tr:'#3f7f3f',hat:['plume','crown'],tech:'organization',unit:'warrior',w:[1.3,.8,.9],wa:1,r:{fruit:1.8,crop:1,animal:.8,fish:1,ore:1},syl:['Ro','Va','Lum','Cor','Tir','Ves','Ma','Pal','Aur','Sen','Qui','Lan'],perk:'Starts with Organization. Lots of fruit.'},
 {n:'Sahrim',s:'Duneah',like:'Oumaji',c:['#e8b923','#ffffff'],sc:['#e0662a','#2a2a2a'],g:'#e6cf8e',tr:'#6f9f3f',hat:['turban','band'],tech:'riding',unit:'rider',w:[2,.3,.5],wa:.8,r:{fruit:.6,crop:.8,animal:1.2,fish:1,ore:1},syl:['Sah','Ra','Kas','Mir','Dun','Zar','Ali','Bah','Qa','Fir','Tal','Am'],perk:'Starts with Riding and a Rider. Wide open deserts.'},
 {n:'Tlaxqo',s:'Itzmal',like:'Quetzali',c:['#2fae4f','#c0392b'],sc:['#c94f8a','#2fd0c0'],g:'#7fc35a',tr:'#2f7f4f',hat:['feather','tall'],tech:'strategy',unit:'defender',w:[1.2,1,.8],wa:1,r:{fruit:1.8,crop:.5,animal:1,fish:1,ore:1},syl:['Tla','Xo','Itz','Co','Mal','Que','Tec','Pan','Ol','Hua','Chi','Ten'],perk:'Starts with Strategy and a Defender. Lots of fruit.'},
-{n:'Myrmex',s:'Petalyn',s3:'Chitara',like:'Cymanti / New Dawn',c:['#c8d84a','#3a2a1a'],sc:['#ff8fc4','#9a5ae0'],tc:['#8fd4ff','#a6e83a'],g:'#a8b86a',tr:'#8a6a4a',hat:['antenna','nd','nd'],tech:'farming',unit:'petalshaman',sp:'bug',w:[1,1.4,.6],wa:1.1,r:{fruit:1.2,crop:1,animal:.6,fish:1.2,ore:.8},syl:['Myr','Pip','Chi','Lulu','Bon','Mimi','Pom','Kiki','Bun','Ix','Qel','Nini'],perk:'Bug tribe with 3 looks: classic Cymanti (Myrmex) or cute New Dawn (Petalyn, Chitara). Starts with Farming and a Shaman/Guru. No ports: Living Isles / Super-Sponges (Ramming) make Foam to cross water. Poison attacks.'},
+{n:'Myrmex',s:'Petalyn',s3:'Chitara',like:'Cymanti / New Dawn',c:['#f2d04a','#5a3a6a'],sc:['#ff8fc4','#9a5ae0'],tc:['#8fd4ff','#a6e83a'],g:'#a8b86a',tr:'#8a6a4a',hat:['bug','nd','nd'],tech:'farming',unit:'petalshaman',sp:'bug',w:[1,1.4,.6],wa:1.1,r:{fruit:1.2,crop:1,animal:.6,fish:1.2,ore:.8},syl:['Myr','Pip','Chi','Lulu','Bon','Mimi','Pom','Kiki','Bun','Ix','Qel','Nini'],perk:'Bug tribe with 3 looks: classic Cymanti (Myrmex) or cute New Dawn (Petalyn, Chitara). Starts with Farming and a Shaman/Guru. No ports: Living Isles / Super-Sponges (Ramming) make Foam to cross water. Poison attacks.'},
 {n:'Sylvane',s:'Emberwild',like:'Elyrion',c:['#e85fb0','#7af0ff'],sc:['#f07a1a','#ffd23f'],g:'#b9cf72',tr:'#c75aa0',hat:['leaf','spike'],tech:'hunting',unit:'wildhorn',sp:'elyr',w:[.9,1.6,.7],wa:1,r:{fruit:1,crop:.8,animal:1.4,fish:1,ore:.8},syl:['Syl','Va','Eli','Ryn','Lae','Thi','Ora','Fen','Aen','Myl','Iri','Ael'],perk:'Magic forest tribe. Starts with a Wildhorn (Hunting). Navigation unlocks Wyrm Eggs that grow into dragons.'},
 {n:'Glacira',s:'Solvara',like:'Polaris / Solaris',c:['#e8f2ff','#3a7fd0'],sc:['#ffb43a','#c0392b'],g:'#eef4f8',tr:'#5f8f8f',hat:['fur','hood'],tech:null,unit:'snowling',sp:'polar',w:[1.4,.6,1],wa:1.1,r:{fruit:.3,crop:.3,animal:.8,fish:1.3,ore:1},syl:['Gla','Cir','Fro','Nix','Pol','Ska','Ys','Hel','Bor','Ise','Sol','Var'],perk:'Ice tribe! Snowlings (Fishing) freeze water into ice. Units skate fast on ice. Specials: Frost Archer, Ice Sled (Sailing), Glacier Keep (Navigation), Frost Titan.'},
 {n:'Fjordheim',s:'Runeholt',like:'Bardur',c:['#3a3a46','#e0e0e0'],sc:['#8a2f2f','#e0b040'],g:'#9fb47e',tr:'#2f5f3f',hat:['horns','hood'],tech:'hunting',unit:'warrior',w:[1,1.4,.8],wa:1,r:{fruit:.6,crop:.8,animal:2,fish:1,ore:1},syl:['Fjor','Heim','Ulf','Rag','Sig','Thor','Bjor','Ka','Vik','Grim','Eir','Hal'],perk:'Starts with Hunting. Lots of animals.'},
@@ -715,21 +715,42 @@ function isoBox2(c,x,y,ex,ey,h,col){const L=[x-ex-ey,y-.5*ex+.5*ey],F=[x+ex-ey,y
  f([L,F,up(F),up(L)],sh2(col,-.04));f([F,R,up(R),up(F)],sh2(col,-.26));f([up(L),up(F),up(R),up(B)],sh2(col,.16));
  return{top:y-h,L:up(L),F:up(F),R:up(R)};}
 function isoBox(c,x,y,a,h,col){return isoBox2(c,x,y,a/2,a/2,h,col);}
-function person(c,x,y,k,col,col2,hat,opt){opt=opt||{};const body=opt.robe||col;
- isoBox(c,x-2.8*k,y-.6*k,3.2*k,7.5*k,'#3b2a1e');isoBox(c,x+2.8*k,y+.6*k,3.2*k,7.5*k,'#3b2a1e');
- isoBox(c,x-8*k,y-7*k,2.6*k,8*k,shade(body,-.08));
- isoBox(c,x,y-6.5*k,11*k,13*k,body);
- const bl=isoBox(c,x,y-9.5*k,11.2*k,2.4*k,col2);
- isoBox(c,x+8*k,y-7.5*k,2.6*k,8*k,body);
- const hb=y-21*k,hs=opt.skin||SKIN;isoBox(c,x,hb,11.5*k,11*k,hs);
- const ey=hb-6.4*k;for(const ex of[x-4.6*k,x+1.6*k]){Rc(c,ex,ey,3*k,4*k,'#1a1a1a');Rc(c,ex+.5*k,ey+.4*k,1.3*k,1.3*k,'#ffffff');}
- Rc(c,x-6*k,ey+4.2*k,2.4*k,1.4*k,'#ff7a9a');Rc(c,x+4*k,ey+4.2*k,2.4*k,1.4*k,'#ff7a9a');
- const hx=x,hy=hb-11*k+5.2*k,hr=5.6*k;drawHat(c,hx,hy,hr,hat,col,col2,k);return{hx,hy,hr};}
+function rpath(c,pts,r){const n=pts.length;c.beginPath();const m=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];const s0=m(pts[n-1],pts[0]);c.moveTo(s0[0],s0[1]);for(let i=0;i<n;i++){const p=pts[i],q=pts[(i+1)%n];c.arcTo(p[0],p[1],(p[0]+q[0])/2,(p[1]+q[1])/2,r);}c.closePath();}
+function roundBox(c,x,y,ex,ey,h,col,r){const L=[x-ex-ey,y-.5*ex+.5*ey],F=[x+ex-ey,y+.5*ex+.5*ey],R=[x+ex+ey,y+.5*ex-.5*ey],B=[x-ex+ey,y-.5*ex-.5*ey];const up=p=>[p[0],p[1]-h];
+ const sil=[L,F,R,up(R),up(B),up(L)];c.save();rpath(c,sil,r);c.fillStyle=sh2(col,-.02);c.fill();c.clip();
+ c.beginPath();[F,R,up(R),up(F)].forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.fillStyle=sh2(col,-.24);c.fill();
+ c.beginPath();[up(L),up(F),up(R),up(B)].forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.fillStyle=sh2(col,.18);c.fill();
+ c.restore();rpath(c,sil,r);c.strokeStyle='rgba(0,0,0,.28)';c.lineWidth=Math.max(.6,r*.18);c.stroke();return{top:y-h,F:up(F)};}
+function cuteFace(c,x,ey,k,happy){for(const ex of[x-4.6*k,x+2.2*k]){c.beginPath();c.ellipse(ex+1.2*k,ey+2*k,1.7*k,2.3*k,0,0,TAU);c.fillStyle='#1a1420';c.fill();Ci(c,ex+.7*k,ey+1.1*k,.75*k,'#ffffff');Ci(c,ex+1.7*k,ey+3*k,.35*k,'#ffffff');}
+ El(c,x-5.6*k,ey+5*k,1.6*k,.9*k,'rgba(255,110,140,.6)');El(c,x+5.4*k,ey+5*k,1.6*k,.9*k,'rgba(255,110,140,.6)');
+ c.beginPath();c.arc(x-.4*k,ey+4.6*k,1.3*k,.25,Math.PI-.25);c.strokeStyle='#6a2a2a';c.lineWidth=.7*k;c.stroke();}
+function person(c,x,y,k,col,col2,hat,opt){opt=opt||{};const body=opt.robe||col,hs=opt.skin||SKIN;
+ // floating feet
+ roundBox(c,x-3.4*k,y-.2*k,1.8*k,2.2*k,2.6*k,shade(body,-.35),1*k);roundBox(c,x+3.4*k,y+.4*k,1.8*k,2.2*k,2.6*k,shade(body,-.35),1*k);
+ // little rounded body
+ roundBox(c,x,y-4.5*k,4.6*k,3.8*k,10*k,body,2.6*k);
+ const bt=y-4.5*k-10*k;
+ roundBox(c,x,y-7.5*k,4.75*k,3.95*k,1.8*k,col2,.8*k);
+ // floating hands
+ roundBox(c,x-9*k,y-9*k,1.6*k,1.6*k,3.2*k,hs,1.2*k);roundBox(c,x+9*k,y-9*k,1.6*k,1.6*k,3.2*k,hs,1.2*k);
+ // big rounded head
+ const hb=bt-1.5*k;roundBox(c,x,hb,6.2*k,5.4*k,12.5*k,hs,4*k);
+ if(hat==='bug'){bugHead(c,x,y,k,'#5a3a6a','#ff8a2a');return{hx:x,hy:hb-7*k,hr:6.4*k,hb};}
+ if(!opt.noFace)cuteFace(c,x,hb-8.6*k,k);
+ const hx=x,hy=hb-12.5*k+5.6*k,hr=6.4*k;if(hat)drawHat(c,hx,hy,hr,hat,col,col2,k);return{hx,hy,hr,hb};}
+function bugHead(c,x,y,k,shell,eye){// Ciru bug on the head: shell over the top, big eyes, antennae, little mandibles
+ const P_=person;const hb=y-4.5*k-10*k-1.5*k,top=hb-12.5*k;
+ c.beginPath();c.ellipse(x,top+3.5*k,8.6*k,6.2*k,0,Math.PI*.95,Math.PI*2.05);c.lineTo(x+8*k,top+7*k);c.lineTo(x-8*k,top+7*k);c.closePath();c.fillStyle=shell;c.fill();c.strokeStyle='rgba(0,0,0,.35)';c.lineWidth=.7*k;c.stroke();
+ Ln(c,x,top-2.5*k,x,top+5*k,.6*k,'rgba(0,0,0,.35)');
+ for(const sd of[-1,1]){Ci(c,x+sd*4.6*k,top+4.6*k,2.6*k,eye,'rgba(0,0,0,.4)',.6*k);Ci(c,x+sd*4.1*k,top+3.8*k,.8*k,'#fff');
+  c.beginPath();c.moveTo(x+sd*2*k,top-1.5*k);c.quadraticCurveTo(x+sd*5*k,top-9*k,x+sd*9*k,top-8*k);c.strokeStyle=shade(shell,-.3);c.lineWidth=.8*k;c.stroke();Ci(c,x+sd*9*k,top-8*k,1*k,eye);
+  Pg(c,[[x+sd*1.4*k,hb-3.4*k],[x+sd*3.4*k,hb-3*k],[x+sd*1.8*k,hb-.6*k]],shade(shell,-.2));}}
+
 function horse(c,x,y,k,col,blanket){const d=shade(col,-.3);
- for(const[a,b]of[[-7,-1],[-3,1],[5,3],[8,5]])isoBox(c,x+a*k,y+b*k-2*k,2.4*k,6.5*k,d);
- isoBox2(c,x,y-5.5*k,9*k,3.6*k,6.5*k,col);if(blanket)isoBox2(c,x-1*k,y-12*k,4.5*k,3.8*k,1.6*k,blanket);
- isoBox2(c,x+9.5*k,y-6*k,2.4*k,2.4*k,10*k,col);isoBox2(c,x+12*k,y-12.5*k,4*k,2.6*k,4.5*k,col);Rc(c,x+12.5*k,y-18.5*k,1.2*k,1.6*k,'#111');
- isoBox2(c,x-10*k,y-7*k,1.6*k,1.6*k,6*k,d);}
+ for(const[a,b]of[[-7,-1],[-3,1],[5,3],[8,5]])roundBox(c,x+a*k,y+b*k-1.5*k,1.3*k,1.3*k,5.5*k,d,1*k);
+ roundBox(c,x,y-5*k,8.5*k,3.4*k,7*k,col,3*k);if(blanket)roundBox(c,x-1*k,y-11.6*k,4.2*k,3.6*k,1.6*k,blanket,1*k);
+ roundBox(c,x+9.5*k,y-6*k,2.3*k,2.3*k,10*k,col,1.8*k);roundBox(c,x+12*k,y-12.5*k,3.8*k,2.5*k,4.6*k,col,1.8*k);Ci(c,x+13*k,y-17.5*k,.9*k,'#111');Ci(c,x+12.8*k,y-17.8*k,.3*k,'#fff');
+ roundBox(c,x-9.6*k,y-7*k,1.4*k,1.4*k,6*k,d,1*k);}
 function bugCube(c,x,y,k,col,dark,o){o=o||{};const bx=o.big||1;
  for(let i=-1;i<=1;i++){Ln(c,x+i*4*k*bx,y-4*k,x+i*4*k*bx-3*k,y+1*k,1.3*k,dark);Ln(c,x+i*4*k*bx+2*k,y-3*k,x+i*4*k*bx+4*k,y+2*k,1.3*k,dark);}
  const B=isoBox2(c,x-1*k,y-3.5*k,7*k*bx,4.2*k*bx,6.5*k*bx,col);
@@ -860,25 +881,28 @@ function drawUnit(c,type,x,y,k,col,col2,hat,base){
 }
 
 
-function classicBug(c,type,x,y,k,col,dark){
+function classicBug(c,type,x,y,k,col,dark){const shell='#5a3a6a',eye='#ff8a2a';
+ const guy=(kk,xx,yy,o)=>{person(c,xx,yy,kk,col,dark,null,Object.assign({noFace:true},o||{}));bugHead(c,xx,yy,kk,shell,eye);};
  switch(type){
- case'petalshaman':{person(c,x,y,k,shade(col,-.25),dark,'none',{skin:col});const hx=x,hb=y-19*k;Ln(c,x-2*k,y-31*k,x-5*k,y-38*k,.9*k,dark);Ln(c,x+2*k,y-31*k,x+5*k,y-38*k,.9*k,dark);Ln(c,x+11*k,y,x+11*k,y-30*k,1.5*k,'#6a4a2a');Ci(c,x+11*k,y-31*k,2.6*k,'#9aff5a');break;}
- case'jellyegg':{El(c,x,y-9*k,8*k,10*k,shade(col,.3),0,OUT,.8*k);for(const[a,b]of[[-3,-12],[3,-7],[-1,-4]])El(c,x+a*k,y+b*k,1.6*k,1.2*k,dark);break;}
- case'larvy':{for(let i=3;i>=0;i--)isoBox(c,x-9*k+i*5.5*k,y-(i===3?1:0)*k,5.5*k,(i===3?7:5)*k,i%2?col:shade(col,-.12));Rc(c,x+6.6*k,y-5.5*k,1.4*k,1.8*k,'#e02a2a');break;}
- case'buzzlet':bugCube(c,x,y,k*.8,col,dark);break;
- case'shellbun':{const b=bugCube(c,x,y,k,col,dark);c.beginPath();c.ellipse(x-1*k,y-11*k,9*k,6*k,0,Math.PI,TAU);c.fillStyle=shade(dark,.25);c.fill();for(let i=-1;i<=1;i++)Ln(c,x-1*k+i*4*k,y-16.5*k,x-1*k+i*5*k,y-11*k,.8*k,col);break;}
- case'mothkin':{const wy=y-10*k;El(c,x-4*k,wy-10*k,9*k,4*k,'rgba(220,240,200,.7)',-.6,'rgba(0,0,0,.3)',.6*k);El(c,x+2*k,wy-11*k,9*k,4*k,'rgba(220,240,200,.7)',-.9,'rgba(0,0,0,.3)',.6*k);bugCube(c,x,wy,k*.75,col,dark);break;}
- case'sporepuff':{bugCube(c,x,y,k,col,dark);Ci(c,x-2*k,y-16*k,7*k,shade(col,-.3),OUT,.6*k);for(let i=0;i<5;i++)Ci(c,x-2*k+Math.cos(i*1.3)*4*k,y-16*k+Math.sin(i*1.3)*4*k,1.2*k,'#cfff6a');break;}
- case'boomhorn':{bugCube(c,x,y,k,col,dark,{big:1.25});Pg(c,[[x+9*k,y-10*k],[x+12*k,y-10*k],[x+14*k,y-22*k]],'#f4ecd8',OUT,.6*k);break;}
- case'ruby':{for(const sd of[-1,1])Ln(c,x+sd*3*k,y,x+sd*3*k,y-9*k,1.6*k,dark);isoBox2(c,x,y-8*k,2.6*k,2.6*k,14*k,col);Pg(c,[[x-4*k,y-22*k],[x+7*k,y-26*k],[x+2*k,y-30*k]],shade(col,.1),OUT,.6*k);Rc(c,x+2*k,y-28*k,2*k,2*k,'#e02a2a');
-  for(const sd of[0,1]){Ln(c,x+2*k,y-17*k-sd*2*k,x+10*k,y-22*k-sd*2*k,1.6*k,col);Ln(c,x+10*k,y-22*k-sd*2*k,x+12*k,y-12*k-sd*2*k,1.4*k,'#f4ecd8');}break;}
- case'axolotl':{El(c,x,y-1*k,14*k,3*k,'rgba(255,255,255,.4)');for(let i=-1;i<=1;i++){Ln(c,x+i*4*k,y-6*k,x+i*7*k-6*k,y,1*k,dark);Ln(c,x+i*4*k,y-6*k,x+i*7*k+6*k,y,1*k,dark);}isoBox2(c,x,y-5*k,6*k,2*k,3*k,col);isoBox(c,x+7*k,y-5.5*k,4*k,4*k,col);Rc(c,x+6*k,y-9*k,1.6*k,1.6*k,'#e02a2a');break;}
- case'squishy':{El(c,x,y-1*k,14*k,3*k,'rgba(255,255,255,.35)');Pg(c,[[x-14*k,y-4*k],[x,y-10*k],[x+14*k,y-4*k],[x,y+1*k]],col,OUT,.7*k);Ln(c,x-12*k,y-3*k,x-20*k,y-1*k,1.2*k,dark);Rc(c,x+3*k,y-6*k,1.6*k,1.6*k,'#e02a2a');Rc(c,x+6*k,y-5*k,1.6*k,1.6*k,'#e02a2a');break;}
- case'lilyisle':{El(c,x,y-2*k,15*k,5*k,'#6a8a4a',0,OUT,.7*k);El(c,x,y-5*k,11*k,4*k,col);for(const[a,b]of[[-6,-8],[5,-9],[0,-6]])Pg(c,[[x+a*k-1.5*k,y+b*k],[x+a*k,y+b*k-6*k],[x+a*k+1.5*k,y+b*k]],'#5a8a3a');Rc(c,x+7*k,y-6*k,1.6*k,1.6*k,'#e02a2a');Rc(c,x+10*k,y-6*k,1.6*k,1.6*k,'#e02a2a');break;}
- case'megapede':{for(let i=5;i>=0;i--){const px=x-14*k+i*5.5*k,py=y-Math.sin(i*.9)*2*k;Ln(c,px,py-3*k,px-2*k,py+2*k,1.2*k,dark);Ln(c,px,py-3*k,px+2*k,py+2*k,1.2*k,dark);isoBox(c,px,py-1*k,(i===5?8:6)*k,(i===5?8:6)*k,i%2?col:shade(col,-.15));}Rc(c,x+14*k,y-9*k,1.8*k,2*k,'#e02a2a');break;}
+ case'petalshaman':guy(k,x,y,{robe:shade(col,.25)});Ln(c,x+11*k,y,x+11*k,y-30*k,1.4*k,'#6a4a2a');Ci(c,x+11*k,y-31*k,2.6*k,'#9aff5a');Ci(c,x+11*k,y-31*k,4.4*k,'rgba(160,255,90,.3)');break;
+ case'jellyegg':{El(c,x,y-9*k,8*k,10*k,'#e8dcb8',0,OUT,.8*k);for(const[a,b]of[[-3,-12],[3,-7],[-1,-4]])El(c,x+a*k,y+b*k,1.6*k,1.2*k,shell);break;}
+ case'larvy':{for(let i=3;i>=0;i--)roundBox(c,x-9*k+i*5.5*k,y-(i===3?1:0)*k,2.6*k,2.6*k,(i===3?7:5)*k,i%2?'#d8c890':'#c8b880',1.6*k);Ci(c,x+7.4*k,y-4.8*k,1.1*k,'#1a1020');Ci(c,x+7.1*k,y-5.2*k,.4*k,'#fff');break;}
+ case'buzzlet':{bugMount(c,x,y,k*.9,shell);guy(k*.8,x-1*k,y-7*k);break;}
+ case'shellbun':{guy(k,x,y);c.beginPath();c.ellipse(x+5*k,y-12*k,6*k,8*k,0,0,TAU);c.fillStyle=shell;c.fill();c.strokeStyle='rgba(0,0,0,.4)';c.lineWidth=.7*k;c.stroke();for(let i=-1;i<=1;i++)Ln(c,x+5*k+i*3*k,y-19*k,x+5*k+i*3.4*k,y-5*k,.7*k,shade(shell,.3));break;}
+ case'mothkin':{const wy=y-6*k;El(c,x-7*k,wy-16*k,9*k,4.2*k,'rgba(230,240,210,.8)',-.6,'rgba(0,0,0,.3)',.6*k);El(c,x+7*k,wy-16*k,9*k,4.2*k,'rgba(230,240,210,.8)',.6,'rgba(0,0,0,.3)',.6*k);guy(k*.9,x,wy);break;}
+ case'sporepuff':{guy(k,x,y);Ci(c,x-7*k,y-20*k,6*k,'#8a6aa0',OUT,.6*k);for(let i=0;i<5;i++)Ci(c,x-7*k+Math.cos(i*1.3)*3.8*k,y-20*k+Math.sin(i*1.3)*3.8*k,1.1*k,'#cfff6a');Ln(c,x-3*k,y-16*k,x+4*k,y-12*k,1.6*k,'#5a4a3a');break;}
+ case'boomhorn':{bugMount(c,x,y,k*1.25,shell,1);guy(k*.8,x-2*k,y-9*k);break;}
+ case'ruby':{guy(k,x,y);for(const sd of[-1,1]){Ln(c,x+sd*9*k,y-12*k,x+sd*12*k,y-22*k,1.4*k,shell);Ln(c,x+sd*12*k,y-22*k,x+sd*13*k,y-12*k,1.2*k,'#f4ecd8');}break;}
+ case'axolotl':{El(c,x,y-1*k,14*k,3*k,'rgba(255,255,255,.4)');for(let i=-1;i<=1;i++){Ln(c,x+i*4*k,y-5*k,x+i*7*k-6*k,y,1*k,shell);Ln(c,x+i*4*k,y-5*k,x+i*7*k+6*k,y,1*k,shell);}guy(k*.75,x,y-5*k);break;}
+ case'squishy':{El(c,x,y-1*k,14*k,3*k,'rgba(255,255,255,.35)');Pg(c,[[x-14*k,y-3*k],[x,y-8*k],[x+14*k,y-3*k],[x,y+1*k]],shell,OUT,.7*k);Ln(c,x-12*k,y-2*k,x-20*k,y,1.2*k,shell);guy(k*.75,x,y-5*k);break;}
+ case'lilyisle':{El(c,x,y-2*k,15*k,5*k,'#6a8a4a',0,OUT,.7*k);El(c,x,y-5*k,11*k,4*k,'#8aaa5a');for(const[a,b]of[[-8,-8],[8,-9]])Pg(c,[[x+a*k-1.5*k,y+b*k],[x+a*k,y+b*k-6*k],[x+a*k+1.5*k,y+b*k]],'#5a8a3a');guy(k*.7,x,y-6*k);break;}
+ case'megapede':{for(let i=5;i>=0;i--){const px=x-14*k+i*5.5*k,py=y-Math.sin(i*.9)*2*k;Ln(c,px,py-3*k,px-2*k,py+2*k,1.2*k,shade(shell,-.2));Ln(c,px,py-3*k,px+2*k,py+2*k,1.2*k,shade(shell,-.2));roundBox(c,px,py-1*k,3*k,3*k,(i===5?7:5.5)*k,i%2?shell:shade(shell,.15),2*k);}Ci(c,x+14*k,y-8*k,1.6*k,eye);guy(k*.7,x-3*k,y-7*k);break;}
  }}
+function bugMount(c,x,y,k,shell,horn){for(let i=-1;i<=1;i++){Ln(c,x+i*4*k,y-4*k,x+i*4*k-3*k,y+1*k,1.3*k,shade(shell,-.2));Ln(c,x+i*4*k+2*k,y-3*k,x+i*4*k+4*k,y+2*k,1.3*k,shade(shell,-.2));}
+ roundBox(c,x,y-3*k,7*k,4*k,6*k,shell,3*k);roundBox(c,x+8.5*k,y-4*k,3*k,3*k,5.5*k,shade(shell,.1),2*k);Ci(c,x+9*k,y-7.5*k,1.3*k,'#ff8a2a');Ci(c,x+8.6*k,y-7.9*k,.4*k,'#fff');
+ if(horn)Pg(c,[[x+10*k,y-9.5*k],[x+12*k,y-9.5*k],[x+14*k,y-19*k]],'#f4ecd8',OUT,.6*k);}
 function drawMini(c,base,x,y,k,col,col2,hat){if(!base)base='warrior';
- if(['buzzlet','shellbun','larvy','jellyegg','petalshaman','boomhorn','mothkin','sporepuff','megapede','ruby','lilyisle','axolotl','squishy'].includes(base)){if(hat==='nd')axoF(c,x,y,k*.7,col,col2);else bugCube(c,x,y,k*.7,col,col2);return;}
+ if(['buzzlet','shellbun','larvy','jellyegg','petalshaman','boomhorn','mothkin','sporepuff','megapede','ruby','lilyisle','axolotl','squishy'].includes(base)){if(hat==='nd')axoF(c,x,y,k*.7,col,col2);else{person(c,x,y,k,col,col2,null,{noFace:true});bugHead(c,x,y,k,'#5a3a6a','#ff8a2a');}return;}
  if(base==='snowling'){Ci(c,x,y-7*k,7*k,'#fbfdff',OUT,k);Ci(c,x,y-17*k,5*k,'#fbfdff',OUT,k);return;}
  person(c,x,y,k,col,col2,hat);}
 

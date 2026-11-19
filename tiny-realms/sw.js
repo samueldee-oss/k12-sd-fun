@@ -1,7 +1,7 @@
 // Made by tools/make_home_screen_apps.py. Lets this game open offline once it has
 // been played online. Always tries the network first, so updates show up right away.
 const PREFIX = "k12-tiny-realms-";
-const CACHE = PREFIX + "v5";
+const CACHE = PREFIX + "v6";
 const PRECACHE = ["./", "./index.html", "./manifest.webmanifest", "./icons/apple-touch-icon.png"];
 // Google Fonts are kept in a shared cache so the games keep their fonts offline.
 const FONT_HOSTS = ["fonts.googleapis.com", "fonts.gstatic.com"];
