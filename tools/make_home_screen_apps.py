@@ -59,6 +59,7 @@ GAMES = [
     ("bounce-pit", "Bounce Pit: Skyward", "Bounce Pit: Skyward", "BO", "#1c2a1c", "#ffffff", "#ffd34d"),
     ("blade-mosaic", "Blade Mosaic", "Blade Mosaic", "BL", "#16161c", "#ffffff", "#ffd34d"),
     ("mochi-star-quest", "Mochi's Star Quest", "Mochi's Star Quest", "MO", "#bfe7ff", "#ffffff", "#ffd34d"),
+    ("brainy-owl", "Brainy Owl", "Brainy Owl", "BO", "#bfe7ff", "#ffffff", "#8e6bd6"),
     ("slice-flip-3d", "Slice Flip 3D", "Slice Flip 3D", "SL", "#bfe0ff", "#ffffff", "#ffd34d"),
     ("blips-climb", "Only Up: Blip's Climb Home", "Only Up: Blip's Climb Home", "ON", "#203050", "#ffffff", "#ffd34d"),
     ("dropper-3d", "Dropper 3D", "Dropper 3D", "DR", "#0c1630", "#ffffff", "#ffd34d"),

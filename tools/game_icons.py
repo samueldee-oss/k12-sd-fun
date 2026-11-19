@@ -725,6 +725,59 @@ def d_ships(c: Canvas, t):
             c.star(x, y, 1 + 2.6 * a, (255, 246, 200, int(255 * a)), points=4, inner=.3)
 
 
+def d_brainy(c: Canvas, t):
+    # Brainy Owl: the purple owl folds a paper in half, punches a hole, opens it: two holes (paper folding)
+    c.sky("#bfe7ff", "#fdf6e3")
+    ease = lambda k: .5 - .5 * math.cos(math.pi * max(0.0, min(1.0, k)))
+    if t < .3:
+        k = ease(t / .3)
+    elif t < .5:
+        k = 1.0
+    elif t < .78:
+        k = 1 - ease((t - .5) / .28)
+    else:
+        k = 0.0
+    punched = .38 <= t or t < 0
+    # paper: right half fixed, left flap swings over the fold line x=70
+    fx, y0, y1, half = 70, 22, 64, 21
+    c.rect(fx, y0, fx + half, y1, fill="#fffdf6", ol=INK, w=1.8)
+    if punched:
+        c.ell(fx + 11, 36, 3.6, fill=INK)
+    flap = math.cos(math.pi * k) * half          # >0: flap on the left (front), <0: folded over (back)
+    x_end = fx - flap
+    col = "#fffdf6" if flap >= 0 else "#f0e6c8"
+    c.poly([(fx, y0), (x_end, y0), (x_end, y1), (fx, y1)], fill=col, ol=INK, w=1.8)
+    if punched and abs(flap) > 2:
+        hx = fx - math.cos(math.pi * k) * 11
+        c.ell(hx, 36, 3.6 * min(1, abs(flap) / half + .3), 3.6, fill=INK)
+    c.line([(fx, y0 - 3), (fx, y1 + 3)], (61, 130, 196, 230), 1.4) if k < .05 else None
+    # punch sparkle
+    if .36 <= t < .5:
+        a = 1 - (t - .36) / .14
+        c.star(fx + 11, 36, 4 + 7 * (1 - a), (255, 210, 63, int(255 * a)), points=8, inner=.35)
+    # two-holes celebration
+    if t >= .8:
+        a = tri((t - .8) / .4)
+        c.star(52, 18, 3 + 3 * a, (255, 210, 63, 230), ol=INK, rot=t)
+    # the owl
+    bob = 1.5 * sn(t * 2)
+    ox, oy = 26, 66 + bob
+    c.ell(ox, oy, 19, 22, fill="#8e6bd6", ol=INK, w=2.2)
+    c.ell(ox, oy + 7, 12, 13, fill="#d9c8f7")
+    c.poly([(ox - 17, oy - 14), (ox - 14, oy - 28), (ox - 6, oy - 18)], fill="#8e6bd6", ol=INK, w=2.0)
+    c.poly([(ox + 17, oy - 14), (ox + 14, oy - 28), (ox + 6, oy - 18)], fill="#8e6bd6", ol=INK, w=2.0)
+    for ex in (ox - 8, ox + 8):
+        c.ell(ex, oy - 8, 8, fill="#ffffff", ol=INK, w=2.0)
+        c.eye(ex + 2.4, oy - 8.5, 3.4)
+    c.poly([(ox - 3, oy - 1), (ox + 3, oy - 1), (ox, oy + 4)], fill="#f2b632", ol=INK, w=1.4)
+    # wing reaching to the paper
+    c.line([(ox + 15, oy + 2), (ox + 28, oy - 10), (fx - 2, y1 - 6)], "#8e6bd6", 5.5)
+    c.line([(ox - 6, oy + 22), (ox - 6, oy + 26)], "#f2b632", 2.2)
+    c.line([(ox + 6, oy + 22), (ox + 6, oy + 26)], "#f2b632", 2.2)
+    c.blush(ox - 13, oy - 1, 2.6)
+    c.blush(ox + 13, oy - 1, 2.6)
+
+
 # id: (background, draw function, still-frame t for the Home Screen icon, pixel-art size or 0)
 ICONS = {
     "pong": ("#111827", d_pong, .12, 0),
@@ -744,6 +797,7 @@ ICONS = {
     "ships-and-villagers": ("#232552", d_ships, 0, 0),
     "bank-game": ("#1f6f4a", d_bank, .3, 0),
     "snake": ("#0f172a", d_snake, .1, 0),
+    "brainy-owl": ("#bfe7ff", d_brainy, .9, 0),
 }
 
 

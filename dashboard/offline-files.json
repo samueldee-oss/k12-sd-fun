@@ -1,5 +1,5 @@
 {
- "version": "b24fba0bdb3f",
+ "version": "f6d53fe0aa41",
  "files": [
   "./",
   "index.html",
@@ -13,6 +13,7 @@
   "app-icons/blade-mosaic.gif",
   "app-icons/blips-climb.gif",
   "app-icons/bounce-pit.gif",
+  "app-icons/brainy-owl.gif",
   "app-icons/capybara-rumble.gif",
   "app-icons/chameleon-hide-seek.gif",
   "app-icons/dropper-3d.gif",
@@ -158,6 +159,12 @@
   "../mochi-star-quest/icons/icon-192.png",
   "../mochi-star-quest/manifest.webmanifest",
   "../mochi-star-quest/sw.js",
+  "../brainy-owl/",
+  "../brainy-owl/index.html",
+  "../brainy-owl/icons/apple-touch-icon.png",
+  "../brainy-owl/icons/icon-192.png",
+  "../brainy-owl/manifest.webmanifest",
+  "../brainy-owl/sw.js",
   "../slice-flip-3d/",
   "../slice-flip-3d/index.html",
   "../slice-flip-3d/icons/apple-touch-icon.png",

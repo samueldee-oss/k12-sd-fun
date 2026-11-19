@@ -139,7 +139,18 @@ svg{display:block}
 .gq{font-size:15px}.gq b{font-size:28px}.gin{font-size:30px;margin:8px 0;border-bottom:2px solid #c9cde0;min-height:44px}
 .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pad button{background:#eef0f7;border-radius:10px;padding:12px;font-size:20px}
 .gclose{position:absolute;right:10px;top:8px;font-size:20px}
-</style></head><body>
+</style><!-- home-screen-app -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=9a7f9a56">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=9a7f9a56">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Brainy Owl">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#bfe7ff">
+<script id="home-screen-sw">if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
+<!-- /home-screen-app -->
+</head><body>
 <svg id="defs" width="0" height="0" style="position:absolute" aria-hidden="true"></svg>
 <div id="home" class="screen"></div><div id="play" class="screen"></div><div id="end" class="screen"></div><div id="parent" class="screen"></div>
 <div id="fx"></div>

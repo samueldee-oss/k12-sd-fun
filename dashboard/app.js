@@ -20,6 +20,7 @@ const GAMES = [
   { id: "bounce-pit", name: "Bounce Pit: Skyward", desc: "Ball-bouncing roguelite: build up New Ballbytown.", src: "../bounce-pit/index.html" },
   { id: "blade-mosaic", name: "Blade Mosaic", desc: "Be a spinning blade: grind giant 3D block mosaics, or relax in the Zen Tower.", src: "../blade-mosaic/index.html" },
   { id: "mochi-star-quest", name: "Mochi's Star Quest", desc: "Story reading game: read with Mochi to build reading speed.", src: "../mochi-star-quest/index.html" },
+  { id: "brainy-owl", name: "Brainy Owl", desc: "CogAT Level 7 thinking games: all 9 puzzle types, no reading needed.", src: "../brainy-owl/index.html" },
   { id: "slice-flip-3d", name: "Slice Flip 3D", desc: "Flip your knife through piles of food and land blade-first.", src: "../slice-flip-3d/index.html" },
   { id: "blips-climb", name: "Only Up: Blip's Climb Home", desc: "Climb a sky tower in 3D to get Blip the alien back to his UFO.", src: "../blips-climb/index.html" },
   { id: "dropper-3d", name: "Dropper 3D", desc: "Steer your ball down the shaft, dodge everything, splash into the water.", src: "../dropper-3d/index.html" },
