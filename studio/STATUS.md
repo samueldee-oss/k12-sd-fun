@@ -53,6 +53,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-18: Tiny Realms: classic Cymanti units have no body, just the Ciru bug with floating hands and feet. Commit `COMMIT`.
 - 2026-11-18: Tiny Realms: classic Cymanti now have the Ciru bug (grey striped shell, white face, big black eyes) as their whole head, per John's reference picture. Commit `ccdff2e`.
 - 2026-11-18: Tiny Realms: fixed all units vanishing after leaving and reopening the game (a saved animation timestamp from the old page made every unit draw far off-screen). Commit `d5967ac`.
 - 2026-11-18: Tiny Realms: cuter Polytopia-style people (rounded cube heads, floating hands and feet, big shiny eyes) and classic Cymanti drawn as people with a bug on their head instead of green bug blocks. Commit `a097ad8`.
