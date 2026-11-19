@@ -53,6 +53,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-18: Brainy Owl fixes after the owner's first try. No sound: speech now starts inside the tap, and a big speaker button appears if the browser blocks the voice. "Gives me the answer" was the first-time demo; it is now clearly framed and waits for the child to tap. Saving: one save per device, with a backup reminder. Commit `d01bcb0`.
 - 2026-11-18: Tiny Realms: classic Cymanti units have no body, just the Ciru bug with floating hands and feet. Commit `5866681`.
 - 2026-11-18: Tiny Realms: classic Cymanti now have the Ciru bug (grey striped shell, white face, big black eyes) as their whole head, per John's reference picture. Commit `ccdff2e`.
 - 2026-11-18: Tiny Realms: fixed all units vanishing after leaving and reopening the game (a saved animation timestamp from the old page made every unit draw far off-screen). Commit `d5967ac`.
