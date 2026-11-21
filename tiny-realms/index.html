@@ -427,6 +427,7 @@ function reachable(u){
    if(!p.ai&&!p.ex[k])continue;
    if(unitAt(x,y))continue;
    if(!canStand(u,t,p))continue;
+   if(t.city>=0&&has(u,'infiltrate')&&atPeace(u.owner,G.cities[t.city].owner))continue;
    let cost=1;if(!naval&&isRoad(t)&&isRoad(ct)&&!isWater(t))cost=.5;if(skate&&t.ter==='ice')cost=.5;
    if(rem<cost-1e-6)continue;
    let nr=rem-cost;
@@ -1261,6 +1262,11 @@ function showPanel(){const pn=$('panel');if(!SEL){pn.style.display='none';return
    if(p.techs.freespirit&&!UNITS[u.type].sup)acts.appendChild(btn('Disband','get '+Math.floor((UNITS[u.base||u.type].c||0)/2)+' stars',fresh,()=>{disband(u);clearSel();updHud();}));
    const why=u.frozen?'Frozen! It thaws and loses its next turn.':u.wasFrozen&&!u.cm&&!u.ca?'It was frozen by ice, so it skips this turn. It can move next turn.':u.merged&&!u.cm?'Just merged: merging uses its turn. It can move next turn.':!u.cm&&!u.ca?'':!u.cm?'Already moved this turn.':MOVES&&!MOVES.size?'No free tile to move to (units, water or mountains in the way).':'';
    if(why){const n=document.createElement('div');n.className='hint';n.textContent=why;pn.appendChild(n);}
+   if(has(u,'infiltrate')){const near=G.cities.filter(c=>c.owner!==u.owner&&c.owner>=0&&p.ex[c.y*G.N+c.x]&&dist(u.x,u.y,c.x,c.y)<=UD(u).m+1).sort((a,b)=>dist(u.x,u.y,a.x,a.y)-dist(u.x,u.y,b.x,b.y));
+    if(!near.length)acts.appendChild(btn('Infiltrate','walk into an enemy city to sneak in Daggers',false));
+    for(const c of near.slice(0,2)){const k=c.y*G.N+c.x;const g=unitAt(c.x,c.y);const ok=!!(MOVES&&MOVES.has(k));
+     const sub=ok?'sneak in 3 Daggers':atPeace(u.owner,c.owner)?'you are at peace with them':g?'a unit is standing in the city':!u.cm?'no moves left this turn':'too far: move closer first';
+     acts.appendChild(btn('Infiltrate '+c.name,sub,ok,()=>{moveUnit(u,c.x,c.y);afterAction(u);}));}}
    if(!u.cm&&!u.ca)acts.appendChild(btn('No moves left','',false));
    else if(MOVES&&MOVES.size||TARGETS&&TARGETS.length){const n=document.createElement('div');n.className='hint';n.textContent=(MOVES&&MOVES.size?'Tap a white tile to move. ':'')+(TARGETS&&TARGETS.length?'Tap a red-outlined enemy to attack.':'');pn.appendChild(n);}
    const tb=document.createElement('div');tb.className='lnk';tb.textContent='Show tile';tb.onclick=()=>select(x,y,'tile');pn.appendChild(tb);}
