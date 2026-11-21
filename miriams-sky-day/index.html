@@ -69,6 +69,10 @@ body.fs #mute, body.fs #fsbtn, body.fs #lvbtn{opacity:.7; padding:6px 8px; font-
 body.fs .pad{position:fixed; z-index:5; left:0; right:0; bottom:0; width:auto; align-items:flex-end; pointer-events:none;
   padding:0 calc(env(safe-area-inset-right, 0px) + 14px) calc(env(safe-area-inset-bottom, 0px) + 14px) calc(env(safe-area-inset-left, 0px) + 14px)}
 body.fs .dpad, body.fs .abtn{pointer-events:auto}
+body.fs .dpad{visibility:hidden}
+#stick{position:fixed; z-index:7; width:84px; height:84px; margin:-42px 0 0 -42px; border-radius:50%; border:3px solid rgba(255,255,255,.55); background:rgba(42,37,71,.25); pointer-events:none; display:flex; align-items:center; justify-content:center}
+#stick[hidden]{display:none}
+#stickknob{width:34px; height:34px; border-radius:50%; background:rgba(255,204,51,.75); border:2px solid #fff3b0}
 body.fs .dpad{--b:clamp(44px, 13vmin, 62px); grid-template-columns:repeat(3, var(--b)); grid-template-rows:repeat(3, var(--b))}
 body.fs .btn{background:rgba(42,37,71,.42); border-color:rgba(200,190,245,.55); box-shadow:none}
 body.fs .btn.on{transform:none; background:rgba(110,95,180,.7)}
@@ -87,8 +91,9 @@ body.fs .abtn.on{background:rgba(184,48,74,.75)}
   </div>
   <canvas id="game" width="240" height="160" tabindex="0" aria-label="Miriam's Sky Day game screen"></canvas>
   <p class="keys desk"><b>Arrows/WASD</b> move · <b>Up</b> jump · <b>Space</b> net, honk &amp; fire · <b>M</b> sound</p>
-  <p class="keys touch">Tap <b>FULL SCREEN</b> to fill the screen with the buttons on top of the game. Turn your phone sideways for the biggest view.</p>
+  <p class="keys touch">Slide your thumb on the game to move (slide up to jump), and use the big button for actions. Tap <b>FULL SCREEN</b> to fill the screen; there you can slide anywhere. Turn your phone sideways for the biggest view.</p>
 </div>
+<div id="stick" hidden><div id="stickknob"></div></div>
 <div class="pad" id="pad">
   <div class="dpad">
     <button class="btn u" data-k="up" aria-label="Up" type="button">▲</button>
@@ -355,15 +360,16 @@ function musicTick() {
 /* ---------- input ---------- */
 const K = {left:false,right:false,up:false,down:false,a:false,enter:false};
 let prevK = {...K}; const P = {...K}; let tapped = false;
+const keyK = {...K}, stickK = {...K};
 const KEYMAP = {ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'up',KeyW:'up',ArrowDown:'down',KeyS:'down',Space:'a',KeyJ:'a',KeyZ:'a',KeyX:'a',Enter:'enter'};
 addEventListener('keydown', e => {
   ensureAudio();
   if (e.code === 'KeyM') { toggleMute(); return; }
   if (e.code === 'Escape' && document.body.classList.contains('fs')) { setFs(false); return; }
-  const k = KEYMAP[e.code]; if (k) { K[k] = true; e.preventDefault(); }
+  const k = KEYMAP[e.code]; if (k) { keyK[k] = true; syncK(); e.preventDefault(); }
 });
-addEventListener('keyup', e => { const k = KEYMAP[e.code]; if (k) { K[k] = false; e.preventDefault(); } });
-addEventListener('blur', () => { for (const k in K) K[k] = false; try { padPtr.clear(); } catch (_) {} });
+addEventListener('keyup', e => { const k = KEYMAP[e.code]; if (k) { keyK[k] = false; syncK(); e.preventDefault(); } });
+addEventListener('blur', () => { for (const k in keyK) keyK[k] = false; try { padPtr.clear(); stickEnd(); } catch (_) {} syncK(); });
 let tapPos = null;
 cv.addEventListener('pointerdown', e => { e.preventDefault(); ensureAudio(); cv.focus(); tapped = true; const r = cv.getBoundingClientRect(); tapPos = {x:(e.clientX - r.left) / r.width * W, y:(e.clientY - r.top) / r.height * H}; });
 // touch pad: remember which finger holds which button, and let go on ANY lift, anywhere on the page
@@ -381,9 +387,12 @@ const padBtns = [...document.querySelectorAll('[data-k]')];
   document.addEventListener('dblclick', e => e.preventDefault(), {passive:false});
 })();
 const padPtr = new Map();
-function padSync() {
-  for (const b of padBtns) { const k = b.dataset.k, on = [...padPtr.values()].includes(k); K[k] = on; b.classList.toggle('on', on); }
+function syncK() {
+  const held = [...padPtr.values()];
+  for (const k in K) K[k] = keyK[k] || stickK[k] || held.includes(k);
+  for (const b of padBtns) b.classList.toggle('on', held.includes(b.dataset.k));
 }
+const padSync = syncK;
 function padClear() { if (padPtr.size) { padPtr.clear(); padSync(); } }
 padBtns.forEach(b => {
   b.addEventListener('pointerdown', e => { e.preventDefault(); ensureAudio(); padPtr.set(e.pointerId, b.dataset.k); padSync(); });
@@ -392,9 +401,33 @@ padBtns.forEach(b => {
 const padUp = e => { if (padPtr.delete(e.pointerId)) padSync(); };
 window.addEventListener('pointerup', padUp, true);
 window.addEventListener('pointercancel', padUp, true);
-document.addEventListener('touchend', e => { if (e.touches.length === 0) padClear(); }, {passive:true});
-document.addEventListener('touchcancel', padClear, {passive:true});
-document.addEventListener('visibilitychange', () => { if (document.hidden) { padClear(); for (const k in K) K[k] = false; } });
+document.addEventListener('touchend', e => { if (e.touches.length === 0) { padClear(); stickEnd(); } }, {passive:true});
+document.addEventListener('touchcancel', () => { padClear(); stickEnd(); }, {passive:true});
+document.addEventListener('visibilitychange', () => { if (document.hidden) { padClear(); stickEnd(); for (const k in keyK) keyK[k] = false; syncK(); } });
+// thumb steering: put a thumb on the game (in full screen: anywhere that isn't a button) and slide it
+const stickEl = document.getElementById('stick'), stickKnob = document.getElementById('stickknob');
+const stick = {id:null, ox:0, oy:0};
+function stickSet(dx, dy) {
+  const dead = 10;
+  stickK.left = dx < -dead; stickK.right = dx > dead; stickK.up = dy < -dead * 1.5; stickK.down = dy > dead * 1.5;
+  const m = Math.hypot(dx, dy), lim = 34, f = m > lim ? lim / m : 1;
+  stickKnob.style.transform = 'translate(' + (dx * f).toFixed(1) + 'px,' + (dy * f).toFixed(1) + 'px)';
+  syncK();
+}
+function stickEnd() { if (stick.id === null) return; stick.id = null; stickEl.hidden = true; stickK.left = stickK.right = stickK.up = stickK.down = false; syncK(); }
+document.addEventListener('pointerdown', e => {
+  if (e.pointerType === 'mouse' || stick.id !== null) return;
+  if (e.target.closest && e.target.closest('button')) return;
+  const fs = document.body.classList.contains('fs');
+  if (!fs && e.target !== cv) return;
+  if (state !== 'play') return;   // taps on cards and the level screen still work as taps
+  stick.id = e.pointerId; stick.ox = e.clientX; stick.oy = e.clientY;
+  stickEl.style.left = e.clientX + 'px'; stickEl.style.top = e.clientY + 'px'; stickEl.hidden = false;
+  stickSet(0, 0);
+}, true);
+document.addEventListener('pointermove', e => { if (e.pointerId === stick.id) stickSet(e.clientX - stick.ox, e.clientY - stick.oy); }, true);
+window.addEventListener('pointerup', e => { if (e.pointerId === stick.id) stickEnd(); }, true);
+window.addEventListener('pointercancel', e => { if (e.pointerId === stick.id) stickEnd(); }, true);
 ['selectstart', 'contextmenu', 'dragstart'].forEach(ev => document.addEventListener(ev, e => e.preventDefault()));
 document.addEventListener('selectionchange', () => { try { const sel = getSelection(); if (sel && sel.rangeCount && !sel.isCollapsed) sel.removeAllRanges(); } catch (_) {} });
 const muteBtn = document.getElementById('mute');
@@ -573,6 +606,8 @@ function spawn(type) {
   L.objs.push(o);
 }
 const playerBox = () => L.dragon ? {x:L.p.x + 6, y:L.p.y + 3, w:22, h:11} : {x:L.p.x + 4, y:L.p.y + 1, w:22, h:7};
+// for stars, books and apples: the plane or dragon AND Miriam riding on it
+const grabBox = () => L.dragon ? {x:L.p.x + 2, y:L.p.y - 3, w:28, h:17} : {x:L.p.x + 3, y:L.p.y - 9, w:24, h:17};
 function updFly() {
   const p = L.p;
   if (L.landing) {
@@ -614,9 +649,9 @@ function updFly() {
     }
     if (o.dead) continue;
     if (o.type === 'star' || o.type === 'book') {
-      if (hit(pb, o)) { o.dead = true; L.got++; (o.type === 'star' ? sfx.star : sfx.book)(); burst(o.x + 3, o.y + 3, ['#ffd23f', '#ffffff'], 8, 1); }
+      if (hit(grabBox(), o)) { o.dead = true; L.got++; (o.type === 'star' ? sfx.star : sfx.book)(); burst(o.x + 3, o.y + 3, ['#ffd23f', '#ffffff'], 8, 1); }
     } else if (o.type === 'apple') {
-      if (hit(pb, o)) { o.dead = true; sfx.gold(); burst(o.x + 3, o.y + 3, ['#e83b3b', '#ffffff'], 8, 1); if (hearts < 3) { hearts++; addFloat(o.x, o.y - 8, '+1 HEART', '#ff8fa3'); } else addFloat(o.x, o.y - 8, 'YUM!', '#ff8fa3'); }
+      if (hit(grabBox(), o)) { o.dead = true; sfx.gold(); burst(o.x + 3, o.y + 3, ['#e83b3b', '#ffffff'], 8, 1); if (hearts < 3) { hearts++; addFloat(o.x, o.y - 8, '+1 HEART', '#ff8fa3'); } else addFloat(o.x, o.y - 8, 'YUM!', '#ff8fa3'); }
     } else if (o.type === 'bird') {
       if (hit(pb, o)) hurt();
     } else if (o.type === 'storm') {
