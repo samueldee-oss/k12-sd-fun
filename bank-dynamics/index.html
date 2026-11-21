@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Bank Dynamics</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0c1018; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
+  body { display: flex; align-items: center; justify-content: center; }
+  canvas { display: block; background: #121824; }
+</style>
+</head>
+<body>
+<canvas id="game" width="1000" height="640"></canvas>
+<script>
+/*
+  Bank Dynamics: the Bank Game money model taught in levels (stock and flows first, loops later).
+  Started as a copy of bank-game/index.html; Free play is that original game.
+  A browser port of bank_game.py (the "Current" version), so it runs on GitHub Pages and iPads
+  with no Python and no build step. The money model is the same as bank_game.py.
+
+  MODEL RULES (from bank.stmx)
+  - Stock My_Account_Balance integrates (Deposits - Withdrawals)
+  - Deposits = Monthly_earnings + Monthly_Interest_Payments
+  - Monthly_Interest_Payments = My_Account_Balance * Monthly_Percent_Interest_Rate / 100
+  - Withdrawals = Monthly_spending (halved while Save is on)
+
+  CONTROLS
+  - Click / tap / Space: Work      - S or Save button: Save      - P or Pause button: Pause and shops
+  - Tap a garage slot, then V or Sell button: Sell      - R: Reset
+  - While paused: I bank offer, Tab next car, B buy, U upgrade garage, M menu (all also buttons)
+
+  LEVELS (start menu): review -> predict quiz -> play with a month timer -> debrief
+  with the stock-and-flow picture and the player's own inflow, outflow and balance graphs.
+*/
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+const WIDTH = 1000, HEIGHT = 640;
+const FONT = "16px Arial", BIG = "26px Arial", SMALL = "14px Arial";
+
+function fit() {
+  const s = Math.min(window.innerWidth / WIDTH, window.innerHeight / HEIGHT);
+  canvas.style.width = WIDTH * s + "px";
+  canvas.style.height = HEIGHT * s + "px";
+}
+window.addEventListener("resize", fit); fit();
+
+const nowSec = () => performance.now() / 1000;
+const rgb = (c, a) => a === undefined ? `rgb(${c[0]},${c[1]},${c[2]})` : `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
+const rand = (a, b) => a + Math.random() * (b - a);
+const money = (v, d = 0) => "$" + v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+const fx = (v, d) => v.toFixed(d);
+
+function apyToMonthlyPercent(apy) { return (Math.pow(1 + apy / 100, 1 / 12) - 1) * 100; }
+function monthlyPercentToApy(m) { return (Math.pow(1 + m / 100, 12) - 1) * 100; }
+
+const LOW_APY = 2.0;
+const MEDIUM_APY = 2.6;
+const PREMIUM_MONTHLY_PERCENT = (50.0 / 20000.0) * 100.0;
+const PREMIUM_APY = monthlyPercentToApy(PREMIUM_MONTHLY_PERCENT);
+
+// ---------------- PARAMETERS (easy to tweak) ----------------
+const MODEL_DT = 0.25;            // months per model step
+const MONTHS_PER_SECOND = 1.5;    // simulation speed
+const CLICK_SAMPLE_WINDOW = 5.0;  // seconds used to estimate click rate
+const IDEAL_CPS = 2.0;            // clicks per second for full earnings
+const TARGET_MONTHLY_EARNINGS = 250.0;
+const ACTION_EFFECTS = {
+  work_deposit: 8.0,
+  save_multiplier: 0.5,
+  save_duration_months: 12.0,
+  neg_rate_duration_months: 24.0,
+  work_cooldown_seconds: 0.12,
+};
+const GARAGE_SLOTS = 6;
+const garagePos = [560, 170];
+const slotW = 120, slotH = 70;
+const CAR_CATALOG = [
+  { name: "Compact", price: 1000, color: [200, 200, 200], score: 1, dep: 1.0 },
+  { name: "Sedan", price: 3000, color: [120, 180, 240], score: 2, dep: 0.8 },
+  { name: "Sports", price: 8000, color: [255, 90, 90], score: 4, dep: 0.6 },
+  { name: "Lamborghini", price: 20000, color: [255, 215, 0], score: 10, dep: -0.2 },
+];
+const SELL_FRACTION = 0.8;
+const UPGRADE_COST = 20000;
+const UPGRADE_SLOTS = 3;
+const STARTER_PERIOD_SECONDS = 30.0;
+const STARTER_MULTIPLIER = 2.0;
+
+// ---------------- GAME STATE ----------------
+let state, flows, actionTimers, cooldowns, balanceHistory, clickTimestamps, coinParticles;
+let garageSlots, carAnimationQueue, liquiditySources, selectedSlot, selectedCarIndex;
+let timeAccumulator, negotiatedApy, negotiatedMinimum, startTime, gameOver, arrowStrength;
+let paused = true;
+let pauseButtons = {};
+let touchButtons = {};
+
+function resetGame() {
+  state = {
+    My_Account_Balance: 0.0,
+    Monthly_earnings: TARGET_MONTHLY_EARNINGS,
+    Monthly_spending: 50.0,
+    Monthly_Percent_Interest_Rate: apyToMonthlyPercent(LOW_APY),
+    Price_of_car: 5000.0,
+  };
+  flows = { Monthly_Interest_Payments: 0, Deposits: 0, Withdrawals: 0 };
+  actionTimers = { save_months: 0, neg_rate_months: 0 };
+  cooldowns = { work: 0 };
+  balanceHistory = [];
+  clickTimestamps = [];
+  coinParticles = [];
+  garageSlots = new Array(GARAGE_SLOTS).fill(null);
+  carAnimationQueue = [];
+  liquiditySources = { work: 0, interest: 0 };
+  selectedSlot = null;
+  selectedCarIndex = 0;
+  timeAccumulator = 0;
+  negotiatedApy = 0;
+  negotiatedMinimum = 0;
+  startTime = nowSec();
+  gameOver = false;
+  arrowStrength = 0;
+}
+resetGame();
+state.Monthly_earnings = 100.0; // same first-launch value as bank_game.py
+
+// ---------------- HELPERS ----------------
+function getAssetValue() { return garageSlots.reduce((s, c) => s + (c ? (c.value ?? c.price) : 0), 0); }
+function getEffectiveInterestRate() {
+  let rate = state.Monthly_Percent_Interest_Rate;
+  if (actionTimers.neg_rate_months > 0 && negotiatedApy > 0) rate = apyToMonthlyPercent(negotiatedApy);
+  return rate;
+}
+function getCurrentApy() { return monthlyPercentToApy(getEffectiveInterestRate()); }
+function getBankOffer(balance) {
+  if (balance >= 20000) return ["Premium Yield", PREMIUM_APY, 20000];
+  if (balance >= 5000) return ["Growth Savings", MEDIUM_APY, 5000];
+  return ["Starter Savings", LOW_APY, 0];
+}
+function getTotalTrackedLiquidity() { return liquiditySources.work + liquiditySources.interest; }
+function rebalanceLiquiditySources(target) {
+  const tracked = getTotalTrackedLiquidity();
+  if (target <= 0 || tracked <= 0) { liquiditySources.work = Math.max(0, target); liquiditySources.interest = 0; return; }
+  const scale = target / tracked;
+  liquiditySources.work *= scale;
+  liquiditySources.interest *= scale;
+}
+function addLiquidity(work = 0, interest = 0) { liquiditySources.work += work; liquiditySources.interest += interest; }
+function removeLiquidity(amount) {
+  if (amount <= 0) return;
+  const tracked = getTotalTrackedLiquidity();
+  if (tracked <= 0) { liquiditySources.work = Math.max(0, state.My_Account_Balance); liquiditySources.interest = 0; return; }
+  const ws = liquiditySources.work / tracked, is = liquiditySources.interest / tracked;
+  liquiditySources.work = Math.max(0, liquiditySources.work - amount * ws);
+  liquiditySources.interest = Math.max(0, liquiditySources.interest - amount * is);
+  rebalanceLiquiditySources(state.My_Account_Balance);
+}
+function getMonthlyLoopGain(rate) { if (rate === undefined) rate = getEffectiveInterestRate(); return rate / 100; }
+function getMonthlyMultiplier(rate) { return 1 + getMonthlyLoopGain(rate); }
+function getSustainBalance(rate, spending) {
+  if (rate === undefined) rate = getEffectiveInterestRate();
+  if (spending === undefined) spending = state.Monthly_spending;
+  const gain = getMonthlyLoopGain(rate);
+  return gain <= 0 ? null : spending / gain;
+}
+function radiusForBalance(bal) { return Math.floor(36 + Math.sqrt(Math.max(0, bal)) * 1.8); }
+function slotRect(i) {
+  return { x: garagePos[0] + (i % 3) * (slotW + 10), y: garagePos[1] + Math.floor(i / 3) * (slotH + 10), w: slotW, h: slotH };
+}
+const inRect = (r, x, y) => x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h;
+
+// ---------------- DRAWING HELPERS ----------------
+function text(t, x, y, color = [255, 255, 255], font = FONT) {
+  ctx.font = font; ctx.fillStyle = rgb(color); ctx.textBaseline = "top"; ctx.textAlign = "left";
+  ctx.fillText(t, x, y);
+}
+function rect(x, y, w, h, color, line = 0, radius = 0) {
+  ctx.beginPath();
+  if (radius > 0) ctx.roundRect(x, y, w, h, radius); else ctx.rect(x, y, w, h);
+  if (line > 0) { ctx.lineWidth = line; ctx.strokeStyle = rgb(color); ctx.stroke(); }
+  else { ctx.fillStyle = rgb(color); ctx.fill(); }
+}
+function line(a, b, color, width) {
+  ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]);
+  ctx.lineWidth = width; ctx.strokeStyle = rgb(color); ctx.lineCap = "butt"; ctx.stroke();
+}
+function circle(x, y, r, color, width = 0) {
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+  if (width > 0) { ctx.lineWidth = width; ctx.strokeStyle = rgb(color); ctx.stroke(); }
+  else { ctx.fillStyle = rgb(color); ctx.fill(); }
+}
+function drawBar(x, y, w, h, value, maxValue, color, label) {
+  rect(x, y, w, h, [34, 38, 48]);
+  const fill = maxValue <= 0 ? 0 : Math.floor(w * clamp(value / maxValue, 0, 1));
+  rect(x, y, fill, h, color);
+  rect(x, y, w, h, [220, 220, 220], 2);
+  text(label, x + 8, y + 5, [255, 255, 255], SMALL);
+}
+function drawButton(r, label, fill = [36, 46, 62], border = [235, 220, 170], textColor = [245, 245, 245], font = SMALL) {
+  rect(r.x, r.y, r.w, r.h, fill, 0, 10);
+  rect(r.x, r.y, r.w, r.h, border, 2, 10);
+  ctx.font = font; ctx.fillStyle = rgb(textColor); ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText(label, r.x + r.w / 2, r.y + r.h / 2);
+  ctx.textAlign = "left";
+}
+const R = (x, y, w, h) => ({ x, y, w, h });
+
+// ---------------- PAUSE SCREEN (bank and dealership) ----------------
+function drawPauseOverlay() {
+  pauseButtons = {};
+  ctx.fillStyle = "rgba(8,12,18,0.84)"; ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  const rate = getEffectiveInterestRate();
+  const currentApy = getCurrentApy();
+  const sustain = getSustainBalance(rate);
+  const [offerName, offerApy] = getBankOffer(state.My_Account_Balance);
+
+  const header = R(110, 36, 780, 70), bank = R(110, 124, 360, 330), dealer = R(500, 124, 390, 330), notes = R(110, 472, 780, 92);
+  for (const p of [header, bank, dealer, notes]) { rect(p.x, p.y, p.w, p.h, [20, 28, 40], 0, 16); rect(p.x, p.y, p.w, p.h, [235, 220, 170], 2, 16); }
+
+  text("Paused", header.x + 22, header.y + 14, [255, 245, 220], BIG);
+  text("I: bank   Tab/B: dealership   U: upgrade   M: menu", header.x + 22, header.y + 46, [225, 232, 240], SMALL);
+  pauseButtons.menu = R(header.x + header.w - 312, header.y + 18, 84, 34);
+  drawButton(pauseButtons.menu, "Menu", [40, 52, 70]);
+  pauseButtons.resume = R(header.x + header.w - 210, header.y + 18, 84, 34);
+  pauseButtons.reset = R(header.x + header.w - 108, header.y + 18, 84, 34);
+  drawButton(pauseButtons.resume, "Resume");
+  drawButton(pauseButtons.reset, "Reset", [58, 42, 42]);
+
+  text("Bank", bank.x + 18, bank.y + 16, [255, 245, 220], BIG);
+  text(`Current APY: ${fx(currentApy, 2)}%`, bank.x + 18, bank.y + 54);
+  text(`Current monthly rate: ${fx(rate, 3)}%`, bank.x + 18, bank.y + 78);
+  text(`Best available now: ${offerName}`, bank.x + 18, bank.y + 114);
+  pauseButtons.apply_bank = R(bank.x + 18, bank.y + 138, 190, 34);
+  drawButton(pauseButtons.apply_bank, `Apply ${fx(offerApy, 2)}% APY`, [64, 82, 58], [235, 220, 170], [255, 245, 220]);
+  text(`Starter Savings: ${fx(LOW_APY, 2)}% APY`, bank.x + 18, bank.y + 180);
+  text(`Growth Savings: ${fx(MEDIUM_APY, 2)}% APY at $5,000+`, bank.x + 18, bank.y + 208);
+  text(`Premium Yield: ${fx(PREMIUM_APY, 2)}% APY at $20,000+`, bank.x + 18, bank.y + 236);
+  if (sustain === null) text("Interest-only sustain balance: not possible", bank.x + 18, bank.y + 278, [255, 210, 160]);
+  else text(`Interest-only sustain balance: ${money(sustain)}`, bank.x + 18, bank.y + 278,
+    state.My_Account_Balance >= sustain ? [120, 240, 160] : [255, 225, 140]);
+
+  text("Dealership", dealer.x + 18, dealer.y + 16, [255, 245, 220], BIG);
+  text("Tap a car (or Tab) to choose. Tap Buy (or B) to buy it.", dealer.x + 18, dealer.y + 54, [255, 255, 255], SMALL);
+  const sel = CAR_CATALOG[selectedCarIndex];
+  const pv = R(dealer.x + 18, dealer.y + 92, 160, 88);
+  rect(pv.x, pv.y, pv.w, pv.h, [28, 34, 46], 0, 12);
+  rect(pv.x + 12, pv.y + 14, 136, 28, sel.color, 0, 8);
+  rect(pv.x, pv.y, pv.w, pv.h, [200, 200, 200], 2, 12);
+  text(sel.name, pv.x + 12, pv.y + 52);
+  text(money(sel.price), pv.x + 12, pv.y + 70, [255, 255, 255], SMALL);
+  pauseButtons.buy_car = R(dealer.x + 196, dealer.y + 106, 170, 36);
+  pauseButtons.upgrade_garage = R(dealer.x + 196, dealer.y + 150, 170, 36);
+  drawButton(pauseButtons.buy_car, `Buy ${sel.name}`, [54, 76, 92]);
+  drawButton(pauseButtons.upgrade_garage, `Upgrade ${money(UPGRADE_COST)}`, [72, 64, 88]);
+  const gridY = dealer.y + 202;
+  CAR_CATALOG.forEach((car, idx) => {
+    const x = dealer.x + 18 + (idx % 2) * 178, y = gridY + Math.floor(idx / 2) * 58;
+    const r = R(x, y, 160, 46);
+    pauseButtons["car_" + idx] = r;
+    rect(x, y, 160, 46, [28, 34, 46], 0, 10);
+    rect(x + 8, y + 9, 20, 20, car.color, 0, 4);
+    rect(x, y, 160, 46, idx === selectedCarIndex ? [255, 215, 120] : [130, 140, 150], 2, 10);
+    text(car.name, x + 36, y + 7);
+    text(money(car.price), x + 36, y + 24, [255, 255, 255], SMALL);
+  });
+
+  text("Notes", notes.x + 18, notes.y + 14, [255, 245, 220], BIG);
+  text(`Each work input adds ${money(ACTION_EFFECTS.work_deposit)}. Work can drive up to ${money(TARGET_MONTHLY_EARNINGS)}/month.`, notes.x + 18, notes.y + 48);
+  text("Bank and dealership panels only appear while paused so the live view stays clear.", notes.x + 18, notes.y + 70, [255, 255, 255], SMALL);
+}
+
+// ---------------- MAIN SCREEN ----------------
+function drawUI() {
+  ctx.fillStyle = rgb([18, 24, 36]); ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+  // Balance bubble
+  const bal = state.My_Account_Balance;
+  const radius = clamp(Math.floor(36 + Math.sqrt(Math.max(0, bal)) * 1.8), 36, 260);
+  const cx = 220, cy = 200;
+  circle(cx, cy, radius, [30, 170, 100]);
+  circle(cx, cy, radius, [255, 255, 255], 3);
+  text(`Balance: ${money(bal, 2)}`, cx - 70, cy + radius + 8, [255, 255, 255], BIG);
+
+  // Reinforcing loop arrows: Balance -> Interest -> Deposits -> Balance
+  const thick = Math.floor(clamp(1 + arrowStrength * 10, 1, 12));
+  const ax1 = [cx + radius, cy], ax2 = [cx + radius + 140, cy - 40];
+  line(ax1, ax2, [200, 180, 40], thick);
+  text("Interest", ax2[0] - 10, ax2[1] - 24);
+  const bx2 = [cx + 80, cy + 110];
+  line(ax2, bx2, [200, 180, 40], thick);
+  text("Deposits", bx2[0] - 20, bx2[1] + 8);
+  line([cx + 30, cy + 80], [cx - radius, cy + 40], [200, 180, 40], thick);
+
+  for (const c of coinParticles) circle(Math.floor(c.x), Math.floor(c.y), Math.floor(c.r), [255, 223, 0]);
+
+  // Top-right summary
+  text(`Bank APY: ${fx(getCurrentApy(), 2)}%`, 520, 28, [255, 255, 255], BIG);
+  text("Pause to visit the bank and dealership.", 520, 58, [215, 220, 230]);
+
+  // Liquidity and asset bar
+  const bx = 520, by = 84, w = 420, h = 36;
+  const assetValue = getAssetValue();
+  const totalNet = bal + assetValue;
+  const liqW = Math.floor(w * (bal / (totalNet > 0 ? totalNet : 1)));
+  const tracked = Math.max(0.01, getTotalTrackedLiquidity());
+  const workLiq = Math.min(bal, liquiditySources.work), intLiq = Math.min(bal, liquiditySources.interest);
+  const workSplit = Math.floor(liqW * (workLiq / tracked)), intSplit = Math.floor(liqW * (intLiq / tracked));
+  rect(bx, by, w, h, [60, 60, 70]);
+  rect(bx, by, workSplit, h, [70, 170, 255]);
+  rect(bx + workSplit, by, intSplit, h, [255, 215, 80]);
+  const rem = Math.max(0, liqW - workSplit - intSplit);
+  if (rem > 0) rect(bx + workSplit + intSplit, by, rem, h, [0, 200, 120]);
+  rect(bx, by, w, h, [220, 220, 220], 2);
+  text(`Liquidity: ${money(bal)}`, bx + 6, by + 6);
+  text(`Assets: ${money(assetValue)}`, bx + 220, by + 6);
+  text(`Work ${money(workLiq)}`, bx, by + 42, [70, 170, 255], SMALL);
+  text(`Interest ${money(intLiq)}`, bx + 120, by + 42, [255, 215, 80], SMALL);
+
+  // Monthly cash flow panel
+  const px = 20, py = 360, pw = 470, ph = 215;
+  rect(px, py, pw, ph, [16, 20, 30]);
+  rect(px, py, pw, ph, [100, 110, 140], 2);
+  text("Monthly Cash Flow", px + 12, py + 10, [255, 255, 255], BIG);
+  const er = getEffectiveInterestRate();
+  const workIncome = state.Monthly_earnings, interestIncome = flows.Monthly_Interest_Payments, spending = state.Monthly_spending;
+  const sustain = getSustainBalance(er, spending);
+  const chartMax = Math.max(1, workIncome, interestIncome, spending);
+  drawBar(px + 12, py + 52, 300, 24, workIncome, chartMax, [70, 170, 255], `Work: ${money(workIncome, 1)}/month`);
+  drawBar(px + 12, py + 84, 300, 24, interestIncome, chartMax, [255, 215, 80], `Interest: ${money(interestIncome, 1)}/month`);
+  drawBar(px + 12, py + 116, 300, 24, spending, chartMax, [255, 120, 120], `Spending: ${money(spending, 1)}/month`);
+  text(`Interest rate: ${fx(monthlyPercentToApy(er), 2)}% APY`, px + 12, py + 154);
+  text(`Loop gain: ${fx(getMonthlyLoopGain(er), 4)}`, px + 12, py + 176);
+  text(`Multiplier: x${fx(getMonthlyMultiplier(er), 4)} / month`, px + 180, py + 176);
+  text(`Liquid from work: ${money(liquiditySources.work)}`, px + 320, py + 60, [70, 170, 255], SMALL);
+  text(`Liquid from interest: ${money(liquiditySources.interest)}`, px + 320, py + 82, [255, 215, 80], SMALL);
+  if (sustain === null) text("Interest-only sustain: not possible", px + 12, py + 198, [255, 210, 160]);
+  else {
+    const ok = bal >= sustain;
+    text(`Sustain target: ${money(sustain)} liquid`, px + 12, py + 198, ok ? [120, 240, 160] : [255, 225, 140]);
+    if (ok) text("Interest can cover the $50/month spend now.", px + 250, py + 198, [120, 240, 160], SMALL);
+    else text(`${money(sustain - bal)} more to self-sustain`, px + 250, py + 198, [255, 225, 140], SMALL);
+  }
+
+  // Garage
+  text("Garage:", garagePos[0], garagePos[1] - 34);
+  garageSlots.forEach((c, i) => {
+    const s = slotRect(i);
+    rect(s.x, s.y, s.w, s.h, [28, 28, 36]);
+    rect(s.x, s.y, s.w, s.h, [100, 100, 110], 2);
+    if (c) { rect(s.x + 10, s.y + 10, slotW - 20, slotH - 28, c.color); text(c.name, s.x + 6, s.y + slotH - 22); }
+    else text("Empty", s.x + 8, s.y + slotH - 22, [120, 120, 120]);
+  });
+
+  // Bottom stats and controls
+  text("P: Pause/shops  Click or Space: Work  S: Save  V: Sell  R: Reset", 20, HEIGHT - 40, [190, 190, 190]);
+  text(`Interest/month: $${fx(flows.Monthly_Interest_Payments, 2)}  Work/month: $${fx(state.Monthly_earnings, 1)}  Spending: $${fx(state.Monthly_spending, 0)}`, 20, HEIGHT - 64);
+
+  // Balance history sparkline
+  const hx = 20, hy = 20, hw = 380, hh = 120;
+  rect(hx, hy, hw, hh, [10, 10, 14]);
+  if (balanceHistory.length > 1) {
+    const maxb = Math.max(...balanceHistory) || 1, minb = Math.min(...balanceHistory);
+    const span = maxb > minb ? maxb - minb : 1;
+    ctx.beginPath();
+    balanceHistory.forEach((v, i) => {
+      const x = hx + Math.floor(i / (balanceHistory.length - 1) * (hw - 6));
+      const y = hy + hh - 6 - Math.floor((v - minb) / span * (hh - 12));
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.lineWidth = 2; ctx.strokeStyle = rgb([90, 220, 150]); ctx.stroke();
+  }
+
+  for (const a of carAnimationQueue) rect(a.x, a.y, a.w, a.h, a.color);
+
+  if (selectedSlot !== null && selectedSlot < garageSlots.length) {
+    const s = slotRect(selectedSlot);
+    rect(s.x, s.y, s.w, s.h, [255, 200, 120], 3);
+  }
+
+  // Touch buttons (for iPad): Save, Sell, Pause
+  touchButtons = {
+    save: R(560, 586, 120, 44),
+    sell: R(690, 586, 120, 44),
+    pause: R(820, 586, 160, 44),
+  };
+  const saving = actionTimers.save_months > 0;
+  drawButton(touchButtons.save, saving ? `Saving ${Math.ceil(actionTimers.save_months)}mo` : "Save (S)",
+    saving ? [40, 70, 50] : [36, 46, 62], [235, 220, 170], [245, 245, 245], FONT);
+  const canSell = selectedSlot !== null && garageSlots[selectedSlot];
+  drawButton(touchButtons.sell, "Sell (V)", canSell ? [70, 50, 40] : [30, 34, 44], canSell ? [235, 220, 170] : [90, 96, 110],
+    canSell ? [245, 245, 245] : [130, 130, 140], FONT);
+  drawButton(touchButtons.pause, "Pause / Shops (P)", [54, 76, 92], [235, 220, 170], [245, 245, 245], FONT);
+
+  if (gameOver) {
+    rect(300, 250, 400, 90, [20, 28, 40], 0, 16);
+    rect(300, 250, 400, 90, [255, 215, 120], 3, 16);
+    text("Garage full! You win!", 360, 268, [255, 245, 220], BIG);
+    text("Press R (or Pause, then Reset) to play again.", 330, 306, [225, 232, 240], SMALL);
+  }
+
+  if (paused) drawPauseOverlay();
+}
+
+// ---------------- MODEL UPDATE (Euler) ----------------
+function modelStep(dt) {
+  const now = nowSec();
+  while (clickTimestamps.length && clickTimestamps[0] < now - CLICK_SAMPLE_WINDOW) clickTimestamps.shift();
+  const idealClicks = IDEAL_CPS * CLICK_SAMPLE_WINDOW;
+  let perClick = TARGET_MONTHLY_EARNINGS / Math.max(1, idealClicks);
+  if (now - startTime < STARTER_PERIOD_SECONDS) perClick *= STARTER_MULTIPLIER;
+  state.Monthly_earnings = Math.min(TARGET_MONTHLY_EARNINGS, clickTimestamps.length * perClick);
+
+  let effSpending = state.Monthly_spending;
+  if (actionTimers.save_months > 0) effSpending *= ACTION_EFFECTS.save_multiplier;
+  let effRate = state.Monthly_Percent_Interest_Rate;
+  if (actionTimers.neg_rate_months > 0 && negotiatedApy > 0) effRate = apyToMonthlyPercent(negotiatedApy);
+
+  flows.Monthly_Interest_Payments = state.My_Account_Balance * effRate / 100;
+  flows.Deposits = state.Monthly_earnings + flows.Monthly_Interest_Payments;
+  flows.Withdrawals = effSpending;
+
+  const workIn = state.Monthly_earnings * dt, intIn = flows.Monthly_Interest_Payments * dt, spendOut = flows.Withdrawals * dt;
+  state.My_Account_Balance = Math.max(0, state.My_Account_Balance + (flows.Deposits - flows.Withdrawals) * dt);
+  addLiquidity(workIn, intIn);
+  removeLiquidity(spendOut);
+  rebalanceLiquiditySources(state.My_Account_Balance);
+
+  // Car values: depreciation (negative = appreciation), percent per month
+  for (const car of garageSlots) {
+    if (!car) continue;
+    car.value = car.value ?? car.price;
+    car.value = Math.max(0, car.value - car.value * ((car.dep ?? 1) / 100) * dt);
+  }
+
+  // Interest coins
+  const spawn = Math.floor(clamp(flows.Monthly_Interest_Payments * dt / 5, 0, 30));
+  for (let i = 0; i < spawn; i++) {
+    coinParticles.push({ x: 220 + radiusForBalance(state.My_Account_Balance), y: 200,
+      vx: rand(30, 140), vy: rand(-80, -20), r: rand(3, 7), life: rand(0.8, 1.6) });
+  }
+  const k = (dt / MODEL_DT) * 0.6;
+  coinParticles = coinParticles.filter((c) => {
+    c.x += c.vx * k; c.y += c.vy * k; c.vy += 80 * k; c.life -= dt / 6;
+    return c.life > 0;
+  });
+
+  arrowStrength = state.My_Account_Balance > 0 ? flows.Monthly_Interest_Payments / Math.max(0.01, state.My_Account_Balance) : 0;
+
+  // Negotiated contract: break it if balance drops below the minimum
+  if (actionTimers.neg_rate_months > 0 && negotiatedMinimum > 0 && state.My_Account_Balance < negotiatedMinimum) {
+    actionTimers.neg_rate_months = 0; negotiatedApy = 0; negotiatedMinimum = 0;
+  }
+  for (const key in actionTimers) if (actionTimers[key] > 0) actionTimers[key] = Math.max(0, actionTimers[key] - dt);
+
+  balanceHistory.push(state.My_Account_Balance);
+  if (balanceHistory.length > 300) balanceHistory.shift();
+}
+
+// ---------------- PLAYER ACTIONS ----------------
+function doWork() {
+  if (cooldowns.work > 0) return;
+  clickTimestamps.push(nowSec());
+  state.My_Account_Balance += ACTION_EFFECTS.work_deposit;
+  addLiquidity(ACTION_EFFECTS.work_deposit);
+  cooldowns.work = ACTION_EFFECTS.work_cooldown_seconds;
+}
+function doSave() { if (actionTimers.save_months > 0) return; actionTimers.save_months = ACTION_EFFECTS.save_duration_months; }
+function doNegotiate() {
+  const offer = getBankOffer(state.My_Account_Balance);
+  negotiatedApy = offer[1]; negotiatedMinimum = offer[2];
+  actionTimers.neg_rate_months = ACTION_EFFECTS.neg_rate_duration_months;
+}
+function buySelectedCar() {
+  const cc = CAR_CATALOG[selectedCarIndex];
+  if (state.My_Account_Balance < cc.price) return;
+  const busy = new Set(carAnimationQueue.map((a) => a.slot));
+  for (let i = 0; i < garageSlots.length; i++) {
+    if (garageSlots[i] === null && !busy.has(i)) {
+      state.My_Account_Balance -= cc.price;
+      removeLiquidity(cc.price);
+      const newcar = { name: cc.name, price: cc.price, color: cc.color, value: cc.price, dep: cc.dep };
+      const s = slotRect(i);
+      carAnimationQueue.push({ x: WIDTH - 180, y: 100, w: slotW - 20, h: slotH - 28, color: cc.color,
+        target: [s.x + 10, s.y + 10], speed: 600, newcar, slot: i });
+      return;
+    }
+  }
+}
+function placeCarInSlot(a) {
+  garageSlots[a.slot] = a.newcar;
+  if (garageSlots.every((s) => s !== null)) gameOver = true;
+  selectedSlot = null;
+}
+function upgradeGarage() {
+  if (state.My_Account_Balance >= UPGRADE_COST) {
+    state.My_Account_Balance -= UPGRADE_COST;
+    removeLiquidity(UPGRADE_COST);
+    for (let i = 0; i < UPGRADE_SLOTS; i++) garageSlots.push(null);
+  }
+}
+function sellSelected() {
+  if (selectedSlot === null || !garageSlots[selectedSlot]) return;
+  const car = garageSlots[selectedSlot];
+  const refund = (car.value ?? car.price) * SELL_FRACTION;
+  state.My_Account_Balance += refund;
+  addLiquidity(refund);
+  garageSlots[selectedSlot] = null;
+  selectedSlot = null;
+}
+
+// ---------------- INPUT ----------------
+window.addEventListener("keydown", (e) => {
+  const key = e.key.toLowerCase();
+  if (key === "tab" || key === " ") e.preventDefault();
+  if (scene !== "free") { levelKey(key, e); return; }
+  if (paused && key === "m") { goMenu(); return; }
+  if (e.repeat && key !== " ") return;
+  if (key === "p") { paused = !paused; return; }
+  if (paused) {
+    if (key === "r") resetGame();
+    else if (key === "i") doNegotiate();
+    else if (key === "tab") selectedCarIndex = (selectedCarIndex + 1) % CAR_CATALOG.length;
+    else if (key === "b") buySelectedCar();
+    else if (key === "u") upgradeGarage();
+    return;
+  }
+  if (key === "s") doSave();
+  else if (key === "v") sellSelected();
+  else if (key === "r") resetGame();
+  else if (key === " ") doWork();
+});
+
+canvas.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
+  const b = canvas.getBoundingClientRect();
+  const mx = (e.clientX - b.left) * WIDTH / b.width, my = (e.clientY - b.top) * HEIGHT / b.height;
+  if (scene !== "free") { levelPointer(mx, my); return; }
+  if (paused) {
+    for (const [id, r] of Object.entries(pauseButtons)) {
+      if (!inRect(r, mx, my)) continue;
+      if (id === "menu") goMenu();
+      else if (id === "resume") paused = false;
+      else if (id === "reset") resetGame();
+      else if (id === "apply_bank") doNegotiate();
+      else if (id === "buy_car") buySelectedCar();
+      else if (id === "upgrade_garage") upgradeGarage();
+      else if (id.startsWith("car_")) selectedCarIndex = parseInt(id.split("_")[1], 10);
+      break;
+    }
+    return;
+  }
+  if (inRect(touchButtons.save, mx, my)) { doSave(); return; }
+  if (inRect(touchButtons.sell, mx, my)) { sellSelected(); return; }
+  if (inRect(touchButtons.pause, mx, my)) { paused = true; return; }
+  for (let i = 0; i < garageSlots.length; i++) {
+    if (inRect(slotRect(i), mx, my)) { selectedSlot = i; return; }
+  }
+  doWork();
+});
+
+// =====================================================================
+// LEVELS: review -> quiz -> play (timer) -> debrief
+// Each level adds one systems idea, climbing the ladder:
+//   1: one inflow fills a stock   2: one outflow drains a stock   (3, 4: both flows, later)
+// The review before a level asks the player to rebuild a sentence they learned earlier.
+// Review styles get harder as levels go up: put pieces in order -> fill the blank -> match a graph.
+// =====================================================================
+const MONTHS_PER_SEC_LEVEL = 1.0;
+const LEVELS = [
+  {
+    n: 1, title: "Level 1: Work", idea: "One inflow fills the stock",
+    goalText: "Save $1,000 for your first car, a compact. Tap anywhere to work!",
+    months: 24, start: 0, pay: 25, bills: 0, goal: 1000, max: 1200,
+    quiz: [
+      { q: "Each tap is work, and work earns pay. What happens to your bank balance when you tap?", a: ["It goes up", "It goes down", "It stays the same"], c: 0 },
+      { q: "If you stop tapping for a while, what will your balance do?", a: ["Keep going up", "Go down", "Stay flat (the same)"], c: 2 },
+    ],
+    key: ["When you work,", "money flows in", "and the balance", "goes up."],
+  },
+  {
+    n: 2, title: "Level 2: Spend", idea: "One outflow drains the stock",
+    goalText: "No work this time. Watch what the bills do to your $500.",
+    months: 12, start: 500, pay: 0, bills: 50, goal: null, max: 600,
+    review: { from: 1, type: "order" },
+    quiz: [
+      { q: "You have $500. Bills take $50 every month. There is no work. What will your balance do?", a: ["Go up", "Go down at a steady speed", "Stay the same"], c: 1 },
+      { q: "In which month will your balance reach $0?", a: ["Month 5", "Month 10", "Month 12", "Never"], c: 1 },
+    ],
+    key: ["When bills flow out", "and nothing flows in,", "the balance", "goes down."],
+  },
+  {
+    n: 3, title: "Level 3: Both", idea: "Inflow and outflow together (easy)",
+    goalText: "Pay is big, bills are small. Save $1,000 for a sedan. Tap to work!",
+    months: 24, start: 0, pay: 40, bills: 20, goal: 1000, max: 1200,
+    car: { name: "Sedan", color: [120, 180, 240] },
+    review: { from: 2, type: "blank", blank: 3, choices: ["goes up.", "goes down.", "stays the same."] },
+    quiz: [
+      { q: "Now work flows in AND bills flow out. When will your balance go up?", a: ["Always", "Only when more flows in than flows out", "Never"], c: 1 },
+      { q: "If you stop working for a while, what will your balance do?", a: ["Stay flat", "Go up", "Go down, because bills keep coming"], c: 2 },
+    ],
+    key: ["When more flows in", "than flows out,", "the balance", "goes up."],
+  },
+  {
+    n: 4, title: "Level 4: Hard Times", idea: "Both flows, low pay (hard)",
+    goalText: "Low pay, real bills. Save $800 for an old hatchback. Keep tapping!",
+    months: 24, start: 0, pay: 20, bills: 40, goal: 800, max: 1000,
+    car: { name: "Old hatchback", color: [190, 150, 110] },
+    review: { from: 3, type: "graph" },
+    quiz: [
+      { q: "Each tap pays $20 and bills are $40 a month. How many taps does it take each month just to pay the bills?", a: ["1 tap", "2 taps", "40 taps"], c: 1 },
+      { q: "You tap 2 times every month, no more. What will your balance do?", a: ["Stay flat (in = out)", "Go up fast", "Go down"], c: 0 },
+    ],
+    key: ["When less flows in", "than flows out,", "the balance", "goes down."],
+  },
+];
+LEVELS[0].car = { name: "Compact", color: [200, 200, 200] };
+
+let scene = "menu";
+let progress = { passed: {}, stars: {} };
+try { Object.assign(progress, JSON.parse(localStorage.getItem("k12-bank-dynamics-levels") || "{}")); } catch (e) {}
+function saveProgress() { try { localStorage.setItem("k12-bank-dynamics-levels", JSON.stringify(progress)); } catch (e) {} }
+
+let LV = null, run = null, quizIdx = 0, answers = [], review = null, uiButtons = [], lastWorkTap = 0;
+const BLUE = [70, 170, 255], RED = [255, 120, 120], GREEN = [60, 200, 120], GOLD = [255, 215, 120], CREAM = [255, 245, 220], MUTED = [150, 160, 175];
+
+function goMenu() { scene = "menu"; paused = true; }
+function addButton(r, label, act, opts = {}) { uiButtons.push({ r, act }); drawButton(r, label, opts.fill, opts.border, opts.text, opts.font || FONT); }
+function wrap(t, x, y, maxW, lineH, color = [255, 255, 255], font = FONT) {
+  ctx.font = font;
+  let lineText = "";
+  for (const word of t.split(" ")) {
+    const test = lineText ? lineText + " " + word : word;
+    if (ctx.measureText(test).width > maxW && lineText) { text(lineText, x, y, color, font); y += lineH; lineText = word; }
+    else lineText = test;
+  }
+  if (lineText) { text(lineText, x, y, color, font); y += lineH; }
+  return y;
+}
+function centerText(t, y, color = [255, 255, 255], font = FONT) {
+  ctx.font = font; ctx.fillStyle = rgb(color); ctx.textBaseline = "top"; ctx.textAlign = "center";
+  ctx.fillText(t, WIDTH / 2, y); ctx.textAlign = "left";
+}
+function shuffled(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+// ---------- flow ----------
+function startLevel(lv) {
+  LV = lv; answers = []; quizIdx = 0;
+  if (lv.review && progress.passed[lv.review.from]) {
+    const pieces = LEVELS[lv.review.from - 1].key.map((t, i) => ({ t, i }));
+    let order = shuffled(pieces);
+    while (order.every((p, k) => p.i === k)) order = shuffled(pieces);
+    review = { from: lv.review.from, type: lv.review.type, order, placed: [], wrong: 0, done: false,
+      choices: lv.review.choices ? shuffled(lv.review.choices) : null, graphs: shuffled(["up", "down", "flat"]) };
+    scene = "review";
+  } else scene = "quiz";
+}
+function beginPlay() {
+  run = {
+    started: false, ended: false, celebrate: 0, month: 0, balance: LV.start,
+    inflowM: new Array(LV.months).fill(0), outflowM: new Array(LV.months).fill(0),
+    series: [[0, LV.start]], nextSample: 0.1, reached: null, emptyAt: null, coins: [], workGlow: 0,
+  };
+  scene = "play";
+}
+function endPlay() {
+  run.ended = true;
+  run.series.push([run.month, run.balance]);
+  const passed = LV.goal ? run.reached !== null : true; // Level 2 passes by watching it through
+  run.passed = passed;
+  if (passed) { progress.passed[LV.n] = true; progress.stars[LV.n] = Math.max(progress.stars[LV.n] || 0, 1); saveProgress(); }
+  scene = "debrief";
+}
+function doLevelWork() {
+  if (!run || run.ended || run.celebrate > 0 || LV.pay <= 0) return;
+  const t = nowSec();
+  if (t - lastWorkTap < 0.1) return; // no super-fast auto-tapping
+  lastWorkTap = t;
+  run.balance += LV.pay;
+  run.inflowM[Math.min(LV.months - 1, Math.floor(run.month))] += LV.pay;
+  run.workGlow = 1;
+  run.coins.push({ x: 140, y: 270, tx: 390, kind: "in" });
+}
+
+// ---------- update ----------
+function levelFrame(elapsed) {
+  if (scene === "play" && run.celebrate > 0) {
+    run.celebrate -= elapsed;
+    if (run.celebrate <= 0) endPlay();
+  } else if (scene === "play" && run.started && !run.ended) {
+    let dm = elapsed * MONTHS_PER_SEC_LEVEL;
+    while (dm > 0 && !run.ended) {
+      const step = Math.min(dm, 0.05);
+      dm -= step;
+      const idx = Math.min(LV.months - 1, Math.floor(run.month));
+      const out = Math.min(run.balance, LV.bills * step); // bills can't take money that isn't there
+      run.balance -= out;
+      run.outflowM[idx] += out;
+      if (out > 0 && Math.random() < step * 3) run.coins.push({ x: 630, y: 270, tx: 860, kind: "out" });
+      run.month += step;
+      if (LV.bills > 0 && run.balance <= 0.0001 && run.emptyAt === null) { run.balance = 0; run.emptyAt = run.month; }
+      if (run.month >= run.nextSample) { run.series.push([run.month, run.balance]); run.nextSample += 0.1; }
+      if (LV.goal && run.balance >= LV.goal) { run.reached = run.month; run.celebrate = 2.0; break; }
+      else if (run.month >= LV.months) { run.month = LV.months; endPlay(); }
+    }
+  }
+  if (run) {
+    run.workGlow = Math.max(0, run.workGlow - elapsed * 3);
+    run.coins = run.coins.filter((c) => { c.x += 420 * elapsed; return c.x < c.tx; });
+  }
+  if (review && review.wrong > 0) review.wrong = Math.max(0, review.wrong - elapsed * 2);
+  drawLevelScene();
+}
+
+// ---------- input ----------
+function levelPointer(mx, my) {
+  for (const b of uiButtons) if (inRect(b.r, mx, my)) { b.act(); return; }
+  if (scene === "play" && !run.ended && !(run.celebrate > 0)) {
+    if (!run.started) { run.started = true; return; }
+    doLevelWork();
+  }
+}
+function levelKey(key) {
+  if (scene === "play" && !run.ended) {
+    if (!run.started && (key === " " || key === "enter")) { run.started = true; return; }
+    if (key === " ") doLevelWork();
+  }
+  if (key === "escape") goMenu();
+}
+
+// ---------- drawing ----------
+function drawLevelScene() {
+  uiButtons = [];
+  ctx.fillStyle = rgb([18, 24, 36]); ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  if (scene === "menu") drawMenu();
+  else if (scene === "review") drawReview();
+  else if (scene === "quiz") drawQuiz();
+  else if (scene === "play") drawPlay();
+  else if (scene === "debrief") drawDebrief();
+}
+
+function drawCar(x, y, color, w = 70) {
+  const h = w * 0.36;
+  rect(x + w * 0.18, y - h * 0.55, w * 0.55, h * 0.6, color, 0, 6);
+  rect(x, y, w, h, color, 0, 7);
+  rect(x + w * 0.28, y - h * 0.42, w * 0.18, h * 0.38, [190, 225, 250], 0, 3);
+  rect(x + w * 0.5, y - h * 0.42, w * 0.18, h * 0.38, [190, 225, 250], 0, 3);
+  circle(x + w * 0.22, y + h, h * 0.36, [30, 30, 36]);
+  circle(x + w * 0.78, y + h, h * 0.36, [30, 30, 36]);
+}
+
+function drawMenu() {
+  centerText("Bank Dynamics", 34, CREAM, "bold 44px Arial");
+  centerText("Learn how money piles up, drains away, and grows.", 90, [215, 220, 230]);
+  LEVELS.forEach((lv, i) => {
+    const r = R(150 + (i % 2) * 370, 130 + Math.floor(i / 2) * 125, 330, 110);
+    const unlocked = lv.n === 1 || progress.passed[lv.n - 1];
+    rect(r.x, r.y, r.w, r.h, unlocked ? [24, 34, 50] : [22, 24, 30], 0, 16);
+    rect(r.x, r.y, r.w, r.h, unlocked ? GOLD : [80, 86, 98], 2, 16);
+    text(lv.title, r.x + 18, r.y + 12, unlocked ? CREAM : MUTED, BIG);
+    text(lv.idea, r.x + 18, r.y + 48, unlocked ? [215, 220, 230] : MUTED);
+    const stars = progress.stars[lv.n] || 0;
+    if (!unlocked) text("Locked: pass Level " + (lv.n - 1) + " first", r.x + 18, r.y + 78, MUTED);
+    else text(stars ? "★ Passed (tap to play again)" : "☆ Tap to play", r.x + 18, r.y + 78, stars ? GOLD : [215, 220, 230]);
+    if (unlocked) uiButtons.push({ r, act: () => startLevel(lv) });
+  });
+  // garage: one car for each level you passed by saving up for it
+  rect(150, 390, 700, 100, [16, 20, 30], 0, 14); rect(150, 390, 700, 100, [100, 110, 140], 2, 14);
+  text("Your garage", 166, 398, CREAM);
+  const won = LEVELS.filter((lv) => lv.car && progress.passed[lv.n]);
+  if (!won.length) text("Pass a level with a car goal to park it here.", 166, 440, MUTED, SMALL);
+  won.forEach((lv, k) => { drawCar(180 + k * 160, 434, lv.car.color, 80); text(lv.car.name, 180 + k * 160, 470, [215, 220, 230], SMALL); });
+  text("Coming later: interest (money that earns money) and surprise events.", 150, 500, MUTED, SMALL);
+  addButton(R(350, 540, 300, 54), "Free play (the full game)", () => { scene = "free"; resetGame(); paused = true; },
+    { fill: [54, 76, 92], font: "20px Arial" });
+  addButton(R(840, 596, 140, 34), "Reset levels", () => { progress = { passed: {}, stars: {} }; saveProgress(); },
+    { fill: [40, 30, 34], border: [120, 100, 100], text: [200, 190, 190], font: SMALL });
+}
+
+function drawReview() {
+  const src = LEVELS[review.from - 1];
+  centerText(LV.title, 40, CREAM, BIG);
+  const how = { order: "Tap the pieces in order to rebuild the sentence.", blank: "Tap the words that finish the sentence.",
+    graph: "Which graph shows this sentence? Blue = in, red = out, green = balance." }[review.type];
+  centerText(`Remember from ${src.title.split(":")[0]}? ${how}`, 90, [215, 220, 230]);
+  let shown;
+  if (review.type === "order") shown = review.placed.map((i) => src.key[i]).join(" ") || "…";
+  else if (review.type === "blank") shown = review.done ? src.key.join(" ") : src.key.slice(0, LV.review.blank).join(" ") + " ____";
+  else shown = src.key.join(" ");
+  rect(100, 140, 800, 70, review.wrong > 0 ? [70, 30, 34] : [24, 34, 50], 0, 14);
+  rect(100, 140, 800, 70, review.done ? GREEN : GOLD, 2, 14);
+  centerText(shown, 163, review.done ? [150, 240, 180] : CREAM, "22px Arial");
+  if (review.done) {
+    centerText("✓ You remembered! Keep that idea in mind for this level.", 470, [150, 240, 180], "20px Arial");
+    addButton(R(400, 530, 200, 54), "Next: quiz", () => { scene = "quiz"; }, { fill: [54, 76, 92], font: "20px Arial" });
+  } else if (review.wrong > 0) centerText("Not that one. Try again!", 470, [255, 190, 170]);
+  if (review.type === "order" && !review.done) {
+    let x = 100, y = 260;
+    review.order.forEach((p) => {
+      if (review.placed.includes(p.i)) return;
+      ctx.font = "20px Arial";
+      const w = ctx.measureText(p.t).width + 40;
+      if (x + w > 900) { x = 100; y += 70; }
+      addButton(R(x, y, w, 50), p.t, () => {
+        if (p.i === review.placed.length) {
+          review.placed.push(p.i);
+          if (review.placed.length === src.key.length) review.done = true;
+        } else review.wrong = 1;
+      }, { fill: [36, 46, 62], font: "20px Arial" });
+      x += w + 16;
+    });
+  } else if (review.type === "blank" && !review.done) {
+    const right = src.key[LV.review.blank];
+    review.choices.forEach((ch, k) => addButton(R(150 + k * 240, 270, 220, 54), ch, () => {
+      if (ch === right) review.done = true; else review.wrong = 1;
+    }, { fill: [36, 46, 62], font: "20px Arial" }));
+  } else if (review.type === "graph") {
+    const want = src.key[0].includes("more") ? "up" : src.key[0].includes("less") ? "down" : "flat";
+    review.graphs.forEach((kind, k) => {
+      const r = R(110 + k * 270, 240, 240, 200);
+      if (!review.done) uiButtons.push({ r, act: () => { if (kind === want) review.done = true; else review.wrong = 1; } });
+      drawMiniGraph(r, kind, review.done && kind === want);
+    });
+  }
+}
+// small in/out/balance picture for the match-the-graph review
+function drawMiniGraph(r, kind, picked) {
+  rect(r.x, r.y, r.w, r.h, [24, 34, 50], 0, 12);
+  rect(r.x, r.y, r.w, r.h, picked ? GREEN : [130, 140, 150], picked ? 4 : 2, 12);
+  const inH = { up: 60, down: 25, flat: 40 }[kind], outH = { up: 25, down: 60, flat: 40 }[kind];
+  rect(r.x + 24, r.y + 80 - inH, 34, inH, BLUE); text("in", r.x + 30, r.y + 84, BLUE, SMALL);
+  rect(r.x + 70, r.y + 80 - outH, 34, outH, RED); text("out", r.x + 74, r.y + 84, RED, SMALL);
+  const y0 = r.y + 150, x0 = r.x + 20, x1 = r.x + r.w - 20;
+  const y1 = { up: r.y + 112, down: r.y + 188, flat: y0 }[kind];
+  line([x0, y0], [x1, y1], GREEN, 4);
+  text("balance", r.x + 120, r.y + 20, GREEN, SMALL);
+}
+
+function drawQuiz() {
+  const q = LV.quiz[quizIdx];
+  centerText(LV.title, 40, CREAM, BIG);
+  centerText(`Predict! Question ${quizIdx + 1} of ${LV.quiz.length}. You'll find out in the debrief.`, 90, [215, 220, 230]);
+  rect(100, 140, 800, 110, [24, 34, 50], 0, 14);
+  rect(100, 140, 800, 110, GOLD, 2, 14);
+  wrap(q.q, 130, 165, 740, 30, CREAM, "22px Arial");
+  q.a.forEach((ans, i) => {
+    addButton(R(250, 280 + i * 70, 500, 54), ans, () => {
+      answers.push(i);
+      if (quizIdx + 1 < LV.quiz.length) quizIdx++; else beginPlay();
+    }, { fill: [36, 46, 62], font: "20px Arial" });
+  });
+}
+
+// stock-and-flow picture: cloud -> inflow valve -> stock box -> outflow valve -> cloud
+function drawCloud(x, y, s) {
+  ctx.fillStyle = rgb([200, 205, 215]);
+  for (const [dx, dy, r] of [[-14, 4, 12], [0, -6, 15], [15, 3, 12], [3, 9, 11]]) {
+    ctx.beginPath(); ctx.arc(x + dx * s, y + dy * s, r * s, 0, Math.PI * 2); ctx.fill();
+  }
+}
+function drawPipe(x1, x2, y, color, active, s) {
+  const c = active ? color : [70, 76, 90];
+  line([x1, y], [x2 - 12 * s, y], c, 10 * s);
+  ctx.beginPath(); ctx.moveTo(x2, y); ctx.lineTo(x2 - 18 * s, y - 12 * s); ctx.lineTo(x2 - 18 * s, y + 12 * s); ctx.closePath();
+  ctx.fillStyle = rgb(c); ctx.fill();
+  const vx = (x1 + x2) / 2; // valve (bow tie)
+  ctx.beginPath(); ctx.moveTo(vx - 12 * s, y - 14 * s); ctx.lineTo(vx + 12 * s, y + 14 * s); ctx.lineTo(vx + 12 * s, y - 14 * s); ctx.lineTo(vx - 12 * s, y + 14 * s); ctx.closePath();
+  ctx.fillStyle = rgb(active ? [240, 240, 240] : [90, 96, 110]); ctx.fill();
+}
+
+function drawPlay() {
+  text(LV.title, 30, 20, CREAM, BIG);
+  text(LV.goalText, 30, 56, [215, 220, 230]);
+  // timer
+  const frac = run.month / LV.months;
+  rect(640, 24, 330, 22, [34, 38, 48], 0, 8);
+  rect(640, 24, 330 * frac, 22, frac > 0.8 ? [255, 140, 110] : GOLD, 0, 8);
+  rect(640, 24, 330, 22, [220, 220, 220], 2, 8);
+  text(`Month ${Math.min(LV.months, Math.floor(run.month) + 1)} of ${LV.months}`, 650, 52, [215, 220, 230], SMALL);
+  addButton(R(890, 52, 80, 28), "Quit", goMenu, { fill: [40, 30, 34], font: SMALL });
+
+  // stock-and-flow picture, live
+  const y = 270;
+  drawCloud(100, y, 1.4);
+  drawPipe(130, 390, y, BLUE, LV.pay > 0, 1.2);
+  drawPipe(610, 870, y, RED, LV.bills > 0, 1.2);
+  drawCloud(905, y, 1.4);
+  if (run.workGlow > 0) circle(260, y, 20 + 20 * run.workGlow, BLUE, 3);
+  const curIdx = Math.min(LV.months - 1, Math.floor(run.month));
+  text("Work (inflow)", 190, y - 66, LV.pay > 0 ? BLUE : MUTED, FONT);
+  text(LV.pay > 0 ? `${money(LV.pay)} per tap · ${money(run.inflowM[curIdx])} this month` : "none this level", 160, y + 30, LV.pay > 0 ? BLUE : MUTED, SMALL);
+  text("Bills (outflow)", 680, y - 66, LV.bills > 0 ? RED : MUTED, FONT);
+  text(LV.bills > 0 ? (run.emptyAt !== null ? "$0 left to pay with" : `${money(LV.bills)} every month`) : "none this level", 670, y + 30, LV.bills > 0 ? RED : MUTED, SMALL);
+  // the stock (tank)
+  const tx = 390, ty = 130, tw = 220, th = 230;
+  rect(tx, ty, tw, th, [16, 20, 30]);
+  const fillH = th * clamp(run.balance / LV.max, 0, 1);
+  rect(tx, ty + th - fillH, tw, fillH, GREEN);
+  rect(tx, ty, tw, th, [235, 235, 235], 3);
+  if (LV.goal) {
+    const gy = ty + th - th * (LV.goal / LV.max);
+    ctx.setLineDash([8, 6]); line([tx - 10, gy], [tx + tw + 10, gy], GOLD, 2); ctx.setLineDash([]);
+    text("Goal " + money(LV.goal), tx + tw + 14, gy - 9, GOLD, SMALL);
+  }
+  centerText("Bank balance (stock)", ty - 26, CREAM);
+  centerText(money(run.balance), ty + th + 10, [255, 255, 255], "bold 26px Arial");
+  for (const c of run.coins) circle(c.x, y, 7, c.kind === "in" ? [255, 223, 0] : [255, 150, 150]);
+
+  // live balance graph
+  const gx = 60, gy = 440, gw = 600, gh = 150;
+  rect(gx, gy, gw, gh, [10, 12, 18]);
+  rect(gx, gy, gw, gh, [70, 76, 90], 1);
+  text("Balance over time", gx + 8, gy + 6, GREEN, SMALL);
+  plotLine(run.series, gx, gy, gw, gh, LV.months, LV.max, GREEN);
+  text("month 0", gx, gy + gh + 4, MUTED, SMALL);
+  text("month " + LV.months, gx + gw - 60, gy + gh + 4, MUTED, SMALL);
+
+  // this month's cash flow (like the old Monthly Cash Flow panel)
+  const cx = 690, cy = 440, cw = 250, ch = 150;
+  rect(cx, cy, cw, ch, [16, 20, 30]); rect(cx, cy, cw, ch, [100, 110, 140], 2);
+  text("This month", cx + 10, cy + 6, CREAM, SMALL);
+  const inNow = run.inflowM[curIdx], outNow = run.outflowM[curIdx];
+  const barMax = Math.max(LV.bills * 2, inNow, 1);
+  rect(cx + 70, cy + 34, 160, 24, [34, 38, 48]); rect(cx + 70, cy + 34, 160 * clamp(inNow / barMax, 0, 1), 24, BLUE);
+  text("In", cx + 10, cy + 38, BLUE, SMALL); text(money(inNow), cx + 76, cy + 38, [255, 255, 255], SMALL);
+  rect(cx + 70, cy + 66, 160, 24, [34, 38, 48]); rect(cx + 70, cy + 66, 160 * clamp(outNow / barMax, 0, 1), 24, RED);
+  text("Out", cx + 10, cy + 70, RED, SMALL); text(money(outNow), cx + 76, cy + 70, [255, 255, 255], SMALL);
+  const net = inNow - outNow;
+  text(net > 0.5 ? "In > out: balance rising" : net < -0.5 ? "Out > in: balance falling" : "In = out: balance flat",
+    cx + 10, cy + 108, net > 0.5 ? [150, 240, 180] : net < -0.5 ? [255, 190, 170] : [215, 220, 230], SMALL);
+
+  if (run.celebrate > 0) {
+    const k = clamp(1 - (run.celebrate - 0.6) / 1.4, 0, 1);
+    ctx.fillStyle = "rgba(8,12,18,0.7)"; ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    rect(260, 200, 480, 220, [20, 28, 40], 0, 18); rect(260, 200, 480, 220, GOLD, 3, 18);
+    centerText(`You saved ${money(LV.goal)}!`, 220, CREAM, "bold 28px Arial");
+    centerText(`Your ${(LV.car && LV.car.name) || "car"} is driving into the garage…`, 262, [215, 220, 230]);
+    rect(420, 300, 160, 100, [40, 44, 56], 0, 8); rect(420, 300, 160, 100, [150, 150, 160], 2, 8);
+    drawCar(720 - 260 * k, 348, (LV.car && LV.car.color) || [200, 200, 200], 90);
+  } else if (!run.started) {
+    rect(300, 330, 400, 90, [20, 28, 40], 0, 16);
+    rect(300, 330, 400, 90, GOLD, 2, 16);
+    centerText("Ready? Tap to start the clock", 350, CREAM, "22px Arial");
+    centerText(LV.pay > 0 ? "Then tap anywhere to work" : "Then watch the bills", 385, [215, 220, 230]);
+  } else if (LV.pay > 0 && run.month < 2.5) centerText("Tap anywhere to work!", 400, [255, 223, 0], "20px Arial");
+}
+
+function plotLine(series, gx, gy, gw, gh, months, maxV, color) {
+  if (series.length < 2) return;
+  ctx.beginPath();
+  series.forEach(([t, v], i) => {
+    const x = gx + (t / months) * gw, yy = gy + gh - 4 - clamp(v / maxV, 0, 1) * (gh - 24);
+    if (i === 0) ctx.moveTo(x, yy); else ctx.lineTo(x, yy);
+  });
+  ctx.lineWidth = 3; ctx.strokeStyle = rgb(color); ctx.stroke();
+}
+function plotBars(vals, n, gx, gy, gw, gh, maxV, color) {
+  const bw = gw / LV.months;
+  for (let i = 0; i < n; i++) {
+    const h = clamp(vals[i] / maxV, 0, 1) * (gh - 24);
+    rect(gx + i * bw + 2, gy + gh - 4 - h, Math.max(1, bw - 4), h, color);
+  }
+}
+
+function debriefLines() {
+  const played = Math.min(LV.months, Math.ceil(run.month - 1e-9));
+  const lines = [];
+  if (LV.n === 1) {
+    lines.push(run.reached !== null ? `You saved ${money(LV.goal)} in month ${Math.ceil(run.reached)}!` : `Time ran out with ${money(run.balance)}. You needed ${money(LV.goal)}. Tap more each month!`);
+    let best = 0; run.inflowM.forEach((v, i) => { if (i < played && v > run.inflowM[best]) best = i; });
+    lines.push(`Your busiest work month was month ${best + 1} (${money(run.inflowM[best])} flowed in). That's where the balance line is steepest.`);
+    const idle = run.inflowM.slice(0, played).filter((v) => v === 0).length;
+    lines.push(idle > 0 ? `In ${idle} month${idle > 1 ? "s" : ""} you didn't work, so nothing flowed in and the balance stayed flat.` : "You worked every month, so the balance kept climbing.");
+    lines.push("With no outflow, the balance never went down.");
+  } else if (LV.n >= 3) {
+    lines.push(run.reached !== null ? `You saved ${money(LV.goal)} in month ${Math.ceil(run.reached)}!` : `Time ran out with ${money(run.balance)}. You needed ${money(LV.goal)}.`);
+    let up = 0, down = 0;
+    for (let i = 0; i < played; i++) { const n = run.inflowM[i] - run.outflowM[i]; if (n > 0.5) up++; else if (n < -0.5) down++; }
+    lines.push(`In ${up} month${up === 1 ? "" : "s"} more flowed in than out, so the balance rose.` + (down ? ` In ${down} month${down === 1 ? "" : "s"} bills were bigger than your pay, so it fell.` : ""));
+    lines.push(`Bills of ${money(LV.bills)} a month meant ${LV.bills / LV.pay} tap${LV.bills / LV.pay === 1 ? "" : "s"} each month just paid the bills. Only taps beyond that made the balance grow.`);
+    if (LV.n === 4) lines.push("Low pay means the gap between in and out is small, so it takes steady work all the time to save.");
+  } else {
+    lines.push(`Bills took ${money(LV.bills)} every month, so the balance went down in a straight line.`);
+    if (run.emptyAt !== null) {
+      lines.push(`It reached $0 in month ${Math.ceil(run.emptyAt - 0.05)}: ${money(LV.start)} ÷ ${money(LV.bills)} = ${LV.start / LV.bills} months.`);
+      lines.push("Once the balance was $0, the outflow had to stop. You can't take money out of an empty stock.");
+    }
+    lines.push("Nothing flowed in, so the balance could never go back up.");
+  }
+  return lines;
+}
+
+function drawDebrief() {
+  text(LV.title + ": what happened and why", 30, 16, CREAM, BIG);
+  // left: structure (picture) on top, behavior (your graphs) below, lined up by color
+  const s = 0.75, y0 = 82;
+  drawCloud(70, y0, 1);
+  drawPipe(90, 250, y0, BLUE, LV.pay > 0, s);
+  rect(250, y0 - 26, 120, 52, [16, 20, 30]); rect(250, y0 - 26, 120 * clamp(run.balance / LV.max, 0, 1), 52, [30, 120, 80]);
+  rect(250, y0 - 26, 120, 52, [235, 235, 235], 2);
+  text("Balance", 280, y0 - 9, CREAM, SMALL);
+  drawPipe(370, 530, y0, RED, LV.bills > 0, s);
+  drawCloud(550, y0, 1);
+  text("Work (inflow)", 120, y0 + 22, BLUE, SMALL);
+  text("Bills (outflow)", 400, y0 + 22, RED, SMALL);
+
+  const played = Math.min(LV.months, Math.ceil(run.month - 1e-9));
+  const gx = 50, gw = 520, gh = 120;
+  const maxFlow = Math.max(1, ...run.inflowM, ...run.outflowM);
+  const panels = [
+    [140, "Inflow: money from work each month", BLUE, () => plotBars(run.inflowM, played, gx, 140, gw, gh, maxFlow, BLUE), LV.pay > 0],
+    [278, "Outflow: bills paid each month", RED, () => plotBars(run.outflowM, played, gx, 278, gw, gh, maxFlow, RED), LV.bills > 0],
+    [416, "Stock: your bank balance", GREEN, () => plotLine(run.series, gx, 416, gw, gh, LV.months, LV.max, GREEN), true],
+  ];
+  for (const [py, label, color, draw, active] of panels) {
+    rect(gx, py, gw, gh, [10, 12, 18]); rect(gx, py, gw, gh, [70, 76, 90], 1);
+    text(label, gx + 8, py + 5, active ? color : MUTED, SMALL);
+    if (active) draw(); else text("none this level", gx + 200, py + 55, MUTED, SMALL);
+  }
+  text("month 0", gx, 540, MUTED, SMALL);
+  text("month " + LV.months, gx + gw - 60, 540, MUTED, SMALL);
+
+  // right: why + your predictions
+  const px = 600, pw = 370;
+  rect(px, 60, pw, 500, [20, 28, 40], 0, 14); rect(px, 60, pw, 500, [100, 110, 140], 2, 14);
+  let y = 74;
+  text(run.passed ? "★ Level passed!" : "☆ Not yet. Try again!", px + 16, y, run.passed ? GOLD : [255, 190, 170], "bold 20px Arial"); y += 34;
+  for (const l of debriefLines()) y = wrap(l, px + 16, y, pw - 32, 20, [225, 232, 240], SMALL) + 6;
+  y += 4;
+  text("Your predictions", px + 16, y, CREAM, "bold 16px Arial"); y += 24;
+  LV.quiz.forEach((q, i) => {
+    const right = answers[i] === q.c;
+    y = wrap((right ? "✓ " : "✗ ") + q.a[answers[i]] + (right ? "" : `  (it was: ${q.a[q.c]})`), px + 16, y, pw - 32, 20, right ? [150, 240, 180] : [255, 190, 170], SMALL) + 4;
+  });
+  y += 6;
+  text("Remember:", px + 16, y, GOLD, "bold 16px Arial"); y += 22;
+  wrap(LV.key.join(" "), px + 16, y, pw - 32, 22, CREAM, "17px Arial");
+
+  addButton(R(600, 580, 120, 44), "Play again", () => startLevel(LV), { fill: [36, 46, 62] });
+  const next = LEVELS[LV.n];
+  if (next && run.passed) addButton(R(730, 580, 120, 44), "Next level", () => startLevel(next), { fill: [54, 76, 92] });
+  addButton(R(860, 580, 110, 44), "Menu", goMenu, { fill: [40, 52, 70] });
+}
+
+// ---------------- MAIN LOOP ----------------
+let lastTime = nowSec();
+function frame() {
+  const now = nowSec();
+  const elapsed = Math.min(0.25, now - lastTime); // avoid a big jump after the tab was hidden
+  lastTime = now;
+  if (scene !== "free") { levelFrame(elapsed); requestAnimationFrame(frame); return; }
+  if (!paused) for (const k in cooldowns) if (cooldowns[k] > 0) cooldowns[k] = Math.max(0, cooldowns[k] - elapsed);
+  if (!paused && !gameOver) {
+    timeAccumulator += elapsed * MONTHS_PER_SECOND;
+    while (timeAccumulator >= MODEL_DT) { modelStep(MODEL_DT); timeAccumulator -= MODEL_DT; }
+  }
+  carAnimationQueue = carAnimationQueue.filter((a) => {
+    const dx = a.target[0] - a.x, dy = a.target[1] - a.y, dist = Math.hypot(dx, dy);
+    if (dist < 8) { placeCarInSlot(a); return false; }
+    const step = Math.min(dist, a.speed * elapsed);
+    a.x += dx / dist * step; a.y += dy / dist * step;
+    return true;
+  });
+  drawUI();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

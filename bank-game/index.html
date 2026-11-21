@@ -28,10 +28,7 @@
   CONTROLS
   - Click / tap / Space: Work      - S or Save button: Save      - P or Pause button: Pause and shops
   - Tap a garage slot, then V or Sell button: Sell      - R: Reset
-  - While paused: I bank offer, Tab next car, B buy, U upgrade garage, M menu (all also buttons)
-
-  LEVELS (start menu): review -> predict quiz -> play with a month timer -> debrief
-  with the stock-and-flow picture and the player's own inflow, outflow and balance graphs.
+  - While paused: I bank offer, Tab next car, B buy, U upgrade garage (all also buttons)
 */
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
@@ -219,9 +216,7 @@ function drawPauseOverlay() {
   for (const p of [header, bank, dealer, notes]) { rect(p.x, p.y, p.w, p.h, [20, 28, 40], 0, 16); rect(p.x, p.y, p.w, p.h, [235, 220, 170], 2, 16); }
 
   text("Paused", header.x + 22, header.y + 14, [255, 245, 220], BIG);
-  text("I: bank   Tab/B: dealership   U: upgrade   M: menu", header.x + 22, header.y + 46, [225, 232, 240], SMALL);
-  pauseButtons.menu = R(header.x + header.w - 312, header.y + 18, 84, 34);
-  drawButton(pauseButtons.menu, "Menu", [40, 52, 70]);
+  text("I: bank   Tab/B: dealership   U: upgrade   (or tap the buttons)", header.x + 22, header.y + 46, [225, 232, 240], SMALL);
   pauseButtons.resume = R(header.x + header.w - 210, header.y + 18, 84, 34);
   pauseButtons.reset = R(header.x + header.w - 108, header.y + 18, 84, 34);
   drawButton(pauseButtons.resume, "Resume");
@@ -513,8 +508,6 @@ function sellSelected() {
 window.addEventListener("keydown", (e) => {
   const key = e.key.toLowerCase();
   if (key === "tab" || key === " ") e.preventDefault();
-  if (scene !== "free") { levelKey(key, e); return; }
-  if (paused && key === "m") { goMenu(); return; }
   if (e.repeat && key !== " ") return;
   if (key === "p") { paused = !paused; return; }
   if (paused) {
@@ -535,12 +528,10 @@ canvas.addEventListener("pointerdown", (e) => {
   e.preventDefault();
   const b = canvas.getBoundingClientRect();
   const mx = (e.clientX - b.left) * WIDTH / b.width, my = (e.clientY - b.top) * HEIGHT / b.height;
-  if (scene !== "free") { levelPointer(mx, my); return; }
   if (paused) {
     for (const [id, r] of Object.entries(pauseButtons)) {
       if (!inRect(r, mx, my)) continue;
-      if (id === "menu") goMenu();
-      else if (id === "resume") paused = false;
+      if (id === "resume") paused = false;
       else if (id === "reset") resetGame();
       else if (id === "apply_bank") doNegotiate();
       else if (id === "buy_car") buySelectedCar();
@@ -559,399 +550,12 @@ canvas.addEventListener("pointerdown", (e) => {
   doWork();
 });
 
-// =====================================================================
-// LEVELS: review -> quiz -> play (timer) -> debrief
-// Each level adds one systems idea, climbing the ladder:
-//   1: one inflow fills a stock   2: one outflow drains a stock   (3, 4: both flows, later)
-// The review before a level asks the player to rebuild a sentence they learned earlier.
-// Review styles get harder as levels go up: put pieces in order -> fill the blank -> match a graph.
-// =====================================================================
-const MONTHS_PER_SEC_LEVEL = 1.0;
-const LEVELS = [
-  {
-    n: 1, title: "Level 1: Work", idea: "One inflow fills the stock",
-    goalText: "Save $1,000 for your first car. Tap anywhere to work!",
-    months: 24, start: 0, pay: 25, bills: 0, goal: 1000, max: 1200,
-    quiz: [
-      { q: "Each tap is work, and work earns pay. What happens to your bank balance when you tap?", a: ["It goes up", "It goes down", "It stays the same"], c: 0 },
-      { q: "If you stop tapping for a while, what will your balance do?", a: ["Keep going up", "Go down", "Stay flat (the same)"], c: 2 },
-    ],
-    key: ["When you work,", "money flows in", "and the balance", "goes up."],
-  },
-  {
-    n: 2, title: "Level 2: Spend", idea: "One outflow drains the stock",
-    goalText: "No work this time. Watch what the bills do to your $500.",
-    months: 12, start: 500, pay: 0, bills: 50, goal: null, max: 600,
-    review: { from: 1, type: "order" },
-    quiz: [
-      { q: "You have $500. Bills take $50 every month. There is no work. What will your balance do?", a: ["Go up", "Go down at a steady speed", "Stay the same"], c: 1 },
-      { q: "In which month will your balance reach $0?", a: ["Month 5", "Month 10", "Month 12", "Never"], c: 1 },
-    ],
-    key: ["When bills flow out", "and nothing flows in,", "the balance", "goes down."],
-  },
-];
-
-let scene = "menu";
-let progress = { passed: {}, stars: {} };
-try { Object.assign(progress, JSON.parse(localStorage.getItem("k12-bank-levels") || "{}")); } catch (e) {}
-function saveProgress() { try { localStorage.setItem("k12-bank-levels", JSON.stringify(progress)); } catch (e) {} }
-
-let LV = null, run = null, quizIdx = 0, answers = [], review = null, uiButtons = [], lastWorkTap = 0;
-const BLUE = [70, 170, 255], RED = [255, 120, 120], GREEN = [60, 200, 120], GOLD = [255, 215, 120], CREAM = [255, 245, 220], MUTED = [150, 160, 175];
-
-function goMenu() { scene = "menu"; paused = true; }
-function addButton(r, label, act, opts = {}) { uiButtons.push({ r, act }); drawButton(r, label, opts.fill, opts.border, opts.text, opts.font || FONT); }
-function wrap(t, x, y, maxW, lineH, color = [255, 255, 255], font = FONT) {
-  ctx.font = font;
-  let lineText = "";
-  for (const word of t.split(" ")) {
-    const test = lineText ? lineText + " " + word : word;
-    if (ctx.measureText(test).width > maxW && lineText) { text(lineText, x, y, color, font); y += lineH; lineText = word; }
-    else lineText = test;
-  }
-  if (lineText) { text(lineText, x, y, color, font); y += lineH; }
-  return y;
-}
-function centerText(t, y, color = [255, 255, 255], font = FONT) {
-  ctx.font = font; ctx.fillStyle = rgb(color); ctx.textBaseline = "top"; ctx.textAlign = "center";
-  ctx.fillText(t, WIDTH / 2, y); ctx.textAlign = "left";
-}
-function shuffled(arr) {
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
-  return a;
-}
-
-// ---------- flow ----------
-function startLevel(lv) {
-  LV = lv; answers = []; quizIdx = 0;
-  if (lv.review && progress.passed[lv.review.from]) {
-    const pieces = LEVELS[lv.review.from - 1].key.map((t, i) => ({ t, i }));
-    let order = shuffled(pieces);
-    while (order.every((p, k) => p.i === k)) order = shuffled(pieces);
-    review = { from: lv.review.from, order, placed: [], wrong: 0, done: false };
-    scene = "review";
-  } else scene = "quiz";
-}
-function beginPlay() {
-  run = {
-    started: false, ended: false, month: 0, balance: LV.start,
-    inflowM: new Array(LV.months).fill(0), outflowM: new Array(LV.months).fill(0),
-    series: [[0, LV.start]], nextSample: 0.1, reached: null, emptyAt: null, coins: [], workGlow: 0,
-  };
-  scene = "play";
-}
-function endPlay() {
-  run.ended = true;
-  run.series.push([run.month, run.balance]);
-  const passed = LV.goal ? run.reached !== null : true; // Level 2 passes by watching it through
-  run.passed = passed;
-  if (passed) { progress.passed[LV.n] = true; progress.stars[LV.n] = Math.max(progress.stars[LV.n] || 0, 1); saveProgress(); }
-  scene = "debrief";
-}
-function doLevelWork() {
-  if (!run || run.ended || LV.pay <= 0) return;
-  const t = nowSec();
-  if (t - lastWorkTap < 0.1) return; // no super-fast auto-tapping
-  lastWorkTap = t;
-  run.balance += LV.pay;
-  run.inflowM[Math.min(LV.months - 1, Math.floor(run.month))] += LV.pay;
-  run.workGlow = 1;
-  run.coins.push({ x: 140, y: 270, tx: 390, kind: "in" });
-}
-
-// ---------- update ----------
-function levelFrame(elapsed) {
-  if (scene === "play" && run.started && !run.ended) {
-    let dm = elapsed * MONTHS_PER_SEC_LEVEL;
-    while (dm > 0 && !run.ended) {
-      const step = Math.min(dm, 0.05);
-      dm -= step;
-      const idx = Math.min(LV.months - 1, Math.floor(run.month));
-      const out = Math.min(run.balance, LV.bills * step); // bills can't take money that isn't there
-      run.balance -= out;
-      run.outflowM[idx] += out;
-      if (out > 0 && Math.random() < step * 3) run.coins.push({ x: 630, y: 270, tx: 860, kind: "out" });
-      run.month += step;
-      if (LV.bills > 0 && run.balance <= 0.0001 && run.emptyAt === null) { run.balance = 0; run.emptyAt = run.month; }
-      if (run.month >= run.nextSample) { run.series.push([run.month, run.balance]); run.nextSample += 0.1; }
-      if (LV.goal && run.balance >= LV.goal) { run.reached = run.month; endPlay(); }
-      else if (run.month >= LV.months) { run.month = LV.months; endPlay(); }
-    }
-  }
-  if (run) {
-    run.workGlow = Math.max(0, run.workGlow - elapsed * 3);
-    run.coins = run.coins.filter((c) => { c.x += 420 * elapsed; return c.x < c.tx; });
-  }
-  if (review && review.wrong > 0) review.wrong = Math.max(0, review.wrong - elapsed * 2);
-  drawLevelScene();
-}
-
-// ---------- input ----------
-function levelPointer(mx, my) {
-  for (const b of uiButtons) if (inRect(b.r, mx, my)) { b.act(); return; }
-  if (scene === "play" && !run.ended) {
-    if (!run.started) { run.started = true; return; }
-    doLevelWork();
-  }
-}
-function levelKey(key) {
-  if (scene === "play" && !run.ended) {
-    if (!run.started && (key === " " || key === "enter")) { run.started = true; return; }
-    if (key === " ") doLevelWork();
-  }
-  if (key === "escape") goMenu();
-}
-
-// ---------- drawing ----------
-function drawLevelScene() {
-  uiButtons = [];
-  ctx.fillStyle = rgb([18, 24, 36]); ctx.fillRect(0, 0, WIDTH, HEIGHT);
-  if (scene === "menu") drawMenu();
-  else if (scene === "review") drawReview();
-  else if (scene === "quiz") drawQuiz();
-  else if (scene === "play") drawPlay();
-  else if (scene === "debrief") drawDebrief();
-}
-
-function drawMenu() {
-  centerText("Bank Game", 50, CREAM, "bold 44px Arial");
-  centerText("Learn how money piles up, drains away, and grows.", 108, [215, 220, 230]);
-  LEVELS.forEach((lv, i) => {
-    const r = R(150 + i * 370, 170, 330, 170);
-    const unlocked = lv.n === 1 || progress.passed[lv.n - 1];
-    rect(r.x, r.y, r.w, r.h, unlocked ? [24, 34, 50] : [22, 24, 30], 0, 16);
-    rect(r.x, r.y, r.w, r.h, unlocked ? GOLD : [80, 86, 98], 2, 16);
-    text(lv.title, r.x + 20, r.y + 18, unlocked ? CREAM : MUTED, BIG);
-    text(lv.idea, r.x + 20, r.y + 58, unlocked ? [215, 220, 230] : MUTED);
-    const stars = progress.stars[lv.n] || 0;
-    if (!unlocked) text("Locked: pass Level " + (lv.n - 1) + " first", r.x + 20, r.y + 120, MUTED);
-    else text(stars ? "★ Passed (tap to play again)" : "☆ Tap to play", r.x + 20, r.y + 120, stars ? GOLD : [215, 220, 230]);
-    if (unlocked) uiButtons.push({ r, act: () => startLevel(lv) });
-  });
-  text("More levels coming: both flows together, then interest.", 150, 360, MUTED, SMALL);
-  addButton(R(350, 420, 300, 60), "Free play (the full game)", () => { scene = "free"; resetGame(); paused = true; },
-    { fill: [54, 76, 92], font: "20px Arial" });
-  addButton(R(840, 590, 140, 34), "Reset levels", () => { progress = { passed: {}, stars: {} }; saveProgress(); },
-    { fill: [40, 30, 34], border: [120, 100, 100], text: [200, 190, 190], font: SMALL });
-}
-
-function drawReview() {
-  const src = LEVELS[review.from - 1];
-  centerText(LV.title, 40, CREAM, BIG);
-  centerText("Remember from " + src.title.split(":")[0] + "? Tap the pieces in order to rebuild the sentence.", 90, [215, 220, 230]);
-  // sentence being built
-  const built = review.placed.map((i) => src.key[i]).join(" ");
-  rect(100, 140, 800, 70, review.wrong > 0 ? [70, 30, 34] : [24, 34, 50], 0, 14);
-  rect(100, 140, 800, 70, review.done ? GREEN : GOLD, 2, 14);
-  ctx.font = "22px Arial";
-  centerText(built || "…", 163, review.done ? [150, 240, 180] : CREAM, "22px Arial");
-  if (!review.done) {
-    let x = 100, y = 260;
-    review.order.forEach((p) => {
-      if (review.placed.includes(p.i)) return;
-      ctx.font = "20px Arial";
-      const w = ctx.measureText(p.t).width + 40;
-      if (x + w > 900) { x = 100; y += 70; }
-      addButton(R(x, y, w, 50), p.t, () => {
-        if (p.i === review.placed.length) {
-          review.placed.push(p.i);
-          if (review.placed.length === src.key.length) review.done = true;
-        } else review.wrong = 1;
-      }, { fill: [36, 46, 62], font: "20px Arial" });
-      x += w + 16;
-    });
-    if (review.wrong > 0) centerText("Not that one yet. Which piece comes next?", 420, [255, 190, 170]);
-  } else {
-    centerText("✓ You remembered! Keep that idea in mind for this level.", 260, [150, 240, 180], "20px Arial");
-    addButton(R(400, 330, 200, 54), "Next: quiz", () => { scene = "quiz"; }, { fill: [54, 76, 92], font: "20px Arial" });
-  }
-}
-
-function drawQuiz() {
-  const q = LV.quiz[quizIdx];
-  centerText(LV.title, 40, CREAM, BIG);
-  centerText(`Predict! Question ${quizIdx + 1} of ${LV.quiz.length}. You'll find out in the debrief.`, 90, [215, 220, 230]);
-  rect(100, 140, 800, 110, [24, 34, 50], 0, 14);
-  rect(100, 140, 800, 110, GOLD, 2, 14);
-  wrap(q.q, 130, 165, 740, 30, CREAM, "22px Arial");
-  q.a.forEach((ans, i) => {
-    addButton(R(250, 280 + i * 70, 500, 54), ans, () => {
-      answers.push(i);
-      if (quizIdx + 1 < LV.quiz.length) quizIdx++; else beginPlay();
-    }, { fill: [36, 46, 62], font: "20px Arial" });
-  });
-}
-
-// stock-and-flow picture: cloud -> inflow valve -> stock box -> outflow valve -> cloud
-function drawCloud(x, y, s) {
-  ctx.fillStyle = rgb([200, 205, 215]);
-  for (const [dx, dy, r] of [[-14, 4, 12], [0, -6, 15], [15, 3, 12], [3, 9, 11]]) {
-    ctx.beginPath(); ctx.arc(x + dx * s, y + dy * s, r * s, 0, Math.PI * 2); ctx.fill();
-  }
-}
-function drawPipe(x1, x2, y, color, active, s) {
-  const c = active ? color : [70, 76, 90];
-  line([x1, y], [x2 - 12 * s, y], c, 10 * s);
-  ctx.beginPath(); ctx.moveTo(x2, y); ctx.lineTo(x2 - 18 * s, y - 12 * s); ctx.lineTo(x2 - 18 * s, y + 12 * s); ctx.closePath();
-  ctx.fillStyle = rgb(c); ctx.fill();
-  const vx = (x1 + x2) / 2; // valve (bow tie)
-  ctx.beginPath(); ctx.moveTo(vx - 12 * s, y - 14 * s); ctx.lineTo(vx + 12 * s, y + 14 * s); ctx.lineTo(vx + 12 * s, y - 14 * s); ctx.lineTo(vx - 12 * s, y + 14 * s); ctx.closePath();
-  ctx.fillStyle = rgb(active ? [240, 240, 240] : [90, 96, 110]); ctx.fill();
-}
-
-function drawPlay() {
-  text(LV.title, 30, 20, CREAM, BIG);
-  text(LV.goalText, 30, 56, [215, 220, 230]);
-  // timer
-  const frac = run.month / LV.months;
-  rect(640, 24, 330, 22, [34, 38, 48], 0, 8);
-  rect(640, 24, 330 * frac, 22, frac > 0.8 ? [255, 140, 110] : GOLD, 0, 8);
-  rect(640, 24, 330, 22, [220, 220, 220], 2, 8);
-  text(`Month ${Math.min(LV.months, Math.floor(run.month) + 1)} of ${LV.months}`, 650, 52, [215, 220, 230], SMALL);
-  addButton(R(890, 52, 80, 28), "Quit", goMenu, { fill: [40, 30, 34], font: SMALL });
-
-  // stock-and-flow picture, live
-  const y = 270;
-  drawCloud(100, y, 1.4);
-  drawPipe(130, 390, y, BLUE, LV.pay > 0, 1.2);
-  drawPipe(610, 870, y, RED, LV.bills > 0, 1.2);
-  drawCloud(905, y, 1.4);
-  if (run.workGlow > 0) circle(260, y, 20 + 20 * run.workGlow, BLUE, 3);
-  const curIdx = Math.min(LV.months - 1, Math.floor(run.month));
-  text("Work (inflow)", 190, y - 66, LV.pay > 0 ? BLUE : MUTED, FONT);
-  text(LV.pay > 0 ? `${money(LV.pay)} per tap · ${money(run.inflowM[curIdx])} this month` : "none this level", 160, y + 30, LV.pay > 0 ? BLUE : MUTED, SMALL);
-  text("Bills (outflow)", 680, y - 66, LV.bills > 0 ? RED : MUTED, FONT);
-  text(LV.bills > 0 ? (run.emptyAt !== null ? "$0 left to pay with" : `${money(LV.bills)} every month`) : "none this level", 670, y + 30, LV.bills > 0 ? RED : MUTED, SMALL);
-  // the stock (tank)
-  const tx = 390, ty = 130, tw = 220, th = 230;
-  rect(tx, ty, tw, th, [16, 20, 30]);
-  const fillH = th * clamp(run.balance / LV.max, 0, 1);
-  rect(tx, ty + th - fillH, tw, fillH, GREEN);
-  rect(tx, ty, tw, th, [235, 235, 235], 3);
-  if (LV.goal) {
-    const gy = ty + th - th * (LV.goal / LV.max);
-    ctx.setLineDash([8, 6]); line([tx - 10, gy], [tx + tw + 10, gy], GOLD, 2); ctx.setLineDash([]);
-    text("Goal " + money(LV.goal), tx + tw + 14, gy - 9, GOLD, SMALL);
-  }
-  centerText("Bank balance (stock)", ty - 26, CREAM);
-  centerText(money(run.balance), ty + th + 10, [255, 255, 255], "bold 26px Arial");
-  for (const c of run.coins) circle(c.x, y, 7, c.kind === "in" ? [255, 223, 0] : [255, 150, 150]);
-
-  // live balance graph
-  const gx = 60, gy = 440, gw = 880, gh = 150;
-  rect(gx, gy, gw, gh, [10, 12, 18]);
-  rect(gx, gy, gw, gh, [70, 76, 90], 1);
-  text("Balance over time", gx + 8, gy + 6, GREEN, SMALL);
-  plotLine(run.series, gx, gy, gw, gh, LV.months, LV.max, GREEN);
-  text("month 0", gx, gy + gh + 4, MUTED, SMALL);
-  text("month " + LV.months, gx + gw - 60, gy + gh + 4, MUTED, SMALL);
-
-  if (!run.started) {
-    rect(300, 330, 400, 90, [20, 28, 40], 0, 16);
-    rect(300, 330, 400, 90, GOLD, 2, 16);
-    centerText("Ready? Tap to start the clock", 350, CREAM, "22px Arial");
-    centerText(LV.pay > 0 ? "Then tap anywhere to work" : "Then watch the bills", 385, [215, 220, 230]);
-  } else if (LV.pay > 0 && run.month < 2.5) centerText("Tap anywhere to work!", 400, [255, 223, 0], "20px Arial");
-}
-
-function plotLine(series, gx, gy, gw, gh, months, maxV, color) {
-  if (series.length < 2) return;
-  ctx.beginPath();
-  series.forEach(([t, v], i) => {
-    const x = gx + (t / months) * gw, yy = gy + gh - 4 - clamp(v / maxV, 0, 1) * (gh - 24);
-    if (i === 0) ctx.moveTo(x, yy); else ctx.lineTo(x, yy);
-  });
-  ctx.lineWidth = 3; ctx.strokeStyle = rgb(color); ctx.stroke();
-}
-function plotBars(vals, n, gx, gy, gw, gh, maxV, color) {
-  const bw = gw / LV.months;
-  for (let i = 0; i < n; i++) {
-    const h = clamp(vals[i] / maxV, 0, 1) * (gh - 24);
-    rect(gx + i * bw + 2, gy + gh - 4 - h, Math.max(1, bw - 4), h, color);
-  }
-}
-
-function debriefLines() {
-  const played = Math.min(LV.months, Math.ceil(run.month - 1e-9));
-  const lines = [];
-  if (LV.n === 1) {
-    lines.push(run.reached !== null ? `You saved ${money(LV.goal)} in month ${Math.ceil(run.reached)}!` : `Time ran out with ${money(run.balance)}. You needed ${money(LV.goal)}. Tap more each month!`);
-    let best = 0; run.inflowM.forEach((v, i) => { if (i < played && v > run.inflowM[best]) best = i; });
-    lines.push(`Your busiest work month was month ${best + 1} (${money(run.inflowM[best])} flowed in). That's where the balance line is steepest.`);
-    const idle = run.inflowM.slice(0, played).filter((v) => v === 0).length;
-    lines.push(idle > 0 ? `In ${idle} month${idle > 1 ? "s" : ""} you didn't work, so nothing flowed in and the balance stayed flat.` : "You worked every month, so the balance kept climbing.");
-    lines.push("With no outflow, the balance never went down.");
-  } else {
-    lines.push(`Bills took ${money(LV.bills)} every month, so the balance went down in a straight line.`);
-    if (run.emptyAt !== null) {
-      lines.push(`It reached $0 in month ${Math.ceil(run.emptyAt - 0.05)}: ${money(LV.start)} ÷ ${money(LV.bills)} = ${LV.start / LV.bills} months.`);
-      lines.push("Once the balance was $0, the outflow had to stop. You can't take money out of an empty stock.");
-    }
-    lines.push("Nothing flowed in, so the balance could never go back up.");
-  }
-  return lines;
-}
-
-function drawDebrief() {
-  text(LV.title + ": what happened and why", 30, 16, CREAM, BIG);
-  // left: structure (picture) on top, behavior (your graphs) below, lined up by color
-  const s = 0.75, y0 = 82;
-  drawCloud(70, y0, 1);
-  drawPipe(90, 250, y0, BLUE, LV.pay > 0, s);
-  rect(250, y0 - 26, 120, 52, [16, 20, 30]); rect(250, y0 - 26, 120 * clamp(run.balance / LV.max, 0, 1), 52, [30, 120, 80]);
-  rect(250, y0 - 26, 120, 52, [235, 235, 235], 2);
-  text("Balance", 280, y0 - 9, CREAM, SMALL);
-  drawPipe(370, 530, y0, RED, LV.bills > 0, s);
-  drawCloud(550, y0, 1);
-  text("Work (inflow)", 120, y0 + 22, BLUE, SMALL);
-  text("Bills (outflow)", 400, y0 + 22, RED, SMALL);
-
-  const played = Math.min(LV.months, Math.ceil(run.month - 1e-9));
-  const gx = 50, gw = 520, gh = 120;
-  const maxFlow = Math.max(1, ...run.inflowM, ...run.outflowM);
-  const panels = [
-    [140, "Inflow: money from work each month", BLUE, () => plotBars(run.inflowM, played, gx, 140, gw, gh, maxFlow, BLUE), LV.pay > 0],
-    [278, "Outflow: bills paid each month", RED, () => plotBars(run.outflowM, played, gx, 278, gw, gh, maxFlow, RED), LV.bills > 0],
-    [416, "Stock: your bank balance", GREEN, () => plotLine(run.series, gx, 416, gw, gh, LV.months, LV.max, GREEN), true],
-  ];
-  for (const [py, label, color, draw, active] of panels) {
-    rect(gx, py, gw, gh, [10, 12, 18]); rect(gx, py, gw, gh, [70, 76, 90], 1);
-    text(label, gx + 8, py + 5, active ? color : MUTED, SMALL);
-    if (active) draw(); else text("none this level", gx + 200, py + 55, MUTED, SMALL);
-  }
-  text("month 0", gx, 540, MUTED, SMALL);
-  text("month " + LV.months, gx + gw - 60, 540, MUTED, SMALL);
-
-  // right: why + your predictions
-  const px = 600, pw = 370;
-  rect(px, 60, pw, 500, [20, 28, 40], 0, 14); rect(px, 60, pw, 500, [100, 110, 140], 2, 14);
-  let y = 74;
-  text(run.passed ? "★ Level passed!" : "☆ Not yet. Try again!", px + 16, y, run.passed ? GOLD : [255, 190, 170], "bold 20px Arial"); y += 34;
-  for (const l of debriefLines()) y = wrap(l, px + 16, y, pw - 32, 20, [225, 232, 240], SMALL) + 6;
-  y += 4;
-  text("Your predictions", px + 16, y, CREAM, "bold 16px Arial"); y += 24;
-  LV.quiz.forEach((q, i) => {
-    const right = answers[i] === q.c;
-    y = wrap((right ? "✓ " : "✗ ") + q.a[answers[i]] + (right ? "" : `  (it was: ${q.a[q.c]})`), px + 16, y, pw - 32, 20, right ? [150, 240, 180] : [255, 190, 170], SMALL) + 4;
-  });
-  y += 6;
-  text("Remember:", px + 16, y, GOLD, "bold 16px Arial"); y += 22;
-  wrap(LV.key.join(" "), px + 16, y, pw - 32, 22, CREAM, "17px Arial");
-
-  addButton(R(600, 580, 120, 44), "Play again", () => startLevel(LV), { fill: [36, 46, 62] });
-  const next = LEVELS[LV.n];
-  if (next && run.passed) addButton(R(730, 580, 120, 44), "Next level", () => startLevel(next), { fill: [54, 76, 92] });
-  addButton(R(860, 580, 110, 44), "Menu", goMenu, { fill: [40, 52, 70] });
-}
-
 // ---------------- MAIN LOOP ----------------
 let lastTime = nowSec();
 function frame() {
   const now = nowSec();
   const elapsed = Math.min(0.25, now - lastTime); // avoid a big jump after the tab was hidden
   lastTime = now;
-  if (scene !== "free") { levelFrame(elapsed); requestAnimationFrame(frame); return; }
   if (!paused) for (const k in cooldowns) if (cooldowns[k] > 0) cooldowns[k] = Math.max(0, cooldowns[k] - elapsed);
   if (!paused && !gameOver) {
     timeAccumulator += elapsed * MONTHS_PER_SECOND;

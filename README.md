@@ -96,8 +96,9 @@ Links assume GitHub Pages is enabled for this repo (Settings → Pages → deplo
 | Chameleon Hide & Seek | `https://samueldee-oss.github.io/k12-sd-fun/chameleon-hide-seek/index.html` |
 | Snake (experiment) | `https://samueldee-oss.github.io/k12-sd-fun/experiments/snake-blender-mode/index.html` |
 | Bank Game (Current) | `https://samueldee-oss.github.io/k12-sd-fun/bank-game/index.html` |
+| Bank Dynamics | `https://samueldee-oss.github.io/k12-sd-fun/bank-dynamics/index.html` |
 
-The Bank Game's Current version also has a browser version in `bank-game/` (a JavaScript port of `bank_game.py` with the same money model, plus Save, Sell and Pause buttons for touch). The older copies are Pygame programs whose web builds are not committed (see `.gitignore`), so they only play from the PC server.
+The Bank Game's Current version also has a browser version in `bank-game/` (a JavaScript port of `bank_game.py` with the same money model, plus Save, Sell and Pause buttons for touch). `bank-dynamics/` teaches the same model in levels (1 Work: one inflow; 2 Spend: one outflow; 3 Both, easy; 4 Hard Times, low pay), each with a review sentence from an earlier level, a predict quiz, a month timer and a debrief with the player's own inflow, outflow and balance graphs. Its Free play is the original game. The older copies are Pygame programs whose web builds are not committed (see `.gitignore`), so they only play from the PC server.
 
 ### Put a game on the iPad Home Screen
 

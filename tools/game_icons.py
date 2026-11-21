@@ -778,6 +778,24 @@ def d_brainy(c: Canvas, t):
     c.blush(ox + 13, oy - 1, 2.6)
 
 
+def d_bankdyn(c: Canvas, t):
+    """Stock and flows: coins flow in from the left, the tank fills and drains, bills flow out right."""
+    lvl = .5 + .32 * sn(t)
+    c.rect(32, 30, 68, 82, fill="#14202c", ol="#e8f0f4", w=2.2, r=3)
+    c.rect(33.5, 81 - 49 * lvl, 66.5, 80.5, fill="#3ccf86", r=2)
+    for x0, x1, col in ((6, 32, "#46aaff"), (68, 94, "#ff7a7a")):
+        c.rect(x0, 50, x1, 58, fill=col, r=2)
+        vx = (x0 + x1) / 2
+        c.poly([(vx - 5, 46), (vx + 5, 62), (vx + 5, 46), (vx - 5, 62)], fill="#ffffff")
+    c.poly([(30, 47), (36, 54), (30, 61)], fill="#46aaff")
+    c.poly([(92, 47), (98, 54), (92, 61)], fill="#ff7a7a")
+    for i in range(2):
+        k = (t * 2 + i / 2) % 1
+        c.ell(6 + 26 * k, 54, 4, 4, fill="#f2c14e", ol=INK, w=1)
+        c.ell(68 + 26 * k, 54, 3.4, 3.4, fill="#ffb3b3", ol=INK, w=1)
+    c.text(50, 20, "$", 14, "#f2c14e")
+
+
 # id: (background, draw function, still-frame t for the Home Screen icon, pixel-art size or 0)
 ICONS = {
     "pong": ("#111827", d_pong, .12, 0),
@@ -796,6 +814,7 @@ ICONS = {
     "rooftop-flow": ("#3a1f5a", d_rooftop, .02, 0),
     "ships-and-villagers": ("#232552", d_ships, 0, 0),
     "bank-game": ("#1f6f4a", d_bank, .3, 0),
+    "bank-dynamics": ("#1b2a3c", d_bankdyn, .25, 0),
     "snake": ("#0f172a", d_snake, .1, 0),
     "brainy-owl": ("#bfe7ff", d_brainy, .9, 0),
 }

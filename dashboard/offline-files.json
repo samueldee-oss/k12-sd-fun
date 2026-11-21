@@ -1,5 +1,5 @@
 {
- "version": "00a6adcf8c78",
+ "version": "df5832e75cba",
  "files": [
   "./",
   "index.html",
@@ -9,6 +9,7 @@
   "sw.js",
   "icons/apple-touch-icon.png",
   "app-icons/banana-slug-arena.gif",
+  "app-icons/bank-dynamics.gif",
   "app-icons/bank-game.gif",
   "app-icons/blade-mosaic.gif",
   "app-icons/blips-climb.gif",
@@ -245,7 +246,9 @@
   "../experiments/snake-blender-mode/manifest.webmanifest",
   "../experiments/snake-blender-mode/sw.js",
   "../bank-game/",
-  "../bank-game/index.html"
+  "../bank-game/index.html",
+  "../bank-dynamics/",
+  "../bank-dynamics/index.html"
  ],
  "fonts": [
   "https://fonts.googleapis.com/css2?family=Alegreya:wght@700;800&family=Nunito:wght@600;800&display=swap",
