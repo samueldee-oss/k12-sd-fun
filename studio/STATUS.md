@@ -53,6 +53,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-20: Miriam's Sky Day: smoother flying in the plane and dragon levels; they speed up and glide to a stop, and thumb steering is gentle for a small slide and fast for a big one. Interface unchanged. Same change on the claude.ai link. Commit `1dd8222`.
 - 2026-11-20: Miriam's Sky Day: slide a thumb on the game to move (a ring shows where); in full screen the small arrow pad is replaced by sliding anywhere. Stars, books and apples now count when they touch Miriam, not just the plane or dragon. Same change on the claude.ai link. Commit `721f38a`.
 - 2026-11-20: Miriam's Sky Day: no more pinch or double-tap zoom on phones; sound now starts on iPhone (also with the silent switch on, iOS 17+); music is lighter and happier (soft melody with a bell sparkle). Same change on the claude.ai link. Commit `47d7657`.
 - 2026-11-18: Tiny Realms: Tasks and Monuments, Random world type and 'Surprise me' setup button, Infinite mode, markets count Flowers for the bug tribe, bug tribe can build Windmills, Zebasi-style tribe sees crops with Farming. Tested every build action through the real buttons. Commit `9cae797`.
