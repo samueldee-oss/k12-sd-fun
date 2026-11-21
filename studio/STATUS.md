@@ -54,7 +54,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
-- 2026-11-21: Tiny Realms: Guru/Shaman and Cloak get Dash (can act after moving). Commit `COMMIT`.
+- 2026-11-21: Tiny Realms: Guru/Shaman and Cloak get Dash (can act after moving). Commit `87d758e`.
 - 2026-11-21: Tiny Realms: tribe mood meter in the Tribes screen (Horrible/Bad/Neutral/Decent/Great) with reasons (Friendly, Peaceful, Generous, Brave, Powerful / Aggressive, Backstabber, Threatening, Foolish, Weak, Envious); AI peace offers, acceptance and war declarations now follow the mood. Commit `835b291`.
 - 2026-11-21: Tiny Realms: new special tribe Gloopa/Jellune (slimes): Merge into bigger slimes (size up to 4), Split apart, Gobble food anywhere for stars, Goo trails that speed and heal their slimes and stop enemies, Bouncer hits back at ranged attackers, King Slime splits in two when defeated. Commit `1de896d`.
 - 2026-11-20: Bank Dynamics Level 5 Wheels: the hatchback doubles pay ($40/tap) but about 1 month in 5 it breaks (flat tire $80, battery $150, brakes $250; at least one by month 6). Repairs pop up during play, show as orange bars in the debrief, and the debrief compares extra pay from the car with repair costs. Bills $40, save $1,000 for an SUV in 24 months (about 3.5 taps a second finishes around month 15). Commit `a85891b`.
