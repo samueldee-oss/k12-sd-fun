@@ -53,6 +53,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-20: Miriam's Sky Day level 6 (Puffling Night) is now hide-and-seek: no cars or hearts; pufflings hide in bins, fish crates, under a bench and a parked car, peek out with a cheep and a music note; swing the net at a hiding spot to find one, then catch it. Cats still chase pufflings out in the open. Same change on the claude.ai link. Commit `4f5d50d`.
 - 2026-11-20: Miriam's Sky Day: fixed quick taps being missed (a tap shorter than one frame never reached the game; this is why the puffin net often did nothing). The puffin-level net now scoops a wider area in front of Miriam for pufflings and cats. Same change on the claude.ai link. Commit `960b507`.
 - 2026-11-20: Miriam's Sky Day: smoother flying in the plane and dragon levels; they speed up and glide to a stop, and thumb steering is gentle for a small slide and fast for a big one. Interface unchanged. Same change on the claude.ai link. Commit `1dd8222`.
 - 2026-11-20: Miriam's Sky Day: slide a thumb on the game to move (a ring shows where); in full screen the small arrow pad is replaced by sliding anywhere. Stars, books and apples now count when they touch Miriam, not just the plane or dragon. Same change on the claude.ai link. Commit `721f38a`.
