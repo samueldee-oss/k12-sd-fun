@@ -231,7 +231,7 @@ const TRIBES=[
 {n:'Tlaxqo',s:'Itzmal',like:'Quetzali',c:['#2fae4f','#c0392b'],sc:['#c94f8a','#2fd0c0'],g:'#7fc35a',tr:'#2f7f4f',hat:['feather','tall'],tech:'strategy',unit:'defender',w:[1.2,1,.8],wa:1,r:{fruit:1.8,crop:.5,animal:1,fish:1,ore:1},syl:['Tla','Xo','Itz','Co','Mal','Que','Tec','Pan','Ol','Hua','Chi','Ten'],perk:'Starts with Strategy and a Defender. Lots of fruit.'},
 {n:'Myrmex',s:'Petalyn',s3:'Chitara',like:'Cymanti / New Dawn',c:['#f2d04a','#5a3a6a'],sc:['#ff8fc4','#9a5ae0'],tc:['#8fd4ff','#a6e83a'],g:'#a8b86a',tr:'#8a6a4a',hat:['bug','nd','nd'],tech:'farming',unit:'petalshaman',sp:'bug',w:[1,1.4,.6],wa:1.1,r:{fruit:1.2,crop:1,animal:.6,fish:1.2,ore:.8},syl:['Myr','Pip','Chi','Lulu','Bon','Mimi','Pom','Kiki','Bun','Ix','Qel','Nini'],perk:'Bug tribe with 3 looks: classic Cymanti (Myrmex) or cute New Dawn (Petalyn, Chitara). Starts with Farming and a Shaman/Guru. No ports: build Foam/Algae (Ramming) to walk across water. Poison attacks.'},
 {n:'Sylvane',s:'Emberwild',like:'Elyrion',c:['#e85fb0','#7af0ff'],sc:['#f07a1a','#ffd23f'],g:'#b9cf72',tr:'#c75aa0',hat:['leaf','spike'],tech:'hunting',unit:'wildhorn',sp:'elyr',w:[.9,1.6,.7],wa:1,r:{fruit:1,crop:.8,animal:1.4,fish:1,ore:.8},syl:['Syl','Va','Eli','Ryn','Lae','Thi','Ora','Fen','Aen','Myl','Iri','Ael'],perk:'Magic forest tribe. Starts with a Wildhorn (Hunting). Navigation unlocks Wyrm Eggs that grow into dragons.'},
-{n:'Glacira',s:'Solvara',like:'Polaris / Solaris',c:['#e8f2ff','#3a7fd0'],sc:['#ffb43a','#c0392b'],g:'#eef4f8',tr:'#5f8f8f',hat:['fur','hood'],tech:null,unit:'snowling',sp:'polar',w:[1.4,.6,1],wa:1.1,r:{fruit:.3,crop:.3,animal:.8,fish:1.3,ore:1},syl:['Gla','Cir','Fro','Nix','Pol','Ska','Ys','Hel','Bor','Ise','Sol','Var'],perk:'Ice tribe! Snowlings (Fishing) freeze water into ice. Units skate fast on ice. Specials: Frost Archer, Ice Sled (Sailing), Glacier Keep (Navigation), Frost Titan.'},
+{n:'Glacira',s:'Solvara',like:'Polaris / Solaris',c:['#e8f2ff','#3a7fd0'],sc:['#ffb43a','#c0392b'],g:'#eef4f8',tr:'#5f8f8f',hat:['fur','hood'],tech:null,unit:'snowling',sp:'polar',w:[1.4,.6,1],wa:1.1,r:{fruit:.3,crop:.3,animal:.8,fish:1.3,ore:1},syl:['Gla','Cir','Fro','Nix','Pol','Ska','Ys','Hel','Bor','Ise','Sol','Var'],perk:'Ice tribe! No ports or boats: Snowlings (Fishing) freeze water into ice so you can walk and skate across. Units skate fast on ice. Specials: Frost Archer, Ice Sled (Sailing), Glacier Keep (Navigation), Frost Titan.'},
 {n:'Fjordheim',s:'Runeholt',like:'Bardur',c:['#3a3a46','#e0e0e0'],sc:['#8a2f2f','#e0b040'],g:'#9fb47e',tr:'#2f5f3f',hat:['horns','hood'],tech:'hunting',unit:'warrior',w:[1,1.4,.8],wa:1,r:{fruit:.6,crop:.8,animal:2,fish:1,ore:1},syl:['Fjor','Heim','Ulf','Rag','Sig','Thor','Bjor','Ka','Vik','Grim','Eir','Hal'],perk:'Starts with Hunting. Lots of animals.'},
 {n:'Moanui',s:'Kalea',like:'Kickoo',c:['#2fd0b0','#ffffff'],sc:['#f06a8a','#ffe08a'],g:'#cfe07e',tr:'#3fa04f',hat:['flower','band'],tech:'fishing',unit:'warrior',w:[1.4,.8,.5],wa:1.6,r:{fruit:1.3,crop:.8,animal:.6,fish:2,ore:.7},syl:['Mo','A','Nui','Ka','Le','Ho','Ma','Lu','Pa','Ki','Wai','Ta'],perk:'Starts with Fishing. Islands with lots of fish.'},
 {n:'Thornwick',s:'Crowmoor',like:'Hoodrick',c:['#b8692a','#f2e2b0'],sc:['#4a7a2a','#2a2a2a'],g:'#93b45c',tr:'#3f6f2f',hat:['hood','tall'],tech:'archery',unit:'archer',w:[1,1.5,.7],wa:1,r:{fruit:1,crop:1,animal:1.2,fish:1,ore:1},syl:['Thorn','Wick','Ash','Bry','Ox','Ham','Ley','Ford','Wyn','Brook','Rid','Elm'],perk:'Starts with Archery and an Archer. Deep forests.'},
@@ -412,7 +412,7 @@ function canStand(u,t,p){
  const naval=has(u,'naval'),fly=has(u,'fly'),amph=has(u,'amph');
  if(naval){if(isWater(t))return t.ter!=='ocean'||!!p.techs.sailing||psp(p)==='aqua';return t.ter!=='mountain'||!!p.techs.climbing;}
  if(fly)return true;
- if(isWater(t)){if(amph)return true;return t.imp==='port'&&tileOwner(t)===p.i;}
+ if(isWater(t)){if(amph)return true;if(psp(p)==='polar')return false;return t.imp==='port'&&tileOwner(t)===p.i;}
  if(t.ter==='mountain')return !!p.techs.climbing;
  return true;
 }
@@ -512,7 +512,7 @@ function destroyImp(p,x,y){const t=T(x,y);t.imp=null;t.road=0;sfx('hit');}
 function promote(u){u.vet=1;u.hp=maxHp(u);u.cm=u.ca=false;fx(u.x,u.y,'Veteran!','#ffd23f');}
 function disband(u){const p=P(u.owner);p.stars+=Math.floor((UNITS[u.base||u.type].c||0)/2);killUnit(u,true);}
 function upgradeBoat(u,to){const p=P(u.owner);p.stars-=UNITS[to].c;u.type=to;u.cm=u.ca=false;}
-function boatOptions(u){const p=P(u.owner);if(u.type!=='raft'||psp(p)==='bug')return[];return BOATS.map(([b,t])=>[utype(p,b),t]);}
+function boatOptions(u){const p=P(u.owner);if(u.type!=='raft'||psp(p)==='bug'||psp(p)==='polar')return[];return BOATS.map(([b,t])=>[utype(p,b),t]);}
 function examine(u){const p=P(u.owner);const t=T(u.x,u.y);t.ruin=0;u.cm=u.ca=false;const r=ri(5);let msg='';
  const cn=psp(p)==='bug'?'hearts':'stars';if(r===0){p.stars+=10;msg='Found 10 '+cn+'!';}
  else if(r===1){const av=Object.keys(TECH).filter(k=>techAvail(p,k));if(av.length){const k=pick(av);p.techs[k]=1;msg='Learned '+TECH[k].n+'!';}else{p.stars+=10;msg='Found 10 '+cn+'!';}}
@@ -525,7 +525,7 @@ function examine(u){const p=P(u.owner);const t=T(u.x,u.y);t.ruin=0;u.cm=u.ca=fal
 function addPop(c,n){c.pop+=n;while(c.pop>=c.level+1){c.pop-=c.level+1;c.level++;logEv(c.owner,c.name+' grew to level '+c.level,-1,'grow');if(P(c.owner).ai)aiReward(c);else G.lvq.push(c.id);}}
 function canFoamAt(p,x,y){const t=T(x,y);return psp(p)==='bug'&&isWater(t)&&!t.imp&&!t.res&&t.city<0&&(tileOwner(t)===p.i||nbrs(x,y).some(([a,b])=>tileOwner(T(a,b))===p.i||T(a,b).foam&&tileOwner(t)<0));}
 function impList(p,x,y){const t=T(x,y);if(t.city>=0||t.village)return[];if(tileOwner(t)!==p.i){if(canFoamAt(p,x,y))return IMPS.filter(im=>im.k==='foam');return[];}const c=G.cities[t.terr];
- return IMPS.filter(im=>im.ok(t,x,y)&&!(im.noBug&&psp(p)==='bug')&&!(im.onlyBug&&psp(p)!=='bug')).filter(im=>{if(im.lvl){return !cityHas(c,im.k);}return true;});}
+ return IMPS.filter(im=>im.ok(t,x,y)&&!(im.noBug&&psp(p)==='bug')&&!(im.onlyBug&&psp(p)!=='bug')&&!(im.k==='port'&&psp(p)==='polar')).filter(im=>{if(im.lvl){return !cityHas(c,im.k);}return true;});}
 function cityHas(c,k){for(let i=0;i<G.map.length;i++){const t=G.map[i];if(t.terr===c.id&&t.imp===k)return true;}return false;}
 function impName(p,im){if(im.k==='flowers')return isND(p)?'Flowers':'Fungi';if(im.k==='foam')return isND(p)?'Foam':'Algae';if(psp(p)==='bug'){if(im.k==='fruit')return'Collect Nectar';if(im.k==='hunt')return'Catch Snulle';}return im.n;}
 function impCost(im){return Math.max(0,im.c);}
@@ -1268,7 +1268,7 @@ function showPanel(){const pn=$('panel');if(!SEL){pn.style.display='none';return
   if(c&&c.owner===p.i){const lab=document.createElement('div');lab.className='sub';lab.textContent='Train units';pn.appendChild(lab);
    for(const[ty,tc]of trainList(p)){const why=canTrain(p,c,ty,tc);acts.appendChild(btn(uname(ty,p),tc&&!p.techs[tc]?'Needs '+TECH[tc].n:CUR()+UNITS[ty].c,!why,()=>{train(p,c,ty);select(x,y,'tile');updHud();},unitIcon(ty,p)));}}
   else if(t.city<0&&tileOwner(t)!==p.i&&canFoamAt(p,x,y)){const im=IMPS.find(i=>i.k==='foam');const have=!!p.techs.ramming;acts.appendChild(btn(impName(p,im),!have?'Needs Ramming':CUR()+im.c+' &middot; walk on water',have&&p.stars>=im.c,()=>{doImp(p,x,y,im);select(x,y,'tile');updHud();}));}
-  else if(tileOwner(t)===p.i&&t.city<0){const ims=IMPS.filter(im=>im.ok(t,x,y)&&!(im.noBug&&psp(p)==='bug')&&!(im.onlyBug&&psp(p)!=='bug')&&(!t.res||seesRes(t)||!['farm','mine'].includes(im.k))&&!(t.res&&!seesRes(t)&&['grow','windmill','forge','sawmill','market','temple'].includes(im.k)));
+  else if(tileOwner(t)===p.i&&t.city<0){const ims=IMPS.filter(im=>im.ok(t,x,y)&&!(im.k==='port'&&psp(p)==='polar')&&!(im.noBug&&psp(p)==='bug')&&!(im.onlyBug&&psp(p)!=='bug')&&(!t.res||seesRes(t)||!['farm','mine'].includes(im.k))&&!(t.res&&!seesRes(t)&&['grow','windmill','forge','sawmill','market','temple'].includes(im.k)));
    for(const im of ims){if(im.lvl&&cityHas(G.cities[t.terr],im.k))continue;const have=!!p.techs[im.tech];const cost=impCost(im);const pop=impPop(im,x,y);
     acts.appendChild(btn(impName(p,im),!have?'Needs '+TECH[im.tech].n:(im.c<0?'free, +1 star':CUR()+cost)+(pop?' &middot; +'+pop+' pop':''),have&&p.stars>=cost,()=>{doImp(p,x,y,im);select(x,y,'tile');showLvq();updHud();}));}
    if(!t.imp&&!t.res&&(t.ter==='field'||t.ter==='forest'))for(const M of monumentsToBuild(p))acts.appendChild(btn('Build '+M.mon,'free &middot; +3 pop &middot; +400 score',true,()=>{buildMonument(p,x,y,M.k);select(x,y,'tile');showLvq();updHud();}));
@@ -1288,7 +1288,7 @@ function showLvq(){if(!G||$('modal').style.display==='flex')return;const p=human
 // ---------- tech screen ----------
 let techSel=null;
 function openTech(){if(!G)return;const p=humanP();if(!p||p.ai)return;const el=$('tech');el.style.display='block';renderTech();}
-function unlocksOf(p,k){const o=[];for(const[u,t]of trainList(p))if(t===k)o.push(uname(u,p));if(psp(p)!=='bug')for(const[b,t]of BOATS)if(t===k)o.push(uname(utype(p,b),p)+' boat');for(const im of IMPS)if(im.tech===k)o.push(im.n);return o;}
+function unlocksOf(p,k){const o=[];for(const[u,t]of trainList(p))if(t===k)o.push(uname(u,p));if(psp(p)!=='bug'&&psp(p)!=='polar')for(const[b,t]of BOATS)if(t===k)o.push(uname(utype(p,b),p)+' boat');for(const im of IMPS)if(im.tech===k)o.push(im.n);return o;}
 function techIcon(k){const T1={riding:'R',roads:'Rd',trade:'Tr',freespirit:'FS',chivalry:'Ch',organization:'Or',farming:'Fa',construction:'Co',strategy:'St',diplomacy:'Di',climbing:'Cl',mining:'Mi',smithery:'Sm',meditation:'Me',philosophy:'Ph',fishing:'Fi',sailing:'Sa',navigation:'Na',ramming:'Ra',aquatism:'Aq',hunting:'Hu',archery:'Ar',spiritualism:'Sp',forestry:'Fo',mathematics:'Ma'};return T1[k];}
 function renderTech(){const p=humanP();const el=$('tech');
  const S=Math.min(innerWidth-8,innerHeight-200,600);const C=S/2;
