@@ -53,6 +53,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-20: Miriam's Sky Day: slide a thumb on the game to move (a ring shows where); in full screen the small arrow pad is replaced by sliding anywhere. Stars, books and apples now count when they touch Miriam, not just the plane or dragon. Same change on the claude.ai link. Commit `721f38a`.
 - 2026-11-20: Miriam's Sky Day: no more pinch or double-tap zoom on phones; sound now starts on iPhone (also with the silent switch on, iOS 17+); music is lighter and happier (soft melody with a bell sparkle). Same change on the claude.ai link. Commit `47d7657`.
 - 2026-11-18: Tiny Realms: Tasks and Monuments, Random world type and 'Surprise me' setup button, Infinite mode, markets count Flowers for the bug tribe, bug tribe can build Windmills, Zebasi-style tribe sees crops with Farming. Tested every build action through the real buttons. Commit `9cae797`.
 - 2026-11-18: Brainy Owl fixes after the owner's first try. No sound: speech now starts inside the tap, and a big speaker button appears if the browser blocks the voice. "Gives me the answer" was the first-time demo; it is now clearly framed and waits for the child to tap. Saving: one save per device, with a backup reminder. Commit `d01bcb0`.
