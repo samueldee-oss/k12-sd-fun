@@ -559,13 +559,13 @@ function rewardOpts(level){return REWARDS[Math.min(level,5)];}
 
 
 // ----- diplomacy -----
-function metTribe(p,q){if(p.i===q.i)return true;if(atPeace(p.i,q.i))return true;return G.cities.some(c=>c.owner===q.i&&p.ex[c.y*G.N+c.x])||G.units.some(u=>u.owner===q.i&&p.ex[u.y*G.N+u.x]);}
+function metTribe(p,q){if(p.i===q.i)return true;if(!p.met)p.met={};if(p.met[q.i])return true;const r=G.rel&&G.rel[rk(p.i,q.i)];const m=atPeace(p.i,q.i)||!!(r&&(r.hit[p.i]||r.hit[q.i]||r.brk))||G.cities.some(c=>c.owner===q.i&&p.ex[c.y*G.N+c.x])||G.units.some(u=>u.owner===q.i&&p.ex[u.y*G.N+u.x]);if(m)p.met[q.i]=1;return m;}
 function rk(a,b){return a<b?a+'-'+b:b+'-'+a;}
 function rel(a,b){if(!G.rel)G.rel={};return G.rel[rk(a,b)]||(G.rel[rk(a,b)]={s:'war',t:0,emb:{},hit:{}});}
 function atPeace(a,b){return a!==b&&G.rel&&G.rel[rk(a,b)]&&G.rel[rk(a,b)].s==='peace';}
 function makePeace(a,b){const r=rel(a,b);r.s='peace';r.t=G.turn;for(const[x,y]of[[a,b],[b,a]]){const c=G.cities.find(c=>c.owner===y&&c.cap)||G.cities.find(c=>c.owner===y);if(c)reveal(P(x),c.x,c.y,1);}logEv(a,pname(P(a))+' and '+pname(P(b))+' made peace',b,'peace');}
 function declareWar(a,b){const r=rel(a,b);if(r.s==='peace')r.brkBy=a;r.s='war';r.t=G.turn;r.emb={};r.hit[a]=G.turn;r.brk=G.turn;logEv(a,pname(P(a))+' declared war on '+pname(P(b))+'!',b,'war');}
-function noteHit(a,b){const r=rel(a,b);r.hit[a]=G.turn;}
+function noteHit(a,b){const r=rel(a,b);r.hit[a]=G.turn;for(const[x,y]of[[a,b],[b,a]]){const p=P(x);if(!p.met)p.met={};p.met[y]=1;}}
 function peaceChance(from,to){const m=moodOf(to,from);let c=.45+m.v/120;if(power(from)>power(to)*1.6)c+=.15;return Math.max(.03,Math.min(.95,c));}
 function offerPeace(from,to){if(!P(from).techs.strategy)return'Needs Strategy';const ok=rnd()<peaceChance(from,to);if(ok)makePeace(from,to);else logEv(to,pname(P(to))+' refused peace with '+pname(P(from)),from,'refuse');return ok?'yes':'no';}
 function buildEmbassy(a,b){const p=P(a);if(!p.techs.diplomacy||!atPeace(a,b)||p.stars<5)return false;p.stars-=5;rel(a,b).emb[a]=1;logEv(a,pname(p)+' built an embassy with '+pname(P(b)),b,'emb');return true;}
@@ -632,6 +632,7 @@ function startTurn(i){const p=P(i);
  }
  p.stars+=income(p);
  checkTasks(p);
+ for(const q of G.players)if(q.i!==p.i)metTribe(p,q);
 }
 function endTurnEffects(i){
  for(const u of G.units){if(u.owner!==i)continue;const t=T(u.x,u.y);if(has(u,'slime')&&isLandT(t)&&t.city<0)t.goo=i+1;else if(t.goo&&t.goo!==i+1&&!has(u,'fly'))t.goo=0;}

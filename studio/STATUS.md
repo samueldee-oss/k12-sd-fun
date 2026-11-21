@@ -54,6 +54,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-21: Tiny Realms: tribes you have met (seen, fought or made peace with) are remembered for good, so an enemy no longer turns back into 'Unknown tribe' when its units walk out of sight. Commit `COMMIT`.
 - 2026-11-21: Tiny Realms: tribes only offer peace once they have met you; making peace counts as meeting and shows each side the other's capital, so a peace partner is never listed as Unknown tribe. Commit `1c25576`.
 - 2026-11-21: Tiny Realms: tech tree 'Unlocks' lists only what your own tribe can build (Foam and Flowers only for the bug tribe, no Port for the ice tribe). Commit `50a610a`.
 - 2026-11-21: Tiny Realms: Glacira (ice tribe) has no ports, rafts or boats, like Polaris; Snowlings freezing water is how they cross it. Commit `7665d33`.
