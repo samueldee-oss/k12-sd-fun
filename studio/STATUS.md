@@ -6,6 +6,7 @@ _Kept by Claude Code. Last updated 2026-11-18._
 
 | Game | Where | State | Plays on iPad? |
 |---|---|---|---|
+| Bank Dynamics | `bank-dynamics/index.html` | Works. Levels 1 to 4 with review, predict quiz, timer, debrief; Free play = original game. | Tap anywhere to work; all buttons tap. Not yet tried on a real iPad. |
 | Bank Game, Current | `bank_game.py`; browser version `bank-game/index.html` (dashboard uses this) | Works. Browser version is a JavaScript port with the same money model; plays on GitHub Pages with no PC server. | Save, Sell and Pause/Shops buttons on screen; tap anywhere to work, tap a garage slot to pick it (simulated touch tested; not yet tried on a real iPad). |
 | Bank Game, Copy 3 to Copy 5 | `bank_game copy 3.py` to `copy 5.py` | Work. Earlier iterations kept for comparison. | Keyboard needed. |
 | Bank Game, Copy and Copy 2 | `bank_game copy.py`, `bank_game copy 2.py` | Work. **Identical code**; one could be dropped from the dashboard. | Keyboard needed. |
@@ -53,6 +54,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-20: Levels moved to their own game, **Bank Dynamics** (`bank-dynamics/`, own dashboard card and icon); Bank Game is back to the original web version. Added Level 3 (both flows, easy: $40/tap, $20 bills, save $1,000; review = fill the blank) and Level 4 Hard Times (low pay: $20/tap, $40 bills, save $800 in 24 months, needs about 4 taps a second the whole time; review = match the graph). From the old game: "This month" in/out bars, a car for each savings goal with a drive-into-the-garage moment, and a garage on the start menu. Levels saved under a new key, so earlier stars reset. Commit `a0c33d1`.
 - 2026-11-20: Miriam's Sky Day: her brother in the Trento level now has blonde hair. Same change on the claude.ai link. Commit `bd7bd94`.
 - 2026-11-20: Miriam's Sky Day level 6 (Puffling Night) is now hide-and-seek: no cars or hearts; pufflings hide in bins, fish crates, under a bench and a parked car, peek out with a cheep and a music note; swing the net at a hiding spot to find one, then catch it. Cats still chase pufflings out in the open. Same change on the claude.ai link. Commit `4f5d50d`.
 - 2026-11-20: Miriam's Sky Day: fixed quick taps being missed (a tap shorter than one frame never reached the game; this is why the puffin net often did nothing). The puffin-level net now scoops a wider area in front of Miriam for pufflings and cats. Same change on the claude.ai link. Commit `960b507`.
