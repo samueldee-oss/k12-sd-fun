@@ -112,8 +112,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#123552;font-family:sy
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#2f6fd1">
 <script id="home-screen-sw">if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
-<!-- /home-screen-app -->
-</head>
+<!-- /home-screen-app --></head>
 <body>
 <canvas id="cv"></canvas>
 <div id="top"><span class="pill" id="who"></span><span class="pill" id="stars"></span><span class="pill" id="turn"></span><span class="sp"></span><button class="btn sm" id="menuBtn">Menu</button></div>
@@ -179,11 +178,11 @@ const UNITS={
  chompy:{n:'Chomper',c:5,hp:15,a:3,d:2,m:1,r:1,sk:['slime','dash','gulp']},
  kingslime:{n:'King Slime',c:20,hp:40,a:4,d:4,m:1,r:1,sk:['slime','splitdeath'],sup:1},
  // ice tribe
- snowling:{n:'Snowling',c:5,hp:10,a:0,d:1,m:1,r:1,sk:['freezearea','skate','stiff']},
- frostarcher:{n:'Frost Archer',c:3,hp:10,a:0,d:1,m:1,r:2,sk:['freeze','skate','dash','fortify']},
- icesled:{n:'Ice Sled',c:5,hp:15,a:3,d:2,m:2,r:1,sk:['skate','dash','escape']},
- glacierkeep:{n:'Glacier Keep',c:15,hp:20,a:4,d:3,m:1,r:1,sk:['skate','fortify']},
- frosttitan:{n:'Frost Titan',c:20,hp:40,a:4,d:3,m:1,r:1,sk:['freezearea','skate'],sup:1},
+ snowling:{sn:'Embling',n:'Snowling',c:5,hp:10,a:0,d:1,m:1,r:1,sk:['freezearea','skate','stiff']},
+ frostarcher:{sn:'Flame Archer',n:'Frost Archer',c:3,hp:10,a:0,d:1,m:1,r:2,sk:['freeze','skate','dash','fortify']},
+ icesled:{sn:'Lava Sled',n:'Ice Sled',c:5,hp:15,a:3,d:2,m:2,r:1,sk:['skate','dash','escape']},
+ glacierkeep:{sn:'Magma Keep',n:'Glacier Keep',c:15,hp:20,a:4,d:3,m:1,r:1,sk:['skate','fortify']},
+ frosttitan:{sn:'Magma Titan',n:'Frost Titan',c:20,hp:40,a:4,d:3,m:1,r:1,sk:['freezearea','skate'],sup:1},
  // bug tribe (New Dawn style)
  petalshaman:{cn:'Shaman',n:'Guru',c:5,hp:10,a:0,d:1,m:1,r:1,sk:['convert','boost','stiff','dash']},
  jellyegg:{cn:'Bug Egg',n:'Eggy',c:2,hp:5,a:0,d:1,m:1,r:1,sk:['hatch','stiff']},
@@ -231,7 +230,7 @@ const TRIBES=[
 {n:'Tlaxqo',s:'Itzmal',like:'Quetzali',c:['#2fae4f','#c0392b'],sc:['#c94f8a','#2fd0c0'],g:'#7fc35a',tr:'#2f7f4f',hat:['feather','tall'],tech:'strategy',unit:'defender',w:[1.2,1,.8],wa:1,r:{fruit:1.8,crop:.5,animal:1,fish:1,ore:1},syl:['Tla','Xo','Itz','Co','Mal','Que','Tec','Pan','Ol','Hua','Chi','Ten'],perk:'Starts with Strategy and a Defender. Lots of fruit.'},
 {n:'Myrmex',s:'Petalyn',s3:'Chitara',like:'Cymanti / New Dawn',c:['#f2d04a','#5a3a6a'],sc:['#ff8fc4','#9a5ae0'],tc:['#8fd4ff','#a6e83a'],g:'#a8b86a',tr:'#8a6a4a',hat:['bug','nd','nd'],tech:'farming',unit:'petalshaman',sp:'bug',w:[1,1.4,.6],wa:1.1,r:{fruit:1.2,crop:1,animal:.6,fish:1.2,ore:.8},syl:['Myr','Pip','Chi','Lulu','Bon','Mimi','Pom','Kiki','Bun','Ix','Qel','Nini'],perk:'Bug tribe with 3 looks: classic Cymanti (Myrmex) or cute New Dawn (Petalyn, Chitara). Starts with Farming and a Shaman/Guru. No ports: build Foam/Algae (Ramming) to walk across water. Poison attacks.'},
 {n:'Sylvane',s:'Emberwild',like:'Elyrion',c:['#e85fb0','#7af0ff'],sc:['#f07a1a','#ffd23f'],g:'#b9cf72',tr:'#c75aa0',hat:['leaf','spike'],tech:'hunting',unit:'wildhorn',sp:'elyr',w:[.9,1.6,.7],wa:1,r:{fruit:1,crop:.8,animal:1.4,fish:1,ore:.8},syl:['Syl','Va','Eli','Ryn','Lae','Thi','Ora','Fen','Aen','Myl','Iri','Ael'],perk:'Magic forest tribe. Starts with a Wildhorn (Hunting). Navigation unlocks Wyrm Eggs that grow into dragons.'},
-{n:'Glacira',s:'Solvara',like:'Polaris / Solaris',c:['#e8f2ff','#3a7fd0'],sc:['#ffb43a','#c0392b'],g:'#eef4f8',tr:'#5f8f8f',hat:['fur','hood'],tech:null,unit:'snowling',sp:'polar',w:[1.4,.6,1],wa:1.1,r:{fruit:.3,crop:.3,animal:.8,fish:1.3,ore:1},syl:['Gla','Cir','Fro','Nix','Pol','Ska','Ys','Hel','Bor','Ise','Sol','Var'],perk:'Ice tribe! No ports or boats: Snowlings (Fishing) freeze water into ice so you can walk and skate across. Units skate fast on ice. Specials: Frost Archer, Ice Sled (Sailing), Glacier Keep (Navigation), Frost Titan.'},
+{n:'Glacira',s:'Solvara',like:'Polaris / Solaris',c:['#e8f2ff','#3a7fd0'],sc:['#ffb43a','#c0392b'],g:'#eef4f8',tr:'#5f8f8f',hat:['fur','flame'],tech:null,unit:'snowling',sp:'polar',w:[1.4,.6,1],wa:1.1,r:{fruit:.3,crop:.3,animal:.8,fish:1.3,ore:1},syl:['Gla','Cir','Fro','Nix','Pol','Ska','Ys','Hel','Bor','Ise','Sol','Var'],perk:'Ice tribe (Solvara is the lava version: Emblings turn water into cooled lava rock). No ports or boats: Snowlings (Fishing) freeze water into ice so you can walk and skate across. Units skate fast on ice. Specials: Frost Archer, Ice Sled (Sailing), Glacier Keep (Navigation), Frost Titan.'},
 {n:'Fjordheim',s:'Runeholt',like:'Bardur',c:['#3a3a46','#e0e0e0'],sc:['#8a2f2f','#e0b040'],g:'#9fb47e',tr:'#2f5f3f',hat:['horns','hood'],tech:'hunting',unit:'warrior',w:[1,1.4,.8],wa:1,r:{fruit:.6,crop:.8,animal:2,fish:1,ore:1},syl:['Fjor','Heim','Ulf','Rag','Sig','Thor','Bjor','Ka','Vik','Grim','Eir','Hal'],perk:'Starts with Hunting. Lots of animals.'},
 {n:'Moanui',s:'Kalea',like:'Kickoo',c:['#2fd0b0','#ffffff'],sc:['#f06a8a','#ffe08a'],g:'#cfe07e',tr:'#3fa04f',hat:['flower','band'],tech:'fishing',unit:'warrior',w:[1.4,.8,.5],wa:1.6,r:{fruit:1.3,crop:.8,animal:.6,fish:2,ore:.7},syl:['Mo','A','Nui','Ka','Le','Ho','Ma','Lu','Pa','Ki','Wai','Ta'],perk:'Starts with Fishing. Islands with lots of fish.'},
 {n:'Thornwick',s:'Crowmoor',like:'Hoodrick',c:['#b8692a','#f2e2b0'],sc:['#4a7a2a','#2a2a2a'],g:'#93b45c',tr:'#3f6f2f',hat:['hood','tall'],tech:'archery',unit:'archer',w:[1,1.5,.7],wa:1,r:{fruit:1,crop:1,animal:1.2,fish:1,ore:1},syl:['Thorn','Wick','Ash','Bry','Ox','Ham','Ley','Ford','Wyn','Brook','Rid','Elm'],perk:'Starts with Archery and an Archer. Deep forests.'},
@@ -296,7 +295,7 @@ function pname(p){const t=TRIBES[p.t];return[t.n,t.s,t.s3||t.s][p.skin|0];}
 function phat(p){const h=TRIBES[p.t].hat;return h[p.skin|0]||h[0];}
 function isND(p){return psp(p)==='bug'&&(p.skin|0)>0;}
 function skinCount(t){return TRIBES[t].s3?3:2;}
-function uname(type,p){const U=UNITS[type];return p&&psp(p)==='bug'&&!isND(p)&&U.cn?U.cn:U.n;}
+function uname(type,p){const U=UNITS[type];if(p&&psp(p)==='polar'&&(p.skin|0)===1&&U.sn)return U.sn;return p&&psp(p)==='bug'&&!isND(p)&&U.cn?U.cn:U.n;}
 function curName(p){return isND(p)?'hearts':'stars';}
 function logEv(a,txt,tg,k){if(!G.ev)G.ev=[];G.ev.push({r:G.turn,a,t:txt,tg:tg==null?-1:tg,k:k||''});if(G.ev.length>400)G.ev.splice(0,100);}
 function psp(p){return TRIBES[p.t].sp||null;}
@@ -386,13 +385,13 @@ function newGame(o){
   if(tr.tech)p.techs[tr.tech]=1;
   makeUnit(tr.unit,i,x,y,c.id);
   if(tr.lux){c.level=2;c.ws=1;p.stars+=3;}
-  if(tr.sp==='polar'){for(const[a,b]of nbrs(x,y,2)){freezeTile(T(a,b));}}
+  if(tr.sp==='polar'){for(const[a,b]of nbrs(x,y,2)){freezeTile(T(a,b),p.skin===1);}}
   reveal(p,x,y,2);
  });
  G.cur=-1;
 }
 function foamTile(t){if(isWater(t)&&!t.imp&&t.city<0){t.under=t.ter;t.ter='ice';t.foam=1;t.res=null;}}
-function freezeTile(t){if(isWater(t)&&!t.imp&&t.city<0){t.under=t.ter;t.ter='ice';t.res=null;}}
+function freezeTile(t,lava){if(isWater(t)&&!t.imp&&t.city<0){t.under=t.ter;t.ter='ice';t.res=null;if(lava)t.lava=1;}}
 
 // ----- tech -----
 function cityCount(p){return G.cities.filter(c=>c.owner===p.i).length;}
@@ -607,7 +606,7 @@ function buildMonument(p,x,y,k){const t=T(x,y);t.imp='mon';t.mon=k;p.mons[k]=1;c
 
 // ----- slime tribe -----
 function mergeTargets(u){if(!has(u,'slime')||!u.cm||!u.ca)return[];return nbrs(u.x,u.y).map(([a,b])=>unitAt(a,b)).filter(v=>v&&v.owner===u.owner&&v.type===u.type&&usz(u)+usz(v)<=4);}
-function mergeSlimes(u,v){const hp=u.hp+v.hp;u.sz=usz(u)+usz(v);u.hp=Math.min(maxHp(u),hp);u.poisoned=0;killUnit(v,true);u.cm=u.ca=false;fx(u.x,u.y,'Merge! Size '+u.sz,'#9aff6a');sfx('magic');}
+function mergeSlimes(u,v){const hp=u.hp+v.hp;u.sz=usz(u)+usz(v);u.hp=Math.min(maxHp(u),hp);u.poisoned=0;killUnit(v,true);u.cm=u.ca=false;u.merged=1;fx(u.x,u.y,'Merge! Size '+u.sz,'#9aff6a');sfx('magic');}
 function splitSpot(u){return nbrs(u.x,u.y).find(([a,b])=>!unitAt(a,b)&&canStand(u,T(a,b),P(u.owner)));}
 function canSplit(u){return has(u,'slime')&&!UNITS[u.type].sup&&usz(u)>=2&&u.cm&&u.ca&&!!splitSpot(u);}
 function splitSlime(u){const s=usz(u),a=Math.ceil(s/2),b=s-a;const sp=splitSpot(u);const frac=u.hp/maxHp(u);u.sz=a;u.hp=Math.max(1,Math.round(maxHp(u)*frac));
@@ -627,7 +626,7 @@ function startTurn(i){const p=P(i);
  for(const u of G.units){if(u.owner!==i)continue;
   if(has(u,'grow')){u.age=(u.age||0)+1;if(u.age>=3){const om=maxHp(u);u.type=u.type==='wyrmegg'?'babywyrm':'firewyrm';u.age=0;u.hp=Math.min(maxHp(u),u.hp+maxHp(u)-om);fx(u.x,u.y,'Grew up!','#ffb050');}}
   if(has(u,'hatch')){u.type='larvy';u.hp=maxHp(u);fx(u.x,u.y,'Hatched!','#ff9be0');}
-  if(u.frozen){u.cm=u.ca=false;u.frozen=0;u.wasFrozen=1;}else{u.cm=u.ca=true;u.wasFrozen=0;}
+  if(u.frozen){u.cm=u.ca=false;u.frozen=0;u.wasFrozen=1;}else{u.cm=u.ca=true;u.wasFrozen=0;u.merged=0;}
   if(has(u,'slime')&&T(u.x,u.y).goo===i+1&&u.hp<maxHp(u)&&!u.poisoned){u.hp=Math.min(maxHp(u),u.hp+2);}
  }
  p.stars+=income(p);
@@ -638,7 +637,7 @@ function endTurnEffects(i){
  for(const u of G.units){if(u.owner!==i)continue;const t=T(u.x,u.y);if(has(u,'slime')&&isLandT(t)&&t.city<0)t.goo=i+1;else if(t.goo&&t.goo!==i+1&&!has(u,'fly'))t.goo=0;}
  for(const u of G.units.slice()){if(u.owner!==i||!has(u,'foamarea'))continue;for(const[a,b]of nbrs(u.x,u.y)){const t=T(a,b);if(isWater(t)&&!t.imp&&t.city<0){const v=unitAt(a,b);foamTile(t);if(v&&has(v,'naval')){v.type=v.base||'warrior';v.base=null;}}}}
  for(const u of G.units.slice()){if(u.owner!==i||!has(u,'freezearea'))continue;
-  for(const[a,b]of nbrs(u.x,u.y)){const t=T(a,b);if(isWater(t)&&!t.imp&&t.city<0){const v=unitAt(a,b);freezeTile(t);if(v&&has(v,'naval')){v.type=v.base||'warrior';v.base=null;}}
+  for(const[a,b]of nbrs(u.x,u.y)){const t=T(a,b);if(isWater(t)&&!t.imp&&t.city<0){const v=unitAt(a,b);freezeTile(t,P(i).skin===1&&psp(P(i))==='polar');if(v&&has(v,'naval')){v.type=v.base||'warrior';v.base=null;}}
    const v=unitAt(a,b);if(v&&v.owner!==i){v.frozen=1;}}}
 }
 function aliveList(){return G.players.filter(p=>p.alive);}
@@ -786,6 +785,7 @@ function drawHat(c,hx,hy,hr,hat,col,col2,k){
  case'fur':El(c,hx,hy-4.5*k,7.2*k,4.6*k,'#9a7a5a');El(c,hx,hy-6*k,5*k,2.5*k,'#c0a080');break;
  case'flower':for(let i=0;i<5;i++){const a=Math.PI+i*Math.PI/4;Ci(c,hx+Math.cos(a)*5.5*k,hy-1*k+Math.sin(a)*5.5*k,2*k,i%2?'#ff7aa8':'#ffe14a');}break;
  case'fin':Pg(c,[[hx-4*k,hy-4*k],[hx+5*k,hy-4*k],[hx-1*k,hy-13*k]],col2,OUT,.8*k);break;
+ case'flame':Pg(c,[[hx-5*k,hy-4*k],[hx+5*k,hy-4*k],[hx+3*k,hy-9*k],[hx+1*k,hy-7*k],[hx,hy-13*k],[hx-1.5*k,hy-8*k],[hx-3.5*k,hy-10*k]],'#ff7a1a','rgba(0,0,0,.25)',.5*k);Pg(c,[[hx-2.5*k,hy-4*k],[hx+2.5*k,hy-4*k],[hx,hy-9*k]],'#ffd23f');break;
  case'leaf':for(let i=-1;i<=1;i++)El(c,hx+i*4*k,hy-6*k-(i?0:2*k),1.8*k,4.5*k,'#5fd06a',i*.5);break;
  }
 }
@@ -936,23 +936,23 @@ function drawUnit(c,type,x,y,k,col,col2,hat,base){
  switch(type){
  case'warrior':{person(c,x,y,k,col,col2,hat);Ln(c,x+8*k,y-12*k,x+11*k,y-24*k,2.6*k,W);Ci(c,x+11*k,y-24*k,2.4*k,W);break;}
  case'dagger':{person(c,x,y,k*.9,'#3a3a40',col,hat);Ln(c,x+7*k,y-12*k,x+10*k,y-18*k,1.6*k,'#ddd');break;}
- case'archer':case'frostarcher':{person(c,x,y,k,col,col2,hat);const bc=type==='frostarcher'?'#9fe0ff':W;c.beginPath();c.arc(x+5*k,y-15*k,9*k,-1.1,1.1);c.lineWidth=2*k;c.strokeStyle=bc;c.stroke();Ln(c,x+5*k+Math.cos(-1.1)*9*k,y-15*k+Math.sin(-1.1)*9*k,x+5*k+Math.cos(1.1)*9*k,y-15*k+Math.sin(1.1)*9*k,.7*k,'#eee');break;}
+ case'archer':case'frostarcher':{person(c,x,y,k,col,col2,hat);const bc=type==='frostarcher'?(hat==='flame'?'#ff7a1a':'#9fe0ff'):W;c.beginPath();c.arc(x+5*k,y-15*k,9*k,-1.1,1.1);c.lineWidth=2*k;c.strokeStyle=bc;c.stroke();Ln(c,x+5*k+Math.cos(-1.1)*9*k,y-15*k+Math.sin(-1.1)*9*k,x+5*k+Math.cos(1.1)*9*k,y-15*k+Math.sin(1.1)*9*k,.7*k,'#eee');break;}
  case'defender':{person(c,x,y,k,col,col2,hat);El(c,x+6*k,y-12*k,6*k,8*k,col2,0,OUT,1.2*k);El(c,x+6*k,y-12*k,2.5*k,3.5*k,col);break;}
  case'swordsman':case'wildhorn':{
   if(type==='wildhorn'){horse(c,x-2*k,y,k,'#8a6040');person(c,x-6*k,y-8*k,k*.85,col,col2,'leaf');Ln(c,x-9*k,y-37*k,x-14*k,y-44*k,1.6*k,'#d8c09a');Ln(c,x-3*k,y-37*k,x+2*k,y-44*k,1.6*k,'#d8c09a');Ln(c,x+2*k,y-20*k,x+8*k,y-34*k,2*k,'#ddd');break;}
   person(c,x,y,k,col,col2,hat);Ln(c,x+8*k,y-12*k,x+12*k,y-30*k,2.4*k,'#e6e6ee');Ln(c,x+6*k,y-15*k,x+10*k,y-14*k,2*k,'#8a6a2a');El(c,x-7*k,y-13*k,4*k,6*k,col2,0,OUT,k);break;}
  case'rider':{horse(c,x,y,k,'#9a6a3a',col2);person(c,x-2*k,y-8*k,k*.85,col,col2,hat);Ln(c,x+4*k,y-18*k,x+8*k,y-30*k,2*k,W);break;}
  case'knight':{horse(c,x,y,k,'#e8e8ee',col);person(c,x-2*k,y-8*k,k*.85,col,col2,'spike');Ln(c,x-2*k,y-20*k,x+18*k,y-34*k,2.2*k,'#d8c070');break;}
- case'icesled':{Ln(c,x-13*k,y,x+12*k,y,1.6*k,'#bfe8ff');Ln(c,x+12*k,y,x+15*k,y-4*k,1.6*k,'#bfe8ff');Pg(c,[[x-11*k,y-2*k],[x+10*k,y-2*k],[x+8*k,y-8*k],[x-11*k,y-8*k]],col2,OUT,k);person(c,x,y-7*k,k*.8,col,col2,hat);Ln(c,x+5*k,y-18*k,x+9*k,y-30*k,2*k,'#bfe8ff');break;}
+ case'icesled':{const rc=hat==='flame'?'#ff7a1a':'#bfe8ff';Ln(c,x-13*k,y,x+12*k,y,1.6*k,rc);Ln(c,x+12*k,y,x+15*k,y-4*k,1.6*k,'#bfe8ff');Pg(c,[[x-11*k,y-2*k],[x+10*k,y-2*k],[x+8*k,y-8*k],[x-11*k,y-8*k]],col2,OUT,k);person(c,x,y-7*k,k*.8,col,col2,hat);Ln(c,x+5*k,y-18*k,x+9*k,y-30*k,2*k,'#bfe8ff');break;}
  case'catapult':{
  
   Rc(c,x-12*k,y-8*k,24*k,4*k,W);Ci(c,x-8*k,y-3*k,3.4*k,'#5a3a20');Ci(c,x+8*k,y-3*k,3.4*k,'#5a3a20');Ln(c,x-4*k,y-8*k,x+10*k,y-26*k,2.6*k,W);Ci(c,x+10*k,y-27*k,3.4*k,'#555');Ln(c,x-8*k,y-8*k,x-8*k,y-20*k,1.6*k,W);Pg(c,[[x-8*k,y-20*k],[x-1*k,y-18*k],[x-8*k,y-15*k]],col);break;}
  case'mindbender':{person(c,x,y,k,col,col2,hat,{robe:shade(col,.25)});Ln(c,x+9*k,y,x+9*k,y-30*k,1.8*k,W);Ci(c,x+9*k,y-31*k,3.4*k,col2,OUT,k);Ci(c,x+9*k,y-31*k,5.5*k,null,'rgba(255,255,255,.5)',k);break;}
  case'cloak':{person(c,x,y,k,'#2e2e38',col,'hood',{skin:'#444'});Ci(c,x-2*k,y-26.5*k,.9*k,'#ff4');Ci(c,x+2*k,y-26.5*k,.9*k,'#ff4');break;}
  case'giant':{person(c,x,y,k*1.55,col,col2,hat);Ln(c,x+12*k,y-18*k,x+18*k,y-40*k,4*k,W);Ci(c,x+18*k,y-40*k,4*k,W);break;}
- case'frosttitan':{person(c,x,y,k*1.55,'#bfe8ff',col,hat,{skin:'#e8f8ff'});Pg(c,[[x+14*k,y-18*k],[x+19*k,y-46*k],[x+22*k,y-18*k]],'#9fe0ff',OUT,k);break;}
- case'snowling':{Ci(c,x,y-8*k,9*k,'#fbfdff',OUT,k);Ci(c,x,y-21*k,6.5*k,'#fbfdff',OUT,k);Ci(c,x-2.2*k,y-22*k,1*k,'#223');Ci(c,x+2.2*k,y-22*k,1*k,'#223');Pg(c,[[x,y-20.5*k],[x+5*k,y-19.5*k],[x,y-19*k]],'#ff8a2a');Rc(c,x-6*k,y-16*k,12*k,3*k,col2);Rc(c,x+2*k,y-16*k,3*k,8*k,col2);Ci(c,x,y-9*k,1*k,'#334');Ci(c,x,y-5*k,1*k,'#334');break;}
- case'glacierkeep':{Pg(c,[[x-10*k,y],[x+10*k,y],[x+9*k,y-26*k],[x-9*k,y-26*k]],'#cfeeff',OUT,k);for(let i=0;i<3;i++)Rc(c,x-9*k+i*7*k,y-31*k,4.5*k,5*k,'#cfeeff');Rc(c,x-9*k,y-12*k,18*k,3*k,col2);Ci(c,x-3*k,y-19*k,1.3*k,'#235');Ci(c,x+3*k,y-19*k,1.3*k,'#235');Pg(c,[[x-3*k,y-7*k],[x+3*k,y-7*k],[x+3*k,y],[x-3*k,y]],'#9fd0ee');break;}
+ case'frosttitan':{if(hat==='flame'){person(c,x,y,k*1.55,'#5a3a30',col,'flame',{skin:'#ff9a4a'});Pg(c,[[x+14*k,y-18*k],[x+19*k,y-46*k],[x+22*k,y-18*k]],'#ff7a1a',OUT,k);break;}person(c,x,y,k*1.55,'#bfe8ff',col,hat,{skin:'#e8f8ff'});Pg(c,[[x+14*k,y-18*k],[x+19*k,y-46*k],[x+22*k,y-18*k]],'#9fe0ff',OUT,k);break;}
+ case'snowling':{if(hat==='flame'){Ci(c,x,y-8*k,9*k,'#3a2a2a',OUT,k);Ln(c,x-5*k,y-11*k,x+1*k,y-5*k,1.2*k,'#ff7a1a');Ln(c,x+2*k,y-13*k,x+6*k,y-7*k,1*k,'#ffb02a');Ci(c,x,y-21*k,6.5*k,'#ff7a1a',OUT,k);Pg(c,[[x-5*k,y-24*k],[x-2*k,y-33*k],[x,y-26*k],[x+3*k,y-34*k],[x+5*k,y-24*k]],'#ffd23f');Ci(c,x-2.2*k,y-21*k,1.1*k,'#1a1010');Ci(c,x+2.2*k,y-21*k,1.1*k,'#1a1010');break;}Ci(c,x,y-8*k,9*k,'#fbfdff',OUT,k);Ci(c,x,y-21*k,6.5*k,'#fbfdff',OUT,k);Ci(c,x-2.2*k,y-22*k,1*k,'#223');Ci(c,x+2.2*k,y-22*k,1*k,'#223');Pg(c,[[x,y-20.5*k],[x+5*k,y-19.5*k],[x,y-19*k]],'#ff8a2a');Rc(c,x-6*k,y-16*k,12*k,3*k,col2);Rc(c,x+2*k,y-16*k,3*k,8*k,col2);Ci(c,x,y-9*k,1*k,'#334');Ci(c,x,y-5*k,1*k,'#334');break;}
+ case'glacierkeep':{if(hat==='flame'){Pg(c,[[x-10*k,y],[x+10*k,y],[x+9*k,y-26*k],[x-9*k,y-26*k]],'#4a3430',OUT,k);for(let i=0;i<3;i++)Rc(c,x-9*k+i*7*k,y-31*k,4.5*k,5*k,'#4a3430');Ln(c,x-7*k,y-4*k,x-2*k,y-14*k,1.4*k,'#ff7a1a');Ln(c,x+3*k,y-6*k,x+7*k,y-20*k,1.2*k,'#ffb02a');Rc(c,x-9*k,y-12*k,18*k,3*k,col2);Ci(c,x-3*k,y-19*k,1.3*k,'#ffd23f');Ci(c,x+3*k,y-19*k,1.3*k,'#ffd23f');break;}Pg(c,[[x-10*k,y],[x+10*k,y],[x+9*k,y-26*k],[x-9*k,y-26*k]],'#cfeeff',OUT,k);for(let i=0;i<3;i++)Rc(c,x-9*k+i*7*k,y-31*k,4.5*k,5*k,'#cfeeff');Rc(c,x-9*k,y-12*k,18*k,3*k,col2);Ci(c,x-3*k,y-19*k,1.3*k,'#235');Ci(c,x+3*k,y-19*k,1.3*k,'#235');Pg(c,[[x-3*k,y-7*k],[x+3*k,y-7*k],[x+3*k,y],[x-3*k,y]],'#9fd0ee');break;}
  case'jellyegg':{const ey=y-12*k;El(c,x,ey,9*k,12*k,'#fff4fa',0,OUT,.8*k);for(const[a,b2]of[[-4,-6],[4,3],[-1,7]])El(c,x+a*k,ey+b2*k,1.8*k,1.4*k,col);
   for(const sx_ of[-1,1])Pg(c,[[x+sx_*3*k,ey-10*k],[x+sx_*7*k,ey-15*k],[x+sx_*5*k,ey-9*k]],col2);El(c,x-4*k,y-1*k,3*k,1.6*k,col2);El(c,x+4*k,y-1*k,3*k,1.6*k,col2);eyesND(c,x+1*k,ey-1*k,k*.75);break;}
  case'larvy':axoF(c,x,y,k*.78,col,col2);break;
@@ -1036,18 +1036,19 @@ function drawTerrain(c,t,X,Y,sx,sy,hw,hh,s,now){
  const tr=TRIBES[t.clim];const bug=tr.sp==='bug'&&t.cs>0,polar=tr.sp==='polar';
  if(t.ter==='water'||t.ter==='ocean'){diamond(c,sx,sy+2*s,hw,hh);c.fillStyle=t.ter==='ocean'?'#2a78b8':'#46a8dc';c.fill();
   const w=Math.sin(now/600+X*1.3+Y*.7);Ln(c,sx-8*s+w*2*s,sy+1*s,sx-2*s+w*2*s,sy+1*s,1*s,'rgba(255,255,255,.35)');Ln(c,sx+4*s-w*2*s,sy+6*s,sx+10*s-w*2*s,sy+6*s,1*s,'rgba(255,255,255,.25)');return;}
- const top=t.foam?'#ffe6f4':t.ter==='ice'?'#dff2ff':polar?'#eef4f8':tr.g;
+ const solar=polar&&t.cs===1;const top=t.foam?'#ffe6f4':t.ter==='ice'?(t.lava?'#4a3430':'#dff2ff'):solar?'#d8a46a':polar?'#eef4f8':tr.g;
  c.beginPath();c.moveTo(sx-hw,sy);c.lineTo(sx,sy+hh);c.lineTo(sx+hw,sy);c.lineTo(sx+hw,sy+5*s);c.lineTo(sx,sy+hh+5*s);c.lineTo(sx-hw,sy+5*s);c.closePath();c.fillStyle=t.ter==='ice'?'#9fcde8':shade(top,-.35);c.fill();
  diamond(c,sx,sy,hw,hh);c.fillStyle=top;c.fill();
  if(t.goo&&G&&G.players[t.goo-1]){const gc=pcol(G.players[t.goo-1])[0];El(c,sx,sy+1*s,hw*.62,hh*.55,sh2(gc,.15),0,'rgba(0,0,0,.15)',.6*s);El(c,sx-hw*.2,sy-hh*.1,hw*.16,hh*.12,'rgba(255,255,255,.65)');Ci(c,sx+hw*.32,sy+hh*.25,2*s,sh2(gc,.15));}
- if(t.foam){for(const[a,b,r]of[[-12,-2,3],[8,-4,2.4],[2,4,3.4],[-5,6,2],[13,3,2.2]])Ci(c,sx+a*s,sy+b*s,r*s,'rgba(255,255,255,.95)');}else if(t.ter==='ice'){Ln(c,sx-10*s,sy-2*s,sx+4*s,sy+4*s,.8*s,'#fff');Ln(c,sx+2*s,sy-6*s,sx+8*s,sy,.8*s,'#fff');}
+ if(t.foam){for(const[a,b,r]of[[-12,-2,3],[8,-4,2.4],[2,4,3.4],[-5,6,2],[13,3,2.2]])Ci(c,sx+a*s,sy+b*s,r*s,'rgba(255,255,255,.95)');}else if(t.ter==='ice'&&t.lava){Ln(c,sx-12*s,sy-1*s,sx-2*s,sy+3*s,1.6*s,'#ff7a1a');Ln(c,sx-2*s,sy+3*s,sx+6*s,sy-1*s,1.4*s,'#ffb02a');Ln(c,sx+3*s,sy-6*s,sx+9*s,sy-2*s,1.2*s,'#ff7a1a');Ci(c,sx+8*s,sy+4*s,1.6*s,'rgba(255,140,40,.8)');}
+ else if(t.ter==='ice'){Ln(c,sx-10*s,sy-2*s,sx+4*s,sy+4*s,.8*s,'#fff');Ln(c,sx+2*s,sy-6*s,sx+8*s,sy,.8*s,'#fff');}
  if(bug&&t.ter==='field'&&((X*7+Y*13)%5===0))flowerSm(c,sx+((X*5)%7-3)*2*s,sy+((Y*3)%5-2)*2*s,1.6*s,(X+Y)%2?'#ff8fc8':'#b48cff');
 }
 function seesRes(t){if(!G)return true;const v=P(G.view);if(!v)return true;if(t.res==='crop')return!!v.techs.organization||!!v.techs.farming;if(t.res==='ore')return!!v.techs.climbing;if(t.res==='starfish')return!!v.techs.fishing;return true;}
 function drawFeature(c,t,X,Y,sx,sy,hw,hh,s){const seeR=seesRes(t);
- const tr=TRIBES[t.clim];const polar=tr.sp==='polar'||tr.sp===undefined&&false;const nd=tr.sp==='bug'&&t.cs>0,shroom=tr.sp==='bug'&&!t.cs;const pink=tr.sp==='elyr'||nd||tr.sp==='slime';
+ const tr=TRIBES[t.clim];const polar=tr.sp==='polar'||tr.sp===undefined&&false;const nd=tr.sp==='bug'&&t.cs>0,shroom=tr.sp==='bug'&&!t.cs;const pink=tr.sp==='elyr'||nd||tr.sp==='slime';const solarT=tr.sp==='polar'&&t.cs===1;
  if(t.road){for(const[a,b]of nbrs(X,Y)){if(Math.abs(a-X)+Math.abs(b-Y)!==1)continue;const n=T(a,b);if(n.road||n.city>=0){const nx=sx+((a-X)-(b-Y))*hw,ny=sy+((a-X)+(b-Y))*hh;Ln(c,sx,sy,(sx+nx)/2,(sy+ny)/2,3*s,'#b08a5a');}}Ci(c,sx,sy,1.6*s,'#b08a5a');}
- if(t.ter==='forest'&&t.imp!=='lumber'&&t.imp!=='ftemple'){tree(c,sx-hw*.42,sy+1*s,s*.9,(nd?(t.cs===2?'#8fd4ff':'#e08ad8'):tr.tr),tr.sp==='polar',shroom?'shroom':pink);tree(c,sx+hw*.35,sy-2*s,s,(nd?(t.cs===2?'#8fd4ff':'#e08ad8'):tr.tr),tr.sp==='polar',shroom?'shroom':pink);tree(c,sx,sy+hh*.6,s*.85,(nd?(t.cs===2?'#8fd4ff':'#e08ad8'):tr.tr),tr.sp==='polar',shroom?'shroom':pink);}
+ if(t.ter==='forest'&&t.imp!=='lumber'&&t.imp!=='ftemple'){tree(c,sx-hw*.42,sy+1*s,s*.9,(nd?(t.cs===2?'#8fd4ff':'#e08ad8'):solarT?'#6a7a2a':tr.tr),(tr.sp==='polar'&&!solarT),shroom?'shroom':pink);tree(c,sx+hw*.35,sy-2*s,s,(nd?(t.cs===2?'#8fd4ff':'#e08ad8'):solarT?'#6a7a2a':tr.tr),(tr.sp==='polar'&&!solarT),shroom?'shroom':pink);tree(c,sx,sy+hh*.6,s*.85,(nd?(t.cs===2?'#8fd4ff':'#e08ad8'):solarT?'#6a7a2a':tr.tr),(tr.sp==='polar'&&!solarT),shroom?'shroom':pink);}
  if(t.ter==='mountain'){Pg(c,[[sx-hw*.8,sy+hh*.3],[sx+hw*.8,sy+hh*.3],[sx+hw*.1,sy-hh*1.9]],'#8e8f9e',OUT,s*.6);Pg(c,[[sx+hw*.1,sy-hh*1.9],[sx+hw*.8,sy+hh*.3],[sx+hw*.25,sy+hh*.3]],'#6e6f7e');Pg(c,[[sx-hw*.12,sy-hh*1.15],[sx+hw*.33,sy-hh*1.15],[sx+hw*.1,sy-hh*1.9]],'#fff');
   if(t.res==='ore'&&!t.imp&&seeR){for(const[a,b]of[[-.3,0],[.2,.1],[-.05,-.4]])Pg(c,[[sx+a*hw-2*s,sy+b*hh],[sx+a*hw,sy+b*hh-5*s],[sx+a*hw+2*s,sy+b*hh]],'#8fd8ff',OUT,.5*s);}}
  if(t.res==='fruit'&&nd){Ln(c,sx,sy+2*s,sx,sy-10*s,1.2*s,'#5fa04a');for(let i=0;i<6;i++){const a=i*TAU/6;El(c,sx+Math.cos(a)*3.5*s,sy-12*s+Math.sin(a)*3*s,3*s,1.8*s,i%2?'#ff8fc8':'#ffb0dc',a);}Ci(c,sx,sy-12*s,1.8*s,'#ffe14a');El(c,sx+6*s,sy-4*s,1.4*s,2*s,'rgba(150,220,255,.9)');}
@@ -1258,6 +1259,8 @@ function showPanel(){const pn=$('panel');if(!SEL){pn.style.display='none';return
    for(const[b,tc]of boatOptions(u)){const own=tileOwner(T(u.x,u.y))===u.owner;const ok=fresh&&p.techs[tc]&&p.stars>=UNITS[b].c&&own;
     acts.appendChild(btn('Upgrade: '+uname(b,p),(!p.techs[tc]?'Needs '+TECH[tc].n:!own?'In your waters':CUR()+UNITS[b].c),ok,()=>{upgradeBoat(u,b);afterAction(u);},unitIcon(b,p,38)));}
    if(p.techs.freespirit&&!UNITS[u.type].sup)acts.appendChild(btn('Disband','get '+Math.floor((UNITS[u.base||u.type].c||0)/2)+' stars',fresh,()=>{disband(u);clearSel();updHud();}));
+   const why=u.frozen?'Frozen! It thaws and loses its next turn.':u.wasFrozen&&!u.cm&&!u.ca?'It was frozen by ice, so it skips this turn. It can move next turn.':u.merged&&!u.cm?'Just merged: merging uses its turn. It can move next turn.':!u.cm&&!u.ca?'':!u.cm?'Already moved this turn.':MOVES&&!MOVES.size?'No free tile to move to (units, water or mountains in the way).':'';
+   if(why){const n=document.createElement('div');n.className='hint';n.textContent=why;pn.appendChild(n);}
    if(!u.cm&&!u.ca)acts.appendChild(btn('No moves left','',false));
    else if(MOVES&&MOVES.size||TARGETS&&TARGETS.length){const n=document.createElement('div');n.className='hint';n.textContent=(MOVES&&MOVES.size?'Tap a white tile to move. ':'')+(TARGETS&&TARGETS.length?'Tap a red-outlined enemy to attack.':'');pn.appendChild(n);}
    const tb=document.createElement('div');tb.className='lnk';tb.textContent='Show tile';tb.onclick=()=>select(x,y,'tile');pn.appendChild(tb);}
