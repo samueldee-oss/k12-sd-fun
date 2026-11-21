@@ -1144,6 +1144,10 @@ function up(e){const had=ptrs.has(e.pointerId);ptrs.delete(e.pointerId);if(ptrs.
 cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',e=>{ptrs.delete(e.pointerId);panStart=null;pinch=null;});
 cv.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.deltaY<0?1.12:1/1.12,e.clientX,e.clientY);},{passive:false});
 function tapScreen(px,py){if(!G||busy||G.over)return;
+ // tapping anywhere on an attackable enemy's body picks that enemy (big units cover the tile behind them)
+ if(TARGETS&&TARGETS.length){let best=null,bd=1e9;const s=cam.z;for(const d of TARGETS){const sx=(d.x-d.y)*hw()+cam.x,sy=(d.x+d.y)*hh()+cam.y;const big=UNITS[d.type].sup?1.6:1;
+   if(px>sx-hw()*.75&&px<sx+hw()*.75&&py>sy-38*s*big&&py<sy+hh()*.9){const dd=Math.hypot(px-sx,py-(sy-12*s));if(dd<bd){bd=dd;best=d;}}}
+  if(best){tapTile(best.x,best.y);return;}}
  // a tap on a highlighted square always wins
  let[X,Y]=screenToTile(px,py);const k0=inb(X,Y)?Y*G.N+X:-1;
  if(MOVES&&MOVES.has(k0)){tapTile(X,Y);return;}
