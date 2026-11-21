@@ -54,6 +54,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-21: Tiny Realms: tech tree 'Unlocks' lists only what your own tribe can build (Foam and Flowers only for the bug tribe, no Port for the ice tribe). Commit `COMMIT`.
 - 2026-11-21: Tiny Realms: Glacira (ice tribe) has no ports, rafts or boats, like Polaris; Snowlings freezing water is how they cross it. Commit `7665d33`.
 - 2026-11-21: Tiny Realms: new Wild world type, used by 'Surprise me': random water amount, smoothness, land shape, mountain/forest/field mix, resources and ruins, so every Wild map is different. Commit `3dea471`.
 - 2026-11-21: Tiny Realms: Guru/Shaman and Cloak get Dash (can act after moving). Commit `87d758e`.

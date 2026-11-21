@@ -1288,7 +1288,7 @@ function showLvq(){if(!G||$('modal').style.display==='flex')return;const p=human
 // ---------- tech screen ----------
 let techSel=null;
 function openTech(){if(!G)return;const p=humanP();if(!p||p.ai)return;const el=$('tech');el.style.display='block';renderTech();}
-function unlocksOf(p,k){const o=[];for(const[u,t]of trainList(p))if(t===k)o.push(uname(u,p));if(psp(p)!=='bug'&&psp(p)!=='polar')for(const[b,t]of BOATS)if(t===k)o.push(uname(utype(p,b),p)+' boat');for(const im of IMPS)if(im.tech===k)o.push(im.n);return o;}
+function unlocksOf(p,k){const o=[];for(const[u,t]of trainList(p))if(t===k)o.push(uname(u,p));if(psp(p)!=='bug'&&psp(p)!=='polar')for(const[b,t]of BOATS)if(t===k)o.push(uname(utype(p,b),p)+' boat');for(const im of IMPS)if(im.tech===k&&!(im.noBug&&psp(p)==='bug')&&!(im.onlyBug&&psp(p)!=='bug')&&!(im.k==='port'&&psp(p)==='polar'))o.push(impName(p,im));return o;}
 function techIcon(k){const T1={riding:'R',roads:'Rd',trade:'Tr',freespirit:'FS',chivalry:'Ch',organization:'Or',farming:'Fa',construction:'Co',strategy:'St',diplomacy:'Di',climbing:'Cl',mining:'Mi',smithery:'Sm',meditation:'Me',philosophy:'Ph',fishing:'Fi',sailing:'Sa',navigation:'Na',ramming:'Ra',aquatism:'Aq',hunting:'Hu',archery:'Ar',spiritualism:'Sp',forestry:'Fo',mathematics:'Ma'};return T1[k];}
 function renderTech(){const p=humanP();const el=$('tech');
  const S=Math.min(innerWidth-8,innerHeight-200,600);const C=S/2;
