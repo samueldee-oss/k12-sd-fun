@@ -638,7 +638,7 @@ function endTurnEffects(i){
  for(const u of G.units.slice()){if(u.owner!==i||!has(u,'foamarea'))continue;for(const[a,b]of nbrs(u.x,u.y)){const t=T(a,b);if(isWater(t)&&!t.imp&&t.city<0){const v=unitAt(a,b);foamTile(t);if(v&&has(v,'naval')){v.type=v.base||'warrior';v.base=null;}}}}
  for(const u of G.units.slice()){if(u.owner!==i||!has(u,'freezearea'))continue;
   for(const[a,b]of nbrs(u.x,u.y)){const t=T(a,b);if(isWater(t)&&!t.imp&&t.city<0){const v=unitAt(a,b);freezeTile(t,P(i).skin===1&&psp(P(i))==='polar');if(v&&has(v,'naval')){v.type=v.base||'warrior';v.base=null;}}
-   const v=unitAt(a,b);if(v&&v.owner!==i){v.frozen=1;}}}
+   const v=unitAt(a,b);if(v&&v.owner!==i&&!atPeace(i,v.owner)){v.frozen=1;}}}
 }
 function aliveList(){return G.players.filter(p=>p.alive);}
 function checkWin(){if(G.over)return null;const al=aliveList();const humans=al.filter(p=>!p.ai);
