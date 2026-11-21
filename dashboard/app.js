@@ -2,6 +2,7 @@
 // Icons are animated GIFs made by tools/game_icons.py. To add a game, add a line here.
 
 const GAMES = [
+  { id: "bank-dynamics", name: "Bank Dynamics", desc: "Bank Game in levels: work, bills, both. Predict, play, then see why.", src: "../bank-dynamics/index.html" },
   { id: "whisker-dash", name: "Whisker Dash", desc: "Pixel cat platformer, 1–2 players.", src: "../whisker-dash/index.html" },
   { id: "rulebound", name: "Rulebound", desc: "Word-rule puzzles: push words to change the rules (90 levels + sandbox).", src: "../rulebound/index.html" },
   { id: "poirot-pigeon", name: "Poirot the Pigeon", desc: "Poirot the Pigeon: 3D whodunit, search rooms with a magnifying glass, 1–2 players.", src: "../poirot-pigeon/index.html" },
@@ -34,7 +35,6 @@ const GAMES = [
   { id: "chameleon-hide-seek", name: "Chameleon Hide & Seek", desc: "Copy colors from the world onto your chameleon and hide.", src: "../chameleon-hide-seek/index.html" },
   { id: "pong", name: "Pong", desc: "Classic Pong with touch controls, 1–2 players.", src: "../pong/index.html" },
   { id: "snake", name: "Blender Mode Snake", desc: "Snake (side project). Swipe to steer.", src: "../experiments/snake-blender-mode/index.html" },
-  { id: "bank-dynamics", name: "Bank Dynamics", desc: "Bank Game in levels: work, bills, both. Predict, play, then see why.", src: "../bank-dynamics/index.html" },
   {
     id: "bank-game", name: "Bank Game", desc: "Stocks, flows and interest: save, buy, and watch money grow. Current works anywhere; older copies need the PC server.",
     versions: [
