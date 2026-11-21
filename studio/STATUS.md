@@ -54,6 +54,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-21: Tiny Realms: Gloopa Blobs have Skewer: every kill lets them attack again, chaining as long as they keep killing (the AI uses it too). Commit `PENDING`.
 - 2026-11-21: Tiny Realms: Cloaks get an Infiltrate button for nearby enemy cities that says why it can't be used (a unit is standing in the city, at peace, too far, no moves); Cloaks can no longer infiltrate friends at peace. Commit `e290ae2`.
 - 2026-11-21: Tiny Realms: ice-tribe Snowlings no longer freeze units of tribes they are at peace with (only enemies). Commit `4968c3b`.
 - 2026-11-21: Tiny Realms: Solvara (the ice tribe's second skin) is now lava-themed: sandy ground, flame hats, Emblings that turn water into cooled lava rock, Flame Archer, Lava Sled, Magma Keep, Magma Titan. The unit panel now says why a unit can't move (just merged, frozen, already moved, or boxed in). Commit `52b22d6`.

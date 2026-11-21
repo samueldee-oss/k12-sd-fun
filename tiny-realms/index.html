@@ -171,7 +171,7 @@ const UNITS={
  scout:{n:'Scout',c:5,a:2,d:1,m:3,r:2,sk:['naval','dash','sight']},
  rammer:{n:'Rammer',c:5,a:3,d:3,m:3,r:1,sk:['naval','dash']},
  bomber:{n:'Bomber',c:15,a:3,d:2,m:2,r:3,sk:['naval','splash','stiff']},
- blob:{n:'Blob',c:2,hp:10,a:2,d:2,m:1,r:1,sk:['slime','dash','fortify']},
+ blob:{n:'Blob',c:2,hp:10,a:2,d:2,m:1,r:1,sk:['slime','dash','skewer','fortify']},
  zipblob:{n:'Zipper',c:3,hp:8,a:2,d:1,m:3,r:1,sk:['slime','dash','escape']},
  spitblob:{n:'Spitter',c:3,hp:10,a:2,d:1,m:1,r:2,sk:['slime','dash','poison']},
  wallblob:{n:'Bouncer',c:4,hp:15,a:1,d:3,m:1,r:1,sk:['slime','fortify','bounce']},
@@ -210,7 +210,7 @@ const UNITS={
  babywyrm:{n:'Young Wyrm',c:10,hp:15,a:3,d:3,m:2,r:1,sk:['fly','dash','grow']},
  firewyrm:{n:'Fire Wyrm',c:10,hp:20,a:4,d:3,m:3,r:2,sk:['fly','splash','dash']},
 };
-const SKILL_TXT={dash:'Dash: can attack after moving',escape:'Escape: can move after attacking',persist:'Persist: attacks again after a kill',fortify:'Fortify: defense bonus in own cities',heal:'Heal: heals nearby friends',convert:'Convert: attack turns enemies to your side',hide:'Hide: invisible to enemies unless next to them',infiltrate:'Infiltrate: sneaks into enemy cities and spawns Daggers',creep:'Creep: forests and mountains do not slow it',splash:'Splash: hurts enemies next to the target too',naval:'Naval: moves on water',freezearea:'Freeze Area: freezes water and enemies next to it at turn end',freeze:'Freeze: attacks freeze the enemy for a turn',skate:'Skate: moves double on ice',boost:'Boost: makes nearby friends hit harder',poison:'Poison: poisoned enemies lose defense and cannot heal',fly:'Fly: flies over anything',amph:'Amphibious: walks on land and water',grow:'Grows up after 3 turns',hatch:'Hatches into a Larvy next turn',slime:'Slime: Merge with a friend to grow (up to size 4), Split into two, Gobble food anywhere, and leave Goo',bounce:'Bounce: hits back with full force, even at archers',splitdeath:'When defeated, splits into two Blobs',gulp:'Gulp: heals 5 when it defeats an enemy',foamarea:'Foam: turns water next to it into Foam that anyone can walk on',explode:'Explode: blows up to hurt and poison all enemies around',sight:'Sees farther'};
+const SKILL_TXT={dash:'Dash: can attack after moving',escape:'Escape: can move after attacking',persist:'Persist: attacks again after a kill',skewer:'Skewer: every kill lets it attack again, as long as it keeps killing',fortify:'Fortify: defense bonus in own cities',heal:'Heal: heals nearby friends',convert:'Convert: attack turns enemies to your side',hide:'Hide: invisible to enemies unless next to them',infiltrate:'Infiltrate: sneaks into enemy cities and spawns Daggers',creep:'Creep: forests and mountains do not slow it',splash:'Splash: hurts enemies next to the target too',naval:'Naval: moves on water',freezearea:'Freeze Area: freezes water and enemies next to it at turn end',freeze:'Freeze: attacks freeze the enemy for a turn',skate:'Skate: moves double on ice',boost:'Boost: makes nearby friends hit harder',poison:'Poison: poisoned enemies lose defense and cannot heal',fly:'Fly: flies over anything',amph:'Amphibious: walks on land and water',grow:'Grows up after 3 turns',hatch:'Hatches into a Larvy next turn',slime:'Slime: Merge with a friend to grow (up to size 4), Split into two, Gobble food anywhere, and leave Goo',bounce:'Bounce: hits back with full force, even at archers',splitdeath:'When defeated, splits into two Blobs',gulp:'Gulp: heals 5 when it defeats an enemy',foamarea:'Foam: turns water next to it into Foam that anyone can walk on',explode:'Explode: blows up to hurt and poison all enemies around',sight:'Sees farther'};
 
 const TRAIN_BASE=[['warrior',null],['rider','riding'],['archer','archery'],['defender','strategy'],['swordsman','smithery'],['catapult','mathematics'],['knight','chivalry'],['mindbender','philosophy'],['cloak','diplomacy']];
 const BOATS=[['scout','sailing'],['rammer','ramming'],['bomber','navigation']];
@@ -482,7 +482,7 @@ function doAttack(a,d){
   if(has(a,'gulp')&&G.units.includes(a)){a.hp=Math.min(maxHp(a),a.hp+5);fx(a.x,a.y,'Gulp! +5','#80ff80');}
   if(UD(a).r===1&&!has(a,'stiff')&&dist(a.x,a.y,dx,dy)===1&&canStand(a,T(dx,dy),p)&&G.units.includes(a)&&!unitAt(dx,dy)){a.ax=a.x;a.ay=a.y;a.t0=(typeof performance!=='undefined'?performance.now():0);
    const to=T(dx,dy);if(has(a,'naval')&&!isWater(to)){}else{a.x=dx;a.y=dy;occDirty();unitSight(a);}}
-  if(has(a,'persist'))a.ca=true;}
+  if(has(a,'persist'))a.ca=true;if(has(a,'skewer')&&G.units.includes(a)){a.ca=true;fx(a.x,a.y,'Skewer!','#ffd23f');}}
  else{logEv(a.owner,pname(p)+' attacked '+pname(P(d.owner))+'\'s '+uname(d.type,P(d.owner))+' (-'+dmg+')',d.owner,'hit');}
  if(d.hp>0&&ret>0){a.hp-=ret;fx(a.x,a.y,'-'+ret,'#ff5050');if(has(d,'poison')&&a.hp>0)a.poisoned=1;if(a.hp<=0)killUnit(a);}
 }
@@ -698,7 +698,7 @@ function aiUnit(u,p,claimed){
   if(has(u,'explode')&&nbrs(u.x,u.y).filter(([a,b])=>{const v=unitAt(a,b);return v&&v.owner!==p.i;}).length>=3){explodeAction(u);return;}
   if(u.type==='raft'&&p.stars>=8&&tileOwner(T(u.x,u.y))===p.i){const op=boatOptions(u).filter(([b,t])=>p.techs[t]&&p.stars>=UNITS[b].c);if(op.length){upgradeBoat(u,pick(op)[0]);return;}}
  }
- if(u.ca){const b=bestTarget(u);if(b&&b.s>0)doAttack(u,b.d);}
+ for(let n=0;n<6&&G.units.includes(u)&&u.ca;n++){const b=bestTarget(u);if(b&&b.s>0)doAttack(u,b.d);else break;}
  if(!G.units.includes(u))return;
  if(u.cm){
   const t=T(u.x,u.y);
@@ -707,7 +707,7 @@ function aiUnit(u,p,claimed){
   if(UD(u).a<=0&&!has(u,'freezearea')&&!has(u,'freeze')&&!has(u,'convert')&&!has(u,'naval')&&!has(u,'infiltrate')&&u.type!=='petalshaman'&&!has(u,'foamarea'))return;
   aiMove(u,p,claimed);
   if(G.units.includes(u)&&u.cm===false&&canCapture({...u,cm:true,ca:true})){}
-  if(G.units.includes(u)&&u.ca){const b=bestTarget(u);if(b&&b.s>0)doAttack(u,b.d);}
+  for(let n=0;n<6&&G.units.includes(u)&&u.ca;n++){const b=bestTarget(u);if(b&&b.s>0)doAttack(u,b.d);else break;}
  }else if(u.ca&&u.hp<maxHp(u)&&u.cm){recover(u);}
 }
 function techValue(p,k){let v=.4;const own=[];for(let i=0;i<G.map.length;i++){const t=G.map[i];if(t.terr>=0&&G.cities[t.terr].owner===p.i)own.push(t);}
