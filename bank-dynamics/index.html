@@ -614,6 +614,20 @@ const LEVELS = [
     ],
     key: ["When less flows in", "than flows out,", "the balance", "goes down."],
   },
+  {
+    n: 5, title: "Level 5: Wheels", idea: "A car raises inflow, but adds surprise repairs",
+    goalText: "Your car gets you a $40-a-tap job, but old cars break. Save $1,000 for an SUV.",
+    months: 24, start: 200, pay: 40, bills: 40, goal: 1000, max: 1200, oldPay: 20,
+    car: { name: "SUV", color: [110, 190, 140] },
+    repairChance: 0.2,
+    repairs: [{ name: "Flat tire", cost: 80 }, { name: "New battery", cost: 150 }, { name: "Brakes", cost: 250 }],
+    review: { from: 4, type: "graph" },
+    quiz: [
+      { q: "The car gets you a better job: pay goes from $20 to $40 a tap. What happens to your inflow?", a: ["It stays the same", "It doubles", "It goes down"], c: 1 },
+      { q: "Sometimes the car breaks and a repair costs money. What does your balance do in that month?", a: ["Drops suddenly", "Keeps rising smoothly", "Nothing changes"], c: 0 },
+    ],
+    key: ["A car can raise your inflow,", "but repairs add", "surprise outflows", "to the stock."],
+  },
 ];
 LEVELS[0].car = { name: "Compact", color: [200, 200, 200] };
 
@@ -665,6 +679,7 @@ function beginPlay() {
     started: false, ended: false, celebrate: 0, month: 0, balance: LV.start,
     inflowM: new Array(LV.months).fill(0), outflowM: new Array(LV.months).fill(0),
     series: [[0, LV.start]], nextSample: 0.1, reached: null, emptyAt: null, coins: [], workGlow: 0,
+    repairsM: new Array(LV.months).fill(0), repairs: [], lastIdx: 0, alert: null,
   };
   scene = "play";
 }
@@ -676,6 +691,20 @@ function endPlay() {
   if (passed) { progress.passed[LV.n] = true; progress.stars[LV.n] = Math.max(progress.stars[LV.n] || 0, 1); saveProgress(); }
   scene = "debrief";
 }
+// Level 5: each new month the old car might break (random). Make sure at least one breakdown
+// happens by month 6, so every player sees a surprise outflow.
+function maybeRepair(idx) {
+  const force = idx >= 5 && run.repairs.length === 0;
+  if (!force && Math.random() >= LV.repairChance) return;
+  const fix = LV.repairs[Math.floor(Math.random() * LV.repairs.length)];
+  const paid = Math.min(run.balance, fix.cost);
+  run.balance -= paid;
+  run.outflowM[idx] += paid; run.repairsM[idx] += paid;
+  run.repairs.push({ month: idx + 1, name: fix.name, cost: paid });
+  run.alert = { text: `${fix.name}! −${money(paid)}`, t: 2.0 };
+  for (let k = 0; k < 4; k++) run.coins.push({ x: 630 - k * 30, y: 270, tx: 860, kind: "out" });
+}
+
 function doLevelWork() {
   if (!run || run.ended || run.celebrate > 0 || LV.pay <= 0) return;
   const t = nowSec();
@@ -703,6 +732,8 @@ function levelFrame(elapsed) {
       run.outflowM[idx] += out;
       if (out > 0 && Math.random() < step * 3) run.coins.push({ x: 630, y: 270, tx: 860, kind: "out" });
       run.month += step;
+      const newIdx = Math.floor(run.month);
+      if (LV.repairs && newIdx > run.lastIdx && newIdx < LV.months) { run.lastIdx = newIdx; maybeRepair(newIdx); }
       if (LV.bills > 0 && run.balance <= 0.0001 && run.emptyAt === null) { run.balance = 0; run.emptyAt = run.month; }
       if (run.month >= run.nextSample) { run.series.push([run.month, run.balance]); run.nextSample += 0.1; }
       if (LV.goal && run.balance >= LV.goal) { run.reached = run.month; run.celebrate = 2.0; break; }
@@ -711,6 +742,7 @@ function levelFrame(elapsed) {
   }
   if (run) {
     run.workGlow = Math.max(0, run.workGlow - elapsed * 3);
+    if (run.alert) { run.alert.t -= elapsed; if (run.alert.t <= 0) run.alert = null; }
     run.coins = run.coins.filter((c) => { c.x += 420 * elapsed; return c.x < c.tx; });
   }
   if (review && review.wrong > 0) review.wrong = Math.max(0, review.wrong - elapsed * 2);
@@ -758,25 +790,26 @@ function drawMenu() {
   centerText("Bank Dynamics", 34, CREAM, "bold 44px Arial");
   centerText("Learn how money piles up, drains away, and grows.", 90, [215, 220, 230]);
   LEVELS.forEach((lv, i) => {
-    const r = R(150 + (i % 2) * 370, 130 + Math.floor(i / 2) * 125, 330, 110);
+    const lastOdd = i === LEVELS.length - 1 && LEVELS.length % 2 === 1;
+    const r = R(lastOdd ? 335 : 150 + (i % 2) * 370, 118 + Math.floor(i / 2) * 98, 330, 88);
     const unlocked = lv.n === 1 || progress.passed[lv.n - 1];
     rect(r.x, r.y, r.w, r.h, unlocked ? [24, 34, 50] : [22, 24, 30], 0, 16);
     rect(r.x, r.y, r.w, r.h, unlocked ? GOLD : [80, 86, 98], 2, 16);
-    text(lv.title, r.x + 18, r.y + 12, unlocked ? CREAM : MUTED, BIG);
-    text(lv.idea, r.x + 18, r.y + 48, unlocked ? [215, 220, 230] : MUTED);
+    text(lv.title, r.x + 18, r.y + 8, unlocked ? CREAM : MUTED, "24px Arial");
+    text(lv.idea, r.x + 18, r.y + 39, unlocked ? [215, 220, 230] : MUTED, SMALL);
     const stars = progress.stars[lv.n] || 0;
-    if (!unlocked) text("Locked: pass Level " + (lv.n - 1) + " first", r.x + 18, r.y + 78, MUTED);
-    else text(stars ? "★ Passed (tap to play again)" : "☆ Tap to play", r.x + 18, r.y + 78, stars ? GOLD : [215, 220, 230]);
+    if (!unlocked) text("Locked: pass Level " + (lv.n - 1) + " first", r.x + 18, r.y + 62, MUTED, SMALL);
+    else text(stars ? "★ Passed (tap to play again)" : "☆ Tap to play", r.x + 18, r.y + 62, stars ? GOLD : [215, 220, 230], SMALL);
     if (unlocked) uiButtons.push({ r, act: () => startLevel(lv) });
   });
   // garage: one car for each level you passed by saving up for it
-  rect(150, 390, 700, 100, [16, 20, 30], 0, 14); rect(150, 390, 700, 100, [100, 110, 140], 2, 14);
-  text("Your garage", 166, 398, CREAM);
+  rect(150, 412, 700, 96, [16, 20, 30], 0, 14); rect(150, 412, 700, 96, [100, 110, 140], 2, 14);
+  text("Your garage", 166, 418, CREAM);
   const won = LEVELS.filter((lv) => lv.car && progress.passed[lv.n]);
-  if (!won.length) text("Pass a level with a car goal to park it here.", 166, 440, MUTED, SMALL);
-  won.forEach((lv, k) => { drawCar(180 + k * 160, 434, lv.car.color, 80); text(lv.car.name, 180 + k * 160, 470, [215, 220, 230], SMALL); });
-  text("Coming later: interest (money that earns money) and surprise events.", 150, 500, MUTED, SMALL);
-  addButton(R(350, 540, 300, 54), "Free play (the full game)", () => { scene = "free"; resetGame(); paused = true; },
+  if (!won.length) text("Pass a level with a car goal to park it here.", 166, 460, MUTED, SMALL);
+  won.forEach((lv, k) => { drawCar(180 + k * 140, 454, lv.car.color, 80); text(lv.car.name, 180 + k * 140, 488, [215, 220, 230], SMALL); });
+  text("Coming later: interest (money that earns money).", 150, 514, MUTED, SMALL);
+  addButton(R(350, 548, 300, 50), "Free play (the full game)", () => { scene = "free"; resetGame(); paused = true; },
     { fill: [54, 76, 92], font: "20px Arial" });
   addButton(R(840, 596, 140, 34), "Reset levels", () => { progress = { passed: {}, stars: {} }; saveProgress(); },
     { fill: [40, 30, 34], border: [120, 100, 100], text: [200, 190, 190], font: SMALL });
@@ -894,7 +927,12 @@ function drawPlay() {
   const curIdx = Math.min(LV.months - 1, Math.floor(run.month));
   text("Work (inflow)", 190, y - 66, LV.pay > 0 ? BLUE : MUTED, FONT);
   text(LV.pay > 0 ? `${money(LV.pay)} per tap · ${money(run.inflowM[curIdx])} this month` : "none this level", 160, y + 30, LV.pay > 0 ? BLUE : MUTED, SMALL);
-  text("Bills (outflow)", 680, y - 66, LV.bills > 0 ? RED : MUTED, FONT);
+  text(LV.repairs ? "Bills + repairs (outflow)" : "Bills (outflow)", LV.repairs ? 640 : 680, y - 66, LV.bills > 0 ? RED : MUTED, FONT);
+  if (LV.repairs) {
+    drawCar(170, 160, [190, 150, 110], 60);
+    text("Your hatchback → better job", 120, 128, [215, 220, 230], SMALL);
+    if (run.repairs.length) text(`Repairs so far: ${run.repairs.length} (${money(run.repairs.reduce((a, r) => a + r.cost, 0))})`, 650, y + 50, [255, 170, 110], SMALL);
+  }
   text(LV.bills > 0 ? (run.emptyAt !== null ? "$0 left to pay with" : `${money(LV.bills)} every month`) : "none this level", 670, y + 30, LV.bills > 0 ? RED : MUTED, SMALL);
   // the stock (tank)
   const tx = 390, ty = 130, tw = 220, th = 230;
@@ -934,6 +972,10 @@ function drawPlay() {
   text(net > 0.5 ? "In > out: balance rising" : net < -0.5 ? "Out > in: balance falling" : "In = out: balance flat",
     cx + 10, cy + 108, net > 0.5 ? [150, 240, 180] : net < -0.5 ? [255, 190, 170] : [215, 220, 230], SMALL);
 
+  if (run.alert && !(run.celebrate > 0)) {
+    rect(560, 120, 400, 56, [90, 36, 30], 0, 12); rect(560, 120, 400, 56, [255, 150, 110], 3, 12);
+    text("🔧 " + run.alert.text, 580, 136, [255, 230, 210], "bold 22px Arial");
+  }
   if (run.celebrate > 0) {
     const k = clamp(1 - (run.celebrate - 0.6) / 1.4, 0, 1);
     ctx.fillStyle = "rgba(8,12,18,0.7)"; ctx.fillRect(0, 0, WIDTH, HEIGHT);
@@ -959,11 +1001,13 @@ function plotLine(series, gx, gy, gw, gh, months, maxV, color) {
   });
   ctx.lineWidth = 3; ctx.strokeStyle = rgb(color); ctx.stroke();
 }
-function plotBars(vals, n, gx, gy, gw, gh, maxV, color) {
+// bars per month; with "top" it draws only the top part of each bar (stacked repairs)
+function plotBars(vals, n, gx, gy, gw, gh, maxV, color, top) {
   const bw = gw / LV.months;
   for (let i = 0; i < n; i++) {
     const h = clamp(vals[i] / maxV, 0, 1) * (gh - 24);
-    rect(gx + i * bw + 2, gy + gh - 4 - h, Math.max(1, bw - 4), h, color);
+    const part = top ? clamp(top[i] / maxV, 0, 1) * (gh - 24) : h;
+    if (part > 0) rect(gx + i * bw + 2, gy + gh - 4 - h, Math.max(1, bw - 4), part, color);
   }
 }
 
@@ -977,6 +1021,14 @@ function debriefLines() {
     const idle = run.inflowM.slice(0, played).filter((v) => v === 0).length;
     lines.push(idle > 0 ? `In ${idle} month${idle > 1 ? "s" : ""} you didn't work, so nothing flowed in and the balance stayed flat.` : "You worked every month, so the balance kept climbing.");
     lines.push("With no outflow, the balance never went down.");
+  } else if (LV.repairs) {
+    lines.push(run.reached !== null ? `You saved ${money(LV.goal)} in month ${Math.ceil(run.reached)}!` : `Time ran out with ${money(run.balance)}. You needed ${money(LV.goal)}.`);
+    const fixTotal = run.repairs.reduce((a, r) => a + r.cost, 0);
+    const earned = run.inflowM.reduce((a, v) => a + v, 0);
+    const extra = earned * (1 - LV.oldPay / LV.pay);
+    lines.push(run.repairs.length ? `The car broke ${run.repairs.length} time${run.repairs.length === 1 ? "" : "s"} (${LV.repairs.map((f) => [f.name.toLowerCase(), run.repairs.filter((r) => r.name === f.name).length]).filter(([, n]) => n).map(([nm, n]) => n > 1 ? `${nm} ×${n}` : nm).join(", ")}). Repairs cost ${money(fixTotal)}: the orange bars and the sudden drops in your balance.` : "Lucky: the car never broke this time.");
+    lines.push(`The car doubled your pay. It earned you ${money(extra)} more than the old $20 job, while repairs took ${money(fixTotal)}. ${extra > fixTotal ? "This time the car was worth it." : "This time the repairs cost more than the car earned you!"}`);
+    lines.push("Surprises like repairs are random, so you can't plan the month, but you can save extra for them.");
   } else if (LV.n >= 3) {
     lines.push(run.reached !== null ? `You saved ${money(LV.goal)} in month ${Math.ceil(run.reached)}!` : `Time ran out with ${money(run.balance)}. You needed ${money(LV.goal)}.`);
     let up = 0, down = 0;
@@ -1007,14 +1059,17 @@ function drawDebrief() {
   drawPipe(370, 530, y0, RED, LV.bills > 0, s);
   drawCloud(550, y0, 1);
   text("Work (inflow)", 120, y0 + 22, BLUE, SMALL);
-  text("Bills (outflow)", 400, y0 + 22, RED, SMALL);
+  text(LV.repairs ? "Bills + repairs (outflow)" : "Bills (outflow)", LV.repairs ? 380 : 400, y0 + 22, RED, SMALL);
 
   const played = Math.min(LV.months, Math.ceil(run.month - 1e-9));
   const gx = 50, gw = 520, gh = 120;
   const maxFlow = Math.max(1, ...run.inflowM, ...run.outflowM);
   const panels = [
     [140, "Inflow: money from work each month", BLUE, () => plotBars(run.inflowM, played, gx, 140, gw, gh, maxFlow, BLUE), LV.pay > 0],
-    [278, "Outflow: bills paid each month", RED, () => plotBars(run.outflowM, played, gx, 278, gw, gh, maxFlow, RED), LV.bills > 0],
+    [278, LV.repairs ? "Outflow: bills (red) + repairs (orange) each month" : "Outflow: bills paid each month", RED, () => {
+      plotBars(run.outflowM, played, gx, 278, gw, gh, maxFlow, RED);
+      if (LV.repairs) plotBars(run.outflowM, played, gx, 278, gw, gh, maxFlow, [255, 160, 70], run.repairsM);
+    }, LV.bills > 0],
     [416, "Stock: your bank balance", GREEN, () => plotLine(run.series, gx, 416, gw, gh, LV.months, LV.max, GREEN), true],
   ];
   for (const [py, label, color, draw, active] of panels) {
