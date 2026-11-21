@@ -406,15 +406,17 @@ document.addEventListener('touchcancel', () => { padClear(); stickEnd(); }, {pas
 document.addEventListener('visibilitychange', () => { if (document.hidden) { padClear(); stickEnd(); for (const k in keyK) keyK[k] = false; syncK(); } });
 // thumb steering: put a thumb on the game (in full screen: anywhere that isn't a button) and slide it
 const stickEl = document.getElementById('stick'), stickKnob = document.getElementById('stickknob');
-const stick = {id:null, ox:0, oy:0};
+const stick = {id:null, ox:0, oy:0, ax:0, ay:0};  // ax/ay: how far the thumb is pushed, -1..1
 function stickSet(dx, dy) {
+  const soft = v => { const a = Math.abs(v); return a < 6 ? 0 : Math.sign(v) * Math.min(1, (a - 6) / 30); };
+  stick.ax = soft(dx); stick.ay = soft(dy);
   const dead = 10;
   stickK.left = dx < -dead; stickK.right = dx > dead; stickK.up = dy < -dead * 1.5; stickK.down = dy > dead * 1.5;
   const m = Math.hypot(dx, dy), lim = 34, f = m > lim ? lim / m : 1;
   stickKnob.style.transform = 'translate(' + (dx * f).toFixed(1) + 'px,' + (dy * f).toFixed(1) + 'px)';
   syncK();
 }
-function stickEnd() { if (stick.id === null) return; stick.id = null; stickEl.hidden = true; stickK.left = stickK.right = stickK.up = stickK.down = false; syncK(); }
+function stickEnd() { if (stick.id === null) return; stick.id = null; stick.ax = stick.ay = 0; stickEl.hidden = true; stickK.left = stickK.right = stickK.up = stickK.down = false; syncK(); }
 document.addEventListener('pointerdown', e => {
   if (e.pointerType === 'mouse' || stick.id !== null) return;
   if (e.target.closest && e.target.closest('button')) return;
@@ -617,8 +619,16 @@ function updFly() {
     if (L.landT > 150) finishLevel();
     return;
   }
-  const ax = (K.right ? 1 : 0) - (K.left ? 1 : 0), ay = (K.down ? 1 : 0) - (K.up ? 1 : 0);
-  p.x = clamp(p.x + ax * 1.6, 4, 150); p.y = clamp(p.y + ay * 1.6, 22, H - 34);
+  // flight feel: the controls set a target speed, and the plane eases toward it (speeds up and glides to a stop)
+  const keyX = (K.right ? 1 : 0) - (K.left ? 1 : 0), keyY = (K.down ? 1 : 0) - (K.up ? 1 : 0);
+  const inX = stick.id !== null ? stick.ax : keyX, inY = stick.id !== null ? stick.ay : keyY;
+  const tvx = inX * 1.9, tvy = inY * 1.9;
+  p.vx = (p.vx || 0) + (tvx - (p.vx || 0)) * (inX ? 0.09 : 0.06);
+  p.vy = (p.vy || 0) + (tvy - (p.vy || 0)) * (inY ? 0.08 : 0.05);
+  const nx = p.x + p.vx, ny = p.y + p.vy + Math.sin(t * 0.045) * 0.06;  // a gentle float on the air
+  p.x = clamp(nx, 4, 150); p.y = clamp(ny, 22, H - 34);
+  if (p.x !== nx) p.vx = 0;
+  if (p.y !== ny - Math.sin(t * 0.045) * 0.06 && (p.y === 22 || p.y === H - 34)) p.vy = 0;
   L.dist += L.speed; L.off += L.speed;
   const prog = L.dist / L.goal;
   if (--L.sS <= 0) { L.sS = (26 + rand(0, 26)) | 0; spawn(L.dragon ? 'book' : 'star'); }
