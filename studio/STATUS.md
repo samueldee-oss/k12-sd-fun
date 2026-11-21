@@ -54,7 +54,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
-- 2026-11-21: Tiny Realms: Solvara (the ice tribe's second skin) is now lava-themed: sandy ground, flame hats, Emblings that turn water into cooled lava rock, Flame Archer, Lava Sled, Magma Keep, Magma Titan. The unit panel now says why a unit can't move (just merged, frozen, already moved, or boxed in). Commit `PENDING`.
+- 2026-11-21: Tiny Realms: Solvara (the ice tribe's second skin) is now lava-themed: sandy ground, flame hats, Emblings that turn water into cooled lava rock, Flame Archer, Lava Sled, Magma Keep, Magma Titan. The unit panel now says why a unit can't move (just merged, frozen, already moved, or boxed in). Commit `52b22d6`.
 - 2026-11-21: Tiny Realms: tapping anywhere on an attackable enemy's body now targets it (big units like the Leviacrab used to cover the tile behind them, so taps moved your unit instead). Commit `0d1f954`.
 - 2026-11-21: Tiny Realms: tribes you have met (seen, fought or made peace with) are remembered for good, so an enemy no longer turns back into 'Unknown tribe' when its units walk out of sight. Commit `63b27a1`.
 - 2026-11-21: Tiny Realms: tribes only offer peace once they have met you; making peace counts as meeting and shows each side the other's capital, so a peace partner is never listed as Unknown tribe. Commit `1c25576`.
