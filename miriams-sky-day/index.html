@@ -361,12 +361,13 @@ function musicTick() {
 const K = {left:false,right:false,up:false,down:false,a:false,enter:false};
 let prevK = {...K}; const P = {...K}; let tapped = false;
 const keyK = {...K}, stickK = {...K};
+const latch = {};  // remembers quick taps that start and end between two frames
 const KEYMAP = {ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'up',KeyW:'up',ArrowDown:'down',KeyS:'down',Space:'a',KeyJ:'a',KeyZ:'a',KeyX:'a',Enter:'enter'};
 addEventListener('keydown', e => {
   ensureAudio();
   if (e.code === 'KeyM') { toggleMute(); return; }
   if (e.code === 'Escape' && document.body.classList.contains('fs')) { setFs(false); return; }
-  const k = KEYMAP[e.code]; if (k) { keyK[k] = true; syncK(); e.preventDefault(); }
+  const k = KEYMAP[e.code]; if (k) { if (!keyK[k]) latch[k] = true; keyK[k] = true; syncK(); e.preventDefault(); }
 });
 addEventListener('keyup', e => { const k = KEYMAP[e.code]; if (k) { keyK[k] = false; syncK(); e.preventDefault(); } });
 addEventListener('blur', () => { for (const k in keyK) keyK[k] = false; try { padPtr.clear(); stickEnd(); } catch (_) {} syncK(); });
@@ -395,7 +396,7 @@ function syncK() {
 const padSync = syncK;
 function padClear() { if (padPtr.size) { padPtr.clear(); padSync(); } }
 padBtns.forEach(b => {
-  b.addEventListener('pointerdown', e => { e.preventDefault(); ensureAudio(); padPtr.set(e.pointerId, b.dataset.k); padSync(); });
+  b.addEventListener('pointerdown', e => { e.preventDefault(); ensureAudio(); latch[b.dataset.k] = true; padPtr.set(e.pointerId, b.dataset.k); padSync(); });
   b.addEventListener('contextmenu', e => e.preventDefault());
 });
 const padUp = e => { if (padPtr.delete(e.pointerId)) padSync(); };
@@ -411,6 +412,7 @@ function stickSet(dx, dy) {
   const soft = v => { const a = Math.abs(v); return a < 6 ? 0 : Math.sign(v) * Math.min(1, (a - 6) / 30); };
   stick.ax = soft(dx); stick.ay = soft(dy);
   const dead = 10;
+  if (dy < -dead * 1.5 && !stickK.up) latch.up = true;
   stickK.left = dx < -dead; stickK.right = dx > dead; stickK.up = dy < -dead * 1.5; stickK.down = dy > dead * 1.5;
   const m = Math.hypot(dx, dy), lim = 34, f = m > lim ? lim / m : 1;
   stickKnob.style.transform = 'translate(' + (dx * f).toFixed(1) + 'px,' + (dy * f).toFixed(1) + 'px)';
@@ -960,7 +962,9 @@ function updPuff() {
   moveGirl(g, P6_MAXX, 4.8);
   if (!L.hasBox && L.filled < P6_BOXES && Math.abs(g.x - P6_STACK) < 12) { L.hasBox = true; L.carry = 0; sfx.ok(); addFloat(g.x - 8, g.y - 20, 'NEW BOX!', '#ffd23f'); }
   if (--L.sp <= 0 && L.pf.length < 4) { L.sp = (90 + rand(0, 70)) | 0; L.pf.push({x:clamp(P6_LAMPS[Math.random() < 0.5 ? 0 : 1] + rand(-26, 26), 8, 170), y:-10, vx:0, vy:0.5, st:'fall', timer:0, ph:Math.random() * 6}); }
-  const net = netGeom(g), active = g.swing > 0 && g.swing < 11;
+  // the net sweeps a whole area in front of her, low enough to scoop pufflings and cats off the ground
+  const active = g.swing > 0 && g.swing < 14;
+  const inNet = (cx, cy) => active && cy > g.y - 8 && cy < FLOOR + 2 && (g.face > 0 ? cx > g.x + 2 && cx < g.x + 34 : cx < g.x + 10 && cx > g.x - 22);
   for (const p of L.pf) {
     if (p.st === 'fall') { p.y += p.vy; p.x = clamp(p.x + Math.sin(t * 0.08 + p.ph) * 0.4, 4, 176); if (p.y >= FLOOR - 8) { p.y = FLOOR - 8; p.st = 'sit'; p.timer = (40 + rand(0, 80)) | 0; } }
     else if (p.st === 'sit') { if (--p.timer <= 0) { p.st = 'hop'; p.vx = (Math.random() < 0.5 ? -1 : 1) * 0.6; p.vy = -1.6; } }
@@ -970,8 +974,7 @@ function updPuff() {
       if (p.y >= FLOOR - 8) { p.y = FLOOR - 8; p.st = 'sit'; p.timer = (50 + rand(0, 90)) | 0; }
     }
     if (active && !p.gone) {
-      const dx = p.x + 4.5 - net.cx, dy = p.y + 4 - net.cy;
-      if (dx * dx + dy * dy < 81) {
+      if (inNet(p.x + 4.5, p.y + 4)) {
         if (!L.hasBox) { if (!p.full) { p.full = true; addFloat(g.x - 14, g.y - 20, 'GET A BOX!', '#ff8fa3'); } }
         else if (L.carry < 3) { p.gone = true; L.carry++; sfx.catch(); burst(p.x + 4, p.y + 4, ['#ffffff', '#ff8a2a'], 8); addFloat(p.x - 10, p.y - 8, 'IN THE BOX!', '#ffd23f'); }
         else if (!p.full) { p.full = true; addFloat(g.x - 14, g.y - 20, 'BOX IS FULL!', '#ff8fa3'); }
@@ -987,7 +990,7 @@ function updPuff() {
     if (best) c.dir = Math.sign(best.x - c.x) || c.dir;
     c.x += c.dir * 0.5;
     for (const p of L.pf) if (!p.gone && p.st !== 'fall' && Math.abs(c.x + 6 - (p.x + 4.5)) < 6) scare(p);
-    if (active) { const dx = c.x + 6 - net.cx, dy = c.y + 4 - net.cy; if (dx * dx + dy * dy < 110) { c.flee = true; c.dir = Math.sign(c.x + 6 - (g.x + 6)) || 1; addFloat(c.x, c.y - 10, 'SHOO!', '#ffd23f'); sfx.poof(); } }
+    if (!c.flee && inNet(c.x + 6, c.y + 4)) { { c.flee = true; c.dir = Math.sign(c.x + 6 - (g.x + 6)) || 1; addFloat(c.x, c.y - 10, 'SHOO!', '#ffd23f'); sfx.poof(); } }
   }
   L.cats = L.cats.filter(c => c.x > -20 && c.x < W + 20);
   // cars: slow, and their headlights shine in for 3 seconds before they arrive
@@ -1660,7 +1663,7 @@ function drawFx() {
 /* ---------- main loop ---------- */
 function update() {
   t++;
-  for (const k in K) P[k] = K[k] && !prevK[k];
+  for (const k in K) { P[k] = (K[k] && !prevK[k]) || !!latch[k]; latch[k] = false; }
   const go = P.a || P.enter || tapped; tapped = false;
   if (state === 'play') LEVELS[levelIdx].update();
   else if (state === 'select') { cardT++; updSelect(go); }
