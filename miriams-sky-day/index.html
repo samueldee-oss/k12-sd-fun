@@ -956,52 +956,77 @@ function p6SetDown() {
   addFloat(x - 14, FLOOR - 30, 'BOX ' + L.filled + ' FULL!', '#c8f08a');
   if (L.filled >= P6_BOXES) L.endT = 80;
 }
+// hiding spots around the harbor street: pufflings tuck in and peek out
+const P6_SPOTS = [
+  {kind:'bin',   x:14,  w:8,  top:FLOOR - 12},
+  {kind:'crate', x:46,  w:12, top:FLOOR - 9},
+  {kind:'bench', x:80,  w:18, top:FLOOR - 9},
+  {kind:'car',   x:112, w:28, top:FLOOR - 10},
+  {kind:'bin',   x:154, w:8,  top:FLOOR - 12},
+  {kind:'crate', x:178, w:12, top:FLOOR - 9}];
 function updPuff() {
   const g = L.girl;
+  if (!L.spots) L.spots = P6_SPOTS.map(sp => ({...sp, cx:sp.x + sp.w / 2, who:null}));
   if (P.a && L.hasBox && L.carry >= 3) { p6SetDown(); P.a = false; }
   moveGirl(g, P6_MAXX, 4.8);
   if (!L.hasBox && L.filled < P6_BOXES && Math.abs(g.x - P6_STACK) < 12) { L.hasBox = true; L.carry = 0; sfx.ok(); addFloat(g.x - 8, g.y - 20, 'NEW BOX!', '#ffd23f'); }
-  if (--L.sp <= 0 && L.pf.length < 4) { L.sp = (90 + rand(0, 70)) | 0; L.pf.push({x:clamp(P6_LAMPS[Math.random() < 0.5 ? 0 : 1] + rand(-26, 26), 8, 170), y:-10, vx:0, vy:0.5, st:'fall', timer:0, ph:Math.random() * 6}); }
+  if (--L.sp <= 0 && L.pf.length < 4) { L.sp = (120 + rand(0, 90)) | 0; L.pf.push({x:clamp(P6_LAMPS[Math.random() < 0.5 ? 0 : 1] + rand(-26, 26), 8, 176), y:-10, vx:0, vy:0.5, st:'fall', timer:0, ph:Math.random() * 6}); }
+  const pickSpot = p => {
+    let best = null, bd = 1e9;
+    for (const sp of L.spots) { if (sp.who) continue; const d = Math.abs(sp.cx - (p.x + 4.5)); if (d < bd) { bd = d; best = sp; } }
+    if (best) { best.who = p; p.spot = best; p.st = 'walk'; p.vx = 0; } else { p.st = 'open'; p.openT = 240; p.timer = 30; }
+  };
   // the net sweeps a whole area in front of her, low enough to scoop pufflings and cats off the ground
   const active = g.swing > 0 && g.swing < 14;
   const inNet = (cx, cy) => active && cy > g.y - 8 && cy < FLOOR + 2 && (g.face > 0 ? cx > g.x + 2 && cx < g.x + 34 : cx < g.x + 10 && cx > g.x - 22);
   for (const p of L.pf) {
-    if (p.st === 'fall') { p.y += p.vy; p.x = clamp(p.x + Math.sin(t * 0.08 + p.ph) * 0.4, 4, 176); if (p.y >= FLOOR - 8) { p.y = FLOOR - 8; p.st = 'sit'; p.timer = (40 + rand(0, 80)) | 0; } }
-    else if (p.st === 'sit') { if (--p.timer <= 0) { p.st = 'hop'; p.vx = (Math.random() < 0.5 ? -1 : 1) * 0.6; p.vy = -1.6; } }
-    else {
-      p.vy += 0.12; p.x += p.vx; p.y += p.vy;
-      if (p.x < 4) p.vx = Math.abs(p.vx); if (p.x > 170) p.vx = -Math.abs(p.vx);
-      if (p.y >= FLOOR - 8) { p.y = FLOOR - 8; p.st = 'sit'; p.timer = (50 + rand(0, 90)) | 0; }
+    if (p.st === 'fall') {
+      p.y += p.vy; p.x = clamp(p.x + Math.sin(t * 0.08 + p.ph) * 0.4, 4, 176);
+      if (p.y >= FLOOR - 8) { p.y = FLOOR - 8; pickSpot(p); }
+    } else if (p.st === 'walk') {
+      const tx = p.spot.cx - 4.5, dx = tx - p.x;
+      p.vx = Math.sign(dx) * 0.45; p.x += Math.abs(dx) < 0.5 ? dx : p.vx;
+      p.y = FLOOR - 8 - ((t >> 3) % 2);
+      if (Math.abs(tx - p.x) < 0.6) { p.st = 'hidden'; p.y = FLOOR - 8; p.peek = (60 + rand(0, 120)) | 0; p.peekT = 0; }
+    } else if (p.st === 'hidden') {
+      if (p.peekT > 0) p.peekT--;
+      else if (--p.peek <= 0) { p.peekT = 50; p.peek = (130 + rand(0, 140)) | 0; tone(1760, 0.05, 'square', 0.02); tone(2093, 0.05, 'square', 0.02, null, AC ? AC.currentTime + 0.09 : null); }
+      if (inNet(p.spot.cx, FLOOR - 5)) {
+        p.spot.who = null; p.spot = null; p.st = 'open'; p.openT = (300 + rand(0, 120)) | 0;
+        p.vy = -2.2; p.vx = (Math.random() < 0.5 ? -1 : 1) * 0.9;
+        seq([79, 84, 88], 0.05, 'triangle', 0.05); addFloat(p.x - 10, p.y - 16, 'FOUND YOU!', '#c8f08a');
+        burst(p.x + 4, p.y + 2, ['#ffd23f', '#ffffff'], 8, 1);
+        p.justFound = 20;   // the same swing doesn't also scoop it: catch it with the next one
+      }
+    } else {   // 'open': out in the street, hopping about
+      if (p.openT !== undefined && --p.openT <= 0 && p.y >= FLOOR - 8) { pickSpot(p); continue; }
+      if (p.vy !== 0 || p.y < FLOOR - 8) {
+        p.vy += 0.12; p.x += p.vx; p.y += p.vy;
+        if (p.x < 4) p.vx = Math.abs(p.vx); if (p.x > 176) p.vx = -Math.abs(p.vx);
+        if (p.y >= FLOOR - 8) { p.y = FLOOR - 8; p.vy = 0; p.timer = (30 + rand(0, 60)) | 0; }
+      } else if (--p.timer <= 0) { p.vx = (Math.random() < 0.5 ? -1 : 1) * 0.6; p.vy = -1.6; }
     }
-    if (active && !p.gone) {
+    if (p.justFound) { p.justFound--; continue; }
+    if (active && !p.gone && p.st !== 'hidden') {
       if (inNet(p.x + 4.5, p.y + 4)) {
         if (!L.hasBox) { if (!p.full) { p.full = true; addFloat(g.x - 14, g.y - 20, 'GET A BOX!', '#ff8fa3'); } }
-        else if (L.carry < 3) { p.gone = true; L.carry++; sfx.catch(); burst(p.x + 4, p.y + 4, ['#ffffff', '#ff8a2a'], 8); addFloat(p.x - 10, p.y - 8, 'IN THE BOX!', '#ffd23f'); }
+        else if (L.carry < 3) { p.gone = true; if (p.spot) { p.spot.who = null; p.spot = null; } L.carry++; sfx.catch(); burst(p.x + 4, p.y + 4, ['#ffffff', '#ff8a2a'], 8); addFloat(p.x - 10, p.y - 8, 'IN THE BOX!', '#ffd23f'); }
         else if (!p.full) { p.full = true; addFloat(g.x - 14, g.y - 20, 'BOX IS FULL!', '#ff8fa3'); }
       }
     }
   }
-  const scare = p => { p.gone = true; L.lost++; addFloat(p.x, p.y - 10, 'EEP!', '#ff8fa3'); L.scared.push({x:p.x, y:p.y, vx:(Math.random() < 0.5 ? -1 : 1) * 1.2, vy:-1.4}); tone(880, 0.12, 'triangle', 0.04, 440); };
-  if (--L.cs <= 0) { L.cs = (480 + rand(0, 260)) | 0; const d = Math.random() < 0.5 ? 1 : -1; L.cats.push({x:d > 0 ? -14 : W + 2, y:FLOOR - 8, dir:d, flee:false}); }
+  const scare = p => { p.gone = true; if (p.spot) { p.spot.who = null; p.spot = null; } L.lost++; addFloat(p.x, p.y - 10, 'EEP!', '#ff8fa3'); L.scared.push({x:p.x, y:p.y, vx:(Math.random() < 0.5 ? -1 : 1) * 1.2, vy:-1.4}); tone(880, 0.12, 'triangle', 0.04, 440); };
+  if (--L.cs <= 0) { L.cs = (520 + rand(0, 300)) | 0; const d = Math.random() < 0.5 ? 1 : -1; L.cats.push({x:d > 0 ? -14 : W + 2, y:FLOOR - 8, dir:d, flee:false}); }
   for (const c of L.cats) {
     if (c.flee) { c.x += c.dir * 2.6; continue; }
     let best = null, bd = 1e9;
-    for (const p of L.pf) { if (p.gone || p.st === 'fall') continue; const d = Math.abs(p.x - c.x); if (d < bd) { bd = d; best = p; } }
+    for (const p of L.pf) { if (p.gone || p.st === 'fall' || p.st === 'hidden') continue; const d = Math.abs(p.x - c.x); if (d < bd) { bd = d; best = p; } }
     if (best) c.dir = Math.sign(best.x - c.x) || c.dir;
     c.x += c.dir * 0.5;
-    for (const p of L.pf) if (!p.gone && p.st !== 'fall' && Math.abs(c.x + 6 - (p.x + 4.5)) < 6) scare(p);
-    if (!c.flee && inNet(c.x + 6, c.y + 4)) { { c.flee = true; c.dir = Math.sign(c.x + 6 - (g.x + 6)) || 1; addFloat(c.x, c.y - 10, 'SHOO!', '#ffd23f'); sfx.poof(); } }
+    for (const p of L.pf) if (!p.gone && p.st !== 'fall' && p.st !== 'hidden' && Math.abs(c.x + 6 - (p.x + 4.5)) < 6) scare(p);
+    if (!c.flee && inNet(c.x + 6, c.y + 4)) { c.flee = true; c.dir = Math.sign(c.x + 6 - (g.x + 6)) || 1; addFloat(c.x, c.y - 10, 'SHOO!', '#ffd23f'); sfx.poof(); }
   }
   L.cats = L.cats.filter(c => c.x > -20 && c.x < W + 20);
-  // cars: slow, and their headlights shine in for 3 seconds before they arrive
-  if (L.warn > 0) {
-    L.warn--;
-    if (L.warn === 90) tone(330, 0.15, 'square', 0.03);
-    if (L.warn === 0) L.cars.push({x:L.wdir > 0 ? -30 : W + 2, y:FLOOR - 10, dir:L.wdir, img:Math.random() < 0.5 ? 0 : 1, sp:1.3});
-  } else if (--L.cr <= 0) { L.cr = (420 + rand(0, 240)) | 0; L.wdir = Math.random() < 0.5 ? 1 : -1; L.warn = 180; tone(330, 0.15, 'square', 0.03); }
-  const gb = {x:g.x + 3, y:g.y + 2, w:6, h:14};
-  for (const c of L.cars) { c.x += c.dir * c.sp; if (hit(gb, {x:c.x + 5, y:c.y + 5, w:18, h:5})) hurt(); }
-  L.cars = L.cars.filter(c => c.x > -34 && c.x < W + 34);
   for (const s of L.scared) { s.x += s.vx; s.y += s.vy; s.vy -= 0.01; }
   L.scared = L.scared.filter(s => s.y > -12 && s.x > -12 && s.x < W + 4);
   L.pf = L.pf.filter(p => !p.gone);
@@ -1061,24 +1086,29 @@ function drawPuffLv() {
     for (let i = 0; i < 3; i++) { const bob = ((t >> 4) + i + (b.ph | 0)) % 5 === 0 ? 1 : 0; rect(b.x + 1 + i * 3, FLOOR - 8 + bob, 2, 2, '#3d3d4f'); rect(b.x + 1 + i * 3, FLOOR - 7 + bob, 1, 1, '#f4f4f8'); }
     put(BOX, b.x, FLOOR - 6);
   }
+  // hiding spots
+  for (const sp of (L.spots || [])) {
+    const x = sp.x, y = sp.top;
+    if (sp.kind === 'bin') { rect(x, y + 1, 8, FLOOR - y - 1, '#3f6a5a'); rect(x - 1, y, 10, 2, '#5a8a78'); rect(x + 2, y + 4, 1, FLOOR - y - 6, '#2f5246'); rect(x + 5, y + 4, 1, FLOOR - y - 6, '#2f5246'); }
+    else if (sp.kind === 'crate') { rect(x, y, 12, FLOOR - y, '#c79a5b'); for (let k = 0; k < 3; k++) rect(x, y + 1 + k * 3, 12, 1, '#9c7440'); rect(x + 1, y - 1, 3, 1, '#9fc4dd'); rect(x + 6, y - 1, 4, 1, '#c8cad8'); }
+    else if (sp.kind === 'bench') { rect(x, y, 18, 2, '#8a5a2b'); rect(x, y - 5, 18, 2, '#8a5a2b'); rect(x + 1, y + 2, 1, FLOOR - y - 2, '#5a3a1b'); rect(x + 16, y + 2, 1, FLOOR - y - 2, '#5a3a1b'); }
+    else if (sp.kind === 'car') put(CARS[1], x, y);
+  }
   for (const p of L.pf) {
+    if (p.st === 'hidden') {
+      if (p.peekT > 0) {
+        const sp = p.spot, cx = Math.round(sp.cx);
+        if (sp.kind === 'car') { rect(cx - 3, FLOOR - 3, 2, 2, '#ffffff'); rect(cx + 1, FLOOR - 3, 2, 2, '#ffffff'); rect(cx - 2, FLOOR - 2, 1, 1, '#111111'); rect(cx + 2, FLOOR - 2, 1, 1, '#111111'); }
+        else ctx.drawImage(PUFF, 0, 0, 9, 4, cx - 4, sp.top - 4 + (p.peekT < 8 || p.peekT > 42 ? 2 : 0), 9, 4);
+        if (p.peekT > 24) { const ny = sp.top - 14 - Math.round((50 - p.peekT) / 6); rect(cx + 6, ny, 1, 5, '#ffd23f'); rect(cx + 4, ny + 4, 2, 2, '#ffd23f'); rect(cx + 7, ny, 2, 1, '#ffd23f'); }
+      }
+      continue;
+    }
     put(p.vx < 0 ? PUFFL : PUFF, p.x, p.y);
     if (p.st === 'fall' && (t >> 3) % 2) { rect(p.x - 2, p.y + 3, 2, 1, '#3d3d4f'); rect(p.x + 9, p.y + 3, 2, 1, '#3d3d4f'); }
   }
   for (const s of L.scared) put(PUFF, s.x, s.y);
   for (const c of L.cats) put((c.dir > 0 ? CAT : CATL)[(t >> 3) % 2], c.x, c.y);
-  if (L.warn > 0) {
-    const k = 1 - L.warn / 180, edge = L.wdir > 0 ? 0 : W;
-    ctx.fillStyle = 'rgba(255,243,160,' + (0.08 + k * 0.22).toFixed(2) + ')';
-    for (let i = 0; i < 30 + k * 40; i++) ctx.fillRect(Math.round(edge + L.wdir * i), Math.round(FLOOR - 6 - i * 0.2), 1, Math.round(3 + i * 0.35));
-    if ((t >> 3) % 2) text('!', L.wdir > 0 ? 4 : W - 10, 112, '#ffd23f', 2);
-  }
-  for (const c of L.cars) {
-    const front = c.dir > 0 ? c.x + 28 : c.x - 1;
-    ctx.fillStyle = 'rgba(255,243,160,0.16)';
-    for (let i = 0; i < 22; i++) ctx.fillRect(Math.round(front + c.dir * i), Math.round(c.y + 4 - i * 0.2), 1, Math.round(3 + i * 0.4));
-    put((c.dir > 0 ? CARS : CARSL)[c.img], c.x, c.y);
-  }
   const g = L.girl;
   drawGirlNet(g, inv > 0 && (t >> 2) % 2);
   if (L.hasBox) {
@@ -1094,8 +1124,7 @@ function drawPuffLv() {
 }
 function hudPuff() {
   rect(0, 0, W, 11, 'rgba(29,26,51,0.6)');
-  for (let i = 0; i < 3; i++) put(i < hearts ? HEART : HEART0, 3 + i * 9, 2);
-  text(L.hasBox ? 'IN BOX ' + L.carry + '/3' : 'NO BOX', 36, 3, '#ffd23f');
+  text(L.hasBox ? 'IN BOX ' + L.carry + '/3' : 'NO BOX', 4, 3, '#ffd23f');
   put(BOX, W - 66, 3);
   text('FULL ' + Math.min(L.filled, P6_BOXES) + '/' + P6_BOXES, W - 3, 3, '#ffffff', 1, 'right');
 }
@@ -1454,7 +1483,7 @@ const LEVELS = [
    intro:() => [['5. BLACK SAND BEACH', '#c9cce0', 2], ['SKIP STONES ACROSS THE WAVES!'], ['PRESS ONCE TO PICK THE POWER,'], ['AGAIN TO PICK THE ANGLE.'], ['STRONG AND LOW SKIPS THE MOST!', '#ffd23f'], [keysL({keys:'SPACE: THROW', touch:'BUTTON: THROW'}), '#b3a8d6']],
    clear:() => [['SPLASH-TASTIC!', '#9fe0ff', 2], ['TOTAL SKIPS: ' + L.total + '   BEST: ' + L.best], ['TONIGHT: SAVE THE PUFFLINGS!']]},
   {a:'NET', init:initPuff, update:updPuff, draw:drawPuffLv, hud:hudPuff,
-   intro:() => [['6. PUFFLING NIGHT', '#ff8a2a', 2], ['HEIMAEY, WESTMAN ISLANDS. BABY PUFFINS'], ['GOT LOST IN THE TOWN LIGHTS!'], ['CATCH THEM AND FILL YOUR BOX WITH 3,'], ['SET IT DOWN, AND GET A NEW BOX.'], ['CARS SHINE THEIR LIGHTS BEFORE THEY COME.', '#ffd23f'], [keysL({keys:'ARROWS: MOVE  UP: JUMP  SPACE: NET / DROP', touch:'PAD: MOVE  UP: JUMP  BUTTON: NET / DROP'}), '#b3a8d6']],
+   intro:() => [['6. PUFFLING NIGHT', '#ff8a2a', 2], ['HEIMAEY, WESTMAN ISLANDS. BABY PUFFINS'], ['GOT LOST IN TOWN AND ARE HIDING!'], ['LISTEN FOR CHEEPS, WATCH FOR PEEKS.'], ['SWING YOUR NET AT A HIDING SPOT,'], ['THEN CATCH THE PUFFLING THAT POPS OUT.'], ['FILL 3 BOXES! SHOO THE CATS AWAY.', '#ffd23f'], [keysL({keys:'ARROWS: MOVE  UP: JUMP  SPACE: NET / DROP', touch:'PAD: MOVE  UP: JUMP  BUTTON: NET / DROP'}), '#b3a8d6']],
    clear:() => [['BOXES FULL!', '#ff8a2a', 2], ['YOU RESCUED ' + L.saved + ' BABY PUFFINS.'], ['IN THE MORNING, SET THEM FREE!']]},
   {a:'SWING', init:initRel, update:updRel, draw:drawRel, hud:hudRel,
    intro:() => [['7. PUFFLING MORNING', '#c8f08a', 2], ['GOOD MORNING! TIME TO SET THE'], ['PUFFLINGS FREE, ONE AT A TIME.'], ['GET A BOX FROM THE CAR, THEN GO'], ['TO THE EDGE. SHE SWINGS EACH ONE:'], ['PRESS WHEN HER ARMS ARE UP HIGH, 3 TIMES.'], ['A BIG TOSS MEANS MORE FLAPPING!', '#ffd23f'], ['THE BEST TOSSES GLIDE.', '#9fe0ff'], [keysL({keys:'ARROWS: WALK   SPACE: SWING', touch:'PAD: WALK   BUTTON: SWING'}), '#b3a8d6']],
