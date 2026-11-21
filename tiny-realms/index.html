@@ -169,6 +169,12 @@ const UNITS={
  scout:{n:'Scout',c:5,a:2,d:1,m:3,r:2,sk:['naval','dash','sight']},
  rammer:{n:'Rammer',c:5,a:3,d:3,m:3,r:1,sk:['naval','dash']},
  bomber:{n:'Bomber',c:15,a:3,d:2,m:2,r:3,sk:['naval','splash','stiff']},
+ blob:{n:'Blob',c:2,hp:10,a:2,d:2,m:1,r:1,sk:['slime','dash','fortify']},
+ zipblob:{n:'Zipper',c:3,hp:8,a:2,d:1,m:3,r:1,sk:['slime','dash','escape']},
+ spitblob:{n:'Spitter',c:3,hp:10,a:2,d:1,m:1,r:2,sk:['slime','dash','poison']},
+ wallblob:{n:'Bouncer',c:4,hp:15,a:1,d:3,m:1,r:1,sk:['slime','fortify','bounce']},
+ chompy:{n:'Chomper',c:5,hp:15,a:3,d:2,m:1,r:1,sk:['slime','dash','gulp']},
+ kingslime:{n:'King Slime',c:20,hp:40,a:4,d:4,m:1,r:1,sk:['slime','splitdeath'],sup:1},
  // ice tribe
  snowling:{n:'Snowling',c:5,hp:10,a:0,d:1,m:1,r:1,sk:['freezearea','skate','stiff']},
  frostarcher:{n:'Frost Archer',c:3,hp:10,a:0,d:1,m:1,r:2,sk:['freeze','skate','dash','fortify']},
@@ -202,7 +208,7 @@ const UNITS={
  babywyrm:{n:'Young Wyrm',c:10,hp:15,a:3,d:3,m:2,r:1,sk:['fly','dash','grow']},
  firewyrm:{n:'Fire Wyrm',c:10,hp:20,a:4,d:3,m:3,r:2,sk:['fly','splash','dash']},
 };
-const SKILL_TXT={dash:'Dash: can attack after moving',escape:'Escape: can move after attacking',persist:'Persist: attacks again after a kill',fortify:'Fortify: defense bonus in own cities',heal:'Heal: heals nearby friends',convert:'Convert: attack turns enemies to your side',hide:'Hide: invisible to enemies unless next to them',infiltrate:'Infiltrate: sneaks into enemy cities and spawns Daggers',creep:'Creep: forests and mountains do not slow it',splash:'Splash: hurts enemies next to the target too',naval:'Naval: moves on water',freezearea:'Freeze Area: freezes water and enemies next to it at turn end',freeze:'Freeze: attacks freeze the enemy for a turn',skate:'Skate: moves double on ice',boost:'Boost: makes nearby friends hit harder',poison:'Poison: poisoned enemies lose defense and cannot heal',fly:'Fly: flies over anything',amph:'Amphibious: walks on land and water',grow:'Grows up after 3 turns',hatch:'Hatches into a Larvy next turn',foamarea:'Foam: turns water next to it into Foam that anyone can walk on',explode:'Explode: blows up to hurt and poison all enemies around',sight:'Sees farther'};
+const SKILL_TXT={dash:'Dash: can attack after moving',escape:'Escape: can move after attacking',persist:'Persist: attacks again after a kill',fortify:'Fortify: defense bonus in own cities',heal:'Heal: heals nearby friends',convert:'Convert: attack turns enemies to your side',hide:'Hide: invisible to enemies unless next to them',infiltrate:'Infiltrate: sneaks into enemy cities and spawns Daggers',creep:'Creep: forests and mountains do not slow it',splash:'Splash: hurts enemies next to the target too',naval:'Naval: moves on water',freezearea:'Freeze Area: freezes water and enemies next to it at turn end',freeze:'Freeze: attacks freeze the enemy for a turn',skate:'Skate: moves double on ice',boost:'Boost: makes nearby friends hit harder',poison:'Poison: poisoned enemies lose defense and cannot heal',fly:'Fly: flies over anything',amph:'Amphibious: walks on land and water',grow:'Grows up after 3 turns',hatch:'Hatches into a Larvy next turn',slime:'Slime: Merge with a friend to grow (up to size 4), Split into two, Gobble food anywhere, and leave Goo',bounce:'Bounce: hits back with full force, even at archers',splitdeath:'When defeated, splits into two Blobs',gulp:'Gulp: heals 5 when it defeats an enemy',foamarea:'Foam: turns water next to it into Foam that anyone can walk on',explode:'Explode: blows up to hurt and poison all enemies around',sight:'Sees farther'};
 
 const TRAIN_BASE=[['warrior',null],['rider','riding'],['archer','archery'],['defender','strategy'],['swordsman','smithery'],['catapult','mathematics'],['knight','chivalry'],['mindbender','philosophy'],['cloak','diplomacy']];
 const BOATS=[['scout','sailing'],['rammer','ramming'],['bomber','navigation']];
@@ -211,6 +217,7 @@ const REPL={
  bug:{warrior:'jellyegg',rider:'buzzlet',defender:'shellbun',archer:'mothkin',catapult:'sporepuff',knight:'boomhorn',mindbender:'petalshaman',swordsman:'ruby',giant:'megapede'},
  aqua:{rider:'tidecrawler',archer:'tidecaster',rammer:'reefjaw',bomber:'spinefish',giant:'leviacrab'},
  elyr:{},
+ slime:{warrior:'blob',rider:'zipblob',archer:'spitblob',defender:'wallblob',swordsman:'chompy',giant:'kingslime'},
 };
 const EXTRA={bug:[['lilyisle','ramming'],['axolotl','sailing'],['squishy','navigation']],polar:[['snowling','fishing'],['icesled','sailing'],['glacierkeep','navigation']],elyr:[['wildhorn','hunting'],['wyrmegg','navigation']]};
 
@@ -230,6 +237,7 @@ const TRIBES=[
 {n:'Aurendor',s:'Velvarre',like:'Luxidoor',c:['#8a3fd0','#ffd23f'],sc:['#d0a020','#ffffff'],g:'#c9c26e',tr:'#4f8f3f',hat:['crown','turban'],tech:null,unit:'warrior',lux:1,w:[1.3,.8,.8],wa:1,r:{fruit:1,crop:1,animal:1,fish:1,ore:1},syl:['Aur','En','Dor','Lux','Vel','Var','Opa','Zan','Ivo','Rel','Sar','Gil'],perk:'Starts with a big golden capital (level 2 + Workshop) and extra stars.'},
 {n:'Grimhald',s:'Cindrak',like:'Vengir',c:['#8a1f1f','#2a2a2a'],sc:['#3f4a5a','#e0602a'],g:'#8f906e',tr:'#4f5f3f',hat:['spike','horns'],tech:'smithery',unit:'swordsman',w:[1,.9,1.2],wa:1,r:{fruit:.5,crop:.8,animal:.5,fish:1,ore:2},syl:['Grim','Hald','Cin','Drak','Vor','Mal','Gor','Rok','Zul','Kur','Mog','Thar'],perk:'Starts with Smithery and a Swordsman. Harsh land, lots of ore.'},
 {n:'Thalassa',s:'Coralis',like:'Aquarion',c:['#f07a6a','#ffffff'],sc:['#3a8ad0','#7af0e0'],g:'#dccca0',tr:'#3f9f7f',hat:['fin','crown'],tech:null,unit:'tidecrawler',sp:'aqua',w:[1.3,.8,.6],wa:1.7,r:{fruit:1,crop:.8,animal:.6,fish:2,ore:.6},syl:['Tha','Las','Cor','Al','Nep','Mar','Ri','Sel','Ond','Ae','Psa','Tri'],perk:'Ocean tribe! Tidecrawlers and Tidecasters walk on water. Specials: Reefjaw, Spinefish, Leviacrab.'},
+{n:'Gloopa',s:'Jellune',like:'Brand new!',c:['#6fd84a','#2a7a3a'],sc:['#b06ae0','#ffd0f4'],g:'#c4e48e',tr:'#5fcf8a',hat:['slime','slime'],tech:null,unit:'blob',sp:'slime',w:[1.4,1,.5],wa:1.1,r:{fruit:1.6,crop:.8,animal:1.4,fish:1.3,ore:.6},syl:['Gloo','Bloop','Squish','Wob','Jel','Plop','Goo','Blub','Ooz','Slur','Mush','Pud'],perk:'Brand-new slime tribe! Slimes Merge into bigger slimes, Split apart, Gobble food anywhere for stars, and leave Goo trails (their slimes slide fast and heal on it, enemies get stuck). Bouncers hit back at archers. King Slime splits in two when defeated.'},
 ];
 
 const IMPS=[
@@ -291,7 +299,9 @@ function logEv(a,txt,tg,k){if(!G.ev)G.ev=[];G.ev.push({r:G.turn,a,t:txt,tg:tg==n
 function psp(p){return TRIBES[p.t].sp||null;}
 function UD(u){return UNITS[u.type];}
 function has(u,s){return UNITS[u.type].sk.includes(s);}
-function maxHp(u){let h=UNITS[u.type].hp;if(!h)h=UNITS[u.base||'warrior'].hp;return h+(u.vet?5:0);}
+function usz(u){return u.sz||1;}
+function maxHp(u){let h=UNITS[u.type].hp;if(!h)h=UNITS[u.base||'warrior'].hp;return h*usz(u)+(u.vet?5:0);}
+function defVal(u){return UNITS[u.type].d*(1+.5*(usz(u)-1));}
 function tileOwner(t){return t.terr>=0?G.cities[t.terr].owner:-1;}
 function cityOf(t){return t.city>=0?G.cities[t.city]:null;}
 function utype(p,b){const sp=psp(p);return(sp&&REPL[sp]&&REPL[sp][b])||b;}
@@ -406,7 +416,7 @@ function enemyAdj(u,x,y){for(const[a,b]of nbrs(x,y)){const v=unitAt(a,b);if(v&&v
 function reachable(u){
  const p=P(u.owner),N=G.N,res=new Map();if(!u.cm||u.frozen)return res;
  const best=new Float32Array(N*N).fill(-1);const s0=u.y*N+u.x;best[s0]=UD(u).m;const q=[s0];
- const naval=has(u,'naval'),skate=has(u,'skate'),creep=has(u,'creep')||has(u,'fly'),amph=has(u,'amph'),fly=has(u,'fly');
+ const slime=has(u,'slime'),naval=has(u,'naval'),skate=has(u,'skate'),creep=has(u,'creep')||has(u,'fly'),amph=has(u,'amph'),fly=has(u,'fly');
  while(q.length){let bi=0;for(let i=1;i<q.length;i++)if(best[q[i]]>best[q[bi]])bi=i;const c=q.splice(bi,1)[0];const rem=best[c];if(rem<=0)continue;
   const cx=c%N,cy=(c/N)|0;const ct=G.map[c];
   for(const[x,y]of nbrs(cx,cy)){const k=y*N+x;const t=G.map[k];
@@ -420,6 +430,7 @@ function reachable(u){
    if(!naval&&!amph&&!fly&&isWater(t))nr=0;
    if(!creep&&(t.ter==='forest'||t.ter==='mountain')&&!(isRoad(t)&&isRoad(ct)))nr=0;
    if(enemyAdj(u,x,y))nr=0;
+   if(t.goo&&t.goo!==u.owner+1&&!fly&&!atPeace(u.owner,t.goo-1))nr=0;
    if(nr>best[k]){best[k]=nr;q.push(k);res.set(k,1);}
   }}
  return res;
@@ -446,10 +457,10 @@ function defBonus(d){const t=T(d.x,d.y),p=P(d.owner);let b=1;
  else if(t.ter==='forest'&&p.techs.archery)b=1.5;else if(t.ter==='mountain'&&p.techs.climbing)b=1.5;
  if(t.city>=0&&G.cities[t.city].owner===d.owner&&has(d,'fortify'))b=G.cities[t.city].wall?4:1.5;
  if(d.poisoned)b*=.5;return b;}
-function atkVal(u){return UD(u).a+(u.boost?.5:0);}
-function calcDmg(a,d){const at=atkVal(a),df=UD(d).d;const aF=at*a.hp/maxHp(a),dF=df*d.hp/maxHp(d)*defBonus(d);const tot=aF+dF;
+function atkVal(u){return(UD(u).a+(u.boost?.5:0))*(1+.5*(usz(u)-1));}
+function calcDmg(a,d){const at=atkVal(a),df=defVal(d);const aF=at*a.hp/maxHp(a),dF=df*d.hp/maxHp(d)*defBonus(d);const tot=aF+dF;
  if(tot<=0)return{dmg:0,ret:0};const dmg=Math.round(aF/tot*at*4.5);let ret=Math.round(dF/tot*df*4.5);
- const dist_=dist(a.x,a.y,d.x,d.y);if(d.hp-dmg<=0||dist_>UD(d).r||UD(d).a<=0||d.frozen)ret=0;return{dmg,ret};}
+ const dist_=dist(a.x,a.y,d.x,d.y);if(d.hp-dmg<=0||(dist_>UD(d).r&&!has(d,'bounce'))||UD(d).a<=0||d.frozen)ret=0;return{dmg,ret};}
 function targets(u){if(!u.ca||u.frozen)return[];const D=UD(u);if(D.a<=0&&!has(u,'freeze')&&!has(u,'convert'))return[];const o=[];
  for(const v of G.units){if(v.owner===u.owner||atPeace(u.owner,v.owner))continue;if(dist(u.x,u.y,v.x,v.y)>D.r)continue;if(!canSee(v,u.owner))continue;o.push(v);}return o;}
 function doAttack(a,d){
@@ -463,13 +474,15 @@ function doAttack(a,d){
  if(has(a,'freeze')&&d.hp>0)d.frozen=1;
  if(has(a,'splash')){for(const v of G.units.slice()){if(v===d||v.owner===a.owner||atPeace(a.owner,v.owner))continue;if(dist(v.x,v.y,d.x,d.y)===1){const s=Math.round(dmg/2);v.hp-=s;fx(v.x,v.y,'-'+s,'#ff8050');if(has(a,'poison'))v.poisoned=1;if(v.hp<=0){killUnit(v);a.kills++;p.kills++;}}}}
  if(d.hp<=0){const dx=d.x,dy=d.y;logEv(a.owner,pname(p)+'\'s '+uname(a.type,p)+' defeated '+pname(P(d.owner))+'\'s '+uname(d.type,P(d.owner)),d.owner,'kill');killUnit(d);a.kills++;p.kills++;
-  if(UD(a).r===1&&!has(a,'stiff')&&dist(a.x,a.y,dx,dy)===1&&canStand(a,T(dx,dy),p)&&G.units.includes(a)){a.ax=a.x;a.ay=a.y;a.t0=(typeof performance!=='undefined'?performance.now():0);
+  if(has(a,'gulp')&&G.units.includes(a)){a.hp=Math.min(maxHp(a),a.hp+5);fx(a.x,a.y,'Gulp! +5','#80ff80');}
+  if(UD(a).r===1&&!has(a,'stiff')&&dist(a.x,a.y,dx,dy)===1&&canStand(a,T(dx,dy),p)&&G.units.includes(a)&&!unitAt(dx,dy)){a.ax=a.x;a.ay=a.y;a.t0=(typeof performance!=='undefined'?performance.now():0);
    const to=T(dx,dy);if(has(a,'naval')&&!isWater(to)){}else{a.x=dx;a.y=dy;occDirty();unitSight(a);}}
   if(has(a,'persist'))a.ca=true;}
  else{logEv(a.owner,pname(p)+' attacked '+pname(P(d.owner))+'\'s '+uname(d.type,P(d.owner))+' (-'+dmg+')',d.owner,'hit');}
  if(d.hp>0&&ret>0){a.hp-=ret;fx(a.x,a.y,'-'+ret,'#ff5050');if(has(d,'poison')&&a.hp>0)a.poisoned=1;if(a.hp<=0)killUnit(a);}
 }
 function killUnit(u,silent){const i=G.units.indexOf(u);if(i<0)return;G.units.splice(i,1);occDirty();if(!silent){fx(u.x,u.y,'X','#fff');sfx('die');}
+ if(has(u,'splitdeath')&&!silent){const sp=[[u.x,u.y]].concat(nbrs(u.x,u.y)).filter(([a,b])=>!unitAt(a,b)&&isLandT(T(a,b))).slice(0,2);for(const[a,b]of sp){const nb=makeUnit('blob',u.owner,a,b,-1);nb.sz=2;nb.hp=maxHp(nb);}fx(u.x,u.y,'Splat! Split in two!','#9aff6a');}
  if(has(u,'explode')&&!silent)explodeAt(u,false);}
 function explodeAt(u,self){for(const v of G.units.slice()){if(v.owner===u.owner||v===u||atPeace(u.owner,v.owner))continue;if(dist(v.x,v.y,u.x,u.y)===1){v.hp-=self?4:2;v.poisoned=1;fx(v.x,v.y,self?'-4':'-2','#ff60c0');if(v.hp<=0){killUnit(v);P(u.owner).kills++;}}}
  fx(u.x,u.y,'Pop!','#ff9be0');}
@@ -562,6 +575,16 @@ function taskDone(p,k){if(!p.tasks)p.tasks={};const T_=TASKS.find(t=>t.k===k);if
 function checkTasks(p){if(!p.tasks)p.tasks={};if(!p.mons)p.mons={};for(const T_ of TASKS){if(p.tasks[T_.k])continue;if(taskDone(p,T_.k)){p.tasks[T_.k]=1;p.mons[T_.k]=0;logEv(p.i,pname(p)+' completed the '+T_.n+' task',-1,'task');if(!p.ai&&typeof toast==='function')toast('Task done: '+T_.n+'! Build the '+T_.mon+'.');}}}
 function monumentsToBuild(p){return TASKS.filter(T_=>p.mons&&p.mons[T_.k]===0);}
 function buildMonument(p,x,y,k){const t=T(x,y);t.imp='mon';t.mon=k;p.mons[k]=1;const c=G.cities[t.terr];if(c)addPop(c,3);logEv(p.i,pname(p)+' built the '+TASKS.find(q=>q.k===k).mon,-1,'mon');sfx('city');}
+
+// ----- slime tribe -----
+function mergeTargets(u){if(!has(u,'slime')||!u.cm||!u.ca)return[];return nbrs(u.x,u.y).map(([a,b])=>unitAt(a,b)).filter(v=>v&&v.owner===u.owner&&v.type===u.type&&usz(u)+usz(v)<=4);}
+function mergeSlimes(u,v){const hp=u.hp+v.hp;u.sz=usz(u)+usz(v);u.hp=Math.min(maxHp(u),hp);u.poisoned=0;killUnit(v,true);u.cm=u.ca=false;fx(u.x,u.y,'Merge! Size '+u.sz,'#9aff6a');sfx('magic');}
+function splitSpot(u){return nbrs(u.x,u.y).find(([a,b])=>!unitAt(a,b)&&canStand(u,T(a,b),P(u.owner)));}
+function canSplit(u){return has(u,'slime')&&!UNITS[u.type].sup&&usz(u)>=2&&u.cm&&u.ca&&!!splitSpot(u);}
+function splitSlime(u){const s=usz(u),a=Math.ceil(s/2),b=s-a;const sp=splitSpot(u);const frac=u.hp/maxHp(u);u.sz=a;u.hp=Math.max(1,Math.round(maxHp(u)*frac));
+ const v=makeUnit(u.type,u.owner,sp[0],sp[1],u.city);v.sz=b;v.hp=Math.max(1,Math.round(maxHp(v)*frac));v.cm=v.ca=false;u.cm=u.ca=false;occDirty();fx(u.x,u.y,'Split!','#9aff6a');sfx('magic');}
+function canGobble(u){const t=T(u.x,u.y);return has(u,'slime')&&u.cm&&u.ca&&['fruit','animal','fish','crop'].includes(t.res)&&!t.imp;}
+function gobble(u){const t=T(u.x,u.y);t.res=null;const p=P(u.owner);p.stars+=3;u.hp=Math.min(maxHp(u),u.hp+3);u.cm=u.ca=false;fx(u.x,u.y,'Gobble! +3','#ffd23f');sfx('build');}
 // ----- score -----
 function score(p){let s=0;for(const e of p.ex)if(e)s+=5;
  for(const c of G.cities)if(c.owner===p.i)s+=100+c.level*50+c.parks*250;
@@ -576,11 +599,13 @@ function startTurn(i){const p=P(i);
   if(has(u,'grow')){u.age=(u.age||0)+1;if(u.age>=3){const om=maxHp(u);u.type=u.type==='wyrmegg'?'babywyrm':'firewyrm';u.age=0;u.hp=Math.min(maxHp(u),u.hp+maxHp(u)-om);fx(u.x,u.y,'Grew up!','#ffb050');}}
   if(has(u,'hatch')){u.type='larvy';u.hp=maxHp(u);fx(u.x,u.y,'Hatched!','#ff9be0');}
   if(u.frozen){u.cm=u.ca=false;u.frozen=0;u.wasFrozen=1;}else{u.cm=u.ca=true;u.wasFrozen=0;}
+  if(has(u,'slime')&&T(u.x,u.y).goo===i+1&&u.hp<maxHp(u)&&!u.poisoned){u.hp=Math.min(maxHp(u),u.hp+2);}
  }
  p.stars+=income(p);
  checkTasks(p);
 }
 function endTurnEffects(i){
+ for(const u of G.units){if(u.owner!==i)continue;const t=T(u.x,u.y);if(has(u,'slime')&&isLandT(t)&&t.city<0)t.goo=i+1;else if(t.goo&&t.goo!==i+1&&!has(u,'fly'))t.goo=0;}
  for(const u of G.units.slice()){if(u.owner!==i||!has(u,'foamarea'))continue;for(const[a,b]of nbrs(u.x,u.y)){const t=T(a,b);if(isWater(t)&&!t.imp&&t.city<0){const v=unitAt(a,b);foamTile(t);if(v&&has(v,'naval')){v.type=v.base||'warrior';v.base=null;}}}}
  for(const u of G.units.slice()){if(u.owner!==i||!has(u,'freezearea'))continue;
   for(const[a,b]of nbrs(u.x,u.y)){const t=T(a,b);if(isWater(t)&&!t.imp&&t.city<0){const v=unitAt(a,b);freezeTile(t);if(v&&has(v,'naval')){v.type=v.base||'warrior';v.base=null;}}
@@ -634,6 +659,9 @@ function aiUnit(u,p,claimed){
   if(canCapture(u)){capture(u);return;}
   if(T(u.x,u.y).ruin){examine(u);return;}
   if(canStarfish(u)){harvestStarfish(u);return;}
+  if(canGobble(u)&&(tileOwner(T(u.x,u.y))!==p.i||!p.techs.organization||rnd()<.6)){gobble(u);return;}
+  {const mt=mergeTargets(u).filter(v=>v.cm&&v.ca);if(mt.length&&(enemyNear(u,3)||cityUnits(G.cities[u.city]||{id:-9})>=cityCap(G.cities[u.city]||{level:9}))&&rnd()<.7){mergeSlimes(u,mt[0]);return;}}
+  if(canSplit(u)&&!enemyNear(u,2)&&u.hp>=maxHp(u)*.8&&rnd()<.35){splitSlime(u);return;}
   if(u.kills>=3&&!u.vet){promote(u);return;}
   if(has(u,'boost')&&nbrs(u.x,u.y).filter(([a,b])=>{const v=unitAt(a,b);return v&&v.owner===p.i;}).length>=2&&enemyNear(u,3)){boostOthers(u);return;}
   if(has(u,'heal')&&nbrs(u.x,u.y).some(([a,b])=>{const v=unitAt(a,b);return v&&v.owner===p.i&&v.hp<maxHp(v)-3;})&&rnd()<.6){healOthers(u);return;}
@@ -845,10 +873,36 @@ function heart(c,x,y,s,col){c.beginPath();c.moveTo(x,y+s*.35);c.bezierCurveTo(x-
 function flowerSm(c,x,y,r,col){for(let i=0;i<5;i++){const a=i*TAU/5;Ci(c,x+Math.cos(a)*r,y+Math.sin(a)*r,r*.7,col);}Ci(c,x,y,r*.6,'#ffe14a');}
 function bugLegs(c,x,y,k,n,len,col){for(let i=0;i<n;i++){const dx=(i-(n-1)/2)*4*k;Ln(c,x+dx,y-3*k,x+dx-2*k,y+len*k-3*k,1.4*k,col);Ln(c,x+dx,y-3*k,x+dx+2*k,y+len*k-3*k,1.4*k,col);}}
 
+let DRAW_SZ=1;
+function slimeBody(c,x,y,r,col,o){o=o||{};const h=r*(o.tall||1.25);
+ El(c,x,y+.5,r*1.08,r*.32,'rgba(0,0,0,.18)');
+ c.beginPath();c.moveTo(x-r,y);c.bezierCurveTo(x-r*1.05,y-h*.75,x-r*.55,y-h,x,y-h);c.bezierCurveTo(x+r*.55,y-h,x+r*1.05,y-h*.75,x+r,y);c.quadraticCurveTo(x,y+r*.28,x-r,y);c.closePath();
+ const g=c.createLinearGradient(x-r,y-h,x+r,y);g.addColorStop(0,sh2(col,.32));g.addColorStop(.55,col);g.addColorStop(1,sh2(col,-.28));c.fillStyle=g;c.fill();c.strokeStyle='rgba(0,0,0,.3)';c.lineWidth=Math.max(.7,r*.06);c.stroke();
+ El(c,x-r*.42,y-h*.72,r*.26,r*.15,'rgba(255,255,255,.75)',-.6);Ci(c,x-r*.16,y-h*.84,r*.07,'rgba(255,255,255,.8)');
+ for(const dx of[-.55,.15,.6])El(c,x+dx*r,y+r*.05,r*.1,r*.14,sh2(col,-.1));
+ return{top:y-h,h};}
+function slimeFace(c,x,y,r,mood){const ex=r*.28,ey=y;for(const sd of[-1,1]){El(c,x+sd*ex+r*.1,ey,r*.11,r*.15,'#141018');Ci(c,x+sd*ex+r*.06,ey-r*.06,r*.045,'#fff');}
+ El(c,x-r*.42+r*.1,ey+r*.2,r*.1,r*.05,'rgba(255,110,150,.6)');El(c,x+r*.42+r*.1,ey+r*.2,r*.1,r*.05,'rgba(255,110,150,.6)');
+ c.beginPath();if(mood==='o'){Ci(c,x+r*.1,ey+r*.22,r*.08,'#4a1a2a');return;}if(mood==='chomp'){c.moveTo(x-r*.3,ey+r*.15);c.lineTo(x+r*.5,ey+r*.15);c.lineTo(x+r*.1,ey+r*.42);c.closePath();c.fillStyle='#4a1a2a';c.fill();for(let i=0;i<4;i++){Pg(c,[[x-r*.25+i*r*.18,ey+r*.15],[x-r*.16+i*r*.18,ey+r*.15],[x-r*.2+i*r*.18,ey+r*.26]],'#fff');}return;}
+ c.arc(x+r*.1,ey+r*.14,r*.12,.2,Math.PI-.2);c.strokeStyle='#4a1a2a';c.lineWidth=Math.max(.6,r*.05);c.stroke();}
+function drawSlime(c,type,x,y,k,col,col2){const sz=DRAW_SZ||1;const r=(10+2.4*sz)*k;
+ switch(type){
+ case'blob':{const b=slimeBody(c,x,y,r,col);slimeFace(c,x,y-b.h*.42,r);break;}
+ case'zipblob':{for(let i=0;i<3;i++)Ln(c,x-r*1.2-i*r*.25,y-r*(.3+i*.25),x-r*1.6-i*r*.25,y-r*(.3+i*.25),Math.max(.8,r*.08),'rgba(255,255,255,.7)');const b=slimeBody(c,x,y,r*.9,col,{tall:1});Pg(c,[[x-r*.8,y-r*.2],[x-r*1.35,y-r*.1],[x-r*.85,y-r*.6]],col);slimeFace(c,x+r*.1,y-b.h*.45,r*.9);break;}
+ case'spitblob':{const b=slimeBody(c,x,y,r,col);slimeFace(c,x,y-b.h*.42,r,'o');Ci(c,x+r*.95,y-b.h*.5,r*.14,sh2(col2,-.1));Ci(c,x+r*1.3,y-b.h*.62,r*.09,sh2(col2,-.1));break;}
+ case'wallblob':{const w=r*1.05,h=r*1.5;El(c,x,y+.5,w*1.1,w*.32,'rgba(0,0,0,.18)');c.beginPath();rr0(c,x-w,y-h,w*2,h,r*.35);const g=c.createLinearGradient(x-w,y-h,x+w,y);g.addColorStop(0,sh2(col,.3));g.addColorStop(1,sh2(col,-.3));c.fillStyle=g;c.fill();c.strokeStyle='rgba(0,0,0,.3)';c.lineWidth=Math.max(.7,r*.06);c.stroke();
+  Rc(c,x-w*.7,y-h*.85,w*.5,h*.12,'rgba(255,255,255,.6)');Rc(c,x-w,y-h*.55,w*2,h*.12,sh2(col2,-.05));slimeFace(c,x,y-h*.32,r);break;}
+ case'chompy':{const b=slimeBody(c,x,y,r*1.05,col,{tall:1.15});slimeFace(c,x,y-b.h*.5,r*1.05,'chomp');break;}
+ case'kingslime':{const R=r*1.5;const b=slimeBody(c,x,y,R,col);slimeFace(c,x,y-b.h*.42,R);Pg(c,[[x-R*.4,b.top+R*.12],[x+R*.4,b.top+R*.12],[x+R*.45,b.top-R*.3],[x+R*.2,b.top-R*.08],[x,b.top-R*.38],[x-R*.2,b.top-R*.08],[x-R*.45,b.top-R*.3]],'#ffd23f','rgba(0,0,0,.3)',.7*k);Ci(c,x,b.top-R*.05,R*.07,'#ff4a6a');break;}
+ }
+ if(sz>1){ctx_badge(c,x-r*.95,y-r*1.3,sz,k);}}
+function rr0(c,x,y,w,h,r){c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+function ctx_badge(c,x,y,sz,k){c.save();c.beginPath();c.arc(x,y,4.2*k,0,TAU);c.fillStyle='#ffffff';c.fill();c.strokeStyle='#2a7a3a';c.lineWidth=1.2*k;c.stroke();c.fillStyle='#2a5a2a';c.font='bold '+Math.round(6*k)+'px system-ui';c.textAlign='center';c.textBaseline='middle';c.fillText('x'+sz,x,y+.3*k);c.restore();}
 function drawUnit(c,type,x,y,k,col,col2,hat,base){
  El(c,x,y,11*k,3.6*k,'rgba(0,0,0,.25)');
  const W='#7a5230';
   if(hat!=='nd'&&['petalshaman','jellyegg','larvy','buzzlet','shellbun','mothkin','sporepuff','boomhorn','ruby','axolotl','squishy','lilyisle','megapede'].includes(type)){classicBug(c,type,x,y,k,col,col2);return;}
+ if(['blob','zipblob','spitblob','wallblob','chompy','kingslime'].includes(type)){El(c,x,y,11*k,3.6*k,'rgba(0,0,0,.0)');drawSlime(c,type,x,y,k,col,col2);return;}
  switch(type){
  case'warrior':{person(c,x,y,k,col,col2,hat);Ln(c,x+8*k,y-12*k,x+11*k,y-24*k,2.6*k,W);Ci(c,x+11*k,y-24*k,2.4*k,W);break;}
  case'dagger':{person(c,x,y,k*.9,'#3a3a40',col,hat);Ln(c,x+7*k,y-12*k,x+10*k,y-18*k,1.6*k,'#ddd');break;}
@@ -936,6 +990,7 @@ function bugMount(c,x,y,k,shell,horn){for(let i=-1;i<=1;i++){Ln(c,x+i*4*k,y-4*k,
  roundBox(c,x,y-3*k,7*k,4*k,6*k,shell,3*k);roundBox(c,x+8.5*k,y-4*k,3*k,3*k,5.5*k,shade(shell,.1),2*k);Ci(c,x+9*k,y-7.5*k,1.3*k,'#ff8a2a');Ci(c,x+8.6*k,y-7.9*k,.4*k,'#fff');
  if(horn)Pg(c,[[x+10*k,y-9.5*k],[x+12*k,y-9.5*k],[x+14*k,y-19*k]],'#f4ecd8',OUT,.6*k);}
 function drawMini(c,base,x,y,k,col,col2,hat){if(!base)base='warrior';
+ if(['blob','zipblob','spitblob','wallblob','chompy','kingslime'].includes(base)){drawSlime(c,base,x,y,k*.8,col,col2);return;}
  if(['buzzlet','shellbun','larvy','jellyegg','petalshaman','boomhorn','mothkin','sporepuff','megapede','ruby','lilyisle','axolotl','squishy'].includes(base)){if(hat==='nd')axoF(c,x,y,k*.7,col,col2);else{person(c,x,y,k,col,col2,null,{ciru:true});}return;}
  if(base==='snowling'){Ci(c,x,y-7*k,7*k,'#fbfdff',OUT,k);Ci(c,x,y-17*k,5*k,'#fbfdff',OUT,k);return;}
  person(c,x,y,k,col,col2,hat);}
@@ -954,12 +1009,13 @@ function drawTerrain(c,t,X,Y,sx,sy,hw,hh,s,now){
  const top=t.foam?'#ffe6f4':t.ter==='ice'?'#dff2ff':polar?'#eef4f8':tr.g;
  c.beginPath();c.moveTo(sx-hw,sy);c.lineTo(sx,sy+hh);c.lineTo(sx+hw,sy);c.lineTo(sx+hw,sy+5*s);c.lineTo(sx,sy+hh+5*s);c.lineTo(sx-hw,sy+5*s);c.closePath();c.fillStyle=t.ter==='ice'?'#9fcde8':shade(top,-.35);c.fill();
  diamond(c,sx,sy,hw,hh);c.fillStyle=top;c.fill();
+ if(t.goo&&G&&G.players[t.goo-1]){const gc=pcol(G.players[t.goo-1])[0];El(c,sx,sy+1*s,hw*.62,hh*.55,sh2(gc,.15),0,'rgba(0,0,0,.15)',.6*s);El(c,sx-hw*.2,sy-hh*.1,hw*.16,hh*.12,'rgba(255,255,255,.65)');Ci(c,sx+hw*.32,sy+hh*.25,2*s,sh2(gc,.15));}
  if(t.foam){for(const[a,b,r]of[[-12,-2,3],[8,-4,2.4],[2,4,3.4],[-5,6,2],[13,3,2.2]])Ci(c,sx+a*s,sy+b*s,r*s,'rgba(255,255,255,.95)');}else if(t.ter==='ice'){Ln(c,sx-10*s,sy-2*s,sx+4*s,sy+4*s,.8*s,'#fff');Ln(c,sx+2*s,sy-6*s,sx+8*s,sy,.8*s,'#fff');}
  if(bug&&t.ter==='field'&&((X*7+Y*13)%5===0))flowerSm(c,sx+((X*5)%7-3)*2*s,sy+((Y*3)%5-2)*2*s,1.6*s,(X+Y)%2?'#ff8fc8':'#b48cff');
 }
 function seesRes(t){if(!G)return true;const v=P(G.view);if(!v)return true;if(t.res==='crop')return!!v.techs.organization||!!v.techs.farming;if(t.res==='ore')return!!v.techs.climbing;if(t.res==='starfish')return!!v.techs.fishing;return true;}
 function drawFeature(c,t,X,Y,sx,sy,hw,hh,s){const seeR=seesRes(t);
- const tr=TRIBES[t.clim];const polar=tr.sp==='polar'||tr.sp===undefined&&false;const nd=tr.sp==='bug'&&t.cs>0,shroom=tr.sp==='bug'&&!t.cs;const pink=tr.sp==='elyr'||nd;
+ const tr=TRIBES[t.clim];const polar=tr.sp==='polar'||tr.sp===undefined&&false;const nd=tr.sp==='bug'&&t.cs>0,shroom=tr.sp==='bug'&&!t.cs;const pink=tr.sp==='elyr'||nd||tr.sp==='slime';
  if(t.road){for(const[a,b]of nbrs(X,Y)){if(Math.abs(a-X)+Math.abs(b-Y)!==1)continue;const n=T(a,b);if(n.road||n.city>=0){const nx=sx+((a-X)-(b-Y))*hw,ny=sy+((a-X)+(b-Y))*hh;Ln(c,sx,sy,(sx+nx)/2,(sy+ny)/2,3*s,'#b08a5a');}}Ci(c,sx,sy,1.6*s,'#b08a5a');}
  if(t.ter==='forest'&&t.imp!=='lumber'&&t.imp!=='ftemple'){tree(c,sx-hw*.42,sy+1*s,s*.9,(nd?(t.cs===2?'#8fd4ff':'#e08ad8'):tr.tr),tr.sp==='polar',shroom?'shroom':pink);tree(c,sx+hw*.35,sy-2*s,s,(nd?(t.cs===2?'#8fd4ff':'#e08ad8'):tr.tr),tr.sp==='polar',shroom?'shroom':pink);tree(c,sx,sy+hh*.6,s*.85,(nd?(t.cs===2?'#8fd4ff':'#e08ad8'):tr.tr),tr.sp==='polar',shroom?'shroom':pink);}
  if(t.ter==='mountain'){Pg(c,[[sx-hw*.8,sy+hh*.3],[sx+hw*.8,sy+hh*.3],[sx+hw*.1,sy-hh*1.9]],'#8e8f9e',OUT,s*.6);Pg(c,[[sx+hw*.1,sy-hh*1.9],[sx+hw*.8,sy+hh*.3],[sx+hw*.25,sy+hh*.3]],'#6e6f7e');Pg(c,[[sx-hw*.12,sy-hh*1.15],[sx+hw*.33,sy-hh*1.15],[sx+hw*.1,sy-hh*1.9]],'#fff');
@@ -1108,7 +1164,7 @@ function render(now){
    const p=P(u.owner),[c1,c2]=pcol(p);const done=u.owner===G.cur&&!u.cm&&!u.ca&&!humanP().ai;
    if(u===selUnit){El(ctx,ux,uy+HH*.25,15*s,5.5*s,'rgba(255,225,74,.55)');}
    ctx.globalAlpha=done?.6:1;if(has(u,'hide'))ctx.globalAlpha*=.75;
-   El(ctx,ux,uy+HH*.25,11*s,3.6*s,'rgba(0,0,0,.22)');drawSprite(ctx,u.type,ux,uy+HH*.25-(has(u,'fly')?6*s:0),s*.92,c1,c2,phat(p),u.base);ctx.globalAlpha=1;
+   El(ctx,ux,uy+HH*.25,11*s,3.6*s,'rgba(0,0,0,.22)');DRAW_SZ=usz(u);drawSprite(ctx,u.type,ux,uy+HH*.25-(has(u,'fly')?6*s:0),s*.92,c1,c2,phat(p),u.base);DRAW_SZ=1;ctx.globalAlpha=1;
    if(TARGETS&&TARGETS.includes(u))marks.push(['a',sx,sy,u]);
    if(u.frozen){Rc(ctx,ux-10*s,uy-22*s,20*s,24*s,'rgba(170,225,255,.45)');}
    const bx=ux+13*s,by=uy-4*s;Ci(ctx,bx,by,6.2*s,c1,'#fff',1.3*s);ctx.fillStyle=lum(c1)>.6?'#222':'#fff';ctx.font='bold '+Math.round(7.5*s)+'px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(Math.max(0,u.hp),bx,by+.5*s);
@@ -1149,12 +1205,16 @@ function showPanel(){const pn=$('panel');if(!SEL){pn.style.display='none';return
  const close=document.createElement('div');close.className='pclose';close.textContent='x';close.onclick=clearSel;pn.appendChild(close);
  if(SEL.mode==='unit'){const u=unitAt(x,y);if(!u){clearSel();return;}const D=UD(u),op=P(u.owner);
   h.innerHTML='<b>'+uname(u.type,op)+(u.vet?' (Veteran)':'')+'</b> <span class="tag" style="background:'+pcol(op)[0]+';color:'+(lum(pcol(op)[0])>.6?'#222':'#fff')+'">'+pname(op)+'</span>'+
-   '<div class="stats">HP '+u.hp+'/'+maxHp(u)+' &nbsp; Attack '+D.a+' &nbsp; Defense '+D.d+' &nbsp; Move '+D.m+' &nbsp; Range '+D.r+'</div>'+
+   (usz(u)>1?'<div class="stats"><b>Size '+usz(u)+'</b></div>':'')+'<div class="stats">HP '+u.hp+'/'+maxHp(u)+' &nbsp; Attack '+(+atkVal(u).toFixed(1))+' &nbsp; Defense '+(+defVal(u).toFixed(1))+' &nbsp; Move '+D.m+' &nbsp; Range '+D.r+'</div>'+
    '<div class="sk">'+D.sk.filter(k=>SKILL_TXT[k]).map(k=>SKILL_TXT[k]).join(' &middot; ')+(u.poisoned?' &middot; <b style="color:#7aff4a">Poisoned</b>':'')+(u.frozen?' &middot; <b style="color:#9fe0ff">Frozen</b>':'')+(u.base?' &middot; Carrying a '+uname(u.base,op):'')+'</div>';
   if(u.owner===p.i){const fresh=u.cm&&u.ca;
    const cap=canCapture(u);if(cap)acts.appendChild(btn(cap==='village'?'Capture Village':'Capture City','',true,()=>{capture(u);afterAction(u);}));
    else{const tt=T(u.x,u.y);if((tt.village||(tt.city>=0&&G.cities[tt.city].owner!==u.owner))&&!fresh)acts.appendChild(btn('Capture','next turn',false));}
    if(T(u.x,u.y).res==='starfish'&&p.techs.fishing)acts.appendChild(btn('Harvest Starfish',p.techs.navigation?'+8 '+(psp(p)==='bug'?'hearts':'stars'):'Needs Navigation',canStarfish(u),()=>{harvestStarfish(u);afterAction(u);}));
+   if(has(u,'slime')){
+    if(['fruit','animal','fish','crop'].includes(T(u.x,u.y).res)&&!T(u.x,u.y).imp)acts.appendChild(btn('Gobble','+3 '+curName(p)+', +3 HP',canGobble(u),()=>{gobble(u);afterAction(u);}));
+    for(const v of mergeTargets(u))acts.appendChild(btn('Merge','with the '+uname(v.type,p)+' next to it (size '+(usz(u)+usz(v))+')',true,()=>{mergeSlimes(u,v);afterAction(u);}));
+    if(usz(u)>=2&&!UNITS[u.type].sup)acts.appendChild(btn('Split','into size '+Math.ceil(usz(u)/2)+' + '+Math.floor(usz(u)/2),canSplit(u),()=>{splitSlime(u);afterAction(u);}));}
    if(T(u.x,u.y).ruin)acts.appendChild(btn('Examine Ruins','',fresh,()=>{const m=examine(u);toast(m);afterAction(u);}));
    if(u.hp<maxHp(u)||u.poisoned)acts.appendChild(btn(u.poisoned?'Cure':'Recover',u.poisoned?'':'+'+(tileOwner(T(u.x,u.y))===u.owner?4:2)+' HP',fresh,()=>{recover(u);afterAction(u);}));
    if(has(u,'heal'))acts.appendChild(btn('Heal Others','+4 HP around',fresh,()=>{healOthers(u);afterAction(u);}));
@@ -1168,7 +1228,7 @@ function showPanel(){const pn=$('panel');if(!SEL){pn.style.display='none';return
    else if(MOVES&&MOVES.size||TARGETS&&TARGETS.length){const n=document.createElement('div');n.className='hint';n.textContent=(MOVES&&MOVES.size?'Tap a white tile to move. ':'')+(TARGETS&&TARGETS.length?'Tap a red-outlined enemy to attack.':'');pn.appendChild(n);}
    const tb=document.createElement('div');tb.className='lnk';tb.textContent='Show tile';tb.onclick=()=>select(x,y,'tile');pn.appendChild(tb);}
  }else{
-  let title=terName(t);if(t.res&&seesRes(t)){const bg=isND(p);title+=' with '+{fruit:bg?'Pupli Nectar':'Fruit',crop:'Crops',animal:bg?'Snulles':'Wild Animals',fish:'Fish',ore:'Ore'}[t.res];}
+  let title=terName(t);if(t.goo&&G.players[t.goo-1])title+=' &middot; '+pname(G.players[t.goo-1])+' goo';if(t.res&&seesRes(t)){const bg=isND(p);title+=' with '+{fruit:bg?'Pupli Nectar':'Fruit',crop:'Crops',animal:bg?'Snulles':'Wild Animals',fish:'Fish',ore:'Ore'}[t.res];}
   if(t.imp==='mon'){const M=TASKS.find(q=>q.k===t.mon);if(M)title+=' &middot; '+M.mon;}else if(t.imp){const im=IMPS.find(i=>i.k===t.imp);if(im)title+=' &middot; '+impName(p,im);}if(t.road)title+=' &middot; Road';
   let info='';const c=cityOf(t);
   if(c){const op=P(c.owner);title='<b>'+(c.cap?'Capital: ':'')+c.name+'</b> <span class="tag" style="background:'+pcol(op)[0]+';color:'+(lum(pcol(op)[0])>.6?'#222':'#fff')+'">'+pname(op)+'</span>';
@@ -1304,8 +1364,8 @@ function renderSetup(){const S=SETUP,s=$('setup');let h='<div class="setup"><h2>
   const ch=document.createElement('button');ch.className='btn sm';ch.textContent='Tribe';ch.onclick=()=>tribePicker(i);d.appendChild(ch);
   if(i>0){const rm=document.createElement('button');rm.className='btn sm red';rm.textContent='X';rm.onclick=()=>{S.slots.splice(i,1);renderSetup();};d.appendChild(rm);}
   hl.appendChild(d);});
- $('addH').onclick=()=>{const used=S.slots.map(x=>x.t);const free=TRIBES.map((_,i)=>i).filter(i=>!used.includes(i));if(!free.length||S.slots.length+S.ai>=15)return toast('Too many tribes');S.slots.push({t:free[0],skin:0,ai:false});renderSetup();};
- $('aim').onclick=()=>{S.ai=Math.max(S.slots.length>1?0:1,S.ai-1);renderSetup();};$('aip').onclick=()=>{if(S.slots.length+S.ai<15)S.ai++;renderSetup();};
+ $('addH').onclick=()=>{const used=S.slots.map(x=>x.t);const free=TRIBES.map((_,i)=>i).filter(i=>!used.includes(i));if(!free.length||S.slots.length+S.ai>=TRIBES.length)return toast('Too many tribes');S.slots.push({t:free[0],skin:0,ai:false});renderSetup();};
+ $('aim').onclick=()=>{S.ai=Math.max(S.slots.length>1?0:1,S.ai-1);renderSetup();};$('aip').onclick=()=>{if(S.slots.length+S.ai<TRIBES.length)S.ai++;renderSetup();};
  for(const[id,k,num]of[['sz','size',1],['mt','mt',0],['md','mode',0],['df','diff',1]])$(id).querySelectorAll('button').forEach(b=>b.onclick=()=>{S[k]=num?+b.dataset.v:b.dataset.v;renderSetup();});
  $('sBack').onclick=showTitle;$('sGo').onclick=startGame;$('rndAll').onclick=()=>{S.size=pick([11,14,16,18,20]);S.mt='random';S.ai=1+ri(Math.min(6,14-S.slots.length+1));for(const sl of S.slots){const used=S.slots.filter(o=>o!==sl).map(o=>o.t);const fr=TRIBES.map((_,i)=>i).filter(i=>!used.includes(i));sl.t=pick(fr);sl.skin=ri(skinCount(sl.t));}sfx('magic');renderSetup();toast('Random world! Size '+S.size+', '+S.ai+' computer tribes');};}
 function tribePicker(i){const S=SETUP;const s=$('setup');let h='<div class="setup"><h2>Pick a tribe for Player '+(i+1)+'</h2><div class="tgrid">';
