@@ -54,6 +54,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
+- 2026-11-21: Tiny Realms: new Wild world type, used by 'Surprise me': random water amount, smoothness, land shape, mountain/forest/field mix, resources and ruins, so every Wild map is different. Commit `COMMIT`.
 - 2026-11-21: Tiny Realms: Guru/Shaman and Cloak get Dash (can act after moving). Commit `87d758e`.
 - 2026-11-21: Tiny Realms: tribe mood meter in the Tribes screen (Horrible/Bad/Neutral/Decent/Great) with reasons (Friendly, Peaceful, Generous, Brave, Powerful / Aggressive, Backstabber, Threatening, Foolish, Weak, Envious); AI peace offers, acceptance and war declarations now follow the mood. Commit `835b291`.
 - 2026-11-21: Tiny Realms: new special tribe Gloopa/Jellune (slimes): Merge into bigger slimes (size up to 4), Split apart, Gobble food anywhere for stars, Goo trails that speed and heal their slimes and stop enemies, Bouncer hits back at ranged attackers, King Slime splits in two when defeated. Commit `1de896d`.

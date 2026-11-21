@@ -327,12 +327,13 @@ function makeUnit(type,owner,x,y,city){const u={id:G.nextId++,type,owner,x,y,hp:
 
 // ----- map generation -----
 function genMap(N,np,mt){mt=mt||'continents';
+ const WD=mt==='wild'?(G.wild=G.wild||{water:.05+rnd()*.8,smooth:ri(5),shape:pick(['none','center','ring','stripes','holes','cross','spots','edges']),fr:rnd()*.4,mtn:.2+rnd()*2.2,forest:.2+rnd()*2.2,field:.4+rnd()*1.6,res:.4+rnd()*1.4,ruins:.5+rnd()*2.5,freq:1+rnd()*3}):null;
  const M=[];for(let i=0;i<N*N;i++)M.push({ter:'field',res:null,imp:null,road:0,city:-1,terr:-1,clim:0,village:0,ruin:0});
  G.map=M;
  const caps=[];
  for(let k=0;k<np;k++){let best=null,bd=-1;for(let t=0;t<120;t++){const x=2+ri(N-4),y=2+ri(N-4);let md=caps.length?99:ri(10);for(const c of caps)md=Math.min(md,dist(x,y,c[0],c[1]));if(md>bd){bd=md;best=[x,y];}}caps.push(best);}
  let v=new Float32Array(N*N).map(()=>rnd());
- const sm={archipelago:1,waterworld:1,lakes:2}[mt]||3;
+ const sm=WD?WD.smooth:({archipelago:1,waterworld:1,lakes:2}[mt]||3);
  for(let s=0;s<sm;s++){const w=new Float32Array(N*N);for(let y=0;y<N;y++)for(let x=0;x<N;x++){let sum=v[y*N+x],n=1;for(const[a,b]of nbrs(x,y)){sum+=v[b*N+a];n++;}w[y*N+x]=sum/n;}v=w;}
  // climate
  const clim=new Int32Array(N*N);
@@ -341,15 +342,16 @@ function genMap(N,np,mt){mt=mt||'continents';
   if(mt!=='lakes'&&mt!=='drylands'&&(x===0||y===0||x===N-1||y===N-1))v[y*N+x]-=.08;
   const cx=(N-1)/2;const dc=Math.hypot(x-cx,y-cx)/(N/2);
   if(mt==='pangea')v[y*N+x]-=dc*.5;
+  if(WD){const fx=x/N,fy=y/N,F=WD.freq;let sh=0;switch(WD.shape){case'center':sh=-dc*.6;break;case'ring':sh=-Math.abs(dc-.6)*.8;break;case'stripes':sh=Math.sin(fx*Math.PI*2*F)*.18;break;case'holes':sh=-Math.max(0,.35-Math.hypot(Math.sin(fx*Math.PI*F),Math.sin(fy*Math.PI*F))*.5)*1.2;break;case'cross':sh=-Math.min(Math.abs(fx-.5),Math.abs(fy-.5))*.9;break;case'spots':sh=Math.sin(fx*Math.PI*2*F)*Math.sin(fy*Math.PI*2*F)*.2;break;case'edges':sh=dc*.45;break;}v[y*N+x]+=sh+(rnd()-.5)*WD.fr;}
   if(mt==='continents'||mt==='archipelago'){const ds=caps.map(c=>dist(x,y,c[0],c[1])).sort((a,b)=>a-b);if(ds.length>1&&ds[1]-ds[0]<1.6)v[y*N+x]-=mt==='continents'?.45:.25;}
   if(mt==='lakes'&&(x===0||y===0||x===N-1||y===N-1))v[y*N+x]+=.3;}
  let wa=0;for(const p of G.players)wa+=TRIBES[p.t].wa;wa/=np;
- const base={drylands:.04,lakes:.24,pangea:.42,continents:.5,archipelago:.62,waterworld:.86}[mt]||.45;
+ const base=WD?WD.water:({drylands:.04,lakes:.24,pangea:.42,continents:.5,archipelago:.62,waterworld:.86}[mt]||.45);
  const frac=Math.max(.02,Math.min(.9,base*(.75+.25*wa)));
  const sorted=Array.from(v).sort((a,b)=>a-b);const th=sorted[Math.floor(frac*N*N)];
  for(let i=0;i<N*N;i++){const t=M[i];const tr=TRIBES[G.players[clim[i]].t];t.clim=G.players[clim[i]].t;t.cs=G.players[clim[i]].skin|0;
   if(v[i]<th){t.ter='water';continue;}
-  const w=tr.w,s=w[0]+w[1]+w[2]*.6;let r=rnd()*s;t.ter=r<w[0]?'field':r<w[0]+w[1]?'forest':'mountain';}
+  const w=WD?[tr.w[0]*WD.field,tr.w[1]*WD.forest,tr.w[2]*WD.mtn]:tr.w,s=w[0]+w[1]+w[2]*.6;let r=rnd()*s;t.ter=r<w[0]?'field':r<w[0]+w[1]?'forest':'mountain';}
  for(let y=0;y<N;y++)for(let x=0;x<N;x++){const t=T(x,y);if(t.ter==='water'&&!nbrs(x,y).some(([a,b])=>isLandT(T(a,b))))t.ter='ocean';}
  for(const c of caps){for(const[a,b]of nbrs(c[0],c[1])){const t=T(a,b);if(isWater(t)||t.ter==='mountain')t.ter=rnd()<.7?'field':'forest';}T(c[0],c[1]).ter='field';}
  // fix oceans next to new land
@@ -362,7 +364,7 @@ function genMap(N,np,mt){mt=mt||'continents';
  // resources
  for(let y=0;y<N;y++)for(let x=0;x<N;x++){const t=T(x,y);if(t.village)continue;if(caps.some(c=>c[0]===x&&c[1]===y))continue;
   let md=99;for(const s of spots)md=Math.min(md,dist(x,y,s[0],s[1]));
-  const pr=md<=1?.55:md<=2?.3:.1;const R=TRIBES[t.clim].r;
+  const pr=(md<=1?.55:md<=2?.3:.1)*(WD?WD.res:1);const R=TRIBES[t.clim].r;
   if(t.ter==='field'){const f=R.fruit,c=R.crop*.7;if(rnd()<pr*Math.min(1.4,(f+c)/1.5)){t.res=rnd()<f/(f+c)?'fruit':'crop';}}
   else if(t.ter==='forest'){if(rnd()<pr*R.animal*.8)t.res='animal';}
   else if(t.ter==='mountain'){if(rnd()<pr*R.ore*.6)t.res='ore';}
@@ -370,7 +372,7 @@ function genMap(N,np,mt){mt=mt||'continents';
  for(let y=0;y<N;y++)for(let x=0;x<N;x++){const t=T(x,y);if(t.ter==='ocean'&&!t.res&&rnd()<.06)t.res='starfish';}
  G.lights=[[0,0],[N-1,0],[0,N-1],[N-1,N-1]];for(const[x,y]of G.lights){const t=T(x,y);t.lighthouse=1;t.res=null;t.village=0;t.ruin=0;}
  // ruins
- const rn=Math.max(2,Math.round(N*N/70));let made=0;for(let k=0;k<400&&made<rn;k++){const x=ri(N),y=ri(N);const t=T(x,y);if(t.village||t.res||t.ruin)continue;if(caps.some(c=>dist(x,y,c[0],c[1])<3))continue;t.ruin=1;made++;}
+ const rn=Math.max(2,Math.round(N*N/70*(WD?WD.ruins:1)));let made=0;for(let k=0;k<400&&made<rn;k++){const x=ri(N),y=ri(N);const t=T(x,y);if(t.village||t.res||t.ruin)continue;if(caps.some(c=>dist(x,y,c[0],c[1])<3))continue;t.ruin=1;made++;}
  return caps;
 }
 
@@ -1386,7 +1388,7 @@ function setupScreen(){if(!SETUP){SETUP={slots:[{t:0,skin:0,ai:false}],ai:3,size
 function renderSetup(){const S=SETUP,s=$('setup');let h='<div class="setup"><h2>New Game</h2><div class="sub">Players (pass and play)</div><div id="hl"></div><button class="btn" id="addH">+ Add human player</button>';
  h+='<div class="sub">Computer tribes: <button class="btn sm" id="aim">-</button> <b id="ain">'+S.ai+'</b> <button class="btn sm" id="aip">+</button></div>';
  const seg=(id,opts,val)=>'<div class="seg" id="'+id+'">'+opts.map(([v,l])=>'<button class="'+(v===val?'on':'')+'" data-v="'+v+'">'+l+'</button>').join('')+'</div>';
- h+='<div class="sub">Map size</div>'+seg('sz',[[11,'Tiny'],[14,'Small'],[16,'Normal'],[18,'Large'],[20,'Huge'],[30,'Massive']],S.size)+'<div class="sub">World type</div>'+seg('mt',[['random','Random'],['drylands','Drylands'],['lakes','Lakes'],['pangea','Pangea'],['continents','Continents'],['archipelago','Archipelago'],['waterworld','Water World']],S.mt)+'<button class="btn sm" id="rndAll" style="margin-top:6px;width:100%">Surprise me: random size, world and tribes</button>'+'<div class="sub">Game mode</div>'+seg('md',[['perf','Perfection (30 turns)'],['dom','Domination'],['inf','Infinite']],S.mode)+'<div class="sub">Computer skill</div>'+seg('df',[[0,'Easy'],[1,'Normal'],[2,'Hard']],S.diff);
+ h+='<div class="sub">Map size</div>'+seg('sz',[[11,'Tiny'],[14,'Small'],[16,'Normal'],[18,'Large'],[20,'Huge'],[30,'Massive']],S.size)+'<div class="sub">World type</div>'+seg('mt',[['wild','Wild'],['random','Random'],['drylands','Drylands'],['lakes','Lakes'],['pangea','Pangea'],['continents','Continents'],['archipelago','Archipelago'],['waterworld','Water World']],S.mt)+'<button class="btn sm" id="rndAll" style="margin-top:6px;width:100%">Surprise me: random size, world and tribes</button>'+'<div class="sub">Game mode</div>'+seg('md',[['perf','Perfection (30 turns)'],['dom','Domination'],['inf','Infinite']],S.mode)+'<div class="sub">Computer skill</div>'+seg('df',[[0,'Easy'],[1,'Normal'],[2,'Hard']],S.diff);
  h+='<div class="row"><button class="btn" id="sBack">Back</button><button class="btn big go" id="sGo">Start!</button></div></div>';s.innerHTML=h;
  const hl=$('hl');S.slots.forEach((sl,i)=>{const tr=TRIBES[sl.t];const d=document.createElement('div');d.className='prow';const col=[tr.c,tr.sc,tr.tc||tr.sc][sl.skin|0];d.appendChild(iconCanvas(tr.unit,col[0],col[1],(tr.hat[sl.skin|0]||tr.hat[0]),52));
   const info=document.createElement('div');info.className='pi';info.innerHTML='<b>Player '+(i+1)+': '+([tr.n,tr.s,tr.s3||tr.s][sl.skin|0])+'</b><small>'+tr.perk+'</small>';d.appendChild(info);
@@ -1396,7 +1398,7 @@ function renderSetup(){const S=SETUP,s=$('setup');let h='<div class="setup"><h2>
  $('addH').onclick=()=>{const used=S.slots.map(x=>x.t);const free=TRIBES.map((_,i)=>i).filter(i=>!used.includes(i));if(!free.length||S.slots.length+S.ai>=TRIBES.length)return toast('Too many tribes');S.slots.push({t:free[0],skin:0,ai:false});renderSetup();};
  $('aim').onclick=()=>{S.ai=Math.max(S.slots.length>1?0:1,S.ai-1);renderSetup();};$('aip').onclick=()=>{if(S.slots.length+S.ai<TRIBES.length)S.ai++;renderSetup();};
  for(const[id,k,num]of[['sz','size',1],['mt','mt',0],['md','mode',0],['df','diff',1]])$(id).querySelectorAll('button').forEach(b=>b.onclick=()=>{S[k]=num?+b.dataset.v:b.dataset.v;renderSetup();});
- $('sBack').onclick=showTitle;$('sGo').onclick=startGame;$('rndAll').onclick=()=>{S.size=pick([11,14,16,18,20]);S.mt='random';S.ai=1+ri(Math.min(6,14-S.slots.length+1));for(const sl of S.slots){const used=S.slots.filter(o=>o!==sl).map(o=>o.t);const fr=TRIBES.map((_,i)=>i).filter(i=>!used.includes(i));sl.t=pick(fr);sl.skin=ri(skinCount(sl.t));}sfx('magic');renderSetup();toast('Random world! Size '+S.size+', '+S.ai+' computer tribes');};}
+ $('sBack').onclick=showTitle;$('sGo').onclick=startGame;$('rndAll').onclick=()=>{S.size=pick([11,14,16,18,20]);S.mt='wild';S.ai=1+ri(Math.min(6,14-S.slots.length+1));for(const sl of S.slots){const used=S.slots.filter(o=>o!==sl).map(o=>o.t);const fr=TRIBES.map((_,i)=>i).filter(i=>!used.includes(i));sl.t=pick(fr);sl.skin=ri(skinCount(sl.t));}sfx('magic');renderSetup();toast('Wild random world! Size '+S.size+', '+S.ai+' computer tribes. Every Wild map is different.');};}
 function tribePicker(i){const S=SETUP;const s=$('setup');let h='<div class="setup"><h2>Pick a tribe for Player '+(i+1)+'</h2><div class="tgrid">';
  TRIBES.forEach((tr,ti)=>{const taken=S.slots.some((x,j)=>j!==i&&x.t===ti);h+='<div class="tcard'+(taken?' taken':'')+'"><div class="pics" data-ti="'+ti+'"></div><b>'+tr.n+'</b><small>'+tr.like+'</small><div class="skins">'+[0,1,2].slice(0,skinCount(ti)).map(sk=>{const cc=[tr.c,tr.sc,tr.tc][sk][0],nm=[tr.n,tr.s,tr.s3][sk];return'<button class="btn sm" data-t="'+ti+'" data-s="'+sk+'" style="background:'+cc+';color:'+(lum(cc)>.6?'#222':'#fff')+'">'+nm+'</button>';}).join('')+'</div><small class="perk">'+tr.perk+'</small></div>';});
  h+='</div><button class="btn" id="pBack">Back</button></div>';s.innerHTML=h;s.scrollTop=0;
