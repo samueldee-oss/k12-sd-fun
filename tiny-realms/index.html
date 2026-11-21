@@ -28,8 +28,11 @@ html,body{margin:0;height:100%;overflow:hidden;background:#123552;font-family:sy
 .bb .bi{font-size:16px;line-height:1;opacity:.9}
 #techBtn{background:#2d6cdf}#nextBtn{background:#7a5ad8}#nextBtn.dim{background:#4a5568}#endBtn{background:#27ae60;flex:1.3}#endBtn.dis{background:#4a5568;pointer-events:none}
 #endBtn.pulse{animation:pl 1.2s infinite}@keyframes pl{50%{box-shadow:0 0 0 6px #6aff9a88,0 4px 0 #0007}}
-.dip .drow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #ffffff18}.dn{flex:1}.dn small{display:block;font-size:12px}.pc{color:#7affa0}.wr{color:#ffb0a0}.db{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.dip .drow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #ffffff18}.dn{flex:1}.dn small{display:block;font-size:12px}.pc{color:#7affa0}.wr{color:#ffb0a0}.db{display:flex;gap:6px;flex-wrap:wrap;width:100%;padding-left:20px}.db:empty{display:none}
 #tribeBtn{background:#d08a2a}
+.mood{display:flex;align-items:center;gap:8px;margin-top:5px}.mbar{position:relative;flex:1;height:10px;border-radius:5px;background:linear-gradient(90deg,#ff5050,#ffa04a 30%,#ffe14a 50%,#b8ff6a 70%,#4aff7a);box-shadow:inset 0 0 0 1px #0006}
+.mk{position:absolute;top:-4px;width:6px;height:18px;margin-left:-3px;border-radius:3px;background:#fff;box-shadow:0 0 0 2px #0008}.ml{font-weight:800;font-size:13px;min-width:62px}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}.mtag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px;cursor:pointer}.mtag.g{background:#1f6a3a;color:#bfffd0}.mtag.b{background:#6a1f1f;color:#ffc8c8}.mtag.n{background:#ffffff18;color:#ccd}
 .recap{max-height:55vh;overflow:auto}.rt{margin:8px 0}.rt ul{margin:4px 0 0 0;padding-left:20px;font-size:14px}.rt li{margin:2px 0}.rt li.bad{color:#ff8a8a;font-weight:700}
 #panel{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 78px);background:#0d1a2cf2;border-top:2px solid #ffffff30;padding:10px 10px calc(env(safe-area-inset-bottom) + 10px);display:none;max-height:42vh;overflow:auto;z-index:5;border-radius:14px}
 .ph{padding-right:30px;font-size:15px}
@@ -558,12 +561,35 @@ function rk(a,b){return a<b?a+'-'+b:b+'-'+a;}
 function rel(a,b){if(!G.rel)G.rel={};return G.rel[rk(a,b)]||(G.rel[rk(a,b)]={s:'war',t:0,emb:{},hit:{}});}
 function atPeace(a,b){return a!==b&&G.rel&&G.rel[rk(a,b)]&&G.rel[rk(a,b)].s==='peace';}
 function makePeace(a,b){const r=rel(a,b);r.s='peace';r.t=G.turn;logEv(a,pname(P(a))+' and '+pname(P(b))+' made peace',b,'peace');}
-function declareWar(a,b){const r=rel(a,b);r.s='war';r.t=G.turn;r.emb={};r.hit[a]=G.turn;r.brk=G.turn;logEv(a,pname(P(a))+' declared war on '+pname(P(b))+'!',b,'war');}
+function declareWar(a,b){const r=rel(a,b);if(r.s==='peace')r.brkBy=a;r.s='war';r.t=G.turn;r.emb={};r.hit[a]=G.turn;r.brk=G.turn;logEv(a,pname(P(a))+' declared war on '+pname(P(b))+'!',b,'war');}
 function noteHit(a,b){const r=rel(a,b);r.hit[a]=G.turn;}
-function peaceChance(from,to){const r=rel(from,to);let c=.55;if(score(P(to))<score(P(from)))c+=.25;if(r.hit[from]&&G.turn-r.hit[from]<4)c-=.45;if(r.brk&&G.turn-r.brk<8)c-=.3;return Math.max(.05,Math.min(.95,c));}
+function peaceChance(from,to){const m=moodOf(to,from);let c=.45+m.v/120;if(power(from)>power(to)*1.6)c+=.15;return Math.max(.03,Math.min(.95,c));}
 function offerPeace(from,to){if(!P(from).techs.strategy)return'Needs Strategy';const ok=rnd()<peaceChance(from,to);if(ok)makePeace(from,to);else logEv(to,pname(P(to))+' refused peace with '+pname(P(from)),from,'refuse');return ok?'yes':'no';}
 function buildEmbassy(a,b){const p=P(a);if(!p.techs.diplomacy||!atPeace(a,b)||p.stars<5)return false;p.stars-=5;rel(a,b).emb[a]=1;logEv(a,pname(p)+' built an embassy with '+pname(P(b)),b,'emb');return true;}
 function embassyIncome(i){let s=0;if(!G.rel)return 0;for(const k in G.rel){const r=G.rel[k];if(r.s!=='peace')continue;const[a,b]=k.split('-').map(Number);if(a!==i&&b!==i)continue;const o=a===i?b:a;if(r.emb[i])s++;if(r.emb[o])s++;}return s;}
+
+// ----- moods: how tribe a feels about tribe b -----
+function power(i){let s=0;for(const u of G.units)if(u.owner===i&&UD(u).a>0)s+=(UNITS[u.base||u.type].c||4)*usz(u);return s;}
+function fought(a,b,turns){const r=G.rel&&G.rel[rk(a,b)];if(!r)return false;return(r.hit[a]&&G.turn-r.hit[a]<=turns)||(r.hit[b]&&G.turn-r.hit[b]<=turns);}
+function moodOf(a,b){// how a thinks of b
+ const r=rel(a,b);let v=0;const tags=[];const add=(t,n,good,why)=>{v+=n;tags.push({t,good,why});};
+ if(r.s==='peace'){add('Friendly',20,1,'You are at peace with them');if(G.turn-r.t>=10)add('Peaceful',10,1,'Your peace has lasted a long time');}
+ if(r.emb[b])add('Generous',15,1,'You built an embassy with them');
+ if(r.hit[b]&&G.turn-r.hit[b]<=5)add('Aggressive',-30,0,'You attacked them recently');
+ if(r.brkBy===b&&G.turn-r.brk<=15)add('Backstabber',-35,0,'You broke a peace treaty with them');
+ let near=0;for(const u of G.units){if(u.owner!==b||UD(u).a<=0)continue;const t=T(u.x,u.y);if(tileOwner(t)===a||nbrs(u.x,u.y).some(([x,y])=>tileOwner(T(x,y))===a))near++;}
+ if(near&&r.s!=='peace')add('Threatening',-Math.min(30,10*near),0,near+' of your fighters '+(near>1?'are':'is')+' at their borders');
+ let foolish=0,brave=0;for(const q of G.players){if(q.i===a||q.i===b||!q.alive)continue;const theirEnemy=fought(a,q.i,6)&&!atPeace(a,q.i),theirFriend=atPeace(a,q.i);
+  if(theirEnemy&&atPeace(b,q.i))foolish++;if(theirFriend&&fought(b,q.i,6)&&!atPeace(b,q.i))foolish++;if(theirEnemy&&fought(b,q.i,6)&&!atPeace(b,q.i))brave++;}
+ if(foolish>brave)add('Foolish',-15,0,'You made peace with their enemies or fight their friends');
+ else if(brave>foolish)add('Brave',10,1,'You fight their enemies too');
+ const pa=power(a),pb=power(b);
+ if(pb<pa*.5&&pa>6)add('Weak',-10,0,'Your army is much smaller than theirs');
+ else if(pb>pa*1.6&&pb>6)add('Powerful',8,1,'Your army is much bigger than theirs');
+ if(score(P(b))>score(P(a))*1.5)add('Envious',-8,0,'You are doing way better than them');
+ v=Math.max(-100,Math.min(100,v));
+ const label=v>=40?'Great':v>=15?'Decent':v>-15?'Neutral':v>-40?'Bad':'Horrible';
+ return{v,label,tags};}
 // ----- lighthouses -----
 function checkLighthouses(u){const p=P(u.owner);if(!p.lh)p.lh=[];const r=(T(u.x,u.y).ter==='mountain'||has(u,'sight'))?2:1;
  for(const L of G.lights||[]){if(p.lh.includes(L[0]+','+L[1]))continue;if(dist(u.x,u.y,L[0],L[1])<=r){p.lh.push(L[0]+','+L[1]);reveal(p,L[0],L[1],3);p.stars+=3;fx(L[0],L[1],'Lighthouse found!','#ffe14a');logEv(p.i,pname(p)+' found a lighthouse',-1,'lh');if(p.lh.length===4){p.stars+=10;logEv(p.i,pname(p)+' found all 4 lighthouses!',-1,'lh');if(!p.ai&&typeof toast==='function')toast('All 4 lighthouses found! +10');}}}}
@@ -709,8 +735,8 @@ function aiSpend(p){
   if(!opts.length)break;opts.sort((a,b)=>b.v-a.v);const o=opts[0];if(o.v<.12)break;if(o.f()===false)break;}
 }
 function aiDiplomacy(p){for(const q of G.players){if(q.i===p.i||!q.alive)continue;const r=rel(p.i,q.i);
-  if(r.s==='war'&&p.techs.strategy&&rnd()<.03&&!(r.hit[q.i]&&G.turn-r.hit[q.i]<3)&&G.turn-(r.brk||-99)>6){if(q.ai){if(rnd()<peaceChance(p.i,q.i))makePeace(p.i,q.i);}else{if(!G.offers)G.offers=[];if(!G.offers.some(o=>o.from===p.i&&o.to===q.i))G.offers.push({from:p.i,to:q.i});}}
-  else if(r.s==='peace'&&G.turn-r.t>6&&rnd()<.02&&score(p)>score(q)*1.4){declareWar(p.i,q.i);r.brk=G.turn;}
+  if(r.s==='war'&&p.techs.strategy&&rnd()<(moodOf(p.i,q.i).v>=15?.12:.03)&&!(r.hit[q.i]&&G.turn-r.hit[q.i]<3)&&G.turn-(r.brk||-99)>6){if(q.ai){if(rnd()<peaceChance(p.i,q.i))makePeace(p.i,q.i);}else{if(!G.offers)G.offers=[];if(!G.offers.some(o=>o.from===p.i&&o.to===q.i))G.offers.push({from:p.i,to:q.i});}}
+  else if(r.s==='peace'&&G.turn-r.t>6){const m=moodOf(p.i,q.i);const ch=m.v<=-40?.12:m.v<-15?.05:(m.tags.some(t=>t.t==='Weak')?.03:.005);if(rnd()<ch){declareWar(p.i,q.i);}}
   else if(r.s==='peace'&&p.techs.diplomacy&&!r.emb[p.i]&&p.stars>12)buildEmbassy(p.i,q.i);}}
 function aiTurn(p){const claimed=new Set();aiDiplomacy(p);
  const my=G.units.filter(u=>u.owner===p.i);
@@ -1299,11 +1325,14 @@ function openTribes(){if(!G||busy)return;const p=humanP();if(!p||p.ai)return;
  let h='<h2>Tribes</h2><p class="sk">'+(p.techs.strategy?'You can offer peace.':'Learn <b>Strategy</b> to offer peace.')+' '+(p.techs.diplomacy?'You can build embassies (+1 '+curName(p)+' each turn for both).':'<b>Diplomacy</b> lets you build embassies.')+'</p><div class="dip">';
  for(const q of G.players){if(q.i===p.i)continue;const met=metTribe(p,q);const[c1]=pcol(q);const r=rel(p.i,q.i);
   let st=!q.alive?'Destroyed':!met?'Not met yet':r.s==='peace'?'At peace':'At war';
-  h+='<div class="drow"><span class="dot" style="background:'+(met?c1:'#777')+'"></span><div class="dn"><b>'+(met?pname(q):'Unknown tribe')+'</b><small class="'+(r.s==='peace'?'pc':'wr')+'">'+st+(met&&q.alive?' &middot; score '+score(q):'')+(r.emb[p.i]?' &middot; your embassy':'')+(r.emb[q.i]?' &middot; their embassy':'')+'</small></div><div class="db">';
+  let md='';if(met&&q.alive&&q.ai){const m=moodOf(q.i,p.i);const pos=(m.v+100)/2;const lc={Great:'#4aff7a',Decent:'#b8ff6a',Neutral:'#ffe14a',Bad:'#ffa04a',Horrible:'#ff5050'}[m.label];
+   md='<div class="mood"><div class="mbar"><div class="mk" style="left:'+pos+'%"></div></div><span class="ml" style="color:'+lc+'">'+m.label+'</span></div><div class="tags">'+(m.tags.length?m.tags.map(t=>'<span class="mtag '+(t.good?'g':'b')+'" title="'+t.why+'">'+t.t+'</span>').join(''):'<span class="mtag n">No strong feelings yet</span>')+'</div>';}
+  h+='<div class="drow"><span class="dot" style="background:'+(met?c1:'#777')+'"></span><div class="dn"><b>'+(met?pname(q):'Unknown tribe')+'</b><small class="'+(r.s==='peace'?'pc':'wr')+'">'+st+(met&&q.alive?' &middot; score '+score(q):'')+(r.emb[p.i]?' &middot; your embassy':'')+(r.emb[q.i]?' &middot; their embassy':'')+'</small>'+md+'</div><div class="db">';
   if(met&&q.alive){if(r.s==='war')h+='<button class="btn sm'+(p.techs.strategy?'':' dis')+'" data-peace="'+q.i+'">Offer peace</button>';
    else{h+='<button class="btn sm red" data-war="'+q.i+'">Declare war</button>';if(!r.emb[p.i])h+='<button class="btn sm'+(p.techs.diplomacy&&p.stars>=5?'':' dis')+'" data-emb="'+q.i+'">Embassy '+CUR()+'5</button>';}}
   h+='</div></div>';}
  h+='</div>';const box=modal(h,[['Close',()=>{updHud();showPanel();}]]);
+ box.querySelectorAll('.mtag[title]').forEach(t=>t.onclick=()=>toast(t.textContent+': '+t.title));
  box.querySelectorAll('[data-peace]').forEach(b=>b.onclick=()=>{const q=+b.dataset.peace;const res=offerPeace(p.i,q);toast(res==='yes'?pname(P(q))+' said YES to peace!':res==='no'?pname(P(q))+' refused peace.':res);sfx(res==='yes'?'city':'click');$('modal').style.display='none';dirty=true;openTribes();});
  box.querySelectorAll('[data-war]').forEach(b=>b.onclick=()=>{const q=+b.dataset.war;declareWar(p.i,q);toast('You declared war on '+pname(P(q))+'!');sfx('hit');$('modal').style.display='none';dirty=true;openTribes();});
  box.querySelectorAll('[data-emb]').forEach(b=>b.onclick=()=>{const q=+b.dataset.emb;if(buildEmbassy(p.i,q)){toast('Embassy built!');sfx('build');}$('modal').style.display='none';updHud();openTribes();});}
