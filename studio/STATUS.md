@@ -54,7 +54,7 @@ A comparison of the Bank Game versions (features, fun, systems lessons) is in `t
 
 ## Recent changes
 
-- 2026-11-21: Tiny Realms: Glacira (ice tribe) has no ports, rafts or boats, like Polaris; Snowlings freezing water is how they cross it. Commit `COMMIT`.
+- 2026-11-21: Tiny Realms: Glacira (ice tribe) has no ports, rafts or boats, like Polaris; Snowlings freezing water is how they cross it. Commit `7665d33`.
 - 2026-11-21: Tiny Realms: new Wild world type, used by 'Surprise me': random water amount, smoothness, land shape, mountain/forest/field mix, resources and ruins, so every Wild map is different. Commit `3dea471`.
 - 2026-11-21: Tiny Realms: Guru/Shaman and Cloak get Dash (can act after moving). Commit `87d758e`.
 - 2026-11-21: Tiny Realms: tribe mood meter in the Tribes screen (Horrible/Bad/Neutral/Decent/Great) with reasons (Friendly, Peaceful, Generous, Brave, Powerful / Aggressive, Backstabber, Threatening, Foolish, Weak, Envious); AI peace offers, acceptance and war declarations now follow the mood. Commit `835b291`.
