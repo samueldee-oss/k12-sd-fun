@@ -1,5 +1,5 @@
 <!doctype html><html><head>
-<script>/* iPad/iPhone Safari shows "It looks like you are typing" in real full screen, so skip it there (Home Screen apps are already full screen) */(function(){var ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(!ios)return;var noop=function(){return Promise.resolve();};Element.prototype.requestFullscreen=noop;Element.prototype.webkitRequestFullscreen=noop;Element.prototype.webkitRequestFullScreen=noop;})();</script><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><!-- home-screen-app -->
+<script>/* iPad/iPhone Safari shows "It looks like you are typing" in real full screen, so skip it there (Home Screen apps are already full screen) */(function(){var ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(!ios)return;var noop=function(){return Promise.resolve();};Element.prototype.requestFullscreen=noop;Element.prototype.webkitRequestFullscreen=noop;Element.prototype.webkitRequestFullScreen=noop;})();</script><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><!-- home-screen-app -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=29063f14">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=29063f14">
@@ -34,6 +34,7 @@ body{
   -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; -webkit-tap-highlight-color:transparent;
 }
 *,*::before,*::after{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
+html,body{touch-action:manipulation}
 button{touch-action:manipulation}
 .wrap{width:min(100%, 960px, calc((100dvh - 250px) * 1.5)); min-width:min(100%, 320px); display:flex; flex-direction:column; gap:10px}
 .top{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap}
@@ -281,11 +282,20 @@ const GUP = spr(GIRL_TOP, GP);
 
 /* ---------- audio ---------- */
 let AC = null, muted = false, nextT = 0, step = 0;
+let audioKicked = false;
 function ensureAudio() {
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (_) {}  // play even with the iPhone silent switch on
   if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { AC = null; } }
-  if (AC && AC.state === 'suspended') AC.resume();
-  if (AC && nextT === 0) nextT = AC.currentTime + 0.1;
+  if (!AC) return;
+  if (AC.state !== 'running') { try { AC.resume(); } catch (_) {} }
+  if (!audioKicked) {  // a silent blip unlocks sound on iPhone and iPad
+    audioKicked = true;
+    try { const b = AC.createBuffer(1, 1, 22050), src = AC.createBufferSource(); src.buffer = b; src.connect(AC.destination); src.start(0); } catch (_) {}
+  }
+  if (nextT === 0 || nextT < AC.currentTime) nextT = AC.currentTime + 0.1;
 }
+['touchend', 'click', 'keydown'].forEach(ev => document.addEventListener(ev, ensureAudio, {passive:true}));
+document.addEventListener('visibilitychange', () => { if (!document.hidden && AC && AC.state !== 'running') { try { AC.resume(); } catch (_) {} } });
 function tone(f, d, type = 'square', v = 0.05, f2 = null, at = null) {
   if (!AC || muted) return;
   const t0 = at == null ? AC.currentTime : at;
@@ -331,10 +341,14 @@ function musicTick() {
   const tr = state === 'title' ? 0 : [0, 2, 5, 7, 3, -3, 2, -5][levelIdx];
   while (nextT < AC.currentTime + 0.2) {
     if (nextT < AC.currentTime) nextT = AC.currentTime + 0.05;
-    const n = LEAD[step % 32];
-    if (n) tone(mtof(n + tr), 0.14, 'square', 0.018, null, nextT);
-    if (step % 4 === 0) tone(mtof(BASS[(step / 4 | 0) % 8] + tr), 0.5, 'triangle', 0.05, null, nextT);
-    nextT += 0.16; step++;
+    const n = LEAD[step % 32], bass = BASS[(step / 4 | 0) % 8] + tr;
+    if (n) {
+      tone(mtof(n + tr), 0.13, 'triangle', 0.05, null, nextT);
+      if (step % 2 === 0) tone(mtof(n + tr + 12), 0.09, 'sine', 0.018, null, nextT);   // little bell sparkle
+    }
+    if (step % 4 === 0) tone(mtof(bass), 0.28, 'sine', 0.07, null, nextT);
+    if (step % 4 === 2) tone(mtof(bass + 19), 0.08, 'triangle', 0.022, null, nextT);   // light off-beat bounce
+    nextT += 0.15; step++;
   }
 }
 
@@ -354,6 +368,18 @@ let tapPos = null;
 cv.addEventListener('pointerdown', e => { e.preventDefault(); ensureAudio(); cv.focus(); tapped = true; const r = cv.getBoundingClientRect(); tapPos = {x:(e.clientX - r.left) / r.width * W, y:(e.clientY - r.top) / r.height * H}; });
 // touch pad: remember which finger holds which button, and let go on ANY lift, anywhere on the page
 const padBtns = [...document.querySelectorAll('[data-k]')];
+(function noZoom() {
+  try { const vm = document.querySelector('meta[name=viewport]'); if (vm) vm.setAttribute('content', 'width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover'); } catch (_) {}
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(ev => document.addEventListener(ev, e => e.preventDefault(), {passive:false}));
+  document.addEventListener('touchmove', e => { if (e.touches.length > 1 || (e.scale !== undefined && e.scale !== 1)) e.preventDefault(); }, {passive:false});
+  let lastEnd = 0;
+  document.addEventListener('touchend', e => {
+    const now = Date.now();
+    if (now - lastEnd < 350 && !(e.target.closest && e.target.closest('#mute, #fsbtn, #lvbtn'))) e.preventDefault();
+    lastEnd = now;
+  }, {passive:false});
+  document.addEventListener('dblclick', e => e.preventDefault(), {passive:false});
+})();
 const padPtr = new Map();
 function padSync() {
   for (const b of padBtns) { const k = b.dataset.k, on = [...padPtr.values()].includes(k); K[k] = on; b.classList.toggle('on', on); }
