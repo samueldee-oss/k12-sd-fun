@@ -4,7 +4,7 @@ Everything is in one file, [`index.html`](index.html) (HTML, CSS and JavaScript;
 The only outside resource is two Google Fonts (Press Start 2P and VT323); without internet it falls back to a monospace font.
 This guide explains how the file is organized, how it changed over time, and how to check or rebuild it.
 
-**Current file:** published as claude.ai artifact version 1794234071-72fd (publish #110) on 2026-11-09; 70 worlds, 341 levels.
+**Current file:** published as claude.ai artifact version 1795737282-9ea5 (publish #112) on 2026-11-26; 70 worlds, 341 levels.
 Line numbers in the map below are from version 53 and have shifted; search for the names instead.
 The artifact page and this repo copy contain the same game; the repo copy adds a small `<!doctype html>` wrapper around it.
 
@@ -89,6 +89,7 @@ The rounds match the plan iterations in [`PLAN.md`](PLAN.md#7-plan-iterations).
 | 107–108 | 2026-11-08 | 31b | Other session: `luggage`, `wagon`, `minecart` mover sprites (`MOVK` 27, 61, 62, 63); secret cats moved into the secret lobby with unique lines (`SRL`, `SR_LW` sizes the lounge); repo phone fixes merged in. Tests: smoke (341 levels, 0 errors) and mechanics all OK. |
 | 109 | 2026-11-09 | 33 | Built on 1794197392-7fa5. VIP → Secret Lounge wording. `WORDER` puts 62–70 after 61, `LASTW`=70, `CUTS[61]` portal, story text for the new order (`WARP` 61/62, `LORE` 61/70), save fix `save.lv70b`. Secret skins for worlds 7, 25, 27, 34, 47, 61 (`sx7` Drizzle, `sx25` Circuit, `sx27` Room Service, `sx34` Croissant, `sx47` Torchlight, `sx61` Confetti; their chicken/sheep/puppy/penguin and secret hats are generated as before), so all 70 worlds have one. Secret level is now `SECRETLV(w)` (last non-climb, non-lobby level); 'step' pockets always have ground under them. Hint animals in every world; jump next to one to talk (`hintN`). Checked: 341 levels load with no errors (artifact and repo copies), `smoke.js` 0 errors, `mechanics.js` 15/15, every world has a secret and a hint animal, a simple bot following the directions collected the secret in 60 of 70 worlds; the other 10 (wind, bouncy floors, floaty gravity, clouds, and the four 'step' pockets) were collected by starting just past the fish, talking and the Yes/No question were tried with screenshots, save fix tested. |
 | 110 | 2026-11-09 | 33 | Merged the repo-only commit c4f45c6 (another session: wider full-screen view up to 720 game pixels with `wideVW`/`setVW`, ⏩ AUTO run button saved in `whiskerdash_auto`, wind/gravity/noise meters moved to the top) into the published game, so the artifact and repo match again. Black Sand Beach basalt pillars now fill a wide screen. Same checks as 109 passed on the merged file. |
+| 109–112 | 2026-11-12 to 11-26 | – | Other sessions: radio, more accessories and booths. Then (112): secret-location hints removed. Repo copy rebuilt from 112 (keeps the no-pinch-zoom viewport). Smoke (341 levels, 0 errors) and mechanics OK. |
 
 ## 5. How it was tested
 
