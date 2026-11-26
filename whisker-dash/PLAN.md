@@ -154,7 +154,7 @@ Once you have visited the lobby in a run, most later levels have a floating **LO
 ### Hotel Lobby 2 (world 61)
 The same hub rebuilt as the "new wing": the Bellhop, Librarian, guards and Queen get new lines (`bellhop2`, `librarian2`, …, via `L2K`),
 friends get `linesFor2()` lines, and past the fair there is a **ball pit** (foam tiles `O` at `BALLC`) and a **Gelato Cat** stand.
-Entering it unlocks **Hand-Drawn mode** (toggle on the title screen or pause menu). The Bellhop hints that "some walls are not as solid as they look".
+Entering it unlocks **Hand-Drawn mode** (toggle on the title screen or pause menu). The Bellhop keeps the new wing's secrets to himself.
 
 ### 🤫 Spoiler: the secret lobby (developer notes; the designer asked not to be told where it is)
 Lobby 2's far-right end wall is fake (tile `W`: drawn like `#`, not solid). Walking into it leads to a hidden **secret lobby**
@@ -182,7 +182,7 @@ The camera is clamped (`srCam`) so the room can't be seen from outside. The old 
 | Geysers | Lab, Yellowstone, Lab II, Iceland | Erupt on a timer. |
 | Open-pit terraces (`pit` style) | Copper Mine | `pitSegs()`: climb onto the rim, walk DOWN terrace after terrace to the lake at the bottom, then climb terraces back UP to the fish on the far rim. Spikes always leave two safe tiles each side; gaps never sit next to a spiked terrace. |
 | Mine galleries | Gold Mine (levels 2–4) | `galleryGrid(floors)`: a vertical level of stacked tunnel floors (4, 5, 6). Start at the bottom, cross each floor past spikes, rocks and holes (a hole drops you one floor), and climb a ladder at the far end to the next floor; the fish is at the surface. Checkpoint every second floor. |
-| Secrets and hint animals | Every world | Each world's secret family (cat, chicken, sheep, puppy, penguin, `sx`…`sxp` + a secret hat `sa`) hides in a pocket behind a fake wall, up high, under a fake floor, or under the steps past the fish of its last ordinary level (`SECRETLV`, `SECRETKIND`). Worlds made only of climbs (Inside a PC, Eiffel Tower) hide it in the left wall at the start of the last level; Hotel Lobby in the bottom of the tall wall at the far right; Hotel Lobby 2 in the floor just right of the NEXT LEVEL portal. On the first level of every world, one of the family (cat, chicken or puppy, by world) stands near the start with a "?" bubble: press jump next to it to talk. It names the level and gives a hint, then asks "Want me to tell you EXACTLY where?" (Yes gives full directions). |
+| Secrets | Every world | Each world's secret family (cat, chicken, sheep, puppy, penguin, `sx`…`sxp` + a secret hat `sa`) hides in a pocket behind a fake wall, up high, under a fake floor, or under the steps past the fish of its last ordinary level (`SECRETLV`, `SECRETKIND`). Worlds made only of climbs (Inside a PC, Eiffel Tower) hide it in the left wall at the start of the last level; Hotel Lobby in the bottom of the tall wall at the far right; Hotel Lobby 2 in the floor just right of the NEXT LEVEL portal. Since 11-26 there are no hints: the hint animals (`makeHint`, `HINTTXT`) are switched off at the designer's request. |
 | Snowball quest | Antarctica → lobby | Grab the glowing snowball, carry it on your head, give it to the Snow Leopard. |
 
 ## 7. Plan iterations
